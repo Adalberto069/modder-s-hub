@@ -1,0 +1,113 @@
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "@/lib/auth";
+import { Button } from "@/components/ui/button";
+import { Terminal, Menu, X, User, LogOut, LayoutDashboard, Shield } from "lucide-react";
+import { useState } from "react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
+export function Navbar() {
+  const { user, profile, isModder, isAdmin, signOut } = useAuth();
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const navigate = useNavigate();
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate("/");
+  };
+
+  return (
+    <nav className="sticky top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-xl">
+      <div className="container flex h-16 items-center justify-between">
+        <Link to="/" className="flex items-center gap-2">
+          <Terminal className="h-6 w-6 text-neon-purple" />
+          <span className="text-xl font-bold font-mono tracking-tight">
+            Mod<span className="text-neon-green">Hub</span>
+          </span>
+        </Link>
+
+        {/* Desktop nav */}
+        <div className="hidden md:flex items-center gap-6">
+          <Link to="/marketplace" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+            Marketplace
+          </Link>
+          {!user ? (
+            <div className="flex gap-2">
+              <Button variant="ghost" size="sm" onClick={() => navigate("/auth")}>
+                Login
+              </Button>
+              <Button size="sm" className="neon-glow-purple" onClick={() => navigate("/auth?tab=signup")}>
+                Cadastrar
+              </Button>
+            </div>
+          ) : (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="gap-2">
+                  <User className="h-4 w-4" />
+                  {profile?.username ?? "Usuário"}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                {isModder && (
+                  <DropdownMenuItem onClick={() => navigate("/dashboard")}>
+                    <LayoutDashboard className="mr-2 h-4 w-4" />
+                    Dashboard
+                  </DropdownMenuItem>
+                )}
+                {isAdmin && (
+                  <DropdownMenuItem onClick={() => navigate("/admin")}>
+                    <Shield className="mr-2 h-4 w-4" />
+                    Admin
+                  </DropdownMenuItem>
+                )}
+                <DropdownMenuItem onClick={() => navigate(`/modder/${user.id}`)}>
+                  <User className="mr-2 h-4 w-4" />
+                  Meu Perfil
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleSignOut}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Sair
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+        </div>
+
+        {/* Mobile toggle */}
+        <button className="md:hidden" onClick={() => setMobileOpen(!mobileOpen)}>
+          {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+        </button>
+      </div>
+
+      {/* Mobile menu */}
+      {mobileOpen && (
+        <div className="md:hidden border-t border-border bg-background p-4 space-y-3">
+          <Link to="/marketplace" className="block text-sm" onClick={() => setMobileOpen(false)}>
+            Marketplace
+          </Link>
+          {!user ? (
+            <div className="flex gap-2">
+              <Button variant="ghost" size="sm" onClick={() => { navigate("/auth"); setMobileOpen(false); }}>Login</Button>
+              <Button size="sm" onClick={() => { navigate("/auth?tab=signup"); setMobileOpen(false); }}>Cadastrar</Button>
+            </div>
+          ) : (
+            <>
+              {isModder && (
+                <Link to="/dashboard" className="block text-sm" onClick={() => setMobileOpen(false)}>Dashboard</Link>
+              )}
+              {isAdmin && (
+                <Link to="/admin" className="block text-sm" onClick={() => setMobileOpen(false)}>Admin</Link>
+              )}
+              <button className="text-sm text-destructive" onClick={() => { handleSignOut(); setMobileOpen(false); }}>Sair</button>
+            </>
+          )}
+        </div>
+      )}
+    </nav>
+  );
+}
