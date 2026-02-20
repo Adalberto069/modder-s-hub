@@ -1,12 +1,14 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
-import { Terminal, Menu, X, User, LogOut, LayoutDashboard, Shield } from "lucide-react";
+import { Terminal, Menu, X, User, LogOut, LayoutDashboard, Shield, Settings } from "lucide-react";
 import { useState } from "react";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
@@ -48,8 +50,13 @@ export function Navbar() {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="sm" className="gap-2">
-                  <User className="h-4 w-4" />
-                  {profile?.username ?? "Usuário"}
+                  <Avatar className="h-6 w-6">
+                    {profile?.avatar_url ? <AvatarImage src={profile.avatar_url} alt="" /> : null}
+                    <AvatarFallback className="bg-secondary text-[10px]">
+                      {(profile?.username ?? "U").charAt(0).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  {profile?.display_name ?? profile?.username ?? "Usuário"}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
@@ -69,6 +76,11 @@ export function Navbar() {
                   <User className="mr-2 h-4 w-4" />
                   Meu Perfil
                 </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate("/profile/settings")}>
+                  <Settings className="mr-2 h-4 w-4" />
+                  Configurações
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleSignOut}>
                   <LogOut className="mr-2 h-4 w-4" />
                   Sair
