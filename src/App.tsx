@@ -11,6 +11,7 @@ import ScriptDetail from "./pages/ScriptDetail";
 import ModderProfile from "./pages/ModderProfile";
 import Dashboard from "./pages/Dashboard";
 import Admin from "./pages/Admin";
+import ProfileSettings from "./pages/ProfileSettings";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -30,6 +31,7 @@ const App = () => (
             <Route path="/modder/:userId" element={<ModderProfile />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/admin" element={<Admin />} />
+            <Route path="/profile/settings" element={<ProfileSettings />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
