@@ -1,13 +1,20 @@
+import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Layout } from "@/components/layout/Layout";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Textarea } from "@/components/ui/textarea";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { supabase } from "@/integrations/supabase/client";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth";
-import { Download, Star, ExternalLink, ArrowLeft, User } from "lucide-react";
+import {
+  Download, Star, ExternalLink, ArrowLeft, User, ShieldCheck,
+  ChevronLeft, ChevronRight, Play, MessageSquare,
+} from "lucide-react";
 import { toast } from "sonner";
+import { motion, AnimatePresence } from "framer-motion";
 
 const statusConfig: Record<string, { label: string; className: string }> = {
   working: { label: "Working", className: "bg-neon-green/20 text-neon-green border-neon-green/30" },
@@ -15,9 +22,50 @@ const statusConfig: Record<string, { label: string; className: string }> = {
   updating: { label: "Updating", className: "bg-neon-cyan/20 text-neon-cyan border-neon-cyan/30" },
 };
 
+function YouTubeEmbed({ url }: { url: string }) {
+  const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/))([a-zA-Z0-9_-]{11})/);
+  if (!match) return null;
+  return (
+    <div className="aspect-video rounded-lg overflow-hidden neon-border">
+      <iframe
+        src={`https://www.youtube.com/embed/${match[1]}`}
+        className="w-full h-full"
+        allowFullScreen
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+      />
+    </div>
+  );
+}
+
+function StarRating({ rating, onRate, interactive = false }: { rating: number; onRate?: (r: number) => void; interactive?: boolean }) {
+  const [hover, setHover] = useState(0);
+  return (
+    <div className="flex gap-1">
+      {[1, 2, 3, 4, 5].map((i) => (
+        <Star
+          key={i}
+          className={`h-5 w-5 transition-colors ${
+            (interactive ? hover || rating : rating) >= i
+              ? "fill-neon-green text-neon-green"
+              : "text-muted-foreground/30"
+          } ${interactive ? "cursor-pointer" : ""}`}
+          onClick={() => interactive && onRate?.(i)}
+          onMouseEnter={() => interactive && setHover(i)}
+          onMouseLeave={() => interactive && setHover(0)}
+        />
+      ))}
+    </div>
+  );
+}
+
 export default function ScriptDetail() {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
+  const queryClient = useQueryClient();
+  const [galleryIndex, setGalleryIndex] = useState(0);
+  const [newRating, setNewRating] = useState(0);
+  const [newComment, setNewComment] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
   const { data: script } = useQuery({
     queryKey: ["script", id],
@@ -41,18 +89,93 @@ export default function ScriptDetail() {
     enabled: !!script?.modder_id,
   });
 
+  const { data: images } = useQuery({
+    queryKey: ["script-images", id],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("script_images")
+        .select("*")
+        .eq("script_id", id!)
+        .order("sort_order");
+      return data ?? [];
+    },
+    enabled: !!id,
+  });
+
+  const { data: reviews } = useQuery({
+    queryKey: ["script-reviews", id],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("reviews")
+        .select("*")
+        .eq("script_id", id!)
+        .order("created_at", { ascending: false });
+      return data ?? [];
+    },
+    enabled: !!id,
+  });
+
+  // Fetch reviewer profiles
+  const reviewerIds = [...new Set(reviews?.map((r: any) => r.user_id) ?? [])];
+  const { data: reviewerProfiles } = useQuery({
+    queryKey: ["reviewer-profiles", reviewerIds],
+    queryFn: async () => {
+      if (reviewerIds.length === 0) return [];
+      const { data } = await supabase.from("profiles").select("*").in("user_id", reviewerIds);
+      return data ?? [];
+    },
+    enabled: reviewerIds.length > 0,
+  });
+
+  const profileMap = (reviewerProfiles ?? []).reduce((acc: any, p: any) => {
+    acc[p.user_id] = p;
+    return acc;
+  }, {});
+
   const handleDownload = async () => {
     if (!script) return;
-
-    // Increment download count
     await supabase.from("scripts").update({ download_count: script.download_count + 1 }).eq("id", script.id);
-
-    if (script.file_url) {
-      window.open(script.file_url, "_blank");
-    } else if (script.external_link) {
-      window.open(script.external_link, "_blank");
-    }
+    if (script.file_url) window.open(script.file_url, "_blank");
+    else if (script.external_link) window.open(script.external_link, "_blank");
     toast.success("Download iniciado!");
+  };
+
+  const handleReview = async () => {
+    if (!user || !script || newRating === 0) {
+      toast.error("Selecione uma avaliação de 1 a 5 estrelas.");
+      return;
+    }
+    setSubmitting(true);
+
+    const existing = reviews?.find((r: any) => r.user_id === user.id);
+    if (existing) {
+      await supabase.from("reviews").update({ rating: newRating, comment: newComment || null }).eq("id", existing.id);
+      toast.success("Avaliação atualizada!");
+    } else {
+      const { error } = await supabase.from("reviews").insert({
+        script_id: script.id,
+        user_id: user.id,
+        rating: newRating,
+        comment: newComment || null,
+      });
+      if (error) {
+        toast.error(error.message);
+        setSubmitting(false);
+        return;
+      }
+      toast.success("Avaliação enviada!");
+    }
+
+    // Recalculate average
+    const allReviews = [...(reviews ?? []).filter((r: any) => r.user_id !== user.id), { rating: newRating }];
+    const avg = allReviews.reduce((s: number, r: any) => s + r.rating, 0) / allReviews.length;
+    await supabase.from("scripts").update({ average_rating: avg, total_ratings: allReviews.length }).eq("id", script.id);
+
+    setNewComment("");
+    setNewRating(0);
+    setSubmitting(false);
+    queryClient.invalidateQueries({ queryKey: ["script-reviews", id] });
+    queryClient.invalidateQueries({ queryKey: ["script", id] });
   };
 
   if (!script) {
@@ -64,10 +187,14 @@ export default function ScriptDetail() {
   }
 
   const st = statusConfig[script.status] ?? statusConfig.working;
+  const allMedia = [
+    ...(script.thumbnail_url ? [{ type: "image" as const, url: script.thumbnail_url }] : []),
+    ...(images ?? []).map((img: any) => ({ type: "image" as const, url: img.image_url })),
+  ];
 
   return (
     <Layout>
-      <div className="container py-8 max-w-4xl">
+      <div className="container py-8 max-w-5xl">
         <Link to="/marketplace" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6">
           <ArrowLeft className="h-4 w-4" /> Voltar ao Marketplace
         </Link>
@@ -75,25 +202,142 @@ export default function ScriptDetail() {
         <div className="grid md:grid-cols-3 gap-6">
           {/* Main content */}
           <div className="md:col-span-2 space-y-6">
+            {/* Title */}
             <div>
-              <div className="flex items-start gap-3 mb-2">
+              <div className="flex items-start gap-3 mb-2 flex-wrap">
                 <h1 className="text-2xl font-bold flex-1">{script.title}</h1>
-                <Badge variant="outline" className={st.className}>{st.label}</Badge>
+                <div className="flex gap-2 shrink-0">
+                  {script.is_verified && (
+                    <Badge className="bg-neon-cyan/20 text-neon-cyan border-neon-cyan/30 gap-1">
+                      <ShieldCheck className="h-3 w-3" /> Verificado
+                    </Badge>
+                  )}
+                  <Badge variant="outline" className={st.className}>{st.label}</Badge>
+                </div>
               </div>
               {script.categories && (
-                <Badge variant="secondary" className="text-xs">{script.categories.name}</Badge>
+                <Badge variant="secondary" className="text-xs">{(script.categories as any).name}</Badge>
               )}
             </div>
 
-            {script.thumbnail_url && (
-              <div className="rounded-lg overflow-hidden neon-border">
-                <img src={script.thumbnail_url} alt={script.title} className="w-full" />
+            {/* Image Gallery */}
+            {allMedia.length > 0 && (
+              <div className="relative rounded-lg overflow-hidden neon-border group">
+                <AnimatePresence mode="wait">
+                  <motion.img
+                    key={galleryIndex}
+                    src={allMedia[galleryIndex]?.url}
+                    alt={script.title}
+                    className="w-full aspect-video object-cover"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                  />
+                </AnimatePresence>
+                {allMedia.length > 1 && (
+                  <>
+                    <button
+                      onClick={() => setGalleryIndex((p) => (p === 0 ? allMedia.length - 1 : p - 1))}
+                      className="absolute left-2 top-1/2 -translate-y-1/2 bg-background/70 rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <ChevronLeft className="h-5 w-5" />
+                    </button>
+                    <button
+                      onClick={() => setGalleryIndex((p) => (p === allMedia.length - 1 ? 0 : p + 1))}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 bg-background/70 rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <ChevronRight className="h-5 w-5" />
+                    </button>
+                    <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
+                      {allMedia.map((_, i) => (
+                        <button
+                          key={i}
+                          onClick={() => setGalleryIndex(i)}
+                          className={`w-2 h-2 rounded-full transition-colors ${i === galleryIndex ? "bg-primary" : "bg-muted-foreground/40"}`}
+                        />
+                      ))}
+                    </div>
+                  </>
+                )}
               </div>
             )}
 
-            <div className="prose prose-invert max-w-none">
-              <p className="text-muted-foreground whitespace-pre-wrap">{script.description ?? "Sem descrição."}</p>
+            {/* Video */}
+            {script.video_url && (
+              <div>
+                <h3 className="text-sm font-semibold mb-2 flex items-center gap-2">
+                  <Play className="h-4 w-4 text-neon-pink" /> Demonstração
+                </h3>
+                <YouTubeEmbed url={script.video_url} />
+              </div>
+            )}
+
+            {/* Description */}
+            <div>
+              <h3 className="text-sm font-semibold mb-2">Descrição</h3>
+              <p className="text-muted-foreground whitespace-pre-wrap text-sm">{script.description ?? "Sem descrição."}</p>
             </div>
+
+            {/* Reviews Section */}
+            <Card className="neon-border bg-card/80">
+              <CardHeader>
+                <CardTitle className="text-base flex items-center gap-2">
+                  <MessageSquare className="h-4 w-4 text-neon-purple" />
+                  Avaliações ({reviews?.length ?? 0})
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {/* Leave review */}
+                {user ? (
+                  <div className="space-y-3 p-3 rounded-lg bg-secondary/30 border border-border/50">
+                    <p className="text-xs text-muted-foreground">Sua avaliação:</p>
+                    <StarRating rating={newRating} onRate={setNewRating} interactive />
+                    <Textarea
+                      placeholder="Comentário (opcional)"
+                      value={newComment}
+                      onChange={(e) => setNewComment(e.target.value)}
+                      rows={2}
+                      className="text-sm"
+                    />
+                    <Button size="sm" onClick={handleReview} disabled={submitting || newRating === 0} className="neon-glow-purple">
+                      {submitting ? "Enviando..." : "Enviar Avaliação"}
+                    </Button>
+                  </div>
+                ) : (
+                  <p className="text-xs text-muted-foreground">
+                    <Link to="/auth" className="text-neon-purple hover:underline">Faça login</Link> para avaliar.
+                  </p>
+                )}
+
+                {/* Reviews list */}
+                <div className="space-y-3">
+                  {reviews?.map((review: any) => {
+                    const rProfile = profileMap[review.user_id];
+                    return (
+                      <div key={review.id} className="flex gap-3 p-3 rounded-lg border border-border/30">
+                        <Avatar className="h-8 w-8 shrink-0">
+                          {rProfile?.avatar_url && <AvatarImage src={rProfile.avatar_url} />}
+                          <AvatarFallback className="bg-secondary text-[10px]">
+                            {(rProfile?.username ?? "U").charAt(0).toUpperCase()}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="text-xs font-semibold">{rProfile?.display_name ?? rProfile?.username ?? "Usuário"}</span>
+                            <StarRating rating={review.rating} />
+                          </div>
+                          {review.comment && <p className="text-xs text-muted-foreground">{review.comment}</p>}
+                        </div>
+                      </div>
+                    );
+                  })}
+                  {(reviews?.length ?? 0) === 0 && (
+                    <p className="text-xs text-muted-foreground text-center py-4">Nenhuma avaliação ainda. Seja o primeiro!</p>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
           </div>
 
           {/* Sidebar */}
@@ -110,7 +354,10 @@ export default function ScriptDetail() {
                   <span className="flex items-center gap-1 text-muted-foreground">
                     <Star className="h-4 w-4" /> Avaliação
                   </span>
-                  <span className="font-mono font-bold">{Number(script.average_rating).toFixed(1)}</span>
+                  <div className="flex items-center gap-1">
+                    <StarRating rating={Math.round(Number(script.average_rating))} />
+                    <span className="font-mono font-bold text-xs">({script.total_ratings})</span>
+                  </div>
                 </div>
 
                 {script.is_paid ? (
@@ -136,9 +383,12 @@ export default function ScriptDetail() {
             <Card className="neon-border bg-card/80">
               <CardContent className="p-4">
                 <Link to={`/modder/${script.modder_id}`} className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-                  <div className="h-10 w-10 rounded-full bg-secondary flex items-center justify-center">
-                    <User className="h-5 w-5 text-muted-foreground" />
-                  </div>
+                  <Avatar className="h-10 w-10">
+                    {modderProfile?.avatar_url && <AvatarImage src={modderProfile.avatar_url} />}
+                    <AvatarFallback className="bg-secondary">
+                      <User className="h-5 w-5 text-muted-foreground" />
+                    </AvatarFallback>
+                  </Avatar>
                   <div>
                     <p className="font-semibold text-sm">{modderProfile?.display_name ?? modderProfile?.username}</p>
                     <p className="text-xs text-muted-foreground font-mono">{modderProfile?.reputation_score ?? 0} pts</p>

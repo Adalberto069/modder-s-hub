@@ -37,6 +37,9 @@ export function Navbar() {
           <Link to="/marketplace" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
             Marketplace
           </Link>
+          <Link to="/tutorials" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+            Tutoriais
+          </Link>
           {!user ? (
             <div className="flex gap-2">
               <Button variant="ghost" size="sm" onClick={() => navigate("/auth")}>
@@ -101,6 +104,9 @@ export function Navbar() {
         <div className="md:hidden border-t border-border bg-background p-4 space-y-3">
           <Link to="/marketplace" className="block text-sm" onClick={() => setMobileOpen(false)}>
             Marketplace
+          </Link>
+          <Link to="/tutorials" className="block text-sm" onClick={() => setMobileOpen(false)}>
+            Tutoriais
           </Link>
           {!user ? (
             <div className="flex gap-2">

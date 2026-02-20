@@ -118,6 +118,38 @@ export type Database = {
           },
         ]
       }
+      script_images: {
+        Row: {
+          created_at: string
+          id: string
+          image_url: string
+          script_id: string
+          sort_order: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          image_url: string
+          script_id: string
+          sort_order?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          image_url?: string
+          script_id?: string
+          sort_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "script_images_script_id_fkey"
+            columns: ["script_id"]
+            isOneToOne: false
+            referencedRelation: "scripts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       scripts: {
         Row: {
           average_rating: number
@@ -129,6 +161,7 @@ export type Database = {
           file_url: string | null
           id: string
           is_paid: boolean
+          is_verified: boolean
           modder_id: string
           price: number | null
           status: Database["public"]["Enums"]["script_status"]
@@ -136,6 +169,7 @@ export type Database = {
           title: string
           total_ratings: number
           updated_at: string
+          video_url: string | null
         }
         Insert: {
           average_rating?: number
@@ -147,6 +181,7 @@ export type Database = {
           file_url?: string | null
           id?: string
           is_paid?: boolean
+          is_verified?: boolean
           modder_id: string
           price?: number | null
           status?: Database["public"]["Enums"]["script_status"]
@@ -154,6 +189,7 @@ export type Database = {
           title: string
           total_ratings?: number
           updated_at?: string
+          video_url?: string | null
         }
         Update: {
           average_rating?: number
@@ -165,6 +201,7 @@ export type Database = {
           file_url?: string | null
           id?: string
           is_paid?: boolean
+          is_verified?: boolean
           modder_id?: string
           price?: number | null
           status?: Database["public"]["Enums"]["script_status"]
@@ -172,6 +209,7 @@ export type Database = {
           title?: string
           total_ratings?: number
           updated_at?: string
+          video_url?: string | null
         }
         Relationships: [
           {
@@ -182,6 +220,45 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      tutorials: {
+        Row: {
+          author_id: string
+          category: string
+          content: string | null
+          created_at: string
+          description: string | null
+          id: string
+          thumbnail_url: string | null
+          title: string
+          updated_at: string
+          video_url: string | null
+        }
+        Insert: {
+          author_id: string
+          category?: string
+          content?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          thumbnail_url?: string | null
+          title: string
+          updated_at?: string
+          video_url?: string | null
+        }
+        Update: {
+          author_id?: string
+          category?: string
+          content?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          thumbnail_url?: string | null
+          title?: string
+          updated_at?: string
+          video_url?: string | null
+        }
+        Relationships: []
       }
       user_roles: {
         Row: {

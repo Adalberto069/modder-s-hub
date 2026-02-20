@@ -12,6 +12,7 @@ import ModderProfile from "./pages/ModderProfile";
 import Dashboard from "./pages/Dashboard";
 import Admin from "./pages/Admin";
 import ProfileSettings from "./pages/ProfileSettings";
+import Tutorials from "./pages/Tutorials";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -32,6 +33,7 @@ const App = () => (
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/admin" element={<Admin />} />
             <Route path="/profile/settings" element={<ProfileSettings />} />
+            <Route path="/tutorials" element={<Tutorials />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
