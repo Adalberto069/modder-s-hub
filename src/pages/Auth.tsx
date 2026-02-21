@@ -16,6 +16,8 @@ export default function Auth() {
   const defaultTab = searchParams.get("tab") === "signup" ? "signup" : "login";
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [showForgot, setShowForgot] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState("");
 
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
@@ -66,6 +68,57 @@ export default function Auth() {
     setLoading(false);
   };
 
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    const { error } = await supabase.auth.resetPasswordForEmail(forgotEmail, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    if (error) {
+      toast.error(error.message);
+    } else {
+      toast.success("Email de recuperação enviado! Verifique sua caixa de entrada.");
+      setShowForgot(false);
+    }
+    setLoading(false);
+  };
+
+  if (showForgot) {
+    return (
+      <Layout>
+        <div className="container flex items-center justify-center py-16">
+          <Card className="w-full max-w-md neon-border bg-card/80 backdrop-blur-sm">
+            <CardHeader className="text-center">
+              <Terminal className="h-10 w-10 mx-auto text-neon-purple mb-2" />
+              <CardTitle className="font-mono text-lg">Recuperar Senha</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleForgotPassword} className="space-y-4">
+                <p className="text-sm text-muted-foreground">
+                  Informe seu email e enviaremos um link para redefinir sua senha.
+                </p>
+                <div>
+                  <Label htmlFor="forgot-email">Email</Label>
+                  <Input id="forgot-email" type="email" value={forgotEmail} onChange={(e) => setForgotEmail(e.target.value)} required />
+                </div>
+                <Button type="submit" className="w-full neon-glow-purple" disabled={loading}>
+                  {loading ? "Enviando..." : "Enviar Link"}
+                </Button>
+                <button
+                  type="button"
+                  className="w-full text-sm text-muted-foreground hover:text-foreground transition-colors"
+                  onClick={() => setShowForgot(false)}
+                >
+                  Voltar ao login
+                </button>
+              </form>
+            </CardContent>
+          </Card>
+        </div>
+      </Layout>
+    );
+  }
+
   return (
     <Layout>
       <div className="container flex items-center justify-center py-16">
@@ -92,6 +145,15 @@ export default function Auth() {
                   <div>
                     <Label htmlFor="login-password">Senha</Label>
                     <Input id="login-password" type="password" value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} required />
+                  </div>
+                  <div className="text-right">
+                    <button
+                      type="button"
+                      className="text-xs text-muted-foreground hover:text-neon-purple transition-colors"
+                      onClick={() => setShowForgot(true)}
+                    >
+                      Esqueci minha senha
+                    </button>
                   </div>
                   <Button type="submit" className="w-full neon-glow-purple" disabled={loading}>
                     {loading ? "Entrando..." : "Entrar"}

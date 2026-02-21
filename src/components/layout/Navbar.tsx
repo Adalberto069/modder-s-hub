@@ -102,27 +102,48 @@ export function Navbar() {
       {/* Mobile menu */}
       {mobileOpen && (
         <div className="md:hidden border-t border-border bg-background p-4 space-y-3">
-          <Link to="/marketplace" className="block text-sm" onClick={() => setMobileOpen(false)}>
+          <Link to="/marketplace" className="block text-sm text-muted-foreground hover:text-foreground" onClick={() => setMobileOpen(false)}>
             Marketplace
           </Link>
-          <Link to="/tutorials" className="block text-sm" onClick={() => setMobileOpen(false)}>
+          <Link to="/tutorials" className="block text-sm text-muted-foreground hover:text-foreground" onClick={() => setMobileOpen(false)}>
             Tutoriais
           </Link>
           {!user ? (
-            <div className="flex gap-2">
+            <div className="flex gap-2 pt-2">
               <Button variant="ghost" size="sm" onClick={() => { navigate("/auth"); setMobileOpen(false); }}>Login</Button>
-              <Button size="sm" onClick={() => { navigate("/auth?tab=signup"); setMobileOpen(false); }}>Cadastrar</Button>
+              <Button size="sm" className="neon-glow-purple" onClick={() => { navigate("/auth?tab=signup"); setMobileOpen(false); }}>Cadastrar</Button>
             </div>
           ) : (
-            <>
+            <div className="space-y-3 pt-2 border-t border-border">
+              <div className="flex items-center gap-3 pb-2">
+                <Avatar className="h-8 w-8">
+                  {profile?.avatar_url ? <AvatarImage src={profile.avatar_url} alt="" /> : null}
+                  <AvatarFallback className="bg-secondary text-xs">
+                    {(profile?.username ?? "U").charAt(0).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                <span className="text-sm font-medium">{profile?.display_name ?? profile?.username ?? "Usuário"}</span>
+              </div>
+              <Link to={`/modder/${user.id}`} className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground" onClick={() => setMobileOpen(false)}>
+                <User className="h-4 w-4" /> Meu Perfil
+              </Link>
+              <Link to="/profile/settings" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground" onClick={() => setMobileOpen(false)}>
+                <Settings className="h-4 w-4" /> Configurações
+              </Link>
               {isModder && (
-                <Link to="/dashboard" className="block text-sm" onClick={() => setMobileOpen(false)}>Dashboard</Link>
+                <Link to="/dashboard" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground" onClick={() => setMobileOpen(false)}>
+                  <LayoutDashboard className="h-4 w-4" /> Dashboard
+                </Link>
               )}
               {isAdmin && (
-                <Link to="/admin" className="block text-sm" onClick={() => setMobileOpen(false)}>Admin</Link>
+                <Link to="/admin" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground" onClick={() => setMobileOpen(false)}>
+                  <Shield className="h-4 w-4" /> Admin
+                </Link>
               )}
-              <button className="text-sm text-destructive" onClick={() => { handleSignOut(); setMobileOpen(false); }}>Sair</button>
-            </>
+              <button className="flex items-center gap-2 text-sm text-destructive hover:text-destructive/80" onClick={() => { handleSignOut(); setMobileOpen(false); }}>
+                <LogOut className="h-4 w-4" /> Sair
+              </button>
+            </div>
           )}
         </div>
       )}
