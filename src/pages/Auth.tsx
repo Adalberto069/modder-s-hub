@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
-import { Terminal } from "lucide-react";
+import { Terminal, Mail, CheckCircle } from "lucide-react";
 
 export default function Auth() {
   const [searchParams] = useSearchParams();
@@ -18,6 +18,8 @@ export default function Auth() {
   const [loading, setLoading] = useState(false);
   const [showForgot, setShowForgot] = useState(false);
   const [forgotEmail, setForgotEmail] = useState("");
+  const [showEmailSent, setShowEmailSent] = useState(false);
+  const [sentEmail, setSentEmail] = useState("");
 
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
@@ -54,7 +56,6 @@ export default function Auth() {
     if (error) {
       toast.error(error.message);
     } else {
-      // If user wants to be a modder, request the role
       if (wantModder && data.user) {
         await supabase.from("user_roles").insert({
           user_id: data.user.id,
@@ -62,8 +63,8 @@ export default function Auth() {
           approved: false,
         });
       }
-      toast.success("Conta criada! Verifique seu email para confirmar.");
-      navigate("/");
+      setSentEmail(signupEmail);
+      setShowEmailSent(true);
     }
     setLoading(false);
   };
@@ -82,6 +83,48 @@ export default function Auth() {
     }
     setLoading(false);
   };
+
+  if (showEmailSent) {
+    return (
+      <Layout>
+        <div className="container flex items-center justify-center py-16">
+          <Card className="w-full max-w-md neon-border bg-card/80 backdrop-blur-sm">
+            <CardContent className="pt-8 text-center space-y-4">
+              <div className="mx-auto w-16 h-16 rounded-full bg-neon-green/10 flex items-center justify-center">
+                <Mail className="h-8 w-8 text-neon-green" />
+              </div>
+              <h2 className="text-xl font-bold font-mono">Conta criada com sucesso!</h2>
+              <p className="text-sm text-muted-foreground">
+                Enviamos um email de confirmação para:
+              </p>
+              <p className="text-sm font-medium text-neon-purple break-all">{sentEmail}</p>
+              <div className="bg-secondary/50 rounded-lg p-4 text-left space-y-2">
+                <div className="flex items-start gap-2">
+                  <CheckCircle className="h-4 w-4 text-neon-green mt-0.5 shrink-0" />
+                  <p className="text-xs text-muted-foreground">Abra sua caixa de entrada e clique no link de confirmação</p>
+                </div>
+                <div className="flex items-start gap-2">
+                  <CheckCircle className="h-4 w-4 text-neon-green mt-0.5 shrink-0" />
+                  <p className="text-xs text-muted-foreground">Verifique também a pasta de spam/lixo eletrônico</p>
+                </div>
+                <div className="flex items-start gap-2">
+                  <CheckCircle className="h-4 w-4 text-neon-green mt-0.5 shrink-0" />
+                  <p className="text-xs text-muted-foreground">Após confirmar, volte aqui e faça login</p>
+                </div>
+              </div>
+              <Button
+                variant="outline"
+                className="w-full"
+                onClick={() => { setShowEmailSent(false); }}
+              >
+                Voltar ao Login
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </Layout>
+    );
+  }
 
   if (showForgot) {
     return (
