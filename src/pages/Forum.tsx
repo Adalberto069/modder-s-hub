@@ -14,7 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { MessageSquare, Plus, Send, ArrowLeft, Search } from "lucide-react";
+import { MessageSquare, Plus, Send, ArrowLeft, Search, ThumbsUp } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const CATEGORIES = [
@@ -118,6 +118,41 @@ export default function Forum() {
     replyCountMap[r.post_id] = (replyCountMap[r.post_id] || 0) + 1;
   });
 
+  // Fetch likes for replies
+  const replyIds = replies.map((r: any) => r.id);
+  const { data: allLikes = [] } = useQuery({
+    queryKey: ["forum-reply-likes", replyIds],
+    queryFn: async () => {
+      if (!replyIds.length) return [];
+      const { data } = await supabase.from("forum_reply_likes").select("*").in("reply_id", replyIds);
+      return data ?? [];
+    },
+    enabled: replyIds.length > 0,
+  });
+
+  const likesPerReply: Record<string, number> = {};
+  const userLikedReply: Record<string, boolean> = {};
+  (allLikes as any[]).forEach((l) => {
+    likesPerReply[l.reply_id] = (likesPerReply[l.reply_id] || 0) + 1;
+    if (user && l.user_id === user.id) userLikedReply[l.reply_id] = true;
+  });
+
+  // Toggle like
+  const toggleLike = useMutation({
+    mutationFn: async (replyId: string) => {
+      if (!user) throw new Error("Login necessário");
+      if (userLikedReply[replyId]) {
+        await supabase.from("forum_reply_likes").delete().eq("reply_id", replyId).eq("user_id", user.id);
+      } else {
+        await supabase.from("forum_reply_likes").insert({ reply_id: replyId, user_id: user.id });
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["forum-reply-likes"] });
+    },
+    onError: (e: any) => toast.error(e.message),
+  });
+
   // Create post
   const createPost = useMutation({
     mutationFn: async () => {
@@ -219,6 +254,14 @@ export default function Forum() {
                               </span>
                             </div>
                             <p className="text-sm text-muted-foreground mt-1 whitespace-pre-wrap">{reply.content}</p>
+                            <button
+                              className={`flex items-center gap-1 mt-2 text-xs transition-colors ${userLikedReply[reply.id] ? "text-neon-green" : "text-muted-foreground hover:text-neon-green"}`}
+                              onClick={() => user && toggleLike.mutate(reply.id)}
+                              disabled={!user}
+                            >
+                              <ThumbsUp className={`h-3.5 w-3.5 ${userLikedReply[reply.id] ? "fill-current" : ""}`} />
+                              {likesPerReply[reply.id] || 0}
+                            </button>
                           </div>
                         </div>
                       </CardContent>
