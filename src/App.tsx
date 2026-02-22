@@ -13,6 +13,7 @@ import Dashboard from "./pages/Dashboard";
 import Admin from "./pages/Admin";
 import ProfileSettings from "./pages/ProfileSettings";
 import Tutorials from "./pages/Tutorials";
+import Forum from "./pages/Forum";
 import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
 
@@ -35,6 +36,7 @@ const App = () => (
             <Route path="/admin" element={<Admin />} />
             <Route path="/profile/settings" element={<ProfileSettings />} />
             <Route path="/tutorials" element={<Tutorials />} />
+            <Route path="/forum" element={<Forum />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
