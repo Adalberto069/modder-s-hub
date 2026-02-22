@@ -40,6 +40,9 @@ export function Navbar() {
           <Link to="/tutorials" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
             Tutoriais
           </Link>
+          <Link to="/forum" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+            Fórum
+          </Link>
           {!user ? (
             <div className="flex gap-2">
               <Button variant="ghost" size="sm" onClick={() => navigate("/auth")}>
@@ -107,6 +110,9 @@ export function Navbar() {
           </Link>
           <Link to="/tutorials" className="block text-sm text-muted-foreground hover:text-foreground" onClick={() => setMobileOpen(false)}>
             Tutoriais
+          </Link>
+          <Link to="/forum" className="block text-sm text-muted-foreground hover:text-foreground" onClick={() => setMobileOpen(false)}>
+            Fórum
           </Link>
           {!user ? (
             <div className="flex gap-2 pt-2">
