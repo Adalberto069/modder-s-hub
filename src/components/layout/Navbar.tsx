@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
-import { Terminal, Menu, X, User, LogOut, LayoutDashboard, Shield, Settings } from "lucide-react";
+import { Terminal, Menu, X, User, LogOut, LayoutDashboard, Shield, Settings, Wrench } from "lucide-react";
 import { useState } from "react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import {
@@ -42,6 +42,9 @@ export function Navbar() {
           </Link>
           <Link to="/forum" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
             Fórum
+          </Link>
+          <Link to="/ferramentas" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+            Ferramentas
           </Link>
           {!user ? (
             <div className="flex gap-2">
@@ -113,6 +116,9 @@ export function Navbar() {
           </Link>
           <Link to="/forum" className="block text-sm text-muted-foreground hover:text-foreground" onClick={() => setMobileOpen(false)}>
             Fórum
+          </Link>
+          <Link to="/ferramentas" className="block text-sm text-muted-foreground hover:text-foreground" onClick={() => setMobileOpen(false)}>
+            Ferramentas
           </Link>
           {!user ? (
             <div className="flex gap-2 pt-2">
