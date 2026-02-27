@@ -312,6 +312,62 @@ export type Database = {
           },
         ]
       }
+      tools: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          download_url: string | null
+          external_url: string | null
+          icon: string | null
+          id: string
+          name: string
+          platform: string
+          sort_order: number
+          tags: string[] | null
+          tutorial_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          download_url?: string | null
+          external_url?: string | null
+          icon?: string | null
+          id?: string
+          name: string
+          platform?: string
+          sort_order?: number
+          tags?: string[] | null
+          tutorial_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          download_url?: string | null
+          external_url?: string | null
+          icon?: string | null
+          id?: string
+          name?: string
+          platform?: string
+          sort_order?: number
+          tags?: string[] | null
+          tutorial_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tools_tutorial_id_fkey"
+            columns: ["tutorial_id"]
+            isOneToOne: false
+            referencedRelation: "tutorials"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tutorials: {
         Row: {
           author_id: string
