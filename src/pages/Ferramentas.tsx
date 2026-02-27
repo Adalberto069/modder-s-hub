@@ -1,105 +1,33 @@
+import { useState } from "react";
 import { Layout } from "@/components/layout/Layout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Smartphone, Monitor, ExternalLink, Download, Shield, Cpu, Box, Gamepad2, Wrench } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Smartphone, Monitor, ExternalLink, Download, Shield, Cpu, Box,
+  Gamepad2, Wrench, Plus, Pencil, Trash2, BookOpen, Loader2,
+} from "lucide-react";
 import { motion } from "framer-motion";
+import { useAuth } from "@/lib/auth";
+import { supabase } from "@/integrations/supabase/client";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { Textarea } from "@/components/ui/textarea";
 
-interface Tool {
-  name: string;
-  description: string;
-  icon: React.ReactNode;
-  platform: "android" | "pc" | "both";
-  category: "cheat-engine" | "virtualizer" | "utility";
-  downloadUrl?: string;
-  externalUrl?: string;
-  tags: string[];
-}
-
-const tools: Tool[] = [
-  {
-    name: "GameGuardian",
-    description: "Editor de memória para jogos Android. Permite modificar valores de HP, moedas, itens e muito mais em tempo real.",
-    icon: <Gamepad2 className="h-6 w-6" />,
-    platform: "android",
-    category: "cheat-engine",
-    externalUrl: "https://gameguardian.net",
-    tags: ["Memory Editor", "Root", "Virtual Space"],
-  },
-  {
-    name: "Cheat Engine",
-    description: "O mais popular editor de memória para PC. Permite escanear e modificar valores em jogos, criar trainers e tabelas.",
-    icon: <Shield className="h-6 w-6" />,
-    platform: "pc",
-    category: "cheat-engine",
-    externalUrl: "https://cheatengine.org",
-    tags: ["Memory Scanner", "Trainer", "Tables"],
-  },
-  {
-    name: "VMOS Pro",
-    description: "Máquina virtual Android dentro do seu celular. Rode um segundo Android com root sem precisar rootear seu dispositivo principal.",
-    icon: <Smartphone className="h-6 w-6" />,
-    platform: "android",
-    category: "virtualizer",
-    externalUrl: "https://www.vmos.com",
-    tags: ["Virtual Machine", "Root", "Sem Root no Host"],
-  },
-  {
-    name: "Virtual Master",
-    description: "Virtualizador leve para Android. Crie espaços virtuais para rodar apps clonados com permissões root.",
-    icon: <Box className="h-6 w-6" />,
-    platform: "android",
-    category: "virtualizer",
-    externalUrl: "#",
-    tags: ["Clone Apps", "Root", "Leve"],
-  },
-  {
-    name: "X8 Sandbox",
-    description: "Ambiente virtual Android com root integrado. Ideal para rodar GameGuardian sem root no dispositivo real.",
-    icon: <Cpu className="h-6 w-6" />,
-    platform: "android",
-    category: "virtualizer",
-    externalUrl: "#",
-    tags: ["Sandbox", "Root", "GameGuardian"],
-  },
-  {
-    name: "BlueStacks",
-    description: "Emulador Android para PC. Rode jogos e apps mobile no computador com ótimo desempenho e compatibilidade.",
-    icon: <Monitor className="h-6 w-6" />,
-    platform: "pc",
-    category: "virtualizer",
-    externalUrl: "https://www.bluestacks.com",
-    tags: ["Emulador", "Android no PC", "Gaming"],
-  },
-  {
-    name: "LDPlayer",
-    description: "Emulador Android leve e otimizado para jogos. Suporte a múltiplas instâncias e mapeamento de teclado.",
-    icon: <Monitor className="h-6 w-6" />,
-    platform: "pc",
-    category: "virtualizer",
-    externalUrl: "https://www.ldplayer.net",
-    tags: ["Emulador", "Multi-instância", "Leve"],
-  },
-  {
-    name: "ArtMoney",
-    description: "Editor de memória clássico para PC. Simples e direto para modificar valores de jogos.",
-    icon: <Wrench className="h-6 w-6" />,
-    platform: "pc",
-    category: "cheat-engine",
-    externalUrl: "http://www.artmoney.ru",
-    tags: ["Memory Editor", "Clássico", "Simples"],
-  },
-  {
-    name: "Parallel Space",
-    description: "Clone e rode múltiplas contas de apps no Android. Útil para testar mods sem afetar a conta principal.",
-    icon: <Smartphone className="h-6 w-6" />,
-    platform: "android",
-    category: "utility",
-    externalUrl: "#",
-    tags: ["Multi-conta", "Clone", "Seguro"],
-  },
-];
+const iconMap: Record<string, React.ReactNode> = {
+  Gamepad2: <Gamepad2 className="h-6 w-6" />,
+  Shield: <Shield className="h-6 w-6" />,
+  Smartphone: <Smartphone className="h-6 w-6" />,
+  Box: <Box className="h-6 w-6" />,
+  Cpu: <Cpu className="h-6 w-6" />,
+  Monitor: <Monitor className="h-6 w-6" />,
+  Wrench: <Wrench className="h-6 w-6" />,
+};
 
 const categoryLabels: Record<string, string> = {
   "cheat-engine": "Editores de Memória",
@@ -113,12 +41,125 @@ const platformIcon = (p: string) =>
 const platformLabel = (p: string) =>
   p === "android" ? "Android" : p === "pc" ? "PC" : "Ambos";
 
-export default function Ferramentas() {
-  const filterTools = (platform?: string) =>
-    platform ? tools.filter((t) => t.platform === platform || t.platform === "both") : tools;
+interface ToolForm {
+  name: string;
+  description: string;
+  platform: string;
+  category: string;
+  external_url: string;
+  download_url: string;
+  icon: string;
+  tags: string;
+  tutorial_id: string;
+}
 
-  const renderGrid = (filtered: Tool[]) => {
-    const grouped: Record<string, Tool[]> = {};
+const emptyForm: ToolForm = {
+  name: "", description: "", platform: "android", category: "utility",
+  external_url: "", download_url: "", icon: "Wrench", tags: "", tutorial_id: "",
+};
+
+export default function Ferramentas() {
+  const { isAdmin } = useAuth();
+  const queryClient = useQueryClient();
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [form, setForm] = useState<ToolForm>(emptyForm);
+
+  const { data: tools = [], isLoading } = useQuery({
+    queryKey: ["tools"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("tools")
+        .select("*, tutorials(id, title)")
+        .order("sort_order");
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const { data: tutorials = [] } = useQuery({
+    queryKey: ["tutorials-list"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("tutorials")
+        .select("id, title")
+        .order("title");
+      if (error) throw error;
+      return data;
+    },
+    enabled: isAdmin,
+  });
+
+  const saveTool = useMutation({
+    mutationFn: async () => {
+      const payload = {
+        name: form.name,
+        description: form.description,
+        platform: form.platform,
+        category: form.category,
+        external_url: form.external_url || null,
+        download_url: form.download_url || null,
+        icon: form.icon,
+        tags: form.tags.split(",").map((t) => t.trim()).filter(Boolean),
+        tutorial_id: form.tutorial_id || null,
+      };
+      if (editingId) {
+        const { error } = await supabase.from("tools").update(payload).eq("id", editingId);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase.from("tools").insert(payload);
+        if (error) throw error;
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["tools"] });
+      setDialogOpen(false);
+      setEditingId(null);
+      setForm(emptyForm);
+      toast.success(editingId ? "Ferramenta atualizada!" : "Ferramenta adicionada!");
+    },
+    onError: (e: any) => toast.error(e.message),
+  });
+
+  const deleteTool = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("tools").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["tools"] });
+      toast.success("Ferramenta removida!");
+    },
+    onError: (e: any) => toast.error(e.message),
+  });
+
+  const openEdit = (tool: any) => {
+    setEditingId(tool.id);
+    setForm({
+      name: tool.name,
+      description: tool.description || "",
+      platform: tool.platform,
+      category: tool.category,
+      external_url: tool.external_url || "",
+      download_url: tool.download_url || "",
+      icon: tool.icon || "Wrench",
+      tags: (tool.tags || []).join(", "),
+      tutorial_id: tool.tutorial_id || "",
+    });
+    setDialogOpen(true);
+  };
+
+  const openNew = () => {
+    setEditingId(null);
+    setForm(emptyForm);
+    setDialogOpen(true);
+  };
+
+  const filterTools = (platform?: string) =>
+    platform ? tools.filter((t: any) => t.platform === platform || t.platform === "both") : tools;
+
+  const renderGrid = (filtered: any[]) => {
+    const grouped: Record<string, any[]> = {};
     filtered.forEach((t) => {
       if (!grouped[t.category]) grouped[t.category] = [];
       grouped[t.category].push(t);
@@ -131,9 +172,9 @@ export default function Ferramentas() {
           {categoryLabels[cat] ?? cat}
         </h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {items.map((tool, i) => (
+          {items.map((tool: any, i: number) => (
             <motion.div
-              key={tool.name}
+              key={tool.id}
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.05 }}
@@ -142,12 +183,24 @@ export default function Ferramentas() {
                 <CardContent className="p-5 flex flex-col h-full">
                   <div className="flex items-start justify-between mb-3">
                     <div className="p-2 rounded-lg bg-secondary text-neon-purple">
-                      {tool.icon}
+                      {iconMap[tool.icon] || <Wrench className="h-6 w-6" />}
                     </div>
-                    <Badge variant="outline" className="flex items-center gap-1 text-xs">
-                      {platformIcon(tool.platform)}
-                      {platformLabel(tool.platform)}
-                    </Badge>
+                    <div className="flex items-center gap-2">
+                      <Badge variant="outline" className="flex items-center gap-1 text-xs">
+                        {platformIcon(tool.platform)}
+                        {platformLabel(tool.platform)}
+                      </Badge>
+                      {isAdmin && (
+                        <div className="flex gap-1">
+                          <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => openEdit(tool)}>
+                            <Pencil className="h-3.5 w-3.5" />
+                          </Button>
+                          <Button size="icon" variant="ghost" className="h-7 w-7 text-destructive" onClick={() => deleteTool.mutate(tool.id)}>
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </Button>
+                        </div>
+                      )}
+                    </div>
                   </div>
                   <h3 className="font-bold text-base mb-1 group-hover:text-neon-purple transition-colors">
                     {tool.name}
@@ -156,31 +209,34 @@ export default function Ferramentas() {
                     {tool.description}
                   </p>
                   <div className="flex flex-wrap gap-1.5 mb-4">
-                    {tool.tags.map((tag) => (
+                    {(tool.tags || []).map((tag: string) => (
                       <Badge key={tag} variant="secondary" className="text-[10px] px-1.5 py-0">
                         {tag}
                       </Badge>
                     ))}
                   </div>
                   <div className="flex gap-2 mt-auto">
-                    {tool.externalUrl && tool.externalUrl !== "#" && (
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="flex-1 text-xs"
-                        asChild
-                      >
-                        <a href={tool.externalUrl} target="_blank" rel="noopener noreferrer">
+                    {tool.external_url && (
+                      <Button size="sm" variant="outline" className="flex-1 text-xs" asChild>
+                        <a href={tool.external_url} target="_blank" rel="noopener noreferrer">
                           <ExternalLink className="h-3.5 w-3.5 mr-1" />
                           Site Oficial
                         </a>
                       </Button>
                     )}
-                    {tool.downloadUrl && (
+                    {tool.download_url && (
                       <Button size="sm" className="flex-1 text-xs neon-glow-purple" asChild>
-                        <a href={tool.downloadUrl} target="_blank" rel="noopener noreferrer">
+                        <a href={tool.download_url} target="_blank" rel="noopener noreferrer">
                           <Download className="h-3.5 w-3.5 mr-1" />
                           Download
+                        </a>
+                      </Button>
+                    )}
+                    {tool.tutorials && (
+                      <Button size="sm" variant="secondary" className="flex-1 text-xs" asChild>
+                        <a href={`/tutorials`}>
+                          <BookOpen className="h-3.5 w-3.5 mr-1" />
+                          Tutorial
                         </a>
                       </Button>
                     )}
@@ -197,36 +253,137 @@ export default function Ferramentas() {
   return (
     <Layout>
       <div className="container py-8 space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold font-mono mb-2">
-            <span className="text-neon-purple">Ferramentas</span> & Instalações
-          </h1>
-          <p className="text-muted-foreground">
-            Tudo que você precisa para começar a moddar — editores de memória, virtualizadores e emuladores para Android e PC.
-          </p>
+        <div className="flex items-start justify-between">
+          <div>
+            <h1 className="text-3xl font-bold font-mono mb-2">
+              <span className="text-neon-purple">Ferramentas</span> & Instalações
+            </h1>
+            <p className="text-muted-foreground">
+              Tudo que você precisa para começar a moddar — editores de memória, virtualizadores e emuladores para Android e PC.
+            </p>
+          </div>
+          {isAdmin && (
+            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+              <DialogTrigger asChild>
+                <Button onClick={openNew} className="neon-glow-purple">
+                  <Plus className="h-4 w-4 mr-1" /> Adicionar
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle>{editingId ? "Editar Ferramenta" : "Nova Ferramenta"}</DialogTitle>
+                </DialogHeader>
+                <form
+                  className="space-y-4"
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    saveTool.mutate();
+                  }}
+                >
+                  <div className="space-y-2">
+                    <Label>Nome *</Label>
+                    <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Descrição</Label>
+                    <Textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={3} />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label>Plataforma</Label>
+                      <Select value={form.platform} onValueChange={(v) => setForm({ ...form, platform: v })}>
+                        <SelectTrigger><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="android">Android</SelectItem>
+                          <SelectItem value="pc">PC</SelectItem>
+                          <SelectItem value="both">Ambos</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Categoria</Label>
+                      <Select value={form.category} onValueChange={(v) => setForm({ ...form, category: v })}>
+                        <SelectTrigger><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="cheat-engine">Editor de Memória</SelectItem>
+                          <SelectItem value="virtualizer">Virtualizador</SelectItem>
+                          <SelectItem value="utility">Utilitário</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Ícone</Label>
+                    <Select value={form.icon} onValueChange={(v) => setForm({ ...form, icon: v })}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        {Object.keys(iconMap).map((k) => (
+                          <SelectItem key={k} value={k}>{k}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Link Externo (Site Oficial)</Label>
+                    <Input value={form.external_url} onChange={(e) => setForm({ ...form, external_url: e.target.value })} placeholder="https://..." />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Link de Download</Label>
+                    <Input value={form.download_url} onChange={(e) => setForm({ ...form, download_url: e.target.value })} placeholder="https://..." />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Tags (separadas por vírgula)</Label>
+                    <Input value={form.tags} onChange={(e) => setForm({ ...form, tags: e.target.value })} placeholder="Root, Leve, Grátis" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Tutorial Associado</Label>
+                    <Select value={form.tutorial_id} onValueChange={(v) => setForm({ ...form, tutorial_id: v })}>
+                      <SelectTrigger><SelectValue placeholder="Nenhum" /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="">Nenhum</SelectItem>
+                        {tutorials.map((t: any) => (
+                          <SelectItem key={t.id} value={t.id}>{t.title}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <Button type="submit" className="w-full" disabled={saveTool.isPending}>
+                    {saveTool.isPending && <Loader2 className="h-4 w-4 mr-1 animate-spin" />}
+                    {editingId ? "Salvar" : "Adicionar"}
+                  </Button>
+                </form>
+              </DialogContent>
+            </Dialog>
+          )}
         </div>
 
-        <Tabs defaultValue="all" className="w-full">
-          <TabsList className="bg-secondary">
-            <TabsTrigger value="all">Todos</TabsTrigger>
-            <TabsTrigger value="android" className="flex items-center gap-1.5">
-              <Smartphone className="h-3.5 w-3.5" /> Android
-            </TabsTrigger>
-            <TabsTrigger value="pc" className="flex items-center gap-1.5">
-              <Monitor className="h-3.5 w-3.5" /> PC
-            </TabsTrigger>
-          </TabsList>
+        {isLoading ? (
+          <div className="flex justify-center py-12">
+            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+          </div>
+        ) : (
+          <Tabs defaultValue="all" className="w-full">
+            <TabsList className="bg-secondary">
+              <TabsTrigger value="all">Todos</TabsTrigger>
+              <TabsTrigger value="android" className="flex items-center gap-1.5">
+                <Smartphone className="h-3.5 w-3.5" /> Android
+              </TabsTrigger>
+              <TabsTrigger value="pc" className="flex items-center gap-1.5">
+                <Monitor className="h-3.5 w-3.5" /> PC
+              </TabsTrigger>
+            </TabsList>
 
-          <TabsContent value="all" className="space-y-8 mt-6">
-            {renderGrid(filterTools())}
-          </TabsContent>
-          <TabsContent value="android" className="space-y-8 mt-6">
-            {renderGrid(filterTools("android"))}
-          </TabsContent>
-          <TabsContent value="pc" className="space-y-8 mt-6">
-            {renderGrid(filterTools("pc"))}
-          </TabsContent>
-        </Tabs>
+            <TabsContent value="all" className="space-y-8 mt-6">
+              {renderGrid(filterTools())}
+            </TabsContent>
+            <TabsContent value="android" className="space-y-8 mt-6">
+              {renderGrid(filterTools("android"))}
+            </TabsContent>
+            <TabsContent value="pc" className="space-y-8 mt-6">
+              {renderGrid(filterTools("pc"))}
+            </TabsContent>
+          </Tabs>
+        )}
       </div>
     </Layout>
   );
