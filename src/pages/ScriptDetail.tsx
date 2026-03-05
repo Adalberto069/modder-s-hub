@@ -4,6 +4,7 @@ import { Layout } from "@/components/layout/Layout";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { supabase } from "@/integrations/supabase/client";
@@ -11,15 +12,15 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth";
 import {
   Download, Star, ExternalLink, ArrowLeft, User, ShieldCheck,
-  ChevronLeft, ChevronRight, Play, MessageSquare,
+  ChevronLeft, ChevronRight, Play, MessageSquare, Lock, Eye, EyeOff, CheckCircle,
 } from "lucide-react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 
 const statusConfig: Record<string, { label: string; className: string }> = {
-  working: { label: "Working", className: "bg-neon-green/20 text-neon-green border-neon-green/30" },
+  working: { label: "Working", className: "bg-accent/20 text-accent border-accent/30" },
   detected: { label: "Detected", className: "bg-destructive/20 text-destructive border-destructive/30" },
-  updating: { label: "Updating", className: "bg-neon-cyan/20 text-neon-cyan border-neon-cyan/30" },
+  updating: { label: "Updating", className: "bg-primary/20 text-primary border-primary/30" },
 };
 
 function YouTubeEmbed({ url }: { url: string }) {
@@ -46,7 +47,7 @@ function StarRating({ rating, onRate, interactive = false }: { rating: number; o
           key={i}
           className={`h-5 w-5 transition-colors ${
             (interactive ? hover || rating : rating) >= i
-              ? "fill-neon-green text-neon-green"
+              ? "fill-accent text-accent"
               : "text-muted-foreground/30"
           } ${interactive ? "cursor-pointer" : ""}`}
           onClick={() => interactive && onRate?.(i)}
@@ -66,6 +67,12 @@ export default function ScriptDetail() {
   const [newRating, setNewRating] = useState(0);
   const [newComment, setNewComment] = useState("");
   const [submitting, setSubmitting] = useState(false);
+
+  // Password unlock state
+  const [enteredPassword, setEnteredPassword] = useState("");
+  const [showPwInput, setShowPwInput] = useState(false);
+  const [unlocking, setUnlocking] = useState(false);
+  const [unlocked, setUnlocked] = useState(false);
 
   const { data: script } = useQuery({
     queryKey: ["script", id],
@@ -115,7 +122,25 @@ export default function ScriptDetail() {
     enabled: !!id,
   });
 
-  // Fetch reviewer profiles
+  // Check if user already has access
+  const { data: existingAccess } = useQuery({
+    queryKey: ["script-access", id, user?.id],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("script_access")
+        .select("id")
+        .eq("script_id", id!)
+        .eq("user_id", user!.id)
+        .maybeSingle();
+      return data;
+    },
+    enabled: !!id && !!user && !!script?.is_paid,
+  });
+
+  // Check if user is the owner
+  const isOwner = user && script && script.modder_id === user.id;
+  const hasAccess = !!existingAccess || unlocked || isOwner;
+
   const reviewerIds = [...new Set(reviews?.map((r: any) => r.user_id) ?? [])];
   const { data: reviewerProfiles } = useQuery({
     queryKey: ["reviewer-profiles", reviewerIds],
@@ -131,6 +156,36 @@ export default function ScriptDetail() {
     acc[p.user_id] = p;
     return acc;
   }, {});
+
+  const handleUnlockWithPassword = async () => {
+    if (!user || !script || !enteredPassword.trim()) return;
+    setUnlocking(true);
+
+    // Validate password using DB function
+    const { data: isValid, error } = await supabase.rpc("validate_script_password", {
+      _script_id: script.id,
+      _password: enteredPassword.trim(),
+    });
+
+    if (error || !isValid) {
+      toast.error("Senha incorreta ou expirada!");
+      setUnlocking(false);
+      return;
+    }
+
+    // Grant access
+    await supabase.from("script_access").insert({
+      script_id: script.id,
+      user_id: user.id,
+    });
+
+    setUnlocked(true);
+    toast.success("Acesso desbloqueado! Agora você pode baixar.");
+    setEnteredPassword("");
+    setShowPwInput(false);
+    setUnlocking(false);
+    queryClient.invalidateQueries({ queryKey: ["script-access", id, user.id] });
+  };
 
   const handleDownload = async () => {
     if (!script) return;
@@ -166,7 +221,6 @@ export default function ScriptDetail() {
       toast.success("Avaliação enviada!");
     }
 
-    // Recalculate average
     const allReviews = [...(reviews ?? []).filter((r: any) => r.user_id !== user.id), { rating: newRating }];
     const avg = allReviews.reduce((s: number, r: any) => s + r.rating, 0) / allReviews.length;
     await supabase.from("scripts").update({ average_rating: avg, total_ratings: allReviews.length }).eq("id", script.id);
@@ -202,13 +256,12 @@ export default function ScriptDetail() {
         <div className="grid md:grid-cols-3 gap-6">
           {/* Main content */}
           <div className="md:col-span-2 space-y-6">
-            {/* Title */}
             <div>
               <div className="flex items-start gap-3 mb-2 flex-wrap">
                 <h1 className="text-2xl font-bold flex-1">{script.title}</h1>
                 <div className="flex gap-2 shrink-0">
                   {script.is_verified && (
-                    <Badge className="bg-neon-cyan/20 text-neon-cyan border-neon-cyan/30 gap-1">
+                    <Badge className="bg-primary/20 text-primary border-primary/30 gap-1">
                       <ShieldCheck className="h-3 w-3" /> Verificado
                     </Badge>
                   )}
@@ -263,32 +316,29 @@ export default function ScriptDetail() {
               </div>
             )}
 
-            {/* Video */}
             {script.video_url && (
               <div>
                 <h3 className="text-sm font-semibold mb-2 flex items-center gap-2">
-                  <Play className="h-4 w-4 text-neon-pink" /> Demonstração
+                  <Play className="h-4 w-4 text-destructive" /> Demonstração
                 </h3>
                 <YouTubeEmbed url={script.video_url} />
               </div>
             )}
 
-            {/* Description */}
             <div>
               <h3 className="text-sm font-semibold mb-2">Descrição</h3>
               <p className="text-muted-foreground whitespace-pre-wrap text-sm">{script.description ?? "Sem descrição."}</p>
             </div>
 
-            {/* Reviews Section */}
+            {/* Reviews */}
             <Card className="neon-border bg-card/80">
               <CardHeader>
                 <CardTitle className="text-base flex items-center gap-2">
-                  <MessageSquare className="h-4 w-4 text-neon-purple" />
+                  <MessageSquare className="h-4 w-4 text-primary" />
                   Avaliações ({reviews?.length ?? 0})
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                {/* Leave review */}
                 {user ? (
                   <div className="space-y-3 p-3 rounded-lg bg-secondary/30 border border-border/50">
                     <p className="text-xs text-muted-foreground">Sua avaliação:</p>
@@ -306,11 +356,10 @@ export default function ScriptDetail() {
                   </div>
                 ) : (
                   <p className="text-xs text-muted-foreground">
-                    <Link to="/auth" className="text-neon-purple hover:underline">Faça login</Link> para avaliar.
+                    <Link to="/auth" className="text-primary hover:underline">Faça login</Link> para avaliar.
                   </p>
                 )}
 
-                {/* Reviews list */}
                 <div className="space-y-3">
                   {reviews?.map((review: any) => {
                     const rProfile = profileMap[review.user_id];
@@ -361,9 +410,70 @@ export default function ScriptDetail() {
                 </div>
 
                 {script.is_paid ? (
-                  <div className="text-center">
-                    <p className="text-2xl font-bold font-mono text-neon-pink mb-2">R$ {Number(script.price).toFixed(2)}</p>
-                    <Button className="w-full neon-glow-purple">Comprar</Button>
+                  <div className="space-y-3">
+                    <p className="text-2xl font-bold font-mono text-primary text-center">R$ {Number(script.price).toFixed(2)}</p>
+
+                    {hasAccess ? (
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2 justify-center text-accent text-sm">
+                          <CheckCircle className="h-4 w-4" />
+                          <span>Acesso desbloqueado</span>
+                        </div>
+                        <Button className="w-full neon-glow-green" onClick={handleDownload}>
+                          <Download className="mr-2 h-4 w-4" /> Download
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="space-y-2">
+                        {!showPwInput ? (
+                          <Button
+                            className="w-full neon-glow-purple"
+                            onClick={() => {
+                              if (!user) {
+                                toast.error("Faça login para desbloquear");
+                                return;
+                              }
+                              setShowPwInput(true);
+                            }}
+                          >
+                            <Lock className="mr-2 h-4 w-4" /> Desbloquear com Senha
+                          </Button>
+                        ) : (
+                          <div className="space-y-2">
+                            <div className="relative">
+                              <Input
+                                type="password"
+                                value={enteredPassword}
+                                onChange={(e) => setEnteredPassword(e.target.value)}
+                                placeholder="Digite a senha"
+                                className="pr-10"
+                                onKeyDown={(e) => e.key === "Enter" && handleUnlockWithPassword()}
+                              />
+                            </div>
+                            <div className="flex gap-2">
+                              <Button
+                                size="sm"
+                                className="flex-1 neon-glow-purple"
+                                onClick={handleUnlockWithPassword}
+                                disabled={unlocking || !enteredPassword.trim()}
+                              >
+                                {unlocking ? "Validando..." : "Confirmar"}
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => { setShowPwInput(false); setEnteredPassword(""); }}
+                              >
+                                Cancelar
+                              </Button>
+                            </div>
+                            <p className="text-[10px] text-muted-foreground text-center">
+                              Insira a senha fornecida pelo modder após o pagamento
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                 ) : (
                   <Button className="w-full neon-glow-green" onClick={handleDownload}>
@@ -371,7 +481,7 @@ export default function ScriptDetail() {
                   </Button>
                 )}
 
-                {script.external_link && (
+                {script.external_link && !script.is_paid && (
                   <Button variant="outline" className="w-full" onClick={() => window.open(script.external_link!, "_blank")}>
                     <ExternalLink className="mr-2 h-4 w-4" /> Link Externo
                   </Button>

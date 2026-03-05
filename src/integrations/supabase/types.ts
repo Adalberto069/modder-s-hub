@@ -209,6 +209,35 @@ export type Database = {
           },
         ]
       }
+      script_access: {
+        Row: {
+          id: string
+          script_id: string
+          unlocked_at: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          script_id: string
+          unlocked_at?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          script_id?: string
+          unlocked_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "script_access_script_id_fkey"
+            columns: ["script_id"]
+            isOneToOne: false
+            referencedRelation: "scripts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       script_images: {
         Row: {
           created_at: string
@@ -236,6 +265,44 @@ export type Database = {
             foreignKeyName: "script_images_script_id_fkey"
             columns: ["script_id"]
             isOneToOne: false
+            referencedRelation: "scripts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      script_passwords: {
+        Row: {
+          created_at: string
+          expires_at: string | null
+          id: string
+          is_permanent: boolean
+          password: string
+          script_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          is_permanent?: boolean
+          password: string
+          script_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          is_permanent?: boolean
+          password?: string
+          script_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "script_passwords_script_id_fkey"
+            columns: ["script_id"]
+            isOneToOne: true
             referencedRelation: "scripts"
             referencedColumns: ["id"]
           },
@@ -451,6 +518,10 @@ export type Database = {
       }
       is_admin: { Args: { _user_id: string }; Returns: boolean }
       is_modder: { Args: { _user_id: string }; Returns: boolean }
+      validate_script_password: {
+        Args: { _password: string; _script_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       app_role: "user" | "modder" | "admin"
