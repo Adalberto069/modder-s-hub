@@ -255,6 +255,7 @@ export type Database = {
           is_verified: boolean
           modder_id: string
           price: number | null
+          script_type: string
           status: Database["public"]["Enums"]["script_status"]
           thumbnail_url: string | null
           title: string
@@ -275,6 +276,7 @@ export type Database = {
           is_verified?: boolean
           modder_id: string
           price?: number | null
+          script_type?: string
           status?: Database["public"]["Enums"]["script_status"]
           thumbnail_url?: string | null
           title: string
@@ -295,6 +297,7 @@ export type Database = {
           is_verified?: boolean
           modder_id?: string
           price?: number | null
+          script_type?: string
           status?: Database["public"]["Enums"]["script_status"]
           thumbnail_url?: string | null
           title?: string

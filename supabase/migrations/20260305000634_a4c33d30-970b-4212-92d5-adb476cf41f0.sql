@@ -1,0 +1,1 @@
+ALTER TABLE public.scripts ADD COLUMN script_type TEXT NOT NULL DEFAULT 'script' CHECK (script_type IN ('script', 'apk'));
