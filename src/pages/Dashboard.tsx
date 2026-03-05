@@ -11,8 +11,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { Upload, Download, Star, DollarSign, Plus, Trash2 } from "lucide-react";
+import { Upload, Download, Star, DollarSign, Plus, Trash2, Code, Package, Lock, Eye, EyeOff } from "lucide-react";
 import { Navigate } from "react-router-dom";
 
 export default function Dashboard() {
@@ -30,6 +31,13 @@ export default function Dashboard() {
   const [externalLink, setExternalLink] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [scriptType, setScriptType] = useState<string>("script");
+
+  // Password protection for paid scripts
+  const [scriptPassword, setScriptPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [passwordPermanent, setPasswordPermanent] = useState(true);
+  const [passwordExpiry, setPasswordExpiry] = useState("");
 
   const { data: categories } = useQuery({
     queryKey: ["categories"],
@@ -68,12 +76,18 @@ export default function Dashboard() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
+
+    if (isPaid && !scriptPassword.trim()) {
+      toast.error("Scripts pagos precisam de uma senha de proteção");
+      return;
+    }
+
     setSubmitting(true);
 
     let fileUrl = null;
     if (file) {
       const path = `${user.id}/${Date.now()}_${file.name}`;
-      const { data: uploadData, error: uploadError } = await supabase.storage.from("scripts").upload(path, file);
+      const { error: uploadError } = await supabase.storage.from("scripts").upload(path, file);
       if (uploadError) {
         toast.error("Erro no upload: " + uploadError.message);
         setSubmitting(false);
@@ -83,7 +97,7 @@ export default function Dashboard() {
       fileUrl = publicData.publicUrl;
     }
 
-    const { error } = await supabase.from("scripts").insert({
+    const { data: insertedScript, error } = await supabase.from("scripts").insert({
       modder_id: user.id,
       title,
       description,
@@ -93,17 +107,34 @@ export default function Dashboard() {
       price: isPaid ? parseFloat(price) : 0,
       file_url: fileUrl,
       external_link: externalLink || null,
-    });
+      script_type: scriptType as any,
+    }).select("id").single();
 
     if (error) {
       toast.error("Erro: " + error.message);
-    } else {
-      toast.success("Script publicado!");
-      setTitle(""); setDescription(""); setCategoryId(""); setStatus("working");
-      setIsPaid(false); setPrice(""); setExternalLink(""); setFile(null);
-      setShowForm(false);
-      queryClient.invalidateQueries({ queryKey: ["my-scripts"] });
+      setSubmitting(false);
+      return;
     }
+
+    // If paid, create password protection
+    if (isPaid && insertedScript) {
+      const { error: pwError } = await supabase.from("script_passwords").insert({
+        script_id: insertedScript.id,
+        password: scriptPassword.trim(),
+        is_permanent: passwordPermanent,
+        expires_at: !passwordPermanent && passwordExpiry ? new Date(passwordExpiry).toISOString() : null,
+      });
+      if (pwError) {
+        toast.error("Script criado, mas erro na senha: " + pwError.message);
+      }
+    }
+
+    toast.success(scriptType === "script" ? "Script publicado!" : "APK/Mod publicado!");
+    setTitle(""); setDescription(""); setCategoryId(""); setStatus("working");
+    setIsPaid(false); setPrice(""); setExternalLink(""); setFile(null);
+    setScriptType("script"); setScriptPassword(""); setPasswordPermanent(true);
+    setPasswordExpiry(""); setShowForm(false);
+    queryClient.invalidateQueries({ queryKey: ["my-scripts"] });
     setSubmitting(false);
   };
 
@@ -111,7 +142,7 @@ export default function Dashboard() {
     const { error } = await supabase.from("scripts").delete().eq("id", scriptId);
     if (error) toast.error(error.message);
     else {
-      toast.success("Script removido!");
+      toast.success("Removido com sucesso!");
       queryClient.invalidateQueries({ queryKey: ["my-scripts"] });
     }
   };
@@ -125,7 +156,7 @@ export default function Dashboard() {
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold">Dashboard</h1>
           <Button onClick={() => setShowForm(!showForm)} className="neon-glow-purple">
-            <Plus className="mr-2 h-4 w-4" /> Novo Script
+            <Plus className="mr-2 h-4 w-4" /> Novo Conteúdo
           </Button>
         </div>
 
@@ -133,28 +164,28 @@ export default function Dashboard() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           <Card className="neon-border bg-card/80">
             <CardContent className="p-4 text-center">
-              <Upload className="h-5 w-5 mx-auto text-neon-purple mb-1" />
+              <Upload className="h-5 w-5 mx-auto text-primary mb-1" />
               <p className="text-2xl font-bold font-mono">{myScripts?.length ?? 0}</p>
-              <p className="text-xs text-muted-foreground">Scripts</p>
+              <p className="text-xs text-muted-foreground">Publicações</p>
             </CardContent>
           </Card>
           <Card className="neon-border bg-card/80">
             <CardContent className="p-4 text-center">
-              <Download className="h-5 w-5 mx-auto text-neon-green mb-1" />
+              <Download className="h-5 w-5 mx-auto text-accent mb-1" />
               <p className="text-2xl font-bold font-mono">{totalDownloads}</p>
               <p className="text-xs text-muted-foreground">Downloads</p>
             </CardContent>
           </Card>
           <Card className="neon-border bg-card/80">
             <CardContent className="p-4 text-center">
-              <Star className="h-5 w-5 mx-auto text-neon-cyan mb-1" />
+              <Star className="h-5 w-5 mx-auto text-primary mb-1" />
               <p className="text-2xl font-bold font-mono">{profile?.reputation_score ?? 0}</p>
               <p className="text-xs text-muted-foreground">Reputação</p>
             </CardContent>
           </Card>
           <Card className="neon-border bg-card/80">
             <CardContent className="p-4 text-center">
-              <DollarSign className="h-5 w-5 mx-auto text-neon-pink mb-1" />
+              <DollarSign className="h-5 w-5 mx-auto text-destructive mb-1" />
               <p className="text-2xl font-bold font-mono">R$ {simulatedEarnings.toFixed(2)}</p>
               <p className="text-xs text-muted-foreground">Ganhos (simulado)</p>
             </CardContent>
@@ -164,9 +195,26 @@ export default function Dashboard() {
         {/* Upload form */}
         {showForm && (
           <Card className="neon-border bg-card/80 mb-8">
-            <CardHeader><CardTitle>Novo Script</CardTitle></CardHeader>
+            <CardHeader>
+              <CardTitle>Nova Publicação</CardTitle>
+            </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-4">
+                {/* Type selector */}
+                <div>
+                  <Label className="mb-2 block">Tipo de conteúdo</Label>
+                  <Tabs value={scriptType} onValueChange={setScriptType}>
+                    <TabsList className="grid w-full max-w-xs grid-cols-2">
+                      <TabsTrigger value="script" className="gap-2">
+                        <Code className="h-4 w-4" /> Script
+                      </TabsTrigger>
+                      <TabsTrigger value="apk" className="gap-2">
+                        <Package className="h-4 w-4" /> APK / Mod
+                      </TabsTrigger>
+                    </TabsList>
+                  </Tabs>
+                </div>
+
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
                     <Label>Título</Label>
@@ -206,6 +254,59 @@ export default function Dashboard() {
                     {isPaid && <Input type="number" placeholder="Preço (R$)" value={price} onChange={(e) => setPrice(e.target.value)} className="w-32" step="0.01" />}
                   </div>
                 </div>
+
+                {/* Password protection for paid */}
+                {isPaid && (
+                  <Card className="border-primary/30 bg-primary/5">
+                    <CardContent className="p-4 space-y-3">
+                      <div className="flex items-center gap-2 text-sm font-medium">
+                        <Lock className="h-4 w-4 text-primary" />
+                        Proteção por Senha
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        Defina uma senha que os compradores receberão após o pagamento para desbloquear o download.
+                      </p>
+                      <div>
+                        <Label>Senha do Script</Label>
+                        <div className="relative">
+                          <Input
+                            type={showPassword ? "text" : "password"}
+                            value={scriptPassword}
+                            onChange={(e) => setScriptPassword(e.target.value)}
+                            placeholder="Crie uma senha forte"
+                            className="pr-10"
+                            required
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                            tabIndex={-1}
+                          >
+                            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                          </button>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-4">
+                        <Switch checked={passwordPermanent} onCheckedChange={setPasswordPermanent} />
+                        <Label className="text-sm">{passwordPermanent ? "Senha permanente (Full)" : "Senha com prazo"}</Label>
+                      </div>
+                      {!passwordPermanent && (
+                        <div>
+                          <Label>Expira em</Label>
+                          <Input
+                            type="datetime-local"
+                            value={passwordExpiry}
+                            onChange={(e) => setPasswordExpiry(e.target.value)}
+                            required={!passwordPermanent}
+                          />
+                          <p className="text-xs text-muted-foreground mt-1">A senha deixará de funcionar após esta data</p>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                )}
+
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
                     <Label>Arquivo (upload)</Label>
@@ -217,7 +318,7 @@ export default function Dashboard() {
                   </div>
                 </div>
                 <Button type="submit" disabled={submitting} className="neon-glow-purple">
-                  {submitting ? "Publicando..." : "Publicar Script"}
+                  {submitting ? "Publicando..." : `Publicar ${scriptType === "script" ? "Script" : "APK/Mod"}`}
                 </Button>
               </form>
             </CardContent>
@@ -225,17 +326,26 @@ export default function Dashboard() {
         )}
 
         {/* My Scripts */}
-        <h2 className="text-xl font-bold mb-4">Meus Scripts</h2>
+        <h2 className="text-xl font-bold mb-4">Minhas Publicações</h2>
         <div className="space-y-3">
           {myScripts?.map((script: any) => (
             <Card key={script.id} className="neon-border bg-card/80">
               <CardContent className="p-4 flex items-center justify-between">
                 <div>
-                  <p className="font-semibold">{script.title}</p>
+                  <div className="flex items-center gap-2 mb-1">
+                    {script.script_type === "apk" ? (
+                      <Package className="h-4 w-4 text-primary" />
+                    ) : (
+                      <Code className="h-4 w-4 text-primary" />
+                    )}
+                    <p className="font-semibold">{script.title}</p>
+                    {script.is_paid && <Lock className="h-3 w-3 text-muted-foreground" />}
+                  </div>
                   <div className="flex gap-3 text-xs text-muted-foreground mt-1">
                     <span>{script.categories?.name}</span>
                     <span>{script.download_count} downloads</span>
                     <Badge variant="outline" className="text-[10px]">{script.status}</Badge>
+                    <Badge variant="secondary" className="text-[10px]">{script.script_type === "apk" ? "APK" : "Script"}</Badge>
                   </div>
                 </div>
                 <Button variant="ghost" size="icon" className="text-destructive" onClick={() => handleDelete(script.id)}>
@@ -244,7 +354,7 @@ export default function Dashboard() {
               </CardContent>
             </Card>
           ))}
-          {myScripts?.length === 0 && <p className="text-muted-foreground">Nenhum script publicado ainda.</p>}
+          {myScripts?.length === 0 && <p className="text-muted-foreground">Nenhuma publicação ainda.</p>}
         </div>
       </div>
     </Layout>
