@@ -52,6 +52,7 @@ export default function Tutorials() {
   const [selectedTutorial, setSelectedTutorial] = useState<any | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<TutorialForm>(emptyForm);
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
 
   const { data: tutorials, isLoading } = useQuery({
     queryKey: ["tutorials"],
