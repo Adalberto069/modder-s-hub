@@ -400,6 +400,7 @@ export default function Ferramentas() {
             </TabsContent>
           </Tabs>
         )}
+        <LoginPromptDialog open={showLoginPrompt} onOpenChange={setShowLoginPrompt} />
       </div>
     </Layout>
   );
