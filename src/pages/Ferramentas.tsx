@@ -13,7 +13,6 @@ import {
   Gamepad2, Wrench, Plus, Pencil, Trash2, BookOpen, Loader2,
 } from "lucide-react";
 import { motion } from "framer-motion";
-import { LoginPromptDialog } from "@/components/LoginPromptDialog";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
