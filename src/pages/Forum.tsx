@@ -342,8 +342,7 @@ export default function Forum() {
                   </Button>
                 </div>
               </DialogContent>
-            </Dialog>
-          )}
+          </Dialog>
         </div>
 
         {/* Filters */}
