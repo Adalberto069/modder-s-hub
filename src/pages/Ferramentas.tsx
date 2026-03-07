@@ -219,20 +219,34 @@ export default function Ferramentas() {
                   </div>
                   <div className="flex gap-2 mt-auto">
                     {tool.external_url && (
-                      <Button size="sm" variant="outline" className="flex-1 text-xs" asChild>
-                        <a href={tool.external_url} target="_blank" rel="noopener noreferrer">
+                      user ? (
+                        <Button size="sm" variant="outline" className="flex-1 text-xs" asChild>
+                          <a href={tool.external_url} target="_blank" rel="noopener noreferrer">
+                            <ExternalLink className="h-3.5 w-3.5 mr-1" />
+                            Site Oficial
+                          </a>
+                        </Button>
+                      ) : (
+                        <Button size="sm" variant="outline" className="flex-1 text-xs" onClick={() => setShowLoginPrompt(true)}>
                           <ExternalLink className="h-3.5 w-3.5 mr-1" />
                           Site Oficial
-                        </a>
-                      </Button>
+                        </Button>
+                      )
                     )}
                     {tool.download_url && (
-                      <Button size="sm" className="flex-1 text-xs neon-glow-purple" asChild>
-                        <a href={tool.download_url} target="_blank" rel="noopener noreferrer">
+                      user ? (
+                        <Button size="sm" className="flex-1 text-xs neon-glow-purple" asChild>
+                          <a href={tool.download_url} target="_blank" rel="noopener noreferrer">
+                            <Download className="h-3.5 w-3.5 mr-1" />
+                            Download
+                          </a>
+                        </Button>
+                      ) : (
+                        <Button size="sm" className="flex-1 text-xs neon-glow-purple" onClick={() => setShowLoginPrompt(true)}>
                           <Download className="h-3.5 w-3.5 mr-1" />
                           Download
-                        </a>
-                      </Button>
+                        </Button>
+                      )
                     )}
                     {tool.tutorials && (
                       <Button size="sm" variant="secondary" className="flex-1 text-xs" asChild>
