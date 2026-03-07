@@ -15,6 +15,11 @@ import { toast } from "sonner";
 import { BookOpen, Play, Clock, Plus, Pencil, Trash2, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 
+const getYouTubeEmbedUrl = (url: string) => {
+  const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/);
+  return match ? `https://www.youtube.com/embed/${match[1]}` : null;
+};
+
 const CATEGORIES = [
   { value: "geral", label: "Geral" },
   { value: "scripts-lua", label: "Scripts Lua" },
