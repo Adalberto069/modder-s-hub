@@ -39,6 +39,8 @@ const App = () => (
             <Route path="/admin" element={<Admin />} />
             <Route path="/profile/settings" element={<ProfileSettings />} />
             <Route path="/tutorials" element={<Tutorials />} />
+            <Route path="/tutorial/new" element={<TutorialEditor />} />
+            <Route path="/tutorial/:id/edit" element={<TutorialEditor />} />
             <Route path="/tutorial/:id" element={<TutorialDetail />} />
             <Route path="/forum" element={<Forum />} />
             <Route path="/ferramentas" element={<Ferramentas />} />
