@@ -80,11 +80,25 @@ export default function ProfileSettings() {
       return;
     }
     setChangingPassword(true);
+
+    // For email users, verify current password first
+    if (!isOAuthUser) {
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: user!.email!,
+        password: currentPassword,
+      });
+      if (signInError) {
+        toast.error("Senha atual incorreta");
+        setChangingPassword(false);
+        return;
+      }
+    }
+
     const { error } = await supabase.auth.updateUser({ password: newPassword });
     if (error) {
       toast.error("Erro ao alterar senha: " + error.message);
     } else {
-      toast.success("Senha alterada com sucesso!");
+      toast.success(isOAuthUser ? "Senha definida com sucesso!" : "Senha alterada com sucesso!");
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
