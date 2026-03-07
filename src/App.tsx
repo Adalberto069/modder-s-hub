@@ -7,6 +7,7 @@ import { AuthProvider } from "@/lib/auth";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Marketplace from "./pages/Marketplace";
+import TutorialDetail from "./pages/TutorialDetail";
 import ScriptDetail from "./pages/ScriptDetail";
 import ModderProfile from "./pages/ModderProfile";
 import Dashboard from "./pages/Dashboard";
@@ -37,6 +38,7 @@ const App = () => (
             <Route path="/admin" element={<Admin />} />
             <Route path="/profile/settings" element={<ProfileSettings />} />
             <Route path="/tutorials" element={<Tutorials />} />
+            <Route path="/tutorial/:id" element={<TutorialDetail />} />
             <Route path="/forum" element={<Forum />} />
             <Route path="/ferramentas" element={<Ferramentas />} />
             <Route path="/reset-password" element={<ResetPassword />} />
