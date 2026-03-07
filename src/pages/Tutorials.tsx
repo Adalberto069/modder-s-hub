@@ -236,7 +236,7 @@ export default function Tutorials() {
               >
                 <Card 
                   className="group overflow-hidden neon-border hover:neon-glow-purple transition-all duration-300 bg-card/80 backdrop-blur-sm h-full flex flex-col cursor-pointer"
-                  onClick={() => setSelectedTutorial(tutorial)}
+                  onClick={() => { if (!user) { setShowLoginPrompt(true); return; } setSelectedTutorial(tutorial); }}
                 >
                   {/* Thumbnail */}
                   <div className="aspect-video bg-secondary/50 flex items-center justify-center overflow-hidden relative">
