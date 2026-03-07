@@ -340,7 +340,7 @@ export default function Ferramentas() {
                     <Select value={form.tutorial_id} onValueChange={(v) => setForm({ ...form, tutorial_id: v })}>
                       <SelectTrigger><SelectValue placeholder="Nenhum" /></SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">Nenhum</SelectItem>
+                        <SelectItem value="none">Nenhum</SelectItem>
                         {tutorials.map((t: any) => (
                           <SelectItem key={t.id} value={t.id}>{t.title}</SelectItem>
                         ))}
