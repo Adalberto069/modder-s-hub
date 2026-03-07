@@ -13,6 +13,8 @@ import { toast } from "sonner";
 import { Navigate } from "react-router-dom";
 import { Check, User, Lock, Eye, EyeOff, Shield, Mail } from "lucide-react";
 import { DEFAULT_AVATARS } from "@/lib/default-avatars";
+import { cn } from "@/lib/utils";
+
 function PasswordField({
   id, label, value, onChange, show, onToggle,
 }: {
