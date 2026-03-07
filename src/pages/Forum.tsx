@@ -278,26 +278,23 @@ export default function Forum() {
             </AnimatePresence>
 
             {/* Reply input */}
-            {user ? (
-              <div className="flex gap-2 mt-4">
-                <Textarea
-                  placeholder="Escreva sua resposta..."
-                  value={replyContent}
-                  onChange={(e) => setReplyContent(e.target.value)}
-                  className="min-h-[60px] flex-1"
-                />
-                <Button
-                  size="icon"
-                  className="neon-glow-green shrink-0 self-end"
-                  disabled={!replyContent.trim() || createReply.isPending}
-                  onClick={() => createReply.mutate()}
-                >
-                  <Send className="h-4 w-4" />
-                </Button>
-              </div>
-            ) : (
-              <p className="text-xs text-muted-foreground text-center py-4">Faça login para responder</p>
-            )}
+            <div className="flex gap-2 mt-4">
+              <Textarea
+                placeholder="Escreva sua resposta..."
+                value={replyContent}
+                onChange={(e) => setReplyContent(e.target.value)}
+                onFocus={() => { if (!user) setShowLoginPrompt(true); }}
+                className="min-h-[60px] flex-1"
+              />
+              <Button
+                size="icon"
+                className="neon-glow-green shrink-0 self-end"
+                disabled={!replyContent.trim() || createReply.isPending}
+                onClick={() => requireAuth(() => createReply.mutate())}
+              >
+                <Send className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
         </div>
       </Layout>
