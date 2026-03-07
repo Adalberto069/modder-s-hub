@@ -312,13 +312,12 @@ export default function Forum() {
             </h1>
             <p className="text-sm text-muted-foreground">Pergunte, ajude e interaja com a comunidade</p>
           </div>
-          {user && (
-            <Dialog open={newPostOpen} onOpenChange={setNewPostOpen}>
-              <DialogTrigger asChild>
-                <Button size="sm" className="neon-glow-purple gap-2">
-                  <Plus className="h-4 w-4" /> Nova Pergunta
-                </Button>
-              </DialogTrigger>
+          <Dialog open={newPostOpen} onOpenChange={setNewPostOpen}>
+            <DialogTrigger asChild>
+              <Button size="sm" className="neon-glow-purple gap-2" onClick={(e) => { if (!user) { e.preventDefault(); setShowLoginPrompt(true); } }}>
+                <Plus className="h-4 w-4" /> Nova Pergunta
+              </Button>
+            </DialogTrigger>
               <DialogContent className="max-w-lg">
                 <DialogHeader>
                   <DialogTitle className="font-mono">Nova Pergunta</DialogTitle>
