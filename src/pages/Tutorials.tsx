@@ -344,6 +344,7 @@ export default function Tutorials() {
             )}
           </DialogContent>
         </Dialog>
+        <LoginPromptDialog open={showLoginPrompt} onOpenChange={setShowLoginPrompt} />
       </div>
     </Layout>
   );
