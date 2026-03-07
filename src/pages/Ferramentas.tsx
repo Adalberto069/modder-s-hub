@@ -59,12 +59,11 @@ const emptyForm: ToolForm = {
 };
 
 export default function Ferramentas() {
-  const { user, isAdmin } = useAuth();
+  const { isAdmin } = useAuth();
   const queryClient = useQueryClient();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<ToolForm>(emptyForm);
-  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
 
   const { data: tools = [], isLoading } = useQuery({
     queryKey: ["tools"],
