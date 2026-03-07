@@ -519,6 +519,7 @@ export default function ScriptDetail() {
           </div>
         </div>
       </div>
+      <LoginPromptDialog open={showLoginPrompt} onOpenChange={setShowLoginPrompt} />
     </Layout>
   );
 }
