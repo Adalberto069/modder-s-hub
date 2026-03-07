@@ -414,9 +414,7 @@ export default function Forum() {
           </div>
         )}
 
-        {!user && (
-          <p className="text-xs text-muted-foreground text-center mt-6">Faça login para criar perguntas e responder</p>
-        )}
+        <LoginPromptDialog open={showLoginPrompt} onOpenChange={setShowLoginPrompt} />
       </div>
     </Layout>
   );
