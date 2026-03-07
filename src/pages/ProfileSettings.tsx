@@ -17,6 +17,7 @@ import { cn } from "@/lib/utils";
 
 export default function ProfileSettings() {
   const { user, profile, loading } = useAuth();
+  const isOAuthUser = user?.app_metadata?.provider && user.app_metadata.provider !== "email";
   const [saving, setSaving] = useState(false);
 
   const [displayName, setDisplayName] = useState("");
