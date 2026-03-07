@@ -235,11 +235,27 @@ export default function ProfileSettings() {
           <CardHeader className="pb-3">
             <div className="flex items-center gap-2">
               <Lock className="h-5 w-5 text-primary" />
-              <CardTitle className="text-lg">Alterar Senha</CardTitle>
+              <CardTitle className="text-lg">
+                {isOAuthUser ? "Definir Senha" : "Alterar Senha"}
+              </CardTitle>
             </div>
-            <CardDescription>Atualize sua senha de acesso</CardDescription>
+            <CardDescription>
+              {isOAuthUser
+                ? "Você entrou com Google. Defina uma senha para também poder entrar com email e senha."
+                : "Atualize sua senha de acesso"}
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
+            {!isOAuthUser && (
+              <PasswordField
+                id="current-password"
+                label="Senha Atual"
+                value={currentPassword}
+                onChange={setCurrentPassword}
+                show={showCurrentPw}
+                onToggle={() => setShowCurrentPw(!showCurrentPw)}
+              />
+            )}
             <PasswordField
               id="new-password"
               label="Nova Senha"
@@ -259,11 +275,11 @@ export default function ProfileSettings() {
             </div>
             <Button
               onClick={handleChangePassword}
-              disabled={changingPassword || !newPassword || !confirmPassword}
+              disabled={changingPassword || !newPassword || !confirmPassword || (!isOAuthUser && !currentPassword)}
               variant="outline"
               className="w-full"
             >
-              {changingPassword ? "Alterando..." : "Alterar Senha"}
+              {changingPassword ? "Alterando..." : isOAuthUser ? "Definir Senha" : "Alterar Senha"}
             </Button>
           </CardContent>
         </Card>
