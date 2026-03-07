@@ -14,6 +14,7 @@ import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
 import { BookOpen, Play, Clock, Plus, Pencil, Trash2, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
+import { LoginPromptDialog } from "@/components/LoginPromptDialog";
 
 const getYouTubeEmbedUrl = (url: string) => {
   const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/);
