@@ -15,6 +15,35 @@ import { Check, User, Lock, Eye, EyeOff, Shield, Mail } from "lucide-react";
 import { DEFAULT_AVATARS } from "@/lib/default-avatars";
 import { cn } from "@/lib/utils";
 
+function PasswordField({
+  id, label, value, onChange, show, onToggle,
+}: {
+  id: string; label: string; value: string; onChange: (v: string) => void; show: boolean; onToggle: () => void;
+}) {
+  return (
+    <div>
+      <Label htmlFor={id}>{label}</Label>
+      <div className="relative">
+        <Input
+          id={id}
+          type={show ? "text" : "password"}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className="pr-10"
+        />
+        <button
+          type="button"
+          onClick={onToggle}
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+          tabIndex={-1}
+        >
+          {show ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function ProfileSettings() {
   const { user, profile, loading } = useAuth();
   const isOAuthUser = user?.app_metadata?.provider && user.app_metadata.provider !== "email";
@@ -106,32 +135,7 @@ export default function ProfileSettings() {
     setChangingPassword(false);
   };
 
-  const PasswordField = ({
-    id, label, value, onChange, show, onToggle,
-  }: {
-    id: string; label: string; value: string; onChange: (v: string) => void; show: boolean; onToggle: () => void;
-  }) => (
-    <div>
-      <Label htmlFor={id}>{label}</Label>
-      <div className="relative">
-        <Input
-          id={id}
-          type={show ? "text" : "password"}
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          className="pr-10"
-        />
-        <button
-          type="button"
-          onClick={onToggle}
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-          tabIndex={-1}
-        >
-          {show ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-        </button>
-      </div>
-    </div>
-  );
+  
 
   return (
     <Layout>
