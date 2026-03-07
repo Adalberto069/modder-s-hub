@@ -49,6 +49,7 @@ export default function Tutorials() {
   const [activeCategory, setActiveCategory] = useState("all");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedTutorial, setSelectedTutorial] = useState<any | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<TutorialForm>(emptyForm);
 
   const { data: tutorials, isLoading } = useQuery({
