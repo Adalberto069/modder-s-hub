@@ -14,6 +14,7 @@ import Dashboard from "./pages/Dashboard";
 import Admin from "./pages/Admin";
 import ProfileSettings from "./pages/ProfileSettings";
 import Tutorials from "./pages/Tutorials";
+import TutorialEditor from "./pages/TutorialEditor";
 import Forum from "./pages/Forum";
 import Ferramentas from "./pages/Ferramentas";
 import ResetPassword from "./pages/ResetPassword";
