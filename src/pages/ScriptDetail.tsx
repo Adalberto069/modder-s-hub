@@ -202,7 +202,8 @@ export default function ScriptDetail() {
   };
 
   const handleReview = async () => {
-    if (!user || !script || newRating === 0) {
+    if (!user) { setShowLoginPrompt(true); return; }
+    if (!script || newRating === 0) {
       toast.error("Selecione uma avaliação de 1 a 5 estrelas.");
       return;
     }
