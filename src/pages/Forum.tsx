@@ -47,6 +47,12 @@ export default function Forum() {
   const [newContent, setNewContent] = useState("");
   const [newCategory, setNewCategory] = useState("geral");
   const [replyContent, setReplyContent] = useState("");
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
+
+  const requireAuth = (action: () => void) => {
+    if (!user) { setShowLoginPrompt(true); return; }
+    action();
+  };
 
   // Fetch posts
   const { data: posts = [], isLoading } = useQuery({
