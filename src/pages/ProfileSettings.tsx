@@ -17,6 +17,7 @@ import { cn } from "@/lib/utils";
 
 export default function ProfileSettings() {
   const { user, profile, loading } = useAuth();
+  const isOAuthUser = user?.app_metadata?.provider && user.app_metadata.provider !== "email";
   const [saving, setSaving] = useState(false);
 
   const [displayName, setDisplayName] = useState("");
@@ -79,11 +80,25 @@ export default function ProfileSettings() {
       return;
     }
     setChangingPassword(true);
+
+    // For email users, verify current password first
+    if (!isOAuthUser) {
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: user!.email!,
+        password: currentPassword,
+      });
+      if (signInError) {
+        toast.error("Senha atual incorreta");
+        setChangingPassword(false);
+        return;
+      }
+    }
+
     const { error } = await supabase.auth.updateUser({ password: newPassword });
     if (error) {
       toast.error("Erro ao alterar senha: " + error.message);
     } else {
-      toast.success("Senha alterada com sucesso!");
+      toast.success(isOAuthUser ? "Senha definida com sucesso!" : "Senha alterada com sucesso!");
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
@@ -234,11 +249,27 @@ export default function ProfileSettings() {
           <CardHeader className="pb-3">
             <div className="flex items-center gap-2">
               <Lock className="h-5 w-5 text-primary" />
-              <CardTitle className="text-lg">Alterar Senha</CardTitle>
+              <CardTitle className="text-lg">
+                {isOAuthUser ? "Definir Senha" : "Alterar Senha"}
+              </CardTitle>
             </div>
-            <CardDescription>Atualize sua senha de acesso</CardDescription>
+            <CardDescription>
+              {isOAuthUser
+                ? "Você entrou com Google. Defina uma senha para também poder entrar com email e senha."
+                : "Atualize sua senha de acesso"}
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
+            {!isOAuthUser && (
+              <PasswordField
+                id="current-password"
+                label="Senha Atual"
+                value={currentPassword}
+                onChange={setCurrentPassword}
+                show={showCurrentPw}
+                onToggle={() => setShowCurrentPw(!showCurrentPw)}
+              />
+            )}
             <PasswordField
               id="new-password"
               label="Nova Senha"
@@ -258,11 +289,11 @@ export default function ProfileSettings() {
             </div>
             <Button
               onClick={handleChangePassword}
-              disabled={changingPassword || !newPassword || !confirmPassword}
+              disabled={changingPassword || !newPassword || !confirmPassword || (!isOAuthUser && !currentPassword)}
               variant="outline"
               className="w-full"
             >
-              {changingPassword ? "Alterando..." : "Alterar Senha"}
+              {changingPassword ? "Alterando..." : isOAuthUser ? "Definir Senha" : "Alterar Senha"}
             </Button>
           </CardContent>
         </Card>
