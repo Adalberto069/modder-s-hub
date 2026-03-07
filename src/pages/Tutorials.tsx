@@ -232,7 +232,10 @@ export default function Tutorials() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.05 }}
               >
-                <Card className="group overflow-hidden neon-border hover:neon-glow-purple transition-all duration-300 bg-card/80 backdrop-blur-sm h-full flex flex-col">
+                <Card 
+                  className="group overflow-hidden neon-border hover:neon-glow-purple transition-all duration-300 bg-card/80 backdrop-blur-sm h-full flex flex-col cursor-pointer"
+                  onClick={() => setSelectedTutorial(tutorial)}
+                >
                   {/* Thumbnail */}
                   <div className="aspect-video bg-secondary/50 flex items-center justify-center overflow-hidden relative">
                     {tutorial.thumbnail_url ? (
