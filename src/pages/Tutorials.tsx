@@ -14,6 +14,7 @@ import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
 import { BookOpen, Play, Clock, Plus, Pencil, Trash2, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
+import { LoginPromptDialog } from "@/components/LoginPromptDialog";
 
 const getYouTubeEmbedUrl = (url: string) => {
   const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/);
@@ -51,6 +52,7 @@ export default function Tutorials() {
   const [selectedTutorial, setSelectedTutorial] = useState<any | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<TutorialForm>(emptyForm);
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
 
   const { data: tutorials, isLoading } = useQuery({
     queryKey: ["tutorials"],
@@ -234,7 +236,7 @@ export default function Tutorials() {
               >
                 <Card 
                   className="group overflow-hidden neon-border hover:neon-glow-purple transition-all duration-300 bg-card/80 backdrop-blur-sm h-full flex flex-col cursor-pointer"
-                  onClick={() => setSelectedTutorial(tutorial)}
+                  onClick={() => { if (!user) { setShowLoginPrompt(true); return; } setSelectedTutorial(tutorial); }}
                 >
                   {/* Thumbnail */}
                   <div className="aspect-video bg-secondary/50 flex items-center justify-center overflow-hidden relative">
@@ -342,6 +344,7 @@ export default function Tutorials() {
             )}
           </DialogContent>
         </Dialog>
+        <LoginPromptDialog open={showLoginPrompt} onOpenChange={setShowLoginPrompt} />
       </div>
     </Layout>
   );

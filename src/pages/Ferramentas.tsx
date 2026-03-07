@@ -13,7 +13,6 @@ import {
   Gamepad2, Wrench, Plus, Pencil, Trash2, BookOpen, Loader2,
 } from "lucide-react";
 import { motion } from "framer-motion";
-import { LoginPromptDialog } from "@/components/LoginPromptDialog";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -60,12 +59,11 @@ const emptyForm: ToolForm = {
 };
 
 export default function Ferramentas() {
-  const { user, isAdmin } = useAuth();
+  const { isAdmin } = useAuth();
   const queryClient = useQueryClient();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<ToolForm>(emptyForm);
-  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
 
   const { data: tools = [], isLoading } = useQuery({
     queryKey: ["tools"],
@@ -219,34 +217,20 @@ export default function Ferramentas() {
                   </div>
                   <div className="flex gap-2 mt-auto">
                     {tool.external_url && (
-                      user ? (
-                        <Button size="sm" variant="outline" className="flex-1 text-xs" asChild>
-                          <a href={tool.external_url} target="_blank" rel="noopener noreferrer">
-                            <ExternalLink className="h-3.5 w-3.5 mr-1" />
-                            Site Oficial
-                          </a>
-                        </Button>
-                      ) : (
-                        <Button size="sm" variant="outline" className="flex-1 text-xs" onClick={() => setShowLoginPrompt(true)}>
+                      <Button size="sm" variant="outline" className="flex-1 text-xs" asChild>
+                        <a href={tool.external_url} target="_blank" rel="noopener noreferrer">
                           <ExternalLink className="h-3.5 w-3.5 mr-1" />
                           Site Oficial
-                        </Button>
-                      )
+                        </a>
+                      </Button>
                     )}
                     {tool.download_url && (
-                      user ? (
-                        <Button size="sm" className="flex-1 text-xs neon-glow-purple" asChild>
-                          <a href={tool.download_url} target="_blank" rel="noopener noreferrer">
-                            <Download className="h-3.5 w-3.5 mr-1" />
-                            Download
-                          </a>
-                        </Button>
-                      ) : (
-                        <Button size="sm" className="flex-1 text-xs neon-glow-purple" onClick={() => setShowLoginPrompt(true)}>
+                      <Button size="sm" className="flex-1 text-xs neon-glow-purple" asChild>
+                        <a href={tool.download_url} target="_blank" rel="noopener noreferrer">
                           <Download className="h-3.5 w-3.5 mr-1" />
                           Download
-                        </Button>
-                      )
+                        </a>
+                      </Button>
                     )}
                     {tool.tutorials && (
                       <Button size="sm" variant="secondary" className="flex-1 text-xs" asChild>
@@ -400,7 +384,6 @@ export default function Ferramentas() {
             </TabsContent>
           </Tabs>
         )}
-        <LoginPromptDialog open={showLoginPrompt} onOpenChange={setShowLoginPrompt} />
       </div>
     </Layout>
   );
