@@ -5,12 +5,12 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
 import { BookOpen, Play, Clock, Plus, Pencil, Trash2, Loader2, Search, Star } from "lucide-react";
+import { motion } from "framer-motion";
 
 const CATEGORIES = [
   { value: "geral", label: "Geral", icon: "📖" },
@@ -22,27 +22,12 @@ const CATEGORIES = [
 
 const categoryLabels: Record<string, string> = Object.fromEntries(CATEGORIES.map(c => [c.value, c.label]));
 
-interface TutorialForm {
-  title: string;
-  description: string;
-  content: string;
-  category: string;
-  video_url: string;
-  thumbnail_url: string;
-}
-
-const emptyForm: TutorialForm = {
-  title: "", description: "", content: "", category: "geral", video_url: "", thumbnail_url: "",
-};
-
 export default function Tutorials() {
   const { user, isAdmin } = useAuth();
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [activeCategory, setActiveCategory] = useState("all");
   const [search, setSearch] = useState("");
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [form, setForm] = useState<TutorialForm>(emptyForm);
 
   const { data: tutorials = [], isLoading } = useQuery({
     queryKey: ["tutorials"],
@@ -55,7 +40,6 @@ export default function Tutorials() {
     },
   });
 
-  // Fetch average ratings for all tutorials
   const tutorialIds = tutorials.map((t: any) => t.id);
   const { data: ratings = [] } = useQuery({
     queryKey: ["tutorial-ratings-all", tutorialIds],
@@ -83,35 +67,6 @@ export default function Tutorials() {
     return map;
   }, [ratings]);
 
-  const saveTutorial = useMutation({
-    mutationFn: async () => {
-      const payload = {
-        title: form.title,
-        description: form.description || null,
-        content: form.content || null,
-        category: form.category,
-        video_url: form.video_url || null,
-        thumbnail_url: form.thumbnail_url || null,
-        author_id: user!.id,
-      };
-      if (editingId) {
-        const { error } = await supabase.from("tutorials").update(payload).eq("id", editingId);
-        if (error) throw error;
-      } else {
-        const { error } = await supabase.from("tutorials").insert(payload);
-        if (error) throw error;
-      }
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["tutorials"] });
-      setDialogOpen(false);
-      setEditingId(null);
-      setForm(emptyForm);
-      toast.success(editingId ? "Tutorial atualizado!" : "Tutorial criado!");
-    },
-    onError: (e: any) => toast.error(e.message),
-  });
-
   const deleteTutorial = useMutation({
     mutationFn: async (id: string) => {
       const { error } = await supabase.from("tutorials").delete().eq("id", id);
@@ -123,25 +78,6 @@ export default function Tutorials() {
     },
     onError: (e: any) => toast.error(e.message),
   });
-
-  const openEdit = (t: any) => {
-    setEditingId(t.id);
-    setForm({
-      title: t.title,
-      description: t.description || "",
-      content: t.content || "",
-      category: t.category,
-      video_url: t.video_url || "",
-      thumbnail_url: t.thumbnail_url || "",
-    });
-    setDialogOpen(true);
-  };
-
-  const openNew = () => {
-    setEditingId(null);
-    setForm(emptyForm);
-    setDialogOpen(true);
-  };
 
   const filtered = useMemo(() => {
     let result = tutorials;
@@ -181,58 +117,9 @@ export default function Tutorials() {
               </p>
             </div>
             {isAdmin && (
-              <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button onClick={openNew} className="neon-glow-purple shrink-0">
-                    <Plus className="h-4 w-4 mr-1" /> Adicionar
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
-                  <DialogHeader>
-                    <DialogTitle>{editingId ? "Editar Tutorial" : "Novo Tutorial"}</DialogTitle>
-                  </DialogHeader>
-                  <form
-                    className="space-y-4"
-                    onSubmit={(e) => { e.preventDefault(); saveTutorial.mutate(); }}
-                  >
-                    <div className="space-y-2">
-                      <Label>Título *</Label>
-                      <Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} required />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Descrição</Label>
-                      <Textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={2} />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Conteúdo (Markdown)</Label>
-                      <Textarea value={form.content} onChange={(e) => setForm({ ...form, content: e.target.value })} rows={8} placeholder="Use ## para subtítulos, - para listas, **negrito**, etc." />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Categoria</Label>
-                      <Select value={form.category} onValueChange={(v) => setForm({ ...form, category: v })}>
-                        <SelectTrigger><SelectValue /></SelectTrigger>
-                        <SelectContent>
-                          {CATEGORIES.map((c) => (
-                            <SelectItem key={c.value} value={c.value}>{c.icon} {c.label}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="space-y-2">
-                      <Label>URL do Vídeo (YouTube)</Label>
-                      <Input value={form.video_url} onChange={(e) => setForm({ ...form, video_url: e.target.value })} placeholder="https://youtube.com/watch?v=..." />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>URL da Thumbnail</Label>
-                      <Input value={form.thumbnail_url} onChange={(e) => setForm({ ...form, thumbnail_url: e.target.value })} placeholder="https://..." />
-                    </div>
-                    <Button type="submit" className="w-full neon-glow-green" disabled={saveTutorial.isPending || !form.title.trim()}>
-                      {saveTutorial.isPending && <Loader2 className="h-4 w-4 mr-1 animate-spin" />}
-                      {editingId ? "Salvar" : "Adicionar"}
-                    </Button>
-                  </form>
-                </DialogContent>
-              </Dialog>
+              <Button onClick={() => navigate("/tutorial/new")} className="neon-glow-purple shrink-0">
+                <Plus className="h-4 w-4 mr-1" /> Adicionar
+              </Button>
             )}
           </div>
 
@@ -323,7 +210,7 @@ export default function Tutorials() {
                         {/* Admin overlay */}
                         {isAdmin && (
                           <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-10">
-                            <Button size="icon" variant="secondary" className="h-7 w-7" onClick={(e) => { e.preventDefault(); e.stopPropagation(); openEdit(tutorial); }}>
+                            <Button size="icon" variant="secondary" className="h-7 w-7" onClick={(e) => { e.preventDefault(); e.stopPropagation(); navigate(`/tutorial/${tutorial.id}/edit`); }}>
                               <Pencil className="h-3.5 w-3.5" />
                             </Button>
                             <Button size="icon" variant="destructive" className="h-7 w-7" onClick={(e) => { e.preventDefault(); e.stopPropagation(); deleteTutorial.mutate(tutorial.id); }}>
