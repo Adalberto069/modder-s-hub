@@ -192,7 +192,7 @@ export default function ScriptDetail() {
   const handleDownload = async () => {
     if (!script) return;
     if (!user) {
-      toast.error("Faça login para baixar.");
+      setShowLoginPrompt(true);
       return;
     }
     await supabase.from("scripts").update({ download_count: script.download_count + 1 }).eq("id", script.id);
