@@ -263,10 +263,7 @@ export default function Forum() {
                             <p className="text-sm text-muted-foreground mt-1 whitespace-pre-wrap">{reply.content}</p>
                             <button
                               className={`flex items-center gap-1 mt-2 text-xs transition-colors ${userLikedReply[reply.id] ? "text-neon-green" : "text-muted-foreground hover:text-neon-green"}`}
-                              onClick={() => {
-                                if (!user) { toast.error("Faça login para curtir."); return; }
-                                toggleLike.mutate(reply.id);
-                              }}
+                              onClick={() => requireAuth(() => toggleLike.mutate(reply.id))}
                             >
                               <ThumbsUp className={`h-3.5 w-3.5 ${userLikedReply[reply.id] ? "fill-current" : ""}`} />
                               {likesPerReply[reply.id] || 0}
