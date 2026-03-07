@@ -15,6 +15,11 @@ import { toast } from "sonner";
 import { BookOpen, Play, Clock, Plus, Pencil, Trash2, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 
+const getYouTubeEmbedUrl = (url: string) => {
+  const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/);
+  return match ? `https://www.youtube.com/embed/${match[1]}` : null;
+};
+
 const CATEGORIES = [
   { value: "geral", label: "Geral" },
   { value: "scripts-lua", label: "Scripts Lua" },
@@ -43,6 +48,7 @@ export default function Tutorials() {
   const queryClient = useQueryClient();
   const [activeCategory, setActiveCategory] = useState("all");
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedTutorial, setSelectedTutorial] = useState<any | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<TutorialForm>(emptyForm);
 
@@ -226,7 +232,10 @@ export default function Tutorials() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.05 }}
               >
-                <Card className="group overflow-hidden neon-border hover:neon-glow-purple transition-all duration-300 bg-card/80 backdrop-blur-sm h-full flex flex-col">
+                <Card 
+                  className="group overflow-hidden neon-border hover:neon-glow-purple transition-all duration-300 bg-card/80 backdrop-blur-sm h-full flex flex-col cursor-pointer"
+                  onClick={() => setSelectedTutorial(tutorial)}
+                >
                   {/* Thumbnail */}
                   <div className="aspect-video bg-secondary/50 flex items-center justify-center overflow-hidden relative">
                     {tutorial.thumbnail_url ? (
@@ -278,6 +287,61 @@ export default function Tutorials() {
             )}
           </div>
         )}
+
+        {/* Tutorial Detail Dialog */}
+        <Dialog open={!!selectedTutorial} onOpenChange={(open) => !open && setSelectedTutorial(null)}>
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            {selectedTutorial && (
+              <>
+                <DialogHeader>
+                  <DialogTitle className="text-xl">{selectedTutorial.title}</DialogTitle>
+                  <div className="flex items-center gap-2 pt-1">
+                    <Badge variant="secondary">{categoryLabels[selectedTutorial.category] ?? selectedTutorial.category}</Badge>
+                    <span className="text-xs text-muted-foreground flex items-center gap-1">
+                      <Clock className="h-3 w-3" />
+                      {new Date(selectedTutorial.created_at).toLocaleDateString("pt-BR")}
+                    </span>
+                  </div>
+                </DialogHeader>
+
+                {selectedTutorial.description && (
+                  <p className="text-sm text-muted-foreground">{selectedTutorial.description}</p>
+                )}
+
+                {selectedTutorial.video_url && (() => {
+                  const embedUrl = getYouTubeEmbedUrl(selectedTutorial.video_url);
+                  return embedUrl ? (
+                    <div className="aspect-video rounded-lg overflow-hidden">
+                      <iframe
+                        src={embedUrl}
+                        title={selectedTutorial.title}
+                        className="w-full h-full"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                      />
+                    </div>
+                  ) : (
+                    <a href={selectedTutorial.video_url} target="_blank" rel="noopener noreferrer" className="text-primary underline text-sm">
+                      Assistir vídeo ↗
+                    </a>
+                  );
+                })()}
+
+                {selectedTutorial.thumbnail_url && !selectedTutorial.video_url && (
+                  <img src={selectedTutorial.thumbnail_url} alt={selectedTutorial.title} className="w-full rounded-lg" />
+                )}
+
+                {selectedTutorial.content ? (
+                  <div className="prose prose-invert prose-sm max-w-none whitespace-pre-wrap text-sm leading-relaxed">
+                    {selectedTutorial.content}
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground italic">Conteúdo ainda não disponível.</p>
+                )}
+              </>
+            )}
+          </DialogContent>
+        </Dialog>
       </div>
     </Layout>
   );
