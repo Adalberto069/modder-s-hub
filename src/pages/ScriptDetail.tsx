@@ -74,6 +74,7 @@ export default function ScriptDetail() {
   const [showPwInput, setShowPwInput] = useState(false);
   const [unlocking, setUnlocking] = useState(false);
   const [unlocked, setUnlocked] = useState(false);
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
 
   const { data: script } = useQuery({
     queryKey: ["script", id],
