@@ -486,7 +486,10 @@ export default function ScriptDetail() {
                 )}
 
                 {script.external_link && !script.is_paid && (
-                  <Button variant="outline" className="w-full" onClick={() => window.open(script.external_link!, "_blank")}>
+                  <Button variant="outline" className="w-full" onClick={() => {
+                    if (!user) { toast.error("Faça login para acessar."); return; }
+                    window.open(script.external_link!, "_blank");
+                  }}>
                     <ExternalLink className="mr-2 h-4 w-4" /> Link Externo
                   </Button>
                 )}
