@@ -101,7 +101,7 @@ export default function Ferramentas() {
         download_url: form.download_url || null,
         icon: form.icon,
         tags: form.tags.split(",").map((t) => t.trim()).filter(Boolean),
-        tutorial_id: form.tutorial_id || null,
+        tutorial_id: form.tutorial_id && form.tutorial_id !== "none" ? form.tutorial_id : null,
       };
       if (editingId) {
         const { error } = await supabase.from("tools").update(payload).eq("id", editingId);
@@ -340,7 +340,7 @@ export default function Ferramentas() {
                     <Select value={form.tutorial_id} onValueChange={(v) => setForm({ ...form, tutorial_id: v })}>
                       <SelectTrigger><SelectValue placeholder="Nenhum" /></SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">Nenhum</SelectItem>
+                        <SelectItem value="none">Nenhum</SelectItem>
                         {tutorials.map((t: any) => (
                           <SelectItem key={t.id} value={t.id}>{t.title}</SelectItem>
                         ))}
