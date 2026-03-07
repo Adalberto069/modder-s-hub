@@ -287,6 +287,61 @@ export default function Tutorials() {
             )}
           </div>
         )}
+
+        {/* Tutorial Detail Dialog */}
+        <Dialog open={!!selectedTutorial} onOpenChange={(open) => !open && setSelectedTutorial(null)}>
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            {selectedTutorial && (
+              <>
+                <DialogHeader>
+                  <DialogTitle className="text-xl">{selectedTutorial.title}</DialogTitle>
+                  <div className="flex items-center gap-2 pt-1">
+                    <Badge variant="secondary">{categoryLabels[selectedTutorial.category] ?? selectedTutorial.category}</Badge>
+                    <span className="text-xs text-muted-foreground flex items-center gap-1">
+                      <Clock className="h-3 w-3" />
+                      {new Date(selectedTutorial.created_at).toLocaleDateString("pt-BR")}
+                    </span>
+                  </div>
+                </DialogHeader>
+
+                {selectedTutorial.description && (
+                  <p className="text-sm text-muted-foreground">{selectedTutorial.description}</p>
+                )}
+
+                {selectedTutorial.video_url && (() => {
+                  const embedUrl = getYouTubeEmbedUrl(selectedTutorial.video_url);
+                  return embedUrl ? (
+                    <div className="aspect-video rounded-lg overflow-hidden">
+                      <iframe
+                        src={embedUrl}
+                        title={selectedTutorial.title}
+                        className="w-full h-full"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                      />
+                    </div>
+                  ) : (
+                    <a href={selectedTutorial.video_url} target="_blank" rel="noopener noreferrer" className="text-primary underline text-sm">
+                      Assistir vídeo ↗
+                    </a>
+                  );
+                })()}
+
+                {selectedTutorial.thumbnail_url && !selectedTutorial.video_url && (
+                  <img src={selectedTutorial.thumbnail_url} alt={selectedTutorial.title} className="w-full rounded-lg" />
+                )}
+
+                {selectedTutorial.content ? (
+                  <div className="prose prose-invert prose-sm max-w-none whitespace-pre-wrap text-sm leading-relaxed">
+                    {selectedTutorial.content}
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground italic">Conteúdo ainda não disponível.</p>
+                )}
+              </>
+            )}
+          </DialogContent>
+        </Dialog>
       </div>
     </Layout>
   );
