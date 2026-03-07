@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
+import { LoginPromptDialog } from "@/components/LoginPromptDialog";
 
 const statusConfig: Record<string, { label: string; className: string }> = {
   working: { label: "Working", className: "bg-accent/20 text-accent border-accent/30" },
