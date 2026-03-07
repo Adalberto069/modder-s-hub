@@ -16,6 +16,7 @@ import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { MessageSquare, Plus, Send, ArrowLeft, Search, ThumbsUp } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { LoginPromptDialog } from "@/components/LoginPromptDialog";
 
 const CATEGORIES = [
   { value: "geral", label: "Geral" },
