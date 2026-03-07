@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
+import { LoginPromptDialog } from "@/components/LoginPromptDialog";
 
 const statusConfig: Record<string, { label: string; className: string }> = {
   working: { label: "Working", className: "bg-accent/20 text-accent border-accent/30" },
@@ -73,6 +74,7 @@ export default function ScriptDetail() {
   const [showPwInput, setShowPwInput] = useState(false);
   const [unlocking, setUnlocking] = useState(false);
   const [unlocked, setUnlocked] = useState(false);
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
 
   const { data: script } = useQuery({
     queryKey: ["script", id],
@@ -190,7 +192,7 @@ export default function ScriptDetail() {
   const handleDownload = async () => {
     if (!script) return;
     if (!user) {
-      toast.error("Faça login para baixar.");
+      setShowLoginPrompt(true);
       return;
     }
     await supabase.from("scripts").update({ download_count: script.download_count + 1 }).eq("id", script.id);
@@ -200,7 +202,8 @@ export default function ScriptDetail() {
   };
 
   const handleReview = async () => {
-    if (!user || !script || newRating === 0) {
+    if (!user) { setShowLoginPrompt(true); return; }
+    if (!script || newRating === 0) {
       toast.error("Selecione uma avaliação de 1 a 5 estrelas.");
       return;
     }
@@ -516,6 +519,7 @@ export default function ScriptDetail() {
           </div>
         </div>
       </div>
+      <LoginPromptDialog open={showLoginPrompt} onOpenChange={setShowLoginPrompt} />
     </Layout>
   );
 }

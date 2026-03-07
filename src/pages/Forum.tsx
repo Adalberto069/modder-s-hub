@@ -16,6 +16,7 @@ import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { MessageSquare, Plus, Send, ArrowLeft, Search, ThumbsUp } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { LoginPromptDialog } from "@/components/LoginPromptDialog";
 
 const CATEGORIES = [
   { value: "geral", label: "Geral" },
@@ -46,6 +47,12 @@ export default function Forum() {
   const [newContent, setNewContent] = useState("");
   const [newCategory, setNewCategory] = useState("geral");
   const [replyContent, setReplyContent] = useState("");
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
+
+  const requireAuth = (action: () => void) => {
+    if (!user) { setShowLoginPrompt(true); return; }
+    action();
+  };
 
   // Fetch posts
   const { data: posts = [], isLoading } = useQuery({
@@ -256,10 +263,7 @@ export default function Forum() {
                             <p className="text-sm text-muted-foreground mt-1 whitespace-pre-wrap">{reply.content}</p>
                             <button
                               className={`flex items-center gap-1 mt-2 text-xs transition-colors ${userLikedReply[reply.id] ? "text-neon-green" : "text-muted-foreground hover:text-neon-green"}`}
-                              onClick={() => {
-                                if (!user) { toast.error("Faça login para curtir."); return; }
-                                toggleLike.mutate(reply.id);
-                              }}
+                              onClick={() => requireAuth(() => toggleLike.mutate(reply.id))}
                             >
                               <ThumbsUp className={`h-3.5 w-3.5 ${userLikedReply[reply.id] ? "fill-current" : ""}`} />
                               {likesPerReply[reply.id] || 0}
@@ -274,26 +278,23 @@ export default function Forum() {
             </AnimatePresence>
 
             {/* Reply input */}
-            {user ? (
-              <div className="flex gap-2 mt-4">
-                <Textarea
-                  placeholder="Escreva sua resposta..."
-                  value={replyContent}
-                  onChange={(e) => setReplyContent(e.target.value)}
-                  className="min-h-[60px] flex-1"
-                />
-                <Button
-                  size="icon"
-                  className="neon-glow-green shrink-0 self-end"
-                  disabled={!replyContent.trim() || createReply.isPending}
-                  onClick={() => createReply.mutate()}
-                >
-                  <Send className="h-4 w-4" />
-                </Button>
-              </div>
-            ) : (
-              <p className="text-xs text-muted-foreground text-center py-4">Faça login para responder</p>
-            )}
+            <div className="flex gap-2 mt-4">
+              <Textarea
+                placeholder="Escreva sua resposta..."
+                value={replyContent}
+                onChange={(e) => setReplyContent(e.target.value)}
+                onFocus={() => { if (!user) setShowLoginPrompt(true); }}
+                className="min-h-[60px] flex-1"
+              />
+              <Button
+                size="icon"
+                className="neon-glow-green shrink-0 self-end"
+                disabled={!replyContent.trim() || createReply.isPending}
+                onClick={() => requireAuth(() => createReply.mutate())}
+              >
+                <Send className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
         </div>
       </Layout>
@@ -311,13 +312,12 @@ export default function Forum() {
             </h1>
             <p className="text-sm text-muted-foreground">Pergunte, ajude e interaja com a comunidade</p>
           </div>
-          {user && (
-            <Dialog open={newPostOpen} onOpenChange={setNewPostOpen}>
-              <DialogTrigger asChild>
-                <Button size="sm" className="neon-glow-purple gap-2">
-                  <Plus className="h-4 w-4" /> Nova Pergunta
-                </Button>
-              </DialogTrigger>
+          <Dialog open={newPostOpen} onOpenChange={setNewPostOpen}>
+            <DialogTrigger asChild>
+              <Button size="sm" className="neon-glow-purple gap-2" onClick={(e) => { if (!user) { e.preventDefault(); setShowLoginPrompt(true); } }}>
+                <Plus className="h-4 w-4" /> Nova Pergunta
+              </Button>
+            </DialogTrigger>
               <DialogContent className="max-w-lg">
                 <DialogHeader>
                   <DialogTitle className="font-mono">Nova Pergunta</DialogTitle>
@@ -342,8 +342,7 @@ export default function Forum() {
                   </Button>
                 </div>
               </DialogContent>
-            </Dialog>
-          )}
+          </Dialog>
         </div>
 
         {/* Filters */}
@@ -415,9 +414,7 @@ export default function Forum() {
           </div>
         )}
 
-        {!user && (
-          <p className="text-xs text-muted-foreground text-center mt-6">Faça login para criar perguntas e responder</p>
-        )}
+        <LoginPromptDialog open={showLoginPrompt} onOpenChange={setShowLoginPrompt} />
       </div>
     </Layout>
   );
