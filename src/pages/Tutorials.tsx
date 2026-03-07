@@ -11,7 +11,6 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
 import { BookOpen, Play, Clock, Plus, Pencil, Trash2, Loader2, Search, Star } from "lucide-react";
-import { motion } from "framer-motion";
 
 const CATEGORIES = [
   { value: "geral", label: "Geral", icon: "📖" },
