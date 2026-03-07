@@ -283,7 +283,8 @@ export default function Forum() {
                 placeholder="Escreva sua resposta..."
                 value={replyContent}
                 onChange={(e) => setReplyContent(e.target.value)}
-                onFocus={() => { if (!user) setShowLoginPrompt(true); }}
+                onClick={() => { if (!user) setShowLoginPrompt(true); }}
+                readOnly={!user}
                 className="min-h-[60px] flex-1"
               />
               <Button
@@ -296,6 +297,7 @@ export default function Forum() {
               </Button>
             </div>
           </div>
+          <LoginPromptDialog open={showLoginPrompt} onOpenChange={setShowLoginPrompt} />
         </div>
       </Layout>
     );
