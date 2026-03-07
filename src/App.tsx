@@ -14,6 +14,7 @@ import Dashboard from "./pages/Dashboard";
 import Admin from "./pages/Admin";
 import ProfileSettings from "./pages/ProfileSettings";
 import Tutorials from "./pages/Tutorials";
+import TutorialEditor from "./pages/TutorialEditor";
 import Forum from "./pages/Forum";
 import Ferramentas from "./pages/Ferramentas";
 import ResetPassword from "./pages/ResetPassword";
@@ -38,6 +39,8 @@ const App = () => (
             <Route path="/admin" element={<Admin />} />
             <Route path="/profile/settings" element={<ProfileSettings />} />
             <Route path="/tutorials" element={<Tutorials />} />
+            <Route path="/tutorial/new" element={<TutorialEditor />} />
+            <Route path="/tutorial/:id/edit" element={<TutorialEditor />} />
             <Route path="/tutorial/:id" element={<TutorialDetail />} />
             <Route path="/forum" element={<Forum />} />
             <Route path="/ferramentas" element={<Ferramentas />} />
