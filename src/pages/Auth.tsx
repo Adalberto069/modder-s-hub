@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
+import { useAuth } from "@/lib/auth";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,10 +14,39 @@ import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import { Terminal, Mail, CheckCircle, Eye, EyeOff } from "lucide-react";
 
+function PasswordInput({
+  id, value, onChange, show, onToggle, ...props
+}: {
+  id: string; value: string; onChange: (v: string) => void; show: boolean; onToggle: () => void;
+} & Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'value'>) {
+  return (
+    <div className="relative">
+      <Input
+        id={id}
+        type={show ? "text" : "password"}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="pr-10"
+        autoComplete={id.includes("login") ? "current-password" : "new-password"}
+        {...props}
+      />
+      <button
+        type="button"
+        onClick={onToggle}
+        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+        tabIndex={-1}
+      >
+        {show ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+      </button>
+    </div>
+  );
+}
+
 export default function Auth() {
   const [searchParams] = useSearchParams();
   const defaultTab = searchParams.get("tab") === "signup" ? "signup" : "login";
   const navigate = useNavigate();
+  const { user, loading: authLoading } = useAuth();
   const [loading, setLoading] = useState(false);
   const [showForgot, setShowForgot] = useState(false);
   const [forgotEmail, setForgotEmail] = useState("");
@@ -32,6 +62,13 @@ export default function Auth() {
   const [showSignupPw, setShowSignupPw] = useState(false);
   const [signupUsername, setSignupUsername] = useState("");
   const [wantModder, setWantModder] = useState(false);
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (!authLoading && user) {
+      navigate("/", { replace: true });
+    }
+  }, [user, authLoading, navigate]);
 
   const handleGoogleLogin = async () => {
     setLoading(true);
@@ -57,6 +94,10 @@ export default function Auth() {
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (signupPassword.length < 6) {
+      toast.error("A senha deve ter pelo menos 6 caracteres.");
+      return;
+    }
     setLoading(true);
     const { data, error } = await supabase.auth.signUp({
       email: signupEmail,
@@ -97,30 +138,16 @@ export default function Auth() {
     setLoading(false);
   };
 
-  const PasswordInput = ({
-    id, value, onChange, show, onToggle, ...props
-  }: {
-    id: string; value: string; onChange: (v: string) => void; show: boolean; onToggle: () => void;
-  } & Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'value'>) => (
-    <div className="relative">
-      <Input
-        id={id}
-        type={show ? "text" : "password"}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="pr-10"
-        {...props}
-      />
-      <button
-        type="button"
-        onClick={onToggle}
-        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-        tabIndex={-1}
-      >
-        {show ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-      </button>
-    </div>
-  );
+  // Show loading while checking auth state
+  if (authLoading) {
+    return (
+      <Layout>
+        <div className="container flex items-center justify-center py-16">
+          <p className="text-muted-foreground">Carregando...</p>
+        </div>
+      </Layout>
+    );
+  }
 
   if (showEmailSent) {
     return (
@@ -174,7 +201,7 @@ export default function Auth() {
                 </p>
                 <div>
                   <Label htmlFor="forgot-email">Email</Label>
-                  <Input id="forgot-email" type="email" value={forgotEmail} onChange={(e) => setForgotEmail(e.target.value)} required />
+                  <Input id="forgot-email" type="email" value={forgotEmail} onChange={(e) => setForgotEmail(e.target.value)} required autoComplete="email" />
                 </div>
                 <Button type="submit" className="w-full neon-glow-purple" disabled={loading}>
                   {loading ? "Enviando..." : "Enviar Link"}
@@ -233,7 +260,7 @@ export default function Auth() {
                 <form onSubmit={handleLogin} className="space-y-4">
                   <div>
                     <Label htmlFor="login-email">Email</Label>
-                    <Input id="login-email" type="email" value={loginEmail} onChange={(e) => setLoginEmail(e.target.value)} required />
+                    <Input id="login-email" type="email" value={loginEmail} onChange={(e) => setLoginEmail(e.target.value)} required autoComplete="email" />
                   </div>
                   <div>
                     <Label htmlFor="login-password">Senha</Label>
@@ -254,11 +281,11 @@ export default function Auth() {
                 <form onSubmit={handleSignup} className="space-y-4">
                   <div>
                     <Label htmlFor="signup-username">Username</Label>
-                    <Input id="signup-username" value={signupUsername} onChange={(e) => setSignupUsername(e.target.value)} required />
+                    <Input id="signup-username" value={signupUsername} onChange={(e) => setSignupUsername(e.target.value)} required autoComplete="username" />
                   </div>
                   <div>
                     <Label htmlFor="signup-email">Email</Label>
-                    <Input id="signup-email" type="email" value={signupEmail} onChange={(e) => setSignupEmail(e.target.value)} required />
+                    <Input id="signup-email" type="email" value={signupEmail} onChange={(e) => setSignupEmail(e.target.value)} required autoComplete="email" />
                   </div>
                   <div>
                     <Label htmlFor="signup-password">Senha</Label>
