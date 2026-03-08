@@ -245,6 +245,11 @@ export default function Admin() {
           </CardContent>
         </Card>
 
+        {/* Moderation Queue */}
+        <div className="mt-8">
+          <AdminModerationQueue />
+        </div>
+
         {/* Flagged Scripts */}
         <div className="mt-8">
           <AdminFlaggedScripts />
