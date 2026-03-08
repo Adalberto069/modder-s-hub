@@ -9,6 +9,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { UserBadges } from "@/components/UserBadges";
+import { RoleBadge } from "@/components/RoleBadge";
 
 export default function ModderProfile() {
   const { userId } = useParams<{ userId: string }>();
