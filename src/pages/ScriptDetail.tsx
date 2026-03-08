@@ -7,7 +7,6 @@ import { Layout } from "@/components/layout/Layout";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { supabase } from "@/integrations/supabase/client";
@@ -15,8 +14,8 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth";
 import {
   Download, Star, ExternalLink, ArrowLeft, User, ShieldCheck, ShieldAlert, ShieldX,
-  ChevronLeft, ChevronRight, Play, MessageSquare, Lock, Eye, EyeOff, CheckCircle, Clock,
-  Copy, Check, Gamepad2, Tag, List, BookOpen, FileCode,
+  ChevronLeft, ChevronRight, Play, MessageSquare, Lock, CheckCircle, Clock,
+  Copy, Check, Gamepad2, Tag, List, BookOpen, FileCode, ShoppingCart, Key,
 } from "lucide-react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
@@ -100,6 +99,19 @@ function CodeBlock({ code }: { code: string }) {
   );
 }
 
+function generateLicenseKey(): string {
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  const segments: string[] = [];
+  for (let s = 0; s < 3; s++) {
+    let seg = "";
+    for (let i = 0; i < 4; i++) {
+      seg += chars[Math.floor(Math.random() * chars.length)];
+    }
+    segments.push(seg);
+  }
+  return segments.join("-");
+}
+
 export default function ScriptDetail() {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
@@ -108,10 +120,8 @@ export default function ScriptDetail() {
   const [newRating, setNewRating] = useState(0);
   const [newComment, setNewComment] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const [enteredPassword, setEnteredPassword] = useState("");
-  const [showPwInput, setShowPwInput] = useState(false);
-  const [unlocking, setUnlocking] = useState(false);
-  const [unlocked, setUnlocked] = useState(false);
+  const [purchasing, setPurchasing] = useState(false);
+  const [purchaseSuccess, setPurchaseSuccess] = useState<string | null>(null);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
 
   const { data: script } = useQuery({
@@ -154,10 +164,17 @@ export default function ScriptDetail() {
     enabled: !!id,
   });
 
-  const { data: existingAccess } = useQuery({
-    queryKey: ["script-access", id, user?.id],
+  // Check if user already has a license for this script
+  const { data: existingLicense } = useQuery({
+    queryKey: ["script-license", id, user?.id],
     queryFn: async () => {
-      const { data } = await supabase.from("script_access").select("id").eq("script_id", id!).eq("user_id", user!.id).maybeSingle();
+      const { data } = await supabase
+        .from("licenses")
+        .select("*")
+        .eq("script_id", id!)
+        .eq("user_id", user!.id)
+        .eq("status", "active")
+        .maybeSingle();
       return data;
     },
     enabled: !!id && !!user && !!script?.is_paid,
@@ -175,7 +192,7 @@ export default function ScriptDetail() {
   });
 
   const isOwner = user && script && script.modder_id === user.id;
-  const hasAccess = !!existingAccess || unlocked || isOwner;
+  const hasAccess = !!existingLicense || isOwner || (script && !script.is_paid);
 
   const reviewerIds = [...new Set(reviews?.map((r: any) => r.user_id) ?? [])];
   const { data: reviewerProfiles } = useQuery({
@@ -190,19 +207,108 @@ export default function ScriptDetail() {
 
   const profileMap = (reviewerProfiles ?? []).reduce((acc: any, p: any) => { acc[p.user_id] = p; return acc; }, {});
 
-  const handleUnlockWithPassword = async () => {
-    if (!user || !script || !enteredPassword.trim()) return;
-    setUnlocking(true);
-    const { data: isValid, error } = await supabase.rpc("validate_script_password", { _script_id: script.id, _password: enteredPassword.trim() });
-    if (error || !isValid) { toast.error("Senha incorreta ou expirada!"); setUnlocking(false); return; }
-    await supabase.from("script_access").insert({ script_id: script.id, user_id: user.id });
-    setUnlocked(true);
-    toast.success("Acesso desbloqueado!");
-    setEnteredPassword(""); setShowPwInput(false); setUnlocking(false);
-    queryClient.invalidateQueries({ queryKey: ["script-access", id, user.id] });
+  const handlePurchase = async () => {
+    if (!user) { setShowLoginPrompt(true); return; }
+    if (!script) return;
+    setPurchasing(true);
+
+    try {
+      // Simulated payment - create purchase record
+      const { data: purchase, error: purchaseError } = await supabase
+        .from("purchases")
+        .insert({
+          user_id: user.id,
+          script_id: script.id,
+          amount: Number(script.price) || 0,
+          status: "completed",
+        })
+        .select("id")
+        .single();
+
+      if (purchaseError) throw purchaseError;
+
+      // Generate license key
+      const licenseKey = generateLicenseKey();
+      const { error: licenseError } = await supabase
+        .from("licenses")
+        .insert({
+          user_id: user.id,
+          script_id: script.id,
+          purchase_id: purchase.id,
+          license_key: licenseKey,
+          status: "active",
+        });
+
+      if (licenseError) throw licenseError;
+
+      setPurchaseSuccess(licenseKey);
+      toast.success("Compra realizada com sucesso!");
+      queryClient.invalidateQueries({ queryKey: ["script-license", id, user.id] });
+    } catch (err: any) {
+      toast.error("Erro na compra: " + err.message);
+    } finally {
+      setPurchasing(false);
+    }
   };
 
-  const handleDownload = async () => {
+  const handleDownloadLoader = () => {
+    if (!script || !user) return;
+    const license = existingLicense || (purchaseSuccess ? { license_key: purchaseSuccess } : null);
+    if (!license) return;
+
+    const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID || "rdagqukqmphvlxbrefil";
+    const baseUrl = `https://${projectId}.supabase.co/functions/v1`;
+
+    const loaderCode = `-- ========================================
+-- ${script.title} - Loader
+-- Powered by ModHub License System
+-- ========================================
+
+local license = "${(license as any).license_key}"
+
+-- Verify license
+local checkUrl = "${baseUrl}/check-license?key=" .. license
+local checkResponse = gg.makeRequest(checkUrl)
+
+if checkResponse == nil or checkResponse.content ~= "valid" then
+  gg.alert("❌ Licença inválida ou banida!\\n\\nVerifique sua licença no dashboard.")
+  os.exit()
+end
+
+gg.toast("✅ Licença válida! Carregando script...")
+
+-- Load protected script
+local scriptUrl = "${baseUrl}/get-script?key=" .. license
+local scriptResponse = gg.makeRequest(scriptUrl)
+
+if scriptResponse == nil or scriptResponse.content == nil then
+  gg.alert("❌ Erro ao carregar o script.")
+  os.exit()
+end
+
+-- Execute the script
+local fn, err = load(scriptResponse.content)
+if fn then
+  fn()
+else
+  gg.alert("❌ Erro no script: " .. tostring(err))
+end
+`;
+
+    const blob = new Blob([loaderCode], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    const safeName = script.title.replace(/[^a-zA-Z0-9\s\-_]/g, "").trim();
+    a.download = `${safeName || "loader"}.lua`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast.success("Loader baixado!");
+  };
+
+  const handleDownloadFree = async () => {
     if (!script) return;
     if (!user) { setShowLoginPrompt(true); return; }
     const secStatus = (script as any).security_status;
@@ -211,17 +317,17 @@ export default function ScriptDetail() {
       return;
     }
     await supabase.from("scripts").update({ download_count: script.download_count + 1 }).eq("id", script.id);
-    
+
     const downloadUrl = script.file_url || script.external_link;
     if (downloadUrl) {
-      // Build a friendly filename from game name + title
+      const gameName = (script as any).game_name;
       const safeName = [gameName, script.title]
         .filter(Boolean)
         .join(" - ")
         .replace(/[^a-zA-Z0-9\s\-_().àáâãéêíóôõúçÀÁÂÃÉÊÍÓÔÕÚÇ]/g, "")
         .trim();
       const ext = script.file_url?.match(/\.(\w+)$/)?.[1] || "lua";
-      
+
       try {
         const response = await fetch(downloadUrl);
         const blob = await response.blob();
@@ -291,7 +397,6 @@ export default function ScriptDetail() {
               <div className="flex items-start gap-3 mb-2 flex-wrap">
                 <h1 className="text-2xl font-bold flex-1">{script.title}</h1>
                 <div className="flex gap-2 shrink-0 flex-wrap">
-                  {/* Security Status Badges */}
                   {(script as any).security_status === "verified" && (
                     <Badge className="bg-accent/20 text-accent border-accent/30 gap-1">
                       <ShieldCheck className="h-3 w-3" /> Verificado
@@ -321,7 +426,6 @@ export default function ScriptDetail() {
                 </div>
               </div>
 
-              {/* Meta info row */}
               <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                 {gameName && (
                   <Badge variant="secondary" className="gap-1 text-[10px]">
@@ -534,38 +638,62 @@ export default function ScriptDetail() {
                 {script.is_paid ? (
                   <div className="space-y-3">
                     <p className="text-2xl font-bold font-mono text-primary text-center">R$ {Number(script.price).toFixed(2)}</p>
-                    {hasAccess ? (
+
+                    {/* Purchase success state */}
+                    {purchaseSuccess && (
+                      <Card className="border-accent/30 bg-accent/5">
+                        <CardContent className="p-4 space-y-3">
+                          <div className="flex items-center gap-2 text-accent text-sm font-semibold">
+                            <CheckCircle className="h-4 w-4" /> Compra Realizada!
+                          </div>
+                          <div>
+                            <p className="text-[10px] text-muted-foreground mb-1">Sua Licença:</p>
+                            <div className="flex items-center gap-2 bg-secondary/50 rounded p-2">
+                              <Key className="h-4 w-4 text-primary shrink-0" />
+                              <code className="text-sm font-mono text-primary flex-1">{purchaseSuccess}</code>
+                              <Button variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={() => { navigator.clipboard.writeText(purchaseSuccess); toast.success("Licença copiada!"); }}>
+                                <Copy className="h-3 w-3" />
+                              </Button>
+                            </div>
+                          </div>
+                          <Button className="w-full neon-glow-green" onClick={handleDownloadLoader}>
+                            <Download className="mr-2 h-4 w-4" /> Baixar Loader (.lua)
+                          </Button>
+                          <p className="text-[10px] text-muted-foreground text-center">
+                            Sua licença também está disponível no Dashboard
+                          </p>
+                        </CardContent>
+                      </Card>
+                    )}
+
+                    {!purchaseSuccess && existingLicense ? (
                       <div className="space-y-2">
                         <div className="flex items-center gap-2 justify-center text-accent text-sm">
-                          <CheckCircle className="h-4 w-4" /><span>Acesso desbloqueado</span>
+                          <CheckCircle className="h-4 w-4" /><span>Já adquirido</span>
                         </div>
-                        <Button className="w-full neon-glow-green" onClick={handleDownload}>
-                          <Download className="mr-2 h-4 w-4" /> Download
+                        <div className="bg-secondary/50 rounded p-2">
+                          <p className="text-[10px] text-muted-foreground mb-1">Sua Licença:</p>
+                          <div className="flex items-center gap-2">
+                            <Key className="h-3 w-3 text-primary shrink-0" />
+                            <code className="text-xs font-mono text-primary flex-1">{(existingLicense as any).license_key}</code>
+                            <Button variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={() => { navigator.clipboard.writeText((existingLicense as any).license_key); toast.success("Licença copiada!"); }}>
+                              <Copy className="h-3 w-3" />
+                            </Button>
+                          </div>
+                        </div>
+                        <Button className="w-full neon-glow-green" onClick={handleDownloadLoader}>
+                          <Download className="mr-2 h-4 w-4" /> Baixar Loader (.lua)
                         </Button>
                       </div>
-                    ) : (
-                      <div className="space-y-2">
-                        {!showPwInput ? (
-                          <Button className="w-full neon-glow-purple" onClick={() => { if (!user) { setShowLoginPrompt(true); return; } setShowPwInput(true); }}>
-                            <Lock className="mr-2 h-4 w-4" /> Desbloquear com Senha
-                          </Button>
-                        ) : (
-                          <div className="space-y-2">
-                            <Input type="password" value={enteredPassword} onChange={(e) => setEnteredPassword(e.target.value)} placeholder="Digite a senha" onKeyDown={(e) => e.key === "Enter" && handleUnlockWithPassword()} />
-                            <div className="flex gap-2">
-                              <Button size="sm" className="flex-1 neon-glow-purple" onClick={handleUnlockWithPassword} disabled={unlocking || !enteredPassword.trim()}>
-                                {unlocking ? "Validando..." : "Confirmar"}
-                              </Button>
-                              <Button size="sm" variant="outline" onClick={() => { setShowPwInput(false); setEnteredPassword(""); }}>Cancelar</Button>
-                            </div>
-                            <p className="text-[10px] text-muted-foreground text-center">Insira a senha fornecida pelo modder</p>
-                          </div>
-                        )}
-                      </div>
-                    )}
+                    ) : !purchaseSuccess ? (
+                      <Button className="w-full neon-glow-purple" onClick={handlePurchase} disabled={purchasing}>
+                        <ShoppingCart className="mr-2 h-4 w-4" />
+                        {purchasing ? "Processando..." : "Comprar Script"}
+                      </Button>
+                    ) : null}
                   </div>
                 ) : (
-                  <Button className="w-full neon-glow-green" onClick={handleDownload}>
+                  <Button className="w-full neon-glow-green" onClick={handleDownloadFree}>
                     <Download className="mr-2 h-4 w-4" /> Download Grátis
                   </Button>
                 )}

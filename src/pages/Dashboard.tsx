@@ -12,9 +12,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { Upload, Download, Star, DollarSign, Plus, Trash2, Code, Package, Lock, Eye, EyeOff, Pencil } from "lucide-react";
+import { Upload, Download, Star, DollarSign, Plus, Trash2, Code, Package, Pencil, Key, Copy, ShoppingBag } from "lucide-react";
 import { Navigate, useNavigate } from "react-router-dom";
 
 export default function Dashboard() {
@@ -22,6 +22,7 @@ export default function Dashboard() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const [showForm, setShowForm] = useState(false);
+  const [activeTab, setActiveTab] = useState("purchases");
 
   // Form state
   const [title, setTitle] = useState("");
@@ -35,12 +36,6 @@ export default function Dashboard() {
   const [submitting, setSubmitting] = useState(false);
   const [scriptType, setScriptType] = useState<string>("script");
 
-  // Password protection for paid scripts
-  const [scriptPassword, setScriptPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [passwordPermanent, setPasswordPermanent] = useState(true);
-  const [passwordExpiry, setPasswordExpiry] = useState("");
-
   const { data: categories } = useQuery({
     queryKey: ["categories"],
     queryFn: async () => {
@@ -49,6 +44,7 @@ export default function Dashboard() {
     },
   });
 
+  // Modder scripts
   const { data: myScripts } = useQuery({
     queryKey: ["my-scripts", user?.id],
     queryFn: async () => {
@@ -59,31 +55,29 @@ export default function Dashboard() {
         .order("created_at", { ascending: false });
       return data ?? [];
     },
+    enabled: !!user && isModder,
+  });
+
+  // Purchased scripts with licenses (for ALL users)
+  const { data: myLicenses } = useQuery({
+    queryKey: ["my-licenses", user?.id],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("licenses")
+        .select("*, scripts(id, title, game_name, thumbnail_url, version)")
+        .eq("user_id", user!.id)
+        .order("created_at", { ascending: false });
+      return data ?? [];
+    },
     enabled: !!user,
   });
 
   if (loading) return <Layout><div className="container py-16 text-center">Carregando...</div></Layout>;
   if (!user) return <Navigate to="/auth" />;
-  if (!isModder) {
-    return (
-      <Layout>
-        <div className="container py-16 text-center space-y-4">
-          <h1 className="text-2xl font-bold">Acesso Restrito</h1>
-          <p className="text-muted-foreground">Você precisa ser um Modder aprovado para acessar o Dashboard.</p>
-        </div>
-      </Layout>
-    );
-  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
-
-    if (isPaid && !scriptPassword.trim()) {
-      toast.error("Scripts pagos precisam de uma senha de proteção");
-      return;
-    }
-
     setSubmitting(true);
 
     let fileUrl = null;
@@ -101,7 +95,7 @@ export default function Dashboard() {
       fileUrl = publicData.publicUrl;
     }
 
-    const { data: insertedScript, error } = await supabase.from("scripts").insert({
+    const { error } = await supabase.from("scripts").insert({
       modder_id: user.id,
       title,
       description,
@@ -112,7 +106,7 @@ export default function Dashboard() {
       file_url: fileUrl,
       external_link: externalLink || null,
       script_type: scriptType as any,
-    }).select("id").single();
+    });
 
     if (error) {
       toast.error("Erro: " + error.message);
@@ -120,24 +114,10 @@ export default function Dashboard() {
       return;
     }
 
-    // If paid, create password protection
-    if (isPaid && insertedScript) {
-      const { error: pwError } = await supabase.from("script_passwords").insert({
-        script_id: insertedScript.id,
-        password: scriptPassword.trim(),
-        is_permanent: passwordPermanent,
-        expires_at: !passwordPermanent && passwordExpiry ? new Date(passwordExpiry).toISOString() : null,
-      });
-      if (pwError) {
-        toast.error("Script criado, mas erro na senha: " + pwError.message);
-      }
-    }
-
     toast.success(scriptType === "script" ? "Script publicado!" : "APK/Mod publicado!");
     setTitle(""); setDescription(""); setCategoryId(""); setStatus("working");
     setIsPaid(false); setPrice(""); setExternalLink(""); setFile(null);
-    setScriptType("script"); setScriptPassword(""); setPasswordPermanent(true);
-    setPasswordExpiry(""); setShowForm(false);
+    setScriptType("script"); setShowForm(false);
     queryClient.invalidateQueries({ queryKey: ["my-scripts"] });
     setSubmitting(false);
   };
@@ -151,6 +131,62 @@ export default function Dashboard() {
     }
   };
 
+  const handleDownloadLoader = (license: any) => {
+    const script = license.scripts;
+    if (!script) return;
+
+    const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID || "rdagqukqmphvlxbrefil";
+    const baseUrl = `https://${projectId}.supabase.co/functions/v1`;
+
+    const loaderCode = `-- ========================================
+-- ${script.title} - Loader
+-- Powered by ModHub License System
+-- ========================================
+
+local license = "${license.license_key}"
+
+-- Verify license
+local checkUrl = "${baseUrl}/check-license?key=" .. license
+local checkResponse = gg.makeRequest(checkUrl)
+
+if checkResponse == nil or checkResponse.content ~= "valid" then
+  gg.alert("❌ Licença inválida ou banida!\\n\\nVerifique sua licença no dashboard.")
+  os.exit()
+end
+
+gg.toast("✅ Licença válida! Carregando script...")
+
+-- Load protected script
+local scriptUrl = "${baseUrl}/get-script?key=" .. license
+local scriptResponse = gg.makeRequest(scriptUrl)
+
+if scriptResponse == nil or scriptResponse.content == nil then
+  gg.alert("❌ Erro ao carregar o script.")
+  os.exit()
+end
+
+-- Execute the script
+local fn, err = load(scriptResponse.content)
+if fn then
+  fn()
+else
+  gg.alert("❌ Erro no script: " .. tostring(err))
+end
+`;
+
+    const blob = new Blob([loaderCode], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    const safeName = script.title?.replace(/[^a-zA-Z0-9\s\-_]/g, "").trim();
+    a.download = `${safeName || "loader"}.lua`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast.success("Loader baixado!");
+  };
+
   const totalDownloads = myScripts?.reduce((sum: number, s: any) => sum + s.download_count, 0) ?? 0;
   const simulatedEarnings = myScripts?.reduce((sum: number, s: any) => sum + (s.is_paid ? s.download_count * Number(s.price) * 0.7 : 0), 0) ?? 0;
 
@@ -159,212 +195,255 @@ export default function Dashboard() {
       <div className="container py-8">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold">Dashboard</h1>
-          <Button onClick={() => navigate("/script/new")} className="neon-glow-purple">
-            <Plus className="mr-2 h-4 w-4" /> Novo Conteúdo
-          </Button>
+          {isModder && (
+            <Button onClick={() => navigate("/script/new")} className="neon-glow-purple">
+              <Plus className="mr-2 h-4 w-4" /> Novo Conteúdo
+            </Button>
+          )}
         </div>
 
-        {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <Card className="neon-border bg-card/80">
-            <CardContent className="p-4 text-center">
-              <Upload className="h-5 w-5 mx-auto text-primary mb-1" />
-              <p className="text-2xl font-bold font-mono">{myScripts?.length ?? 0}</p>
-              <p className="text-xs text-muted-foreground">Publicações</p>
-            </CardContent>
-          </Card>
-          <Card className="neon-border bg-card/80">
-            <CardContent className="p-4 text-center">
-              <Download className="h-5 w-5 mx-auto text-accent mb-1" />
-              <p className="text-2xl font-bold font-mono">{totalDownloads}</p>
-              <p className="text-xs text-muted-foreground">Downloads</p>
-            </CardContent>
-          </Card>
-          <Card className="neon-border bg-card/80">
-            <CardContent className="p-4 text-center">
-              <Star className="h-5 w-5 mx-auto text-primary mb-1" />
-              <p className="text-2xl font-bold font-mono">{profile?.reputation_score ?? 0}</p>
-              <p className="text-xs text-muted-foreground">Reputação</p>
-            </CardContent>
-          </Card>
-          <Card className="neon-border bg-card/80">
-            <CardContent className="p-4 text-center">
-              <DollarSign className="h-5 w-5 mx-auto text-destructive mb-1" />
-              <p className="text-2xl font-bold font-mono">R$ {simulatedEarnings.toFixed(2)}</p>
-              <p className="text-xs text-muted-foreground">Ganhos (simulado)</p>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Upload form */}
-        {showForm && (
-          <Card className="neon-border bg-card/80 mb-8">
-            <CardHeader>
-              <CardTitle>Nova Publicação</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                {/* Type selector */}
-                <div>
-                  <Label className="mb-2 block">Tipo de conteúdo</Label>
-                  <Tabs value={scriptType} onValueChange={setScriptType}>
-                    <TabsList className="grid w-full max-w-xs grid-cols-2">
-                      <TabsTrigger value="script" className="gap-2">
-                        <Code className="h-4 w-4" /> Script
-                      </TabsTrigger>
-                      <TabsTrigger value="apk" className="gap-2">
-                        <Package className="h-4 w-4" /> APK / Mod
-                      </TabsTrigger>
-                    </TabsList>
-                  </Tabs>
-                </div>
-
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div>
-                    <Label>Título</Label>
-                    <Input value={title} onChange={(e) => setTitle(e.target.value)} required />
-                  </div>
-                  <div>
-                    <Label>Categoria</Label>
-                    <Select value={categoryId} onValueChange={setCategoryId}>
-                      <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
-                      <SelectContent>
-                        {categories?.map((c: any) => (
-                          <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                <div>
-                  <Label>Descrição</Label>
-                  <Textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={4} />
-                </div>
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div>
-                    <Label>Status</Label>
-                    <Select value={status} onValueChange={setStatus}>
-                      <SelectTrigger><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="working">Working</SelectItem>
-                        <SelectItem value="detected">Detected</SelectItem>
-                        <SelectItem value="updating">Updating</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="flex items-center gap-4 pt-6">
-                    <Switch checked={isPaid} onCheckedChange={setIsPaid} />
-                    <Label>Pago</Label>
-                    {isPaid && <Input type="number" placeholder="Preço (R$)" value={price} onChange={(e) => setPrice(e.target.value)} className="w-32" step="0.01" />}
-                  </div>
-                </div>
-
-                {/* Password protection for paid */}
-                {isPaid && (
-                  <Card className="border-primary/30 bg-primary/5">
-                    <CardContent className="p-4 space-y-3">
-                      <div className="flex items-center gap-2 text-sm font-medium">
-                        <Lock className="h-4 w-4 text-primary" />
-                        Proteção por Senha
-                      </div>
-                      <p className="text-xs text-muted-foreground">
-                        Defina uma senha que os compradores receberão após o pagamento para desbloquear o download.
-                      </p>
-                      <div>
-                        <Label>Senha do Script</Label>
-                        <div className="relative">
-                          <Input
-                            type={showPassword ? "text" : "password"}
-                            value={scriptPassword}
-                            onChange={(e) => setScriptPassword(e.target.value)}
-                            placeholder="Crie uma senha forte"
-                            className="pr-10"
-                            required
-                          />
-                          <button
-                            type="button"
-                            onClick={() => setShowPassword(!showPassword)}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                            tabIndex={-1}
-                          >
-                            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                          </button>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-4">
-                        <Switch checked={passwordPermanent} onCheckedChange={setPasswordPermanent} />
-                        <Label className="text-sm">{passwordPermanent ? "Senha permanente (Full)" : "Senha com prazo"}</Label>
-                      </div>
-                      {!passwordPermanent && (
-                        <div>
-                          <Label>Expira em</Label>
-                          <Input
-                            type="datetime-local"
-                            value={passwordExpiry}
-                            onChange={(e) => setPasswordExpiry(e.target.value)}
-                            required={!passwordPermanent}
-                          />
-                          <p className="text-xs text-muted-foreground mt-1">A senha deixará de funcionar após esta data</p>
-                        </div>
-                      )}
-                    </CardContent>
-                  </Card>
-                )}
-
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div>
-                    <Label>Arquivo (upload)</Label>
-                    <Input type="file" onChange={(e) => setFile(e.target.files?.[0] ?? null)} />
-                  </div>
-                  <div>
-                    <Label>Link externo (opcional)</Label>
-                    <Input value={externalLink} onChange={(e) => setExternalLink(e.target.value)} placeholder="https://..." />
-                  </div>
-                </div>
-                <Button type="submit" disabled={submitting} className="neon-glow-purple">
-                  {submitting ? "Publicando..." : `Publicar ${scriptType === "script" ? "Script" : "APK/Mod"}`}
-                </Button>
-              </form>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* My Scripts */}
-        <h2 className="text-xl font-bold mb-4">Minhas Publicações</h2>
-        <div className="space-y-3">
-          {myScripts?.map((script: any) => (
-            <Card key={script.id} className="neon-border bg-card/80">
-              <CardContent className="p-4 flex items-center justify-between">
-                <div>
-                  <div className="flex items-center gap-2 mb-1">
-                    {script.script_type === "apk" ? (
-                      <Package className="h-4 w-4 text-primary" />
-                    ) : (
-                      <Code className="h-4 w-4 text-primary" />
-                    )}
-                    <p className="font-semibold">{script.title}</p>
-                    {script.is_paid && <Lock className="h-3 w-3 text-muted-foreground" />}
-                  </div>
-                  <div className="flex gap-3 text-xs text-muted-foreground mt-1">
-                    <span>{script.categories?.name}</span>
-                    <span>{script.download_count} downloads</span>
-                    <Badge variant="outline" className="text-[10px]">{script.status}</Badge>
-                    <Badge variant="secondary" className="text-[10px]">{script.script_type === "apk" ? "APK" : "Script"}</Badge>
-                  </div>
-                </div>
-                <div className="flex gap-1">
-                  <Button variant="ghost" size="icon" onClick={() => navigate(`/script/${script.id}/edit`)}>
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                  <Button variant="ghost" size="icon" className="text-destructive" onClick={() => handleDelete(script.id)}>
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
+        {/* Stats - only for modders */}
+        {isModder && (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <Card className="neon-border bg-card/80">
+              <CardContent className="p-4 text-center">
+                <Upload className="h-5 w-5 mx-auto text-primary mb-1" />
+                <p className="text-2xl font-bold font-mono">{myScripts?.length ?? 0}</p>
+                <p className="text-xs text-muted-foreground">Publicações</p>
               </CardContent>
             </Card>
-          ))}
-          {myScripts?.length === 0 && <p className="text-muted-foreground">Nenhuma publicação ainda.</p>}
-        </div>
+            <Card className="neon-border bg-card/80">
+              <CardContent className="p-4 text-center">
+                <Download className="h-5 w-5 mx-auto text-accent mb-1" />
+                <p className="text-2xl font-bold font-mono">{totalDownloads}</p>
+                <p className="text-xs text-muted-foreground">Downloads</p>
+              </CardContent>
+            </Card>
+            <Card className="neon-border bg-card/80">
+              <CardContent className="p-4 text-center">
+                <Star className="h-5 w-5 mx-auto text-primary mb-1" />
+                <p className="text-2xl font-bold font-mono">{profile?.reputation_score ?? 0}</p>
+                <p className="text-xs text-muted-foreground">Reputação</p>
+              </CardContent>
+            </Card>
+            <Card className="neon-border bg-card/80">
+              <CardContent className="p-4 text-center">
+                <DollarSign className="h-5 w-5 mx-auto text-destructive mb-1" />
+                <p className="text-2xl font-bold font-mono">R$ {simulatedEarnings.toFixed(2)}</p>
+                <p className="text-xs text-muted-foreground">Ganhos (simulado)</p>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <TabsList className={`mb-6 grid w-full ${isModder ? "grid-cols-2" : "grid-cols-1"}`}>
+            <TabsTrigger value="purchases" className="gap-2">
+              <ShoppingBag className="h-4 w-4" /> Meus Scripts Comprados
+            </TabsTrigger>
+            {isModder && (
+              <TabsTrigger value="my-scripts" className="gap-2">
+                <Code className="h-4 w-4" /> Minhas Publicações
+              </TabsTrigger>
+            )}
+          </TabsList>
+
+          {/* Purchased Scripts Tab */}
+          <TabsContent value="purchases">
+            <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+              <Key className="h-5 w-5 text-primary" /> Scripts Adquiridos
+            </h2>
+            <div className="space-y-3">
+              {myLicenses?.map((license: any) => (
+                <Card key={license.id} className="neon-border bg-card/80">
+                  <CardContent className="p-4">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex items-center gap-3 flex-1 min-w-0">
+                        {license.scripts?.thumbnail_url ? (
+                          <img src={license.scripts.thumbnail_url} alt="" className="w-12 h-12 rounded object-cover shrink-0" />
+                        ) : (
+                          <div className="w-12 h-12 rounded bg-secondary flex items-center justify-center shrink-0">
+                            <Code className="h-5 w-5 text-muted-foreground/30" />
+                          </div>
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <p className="font-semibold truncate">{license.scripts?.title ?? "Script"}</p>
+                          <div className="flex items-center gap-2 mt-1 flex-wrap">
+                            {license.scripts?.game_name && (
+                              <Badge variant="secondary" className="text-[10px]">🎮 {license.scripts.game_name}</Badge>
+                            )}
+                            {license.scripts?.version && (
+                              <Badge variant="outline" className="text-[10px]">v{license.scripts.version}</Badge>
+                            )}
+                            <Badge variant={license.status === "active" ? "default" : "destructive"} className="text-[10px]">
+                              {license.status === "active" ? "✅ Ativa" : "🚫 Banida"}
+                            </Badge>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* License Key */}
+                    <div className="mt-3 p-3 rounded-lg bg-secondary/30 border border-border/50">
+                      <p className="text-[10px] text-muted-foreground mb-1">Licença:</p>
+                      <div className="flex items-center gap-2">
+                        <Key className="h-3.5 w-3.5 text-primary shrink-0" />
+                        <code className="text-sm font-mono text-primary flex-1">{license.license_key}</code>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-7 w-7 p-0"
+                          onClick={() => { navigator.clipboard.writeText(license.license_key); toast.success("Licença copiada!"); }}
+                        >
+                          <Copy className="h-3.5 w-3.5" />
+                        </Button>
+                      </div>
+                    </div>
+
+                    {/* Download Loader */}
+                    {license.status === "active" && (
+                      <Button className="w-full mt-3 neon-glow-green" size="sm" onClick={() => handleDownloadLoader(license)}>
+                        <Download className="mr-2 h-4 w-4" /> Baixar Loader (.lua)
+                      </Button>
+                    )}
+                  </CardContent>
+                </Card>
+              ))}
+              {(myLicenses?.length ?? 0) === 0 && (
+                <Card className="neon-border bg-card/80">
+                  <CardContent className="p-8 text-center">
+                    <ShoppingBag className="h-10 w-10 mx-auto text-muted-foreground/30 mb-3" />
+                    <p className="text-muted-foreground">Nenhum script comprado ainda.</p>
+                    <Button variant="outline" className="mt-3" onClick={() => navigate("/marketplace")}>
+                      Ir ao Marketplace
+                    </Button>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          </TabsContent>
+
+          {/* Modder Scripts Tab */}
+          {isModder && (
+            <TabsContent value="my-scripts">
+              {/* Upload form */}
+              {showForm && (
+                <Card className="neon-border bg-card/80 mb-8">
+                  <CardHeader>
+                    <CardTitle>Nova Publicação</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                      <div>
+                        <Label className="mb-2 block">Tipo de conteúdo</Label>
+                        <Tabs value={scriptType} onValueChange={setScriptType}>
+                          <TabsList className="grid w-full max-w-xs grid-cols-2">
+                            <TabsTrigger value="script" className="gap-2">
+                              <Code className="h-4 w-4" /> Script
+                            </TabsTrigger>
+                            <TabsTrigger value="apk" className="gap-2">
+                              <Package className="h-4 w-4" /> APK / Mod
+                            </TabsTrigger>
+                          </TabsList>
+                        </Tabs>
+                      </div>
+
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <div>
+                          <Label>Título</Label>
+                          <Input value={title} onChange={(e) => setTitle(e.target.value)} required />
+                        </div>
+                        <div>
+                          <Label>Categoria</Label>
+                          <Select value={categoryId} onValueChange={setCategoryId}>
+                            <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                            <SelectContent>
+                              {categories?.map((c: any) => (
+                                <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                      <div>
+                        <Label>Descrição</Label>
+                        <Textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={4} />
+                      </div>
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <div>
+                          <Label>Status</Label>
+                          <Select value={status} onValueChange={setStatus}>
+                            <SelectTrigger><SelectValue /></SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="working">Working</SelectItem>
+                              <SelectItem value="detected">Detected</SelectItem>
+                              <SelectItem value="updating">Updating</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="flex items-center gap-4 pt-6">
+                          <Switch checked={isPaid} onCheckedChange={setIsPaid} />
+                          <Label>Pago</Label>
+                          {isPaid && <Input type="number" placeholder="Preço (R$)" value={price} onChange={(e) => setPrice(e.target.value)} className="w-32" step="0.01" />}
+                        </div>
+                      </div>
+
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <div>
+                          <Label>Arquivo (upload)</Label>
+                          <Input type="file" onChange={(e) => setFile(e.target.files?.[0] ?? null)} />
+                        </div>
+                        <div>
+                          <Label>Link externo (opcional)</Label>
+                          <Input value={externalLink} onChange={(e) => setExternalLink(e.target.value)} placeholder="https://..." />
+                        </div>
+                      </div>
+                      <Button type="submit" disabled={submitting} className="neon-glow-purple">
+                        {submitting ? "Publicando..." : `Publicar ${scriptType === "script" ? "Script" : "APK/Mod"}`}
+                      </Button>
+                    </form>
+                  </CardContent>
+                </Card>
+              )}
+
+              <h2 className="text-xl font-bold mb-4">Minhas Publicações</h2>
+              <div className="space-y-3">
+                {myScripts?.map((script: any) => (
+                  <Card key={script.id} className="neon-border bg-card/80">
+                    <CardContent className="p-4 flex items-center justify-between">
+                      <div>
+                        <div className="flex items-center gap-2 mb-1">
+                          {script.script_type === "apk" ? (
+                            <Package className="h-4 w-4 text-primary" />
+                          ) : (
+                            <Code className="h-4 w-4 text-primary" />
+                          )}
+                          <p className="font-semibold">{script.title}</p>
+                          {script.is_paid && <Badge variant="secondary" className="text-[10px]">R$ {Number(script.price).toFixed(2)}</Badge>}
+                        </div>
+                        <div className="flex gap-3 text-xs text-muted-foreground mt-1">
+                          <span>{script.categories?.name}</span>
+                          <span>{script.download_count} downloads</span>
+                          <Badge variant="outline" className="text-[10px]">{script.status}</Badge>
+                          <Badge variant="secondary" className="text-[10px]">{script.script_type === "apk" ? "APK" : "Script"}</Badge>
+                        </div>
+                      </div>
+                      <div className="flex gap-1">
+                        <Button variant="ghost" size="icon" onClick={() => navigate(`/script/${script.id}/edit`)}>
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="icon" className="text-destructive" onClick={() => handleDelete(script.id)}>
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+                {myScripts?.length === 0 && <p className="text-muted-foreground">Nenhuma publicação ainda.</p>}
+              </div>
+            </TabsContent>
+          )}
+        </Tabs>
       </div>
     </Layout>
   );

@@ -7,7 +7,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { Navigate, useNavigate } from "react-router-dom";
-import { Users, Code, CheckCircle, XCircle, Trash2, Plus, Pencil, Eye, Clock, FileX, Send, Shield, UserCheck, ShieldCheck, ShieldOff } from "lucide-react";
+import {
+  Users, Code, CheckCircle, XCircle, Trash2, Plus, Pencil, Eye, Clock, FileX, Send, Shield,
+  UserCheck, ShieldCheck, ShieldOff, Key, Ban, ShoppingCart, Copy,
+} from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { AdminBadges } from "@/components/admin/AdminBadges";
 import { AdminFlaggedScripts } from "@/components/admin/AdminFlaggedScripts";
@@ -68,7 +71,41 @@ export default function Admin() {
         .eq("role", "modder" as any)
         .eq("approved", true);
       const moddersCount = modderRoles?.length ?? 0;
-      return { users: usersCount ?? 0, scripts: scriptsCount ?? 0, modders: moddersCount };
+      const { count: purchasesCount } = await supabase.from("purchases").select("*", { count: "exact", head: true });
+      const { count: licensesCount } = await supabase.from("licenses").select("*", { count: "exact", head: true });
+      return {
+        users: usersCount ?? 0,
+        scripts: scriptsCount ?? 0,
+        modders: moddersCount,
+        purchases: purchasesCount ?? 0,
+        licenses: licensesCount ?? 0,
+      };
+    },
+    enabled: isAdmin,
+  });
+
+  // All licenses for admin
+  const { data: allLicenses } = useQuery({
+    queryKey: ["admin-licenses"],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("licenses")
+        .select("*, scripts(title), profiles:user_id(username, display_name)")
+        .order("created_at", { ascending: false });
+      return data ?? [];
+    },
+    enabled: isAdmin,
+  });
+
+  // All purchases for admin
+  const { data: allPurchases } = useQuery({
+    queryKey: ["admin-purchases"],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("purchases")
+        .select("*, scripts(title), profiles:user_id(username, display_name)")
+        .order("created_at", { ascending: false });
+      return data ?? [];
     },
     enabled: isAdmin,
   });
@@ -148,6 +185,14 @@ export default function Admin() {
     queryClient.invalidateQueries({ queryKey: ["admin-scripts"] });
   };
 
+  const toggleLicenseBan = async (licenseId: string, currentStatus: string) => {
+    const newStatus = currentStatus === "active" ? "banned" : "active";
+    const { error } = await supabase.from("licenses").update({ status: newStatus }).eq("id", licenseId);
+    if (error) { toast.error(error.message); return; }
+    toast.success(newStatus === "banned" ? "Licença banida!" : "Licença reativada!");
+    queryClient.invalidateQueries({ queryKey: ["admin-licenses"] });
+  };
+
   const pendingReview = allScripts?.filter((s: any) => s.publish_status === "pending_review") ?? [];
   const published = allScripts?.filter((s: any) => s.publish_status === "published" || !s.publish_status) ?? [];
   const drafts = allScripts?.filter((s: any) => s.publish_status === "draft") ?? [];
@@ -219,14 +264,7 @@ export default function Admin() {
             <CardContent className="p-4 text-center">
               <Users className="h-5 w-5 mx-auto text-neon-purple mb-1" />
               <p className="text-2xl font-bold font-mono">{stats?.users}</p>
-              <p className="text-xs text-muted-foreground">Usuários Total</p>
-            </CardContent>
-          </Card>
-          <Card className="neon-border bg-card/80">
-            <CardContent className="p-4 text-center">
-              <UserCheck className="h-5 w-5 mx-auto text-neon-cyan mb-1" />
-              <p className="text-2xl font-bold font-mono">{stats?.modders}</p>
-              <p className="text-xs text-muted-foreground">Modders</p>
+              <p className="text-xs text-muted-foreground">Usuários</p>
             </CardContent>
           </Card>
           <Card className="neon-border bg-card/80">
@@ -238,16 +276,23 @@ export default function Admin() {
           </Card>
           <Card className="neon-border bg-card/80">
             <CardContent className="p-4 text-center">
-              <Clock className="h-5 w-5 mx-auto text-primary mb-1" />
-              <p className="text-2xl font-bold font-mono">{pendingReview.length}</p>
-              <p className="text-xs text-muted-foreground">Em Revisão</p>
+              <ShoppingCart className="h-5 w-5 mx-auto text-primary mb-1" />
+              <p className="text-2xl font-bold font-mono">{stats?.purchases}</p>
+              <p className="text-xs text-muted-foreground">Compras</p>
+            </CardContent>
+          </Card>
+          <Card className="neon-border bg-card/80">
+            <CardContent className="p-4 text-center">
+              <Key className="h-5 w-5 mx-auto text-accent mb-1" />
+              <p className="text-2xl font-bold font-mono">{stats?.licenses}</p>
+              <p className="text-xs text-muted-foreground">Licenças</p>
             </CardContent>
           </Card>
           <Card className="neon-border bg-card/80">
             <CardContent className="p-4 text-center">
               <Shield className="h-5 w-5 mx-auto text-primary mb-1" />
               <p className="text-2xl font-bold font-mono">{pendingModders?.length}</p>
-              <p className="text-xs text-muted-foreground">Modders Pendentes</p>
+              <p className="text-xs text-muted-foreground">Pendentes</p>
             </CardContent>
           </Card>
         </div>
@@ -277,50 +322,151 @@ export default function Admin() {
           </Card>
         )}
 
-        {/* Scripts Management with Tabs */}
-        <Card className="neon-border bg-card/80">
-          <CardHeader>
-            <CardTitle>Gerenciar Scripts</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Tabs defaultValue="pending_review">
-              <TabsList className="mb-4 grid w-full grid-cols-4">
-                <TabsTrigger value="pending_review" className="text-xs gap-1">
-                  <Send className="h-3 w-3" /> Revisão ({pendingReview.length})
-                </TabsTrigger>
-                <TabsTrigger value="published" className="text-xs gap-1">
-                  <Eye className="h-3 w-3" /> Publicados ({published.length})
-                </TabsTrigger>
-                <TabsTrigger value="drafts" className="text-xs gap-1">
-                  <Clock className="h-3 w-3" /> Rascunhos ({drafts.length})
-                </TabsTrigger>
-                <TabsTrigger value="archived" className="text-xs gap-1">
-                  <FileX className="h-3 w-3" /> Arquivados ({archived.length})
-                </TabsTrigger>
-              </TabsList>
+        {/* Main admin tabs */}
+        <Tabs defaultValue="scripts">
+          <TabsList className="mb-4 grid w-full grid-cols-3">
+            <TabsTrigger value="scripts" className="text-xs gap-1">
+              <Code className="h-3 w-3" /> Scripts
+            </TabsTrigger>
+            <TabsTrigger value="licenses" className="text-xs gap-1">
+              <Key className="h-3 w-3" /> Licenças
+            </TabsTrigger>
+            <TabsTrigger value="purchases" className="text-xs gap-1">
+              <ShoppingCart className="h-3 w-3" /> Compras
+            </TabsTrigger>
+          </TabsList>
 
-              <TabsContent value="pending_review" className="space-y-2">
-                {pendingReview.length === 0 && <p className="text-sm text-muted-foreground py-4 text-center">Nenhum script aguardando revisão.</p>}
-                {pendingReview.map((s: any) => <ScriptRow key={s.id} script={s} />)}
-              </TabsContent>
+          {/* Scripts Tab */}
+          <TabsContent value="scripts">
+            <Card className="neon-border bg-card/80">
+              <CardHeader>
+                <CardTitle>Gerenciar Scripts</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Tabs defaultValue="pending_review">
+                  <TabsList className="mb-4 grid w-full grid-cols-4">
+                    <TabsTrigger value="pending_review" className="text-xs gap-1">
+                      <Send className="h-3 w-3" /> Revisão ({pendingReview.length})
+                    </TabsTrigger>
+                    <TabsTrigger value="published" className="text-xs gap-1">
+                      <Eye className="h-3 w-3" /> Publicados ({published.length})
+                    </TabsTrigger>
+                    <TabsTrigger value="drafts" className="text-xs gap-1">
+                      <Clock className="h-3 w-3" /> Rascunhos ({drafts.length})
+                    </TabsTrigger>
+                    <TabsTrigger value="archived" className="text-xs gap-1">
+                      <FileX className="h-3 w-3" /> Arquivados ({archived.length})
+                    </TabsTrigger>
+                  </TabsList>
 
-              <TabsContent value="published" className="space-y-2">
-                {published.length === 0 && <p className="text-sm text-muted-foreground py-4 text-center">Nenhum script publicado.</p>}
-                {published.map((s: any) => <ScriptRow key={s.id} script={s} />)}
-              </TabsContent>
+                  <TabsContent value="pending_review" className="space-y-2">
+                    {pendingReview.length === 0 && <p className="text-sm text-muted-foreground py-4 text-center">Nenhum script aguardando revisão.</p>}
+                    {pendingReview.map((s: any) => <ScriptRow key={s.id} script={s} />)}
+                  </TabsContent>
 
-              <TabsContent value="drafts" className="space-y-2">
-                {drafts.length === 0 && <p className="text-sm text-muted-foreground py-4 text-center">Nenhum rascunho.</p>}
-                {drafts.map((s: any) => <ScriptRow key={s.id} script={s} />)}
-              </TabsContent>
+                  <TabsContent value="published" className="space-y-2">
+                    {published.length === 0 && <p className="text-sm text-muted-foreground py-4 text-center">Nenhum script publicado.</p>}
+                    {published.map((s: any) => <ScriptRow key={s.id} script={s} />)}
+                  </TabsContent>
 
-              <TabsContent value="archived" className="space-y-2">
-                {archived.length === 0 && <p className="text-sm text-muted-foreground py-4 text-center">Nenhum script arquivado.</p>}
-                {archived.map((s: any) => <ScriptRow key={s.id} script={s} />)}
-              </TabsContent>
-            </Tabs>
-          </CardContent>
-        </Card>
+                  <TabsContent value="drafts" className="space-y-2">
+                    {drafts.length === 0 && <p className="text-sm text-muted-foreground py-4 text-center">Nenhum rascunho.</p>}
+                    {drafts.map((s: any) => <ScriptRow key={s.id} script={s} />)}
+                  </TabsContent>
+
+                  <TabsContent value="archived" className="space-y-2">
+                    {archived.length === 0 && <p className="text-sm text-muted-foreground py-4 text-center">Nenhum script arquivado.</p>}
+                    {archived.map((s: any) => <ScriptRow key={s.id} script={s} />)}
+                  </TabsContent>
+                </Tabs>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Licenses Tab */}
+          <TabsContent value="licenses">
+            <Card className="neon-border bg-card/80">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Key className="h-5 w-5 text-primary" /> Gerenciar Licenças
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                {allLicenses?.map((license: any) => (
+                  <div key={license.id} className="flex items-center justify-between p-3 rounded-lg bg-secondary/30 gap-2">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <p className="font-semibold text-sm truncate">{license.scripts?.title ?? "Script"}</p>
+                        <Badge variant={license.status === "active" ? "default" : "destructive"} className="text-[10px]">
+                          {license.status === "active" ? "Ativa" : "Banida"}
+                        </Badge>
+                      </div>
+                      <div className="flex items-center gap-3 text-[10px] text-muted-foreground mt-1 flex-wrap">
+                        <span>👤 {(license as any).profiles?.display_name ?? (license as any).profiles?.username ?? "?"}</span>
+                        <span className="font-mono">{license.license_key}</span>
+                        <span>{new Date(license.created_at).toLocaleDateString("pt-BR")}</span>
+                      </div>
+                    </div>
+                    <div className="flex gap-1 shrink-0">
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="h-8 w-8 p-0"
+                        onClick={() => { navigator.clipboard.writeText(license.license_key); toast.success("Copiado!"); }}
+                        title="Copiar licença"
+                      >
+                        <Copy className="h-3.5 w-3.5" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className={`h-8 ${license.status === "active" ? "text-destructive" : "text-accent"}`}
+                        onClick={() => toggleLicenseBan(license.id, license.status)}
+                        title={license.status === "active" ? "Banir Licença" : "Reativar Licença"}
+                      >
+                        {license.status === "active" ? <Ban className="h-4 w-4" /> : <CheckCircle className="h-4 w-4" />}
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+                {(allLicenses?.length ?? 0) === 0 && (
+                  <p className="text-sm text-muted-foreground py-4 text-center">Nenhuma licença registrada.</p>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Purchases Tab */}
+          <TabsContent value="purchases">
+            <Card className="neon-border bg-card/80">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <ShoppingCart className="h-5 w-5 text-primary" /> Histórico de Compras
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                {allPurchases?.map((purchase: any) => (
+                  <div key={purchase.id} className="flex items-center justify-between p-3 rounded-lg bg-secondary/30">
+                    <div>
+                      <p className="font-semibold text-sm">{purchase.scripts?.title ?? "Script"}</p>
+                      <div className="flex gap-3 text-[10px] text-muted-foreground mt-1">
+                        <span>👤 {(purchase as any).profiles?.display_name ?? (purchase as any).profiles?.username ?? "?"}</span>
+                        <span>R$ {Number(purchase.amount).toFixed(2)}</span>
+                        <span>{new Date(purchase.created_at).toLocaleDateString("pt-BR")}</span>
+                      </div>
+                    </div>
+                    <Badge variant="outline" className="text-[10px] bg-accent/20 text-accent border-accent/30">
+                      {purchase.status}
+                    </Badge>
+                  </div>
+                ))}
+                {(allPurchases?.length ?? 0) === 0 && (
+                  <p className="text-sm text-muted-foreground py-4 text-center">Nenhuma compra registrada.</p>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
 
         {/* Moderation Queue */}
         <div className="mt-8">
