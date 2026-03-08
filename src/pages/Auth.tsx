@@ -163,13 +163,6 @@ export default function Auth() {
         setDuplicateEmail(signupEmail);
         setShowDuplicateEmail(true);
       } else {
-        if (wantModder && data.user) {
-          await supabase.from("user_roles").insert({
-            user_id: data.user.id,
-            role: "modder" as any,
-            approved: false,
-          });
-        }
         setSentEmail(signupEmail);
         setShowEmailSent(true);
       }
