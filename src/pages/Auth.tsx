@@ -86,29 +86,24 @@ export default function Auth() {
     setLoading(true);
     
     let email = loginIdentifier;
-    // If input doesn't look like an email, look up the username
+    
+    // If input doesn't look like an email, resolve username via edge function
     if (!loginIdentifier.includes("@")) {
-      const { data: profileData } = await supabase
-        .from("profiles")
-        .select("user_id")
-        .eq("username", loginIdentifier)
-        .single();
-      if (!profileData) {
-        toast.error("Usuário não encontrado.");
+      try {
+        const { data, error } = await supabase.functions.invoke("resolve-username", {
+          body: { username: loginIdentifier },
+        });
+        if (error || !data?.email) {
+          toast.error("Usuário não encontrado.");
+          setLoading(false);
+          return;
+        }
+        email = data.email;
+      } catch {
+        toast.error("Erro ao buscar usuário.");
         setLoading(false);
         return;
       }
-      // Get email from auth via a workaround: try to sign in and let Supabase resolve
-      // We need the actual email. Let's query profiles for it or use admin. 
-      // Since we can't get email from profiles, we'll attempt login with identifier as email
-      // and if it fails, show error. For username login we need the email stored.
-      // Actually, let's look for user_id and use supabase admin - but we can't from client.
-      // Best approach: store email in profiles or use an edge function.
-      // For now, let's check if we have user's email via auth.admin - not possible from client.
-      // Simplest: just try signing in with the identifier as-is (will fail if not email)
-      toast.error("Por favor, use seu email para fazer login.");
-      setLoading(false);
-      return;
     }
     
     const { error } = await supabase.auth.signInWithPassword({ email, password: loginPassword });
