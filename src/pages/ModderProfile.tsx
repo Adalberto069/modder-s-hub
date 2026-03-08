@@ -123,10 +123,14 @@ export default function ModderProfile() {
 
               {/* Info */}
               <div className="text-center sm:text-left flex-1 space-y-1">
-                <h1 className="text-3xl font-bold tracking-tight">
-                  {profile.display_name ?? profile.username}
-                </h1>
+                <div className="flex items-center gap-2 justify-center sm:justify-start flex-wrap">
+                  <h1 className="text-3xl font-bold tracking-tight">
+                    {profile.display_name ?? profile.username}
+                  </h1>
+                  <RoleBadge role={displayRole} />
+                </div>
                 <p className="text-sm text-muted-foreground font-mono">@{profile.username}</p>
+                <UserBadges userId={userId!} />
                 {profile.bio && (
                   <p className="text-sm text-muted-foreground mt-2 max-w-lg">{profile.bio}</p>
                 )}
