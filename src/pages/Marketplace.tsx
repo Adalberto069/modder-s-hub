@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Layout } from "@/components/layout/Layout";
 import { ScriptCard } from "@/components/ScriptCard";
@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
+import { useModderProfiles } from "@/hooks/use-modder-profiles";
 import { Search, Code, Shield, Monitor, Package } from "lucide-react";
 
 const categoryIcons: Record<string, any> = {
@@ -56,6 +57,13 @@ export default function Marketplace() {
     },
     enabled: !!categories,
   });
+
+  const modderIds = useMemo(() => {
+    const ids = scripts?.map((s: any) => s.modder_id) ?? [];
+    return [...new Set(ids)];
+  }, [scripts]);
+
+  const { data: modderProfiles } = useModderProfiles(modderIds);
 
   const setFilter = (key: string, value: string) => {
     const params = new URLSearchParams(searchParams);
@@ -151,7 +159,7 @@ export default function Marketplace() {
                 key={script.id}
                 id={script.id}
                 title={script.title}
-                modderName={"Modder"}
+                modderName={modderProfiles?.[script.modder_id]?.display_name || modderProfiles?.[script.modder_id]?.username || "Modder"}
                 modderId={script.modder_id}
                 status={script.status}
                 downloadCount={script.download_count}
