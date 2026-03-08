@@ -242,6 +242,11 @@ export default function Admin() {
             </Tabs>
           </CardContent>
         </Card>
+
+        {/* Badge Management */}
+        <div className="mt-8">
+          <AdminBadges />
+        </div>
       </div>
     </Layout>
   );
