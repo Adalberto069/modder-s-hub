@@ -371,6 +371,9 @@ end
     return <Layout><div className="container py-16 text-center text-muted-foreground">Carregando...</div></Layout>;
   }
 
+  const scriptIsActive = (script as any).is_active !== false;
+  const isInactiveBuyer = !scriptIsActive && existingLicense;
+
   const st = statusConfig[script.status] ?? statusConfig.working;
   const allMedia = [
     ...(script.thumbnail_url ? [{ type: "image" as const, url: script.thumbnail_url }] : []),
@@ -397,6 +400,11 @@ end
               <div className="flex items-start gap-3 mb-2 flex-wrap">
                 <h1 className="text-2xl font-bold flex-1">{script.title}</h1>
                 <div className="flex gap-2 shrink-0 flex-wrap">
+                  {!scriptIsActive && (
+                    <Badge className="bg-destructive/20 text-destructive border-destructive/30 gap-1">
+                      Inativo
+                    </Badge>
+                  )}
                   {(script as any).security_status === "verified" && (
                     <Badge className="bg-accent/20 text-accent border-accent/30 gap-1">
                       <ShieldCheck className="h-3 w-3" /> Verificado
@@ -686,10 +694,17 @@ end
                         </Button>
                       </div>
                     ) : !purchaseSuccess ? (
-                      <Button className="w-full neon-glow-purple" onClick={handlePurchase} disabled={purchasing}>
-                        <ShoppingCart className="mr-2 h-4 w-4" />
-                        {purchasing ? "Processando..." : "Comprar Script"}
-                      </Button>
+                      scriptIsActive ? (
+                        <Button className="w-full neon-glow-purple" onClick={handlePurchase} disabled={purchasing}>
+                          <ShoppingCart className="mr-2 h-4 w-4" />
+                          {purchasing ? "Processando..." : "Comprar Script"}
+                        </Button>
+                      ) : (
+                        <div className="text-center p-3 rounded-lg bg-destructive/10 border border-destructive/20">
+                          <p className="text-sm text-destructive font-semibold">Script Indisponível</p>
+                          <p className="text-[10px] text-muted-foreground mt-1">Este script foi desativado pelo criador.</p>
+                        </div>
+                      )
                     ) : null}
                   </div>
                 ) : (

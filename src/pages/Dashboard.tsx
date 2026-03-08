@@ -14,7 +14,7 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { Upload, Download, Star, DollarSign, Plus, Trash2, Code, Package, Pencil, Key, Copy, ShoppingBag } from "lucide-react";
+import { Upload, Download, Star, DollarSign, Plus, Trash2, Code, Package, Pencil, Key, Copy, ShoppingBag, EyeOff, Eye } from "lucide-react";
 import { Navigate, useNavigate } from "react-router-dom";
 
 export default function Dashboard() {
@@ -123,12 +123,25 @@ export default function Dashboard() {
   };
 
   const handleDelete = async (scriptId: string) => {
+    // Check if script has purchases
+    const { count } = await supabase.from("purchases").select("*", { count: "exact", head: true }).eq("script_id", scriptId);
+    if ((count ?? 0) > 0) {
+      toast.error("Este script possui compras e não pode ser excluído. Você pode desativá-lo.");
+      return;
+    }
     const { error } = await supabase.from("scripts").delete().eq("id", scriptId);
     if (error) toast.error(error.message);
     else {
       toast.success("Removido com sucesso!");
       queryClient.invalidateQueries({ queryKey: ["my-scripts"] });
     }
+  };
+
+  const handleToggleActive = async (scriptId: string, currentActive: boolean) => {
+    const { error } = await supabase.from("scripts").update({ is_active: !currentActive } as any).eq("id", scriptId);
+    if (error) { toast.error(error.message); return; }
+    toast.success(currentActive ? "Script desativado. Compradores existentes ainda têm acesso." : "Script reativado!");
+    queryClient.invalidateQueries({ queryKey: ["my-scripts"] });
   };
 
   const handleDownloadLoader = (license: any) => {
@@ -409,7 +422,7 @@ end
               <h2 className="text-xl font-bold mb-4">Minhas Publicações</h2>
               <div className="space-y-3">
                 {myScripts?.map((script: any) => (
-                  <Card key={script.id} className="neon-border bg-card/80">
+                  <Card key={script.id} className={`neon-border bg-card/80 ${!script.is_active ? 'opacity-60' : ''}`}>
                     <CardContent className="p-4 flex items-center justify-between">
                       <div>
                         <div className="flex items-center gap-2 mb-1">
@@ -420,6 +433,7 @@ end
                           )}
                           <p className="font-semibold">{script.title}</p>
                           {script.is_paid && <Badge variant="secondary" className="text-[10px]">R$ {Number(script.price).toFixed(2)}</Badge>}
+                          {!script.is_active && <Badge variant="destructive" className="text-[10px]">Inativo</Badge>}
                         </div>
                         <div className="flex gap-3 text-xs text-muted-foreground mt-1">
                           <span>{script.categories?.name}</span>
@@ -431,6 +445,15 @@ end
                       <div className="flex gap-1">
                         <Button variant="ghost" size="icon" onClick={() => navigate(`/script/${script.id}/edit`)}>
                           <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className={script.is_active ? "text-primary" : "text-accent"}
+                          onClick={() => handleToggleActive(script.id, script.is_active)}
+                          title={script.is_active ? "Desativar script" : "Reativar script"}
+                        >
+                          {script.is_active ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                         </Button>
                         <Button variant="ghost" size="icon" className="text-destructive" onClick={() => handleDelete(script.id)}>
                           <Trash2 className="h-4 w-4" />

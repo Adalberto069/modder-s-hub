@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { Navigate, useNavigate } from "react-router-dom";
 import {
-  Users, Code, CheckCircle, XCircle, Trash2, Plus, Pencil, Eye, Clock, FileX, Send, Shield,
+  Users, Code, CheckCircle, XCircle, Trash2, Plus, Pencil, Eye, EyeOff, Clock, FileX, Send, Shield,
   UserCheck, ShieldCheck, ShieldOff, Key, Ban, ShoppingCart, Copy,
 } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -141,9 +141,21 @@ export default function Admin() {
   };
 
   const deleteScript = async (scriptId: string) => {
+    // Check if script has purchases - warn admin
+    const { count } = await supabase.from("purchases").select("*", { count: "exact", head: true }).eq("script_id", scriptId);
+    if ((count ?? 0) > 0) {
+      if (!window.confirm(`⚠️ Este script possui ${count} compra(s). Excluir permanentemente apagará o acesso dos compradores. Deseja continuar?`)) return;
+    }
     const { error } = await supabase.from("scripts").delete().eq("id", scriptId);
     if (error) toast.error(error.message);
-    else { toast.success("Script removido!"); queryClient.invalidateQueries({ queryKey: ["admin-scripts"] }); }
+    else { toast.success("Script removido permanentemente!"); queryClient.invalidateQueries({ queryKey: ["admin-scripts"] }); }
+  };
+
+  const toggleScriptActive = async (scriptId: string, currentActive: boolean) => {
+    const { error } = await supabase.from("scripts").update({ is_active: !currentActive } as any).eq("id", scriptId);
+    if (error) { toast.error(error.message); return; }
+    toast.success(currentActive ? "Script desativado. Compradores existentes mantêm acesso." : "Script reativado!");
+    queryClient.invalidateQueries({ queryKey: ["admin-scripts"] });
   };
 
   const updatePublishStatus = async (scriptId: string, newStatus: string) => {
@@ -201,12 +213,13 @@ export default function Admin() {
   const ScriptRow = ({ script }: { script: any }) => {
     const ps = publishStatusConfig[(script as any).publish_status ?? "published"] ?? publishStatusConfig.published;
     return (
-      <div className="flex items-center justify-between p-3 rounded-lg bg-secondary/30 gap-2">
+      <div className={`flex items-center justify-between p-3 rounded-lg bg-secondary/30 gap-2 ${!script.is_active ? 'opacity-60' : ''}`}>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
             <p className="font-semibold text-sm truncate">{script.title}</p>
             <Badge variant="outline" className={`text-[10px] ${ps.className}`}>{ps.label}</Badge>
             {script.is_verified && <Badge variant="outline" className="text-[10px] bg-accent/20 text-accent border-accent/30">✅ Verificado</Badge>}
+            {!script.is_active && <Badge variant="destructive" className="text-[10px]">Inativo</Badge>}
           </div>
           <div className="flex gap-3 text-[10px] text-muted-foreground mt-1">
             {(script as any).game_name && <span>🎮 {(script as any).game_name}</span>}
@@ -227,6 +240,15 @@ export default function Admin() {
           >
             {script.is_verified ? <ShieldCheck className="h-4 w-4" /> : <ShieldOff className="h-4 w-4" />}
           </Button>
+          <Button
+            size="icon"
+            variant="ghost"
+            className={`h-8 w-8 ${script.is_active ? "text-primary" : "text-accent"}`}
+            onClick={() => toggleScriptActive(script.id, script.is_active ?? true)}
+            title={script.is_active ? "Desativar Script" : "Reativar Script"}
+          >
+            {script.is_active ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+          </Button>
           {(script as any).publish_status === "pending_review" && (
             <Button size="icon" variant="ghost" className="h-8 w-8 text-accent" onClick={() => updatePublishStatus(script.id, "published")} title="Aprovar">
               <CheckCircle className="h-4 w-4" />
@@ -240,7 +262,7 @@ export default function Admin() {
           <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => navigate(`/script/${script.id}/edit`)} title="Editar">
             <Pencil className="h-4 w-4" />
           </Button>
-          <Button size="icon" variant="ghost" className="h-8 w-8 text-destructive" onClick={() => deleteScript(script.id)} title="Excluir">
+          <Button size="icon" variant="ghost" className="h-8 w-8 text-destructive" onClick={() => deleteScript(script.id)} title="Excluir Permanentemente">
             <Trash2 className="h-4 w-4" />
           </Button>
         </div>
