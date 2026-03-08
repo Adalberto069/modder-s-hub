@@ -163,7 +163,7 @@ export default function ScriptEditor() {
       features,
       tags,
       lua_code: luaCode || null,
-      related_tutorial_id: relatedTutorialId || null,
+      related_tutorial_id: relatedTutorialId && relatedTutorialId !== "none" ? relatedTutorialId : null,
     };
 
     let error;
@@ -426,7 +426,7 @@ export default function ScriptEditor() {
               <Select value={relatedTutorialId} onValueChange={setRelatedTutorialId}>
                 <SelectTrigger><SelectValue placeholder="Nenhum tutorial vinculado" /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Nenhum</SelectItem>
+                  <SelectItem value="none">Nenhum</SelectItem>
                   {tutorials?.map((t: any) => (
                     <SelectItem key={t.id} value={t.id}>{t.title}</SelectItem>
                   ))}
