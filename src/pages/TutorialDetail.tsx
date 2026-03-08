@@ -13,7 +13,7 @@ import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
 import {
   ArrowLeft, BookOpen, Clock, Star, Play, MessageSquare, Send,
-  Loader2, Lightbulb, AlertTriangle, ChevronRight,
+  Loader2, Lightbulb, AlertTriangle, ChevronRight, Lock,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { formatDistanceToNow } from "date-fns";
