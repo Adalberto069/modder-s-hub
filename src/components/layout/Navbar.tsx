@@ -99,6 +99,7 @@ export function Navbar() {
               </DropdownMenuContent>
             </DropdownMenu>
             </div>
+          )}
         </div>
 
         {/* Mobile toggle */}
