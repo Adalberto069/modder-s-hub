@@ -18,6 +18,7 @@ const AuthContext = createContext<AuthContextType>({
   user: null,
   session: null,
   loading: true,
+  rolesLoading: true,
   profile: null,
   roles: [],
   isModder: false,
