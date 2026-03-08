@@ -273,7 +273,17 @@ local license = "${(license as any).license_key}"
 local checkUrl = "${baseUrl}/check-license?key=" .. license
 local checkResponse = gg.makeRequest(checkUrl)
 
-if checkResponse == nil or checkResponse.content ~= "valid" then
+if checkResponse == nil then
+  gg.alert("❌ Erro de conexão. Verifique sua internet.")
+  os.exit()
+end
+
+if checkResponse.content == "expired" then
+  gg.alert("⏳ Sua licença expirou!\\n\\nRenove no marketplace.")
+  os.exit()
+end
+
+if checkResponse.content ~= "valid" then
   gg.alert("❌ Licença inválida ou banida!\\n\\nVerifique sua licença no dashboard.")
   os.exit()
 end
