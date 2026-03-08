@@ -31,22 +31,6 @@ export default function Tutorials() {
   const [search, setSearch] = useState("");
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
 
-  if (!loading && !user) {
-    return (
-      <Layout>
-        <div className="container py-20 max-w-lg text-center">
-          <Lock className="h-16 w-16 mx-auto mb-6 text-muted-foreground" />
-          <h1 className="text-2xl font-bold mb-3">Acesso Restrito</h1>
-          <p className="text-muted-foreground mb-6">
-            Você precisa estar logado para acessar os tutoriais e guias.
-          </p>
-          <Button onClick={() => navigate("/auth?tab=login")}>Entrar</Button>
-          <LoginPromptDialog open={showLoginPrompt} onOpenChange={setShowLoginPrompt} />
-        </div>
-      </Layout>
-    );
-  }
-
   const { data: tutorials = [], isLoading } = useQuery({
     queryKey: ["tutorials"],
     queryFn: async () => {
@@ -56,6 +40,7 @@ export default function Tutorials() {
         .order("created_at", { ascending: false });
       return data ?? [];
     },
+    enabled: !!user,
   });
 
   const tutorialIds = tutorials.map((t: any) => t.id);
@@ -69,7 +54,7 @@ export default function Tutorials() {
         .in("tutorial_id", tutorialIds);
       return data ?? [];
     },
-    enabled: tutorialIds.length > 0,
+    enabled: !!user && tutorialIds.length > 0,
   });
 
   const ratingMap = useMemo(() => {
@@ -96,6 +81,22 @@ export default function Tutorials() {
     },
     onError: (e: any) => toast.error(e.message),
   });
+
+  if (!loading && !user) {
+    return (
+      <Layout>
+        <div className="container py-20 max-w-lg text-center">
+          <Lock className="h-16 w-16 mx-auto mb-6 text-muted-foreground" />
+          <h1 className="text-2xl font-bold mb-3">Acesso Restrito</h1>
+          <p className="text-muted-foreground mb-6">
+            Você precisa estar logado para acessar os tutoriais e guias.
+          </p>
+          <Button onClick={() => navigate("/auth?tab=login")}>Entrar</Button>
+          <LoginPromptDialog open={showLoginPrompt} onOpenChange={setShowLoginPrompt} />
+        </div>
+      </Layout>
+    );
+  }
 
   const filtered = useMemo(() => {
     let result = tutorials;
