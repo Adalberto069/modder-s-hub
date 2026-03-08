@@ -132,17 +132,29 @@ export default function Auth() {
       },
     });
     if (error) {
-      toast.error(error.message);
-    } else {
-      if (wantModder && data.user) {
-        await supabase.from("user_roles").insert({
-          user_id: data.user.id,
-          role: "modder" as any,
-          approved: false,
-        });
+      if (error.message?.toLowerCase().includes("already registered") || error.message?.toLowerCase().includes("already been registered")) {
+        setDuplicateEmail(signupEmail);
+        setShowDuplicateEmail(true);
+      } else {
+        toast.error(error.message);
       }
-      setSentEmail(signupEmail);
-      setShowEmailSent(true);
+    } else {
+      // Supabase may return a user with fake id when email already exists (no error but identities empty)
+      const isRealNewUser = data.user && data.user.identities && data.user.identities.length > 0;
+      if (!isRealNewUser) {
+        setDuplicateEmail(signupEmail);
+        setShowDuplicateEmail(true);
+      } else {
+        if (wantModder && data.user) {
+          await supabase.from("user_roles").insert({
+            user_id: data.user.id,
+            role: "modder" as any,
+            approved: false,
+          });
+        }
+        setSentEmail(signupEmail);
+        setShowEmailSent(true);
+      }
     }
     setLoading(false);
   };
