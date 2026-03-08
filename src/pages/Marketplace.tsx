@@ -159,7 +159,7 @@ export default function Marketplace() {
                 key={script.id}
                 id={script.id}
                 title={script.title}
-                modderName={"Modder"}
+                modderName={modderProfiles?.[script.modder_id]?.display_name || modderProfiles?.[script.modder_id]?.username || "Modder"}
                 modderId={script.modder_id}
                 status={script.status}
                 downloadCount={script.download_count}
