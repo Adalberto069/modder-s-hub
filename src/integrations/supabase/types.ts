@@ -274,6 +274,59 @@ export type Database = {
           },
         ]
       }
+      script_analyses: {
+        Row: {
+          analyzed_by: string
+          classification: string
+          created_at: string
+          functionality: string | null
+          id: string
+          reviewed: boolean
+          reviewed_at: string | null
+          reviewed_by: string | null
+          script_id: string
+          security_score: number
+          summary: string | null
+          threats: Json
+        }
+        Insert: {
+          analyzed_by: string
+          classification?: string
+          created_at?: string
+          functionality?: string | null
+          id?: string
+          reviewed?: boolean
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          script_id: string
+          security_score?: number
+          summary?: string | null
+          threats?: Json
+        }
+        Update: {
+          analyzed_by?: string
+          classification?: string
+          created_at?: string
+          functionality?: string | null
+          id?: string
+          reviewed?: boolean
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          script_id?: string
+          security_score?: number
+          summary?: string | null
+          threats?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "script_analyses_script_id_fkey"
+            columns: ["script_id"]
+            isOneToOne: false
+            referencedRelation: "scripts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       script_images: {
         Row: {
           created_at: string
