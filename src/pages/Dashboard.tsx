@@ -155,7 +155,7 @@ export default function Dashboard() {
       <div className="container py-8">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold">Dashboard</h1>
-          <Button onClick={() => setShowForm(!showForm)} className="neon-glow-purple">
+          <Button onClick={() => navigate("/script/new")} className="neon-glow-purple">
             <Plus className="mr-2 h-4 w-4" /> Novo Conteúdo
           </Button>
         </div>
