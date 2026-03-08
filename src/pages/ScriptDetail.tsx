@@ -194,7 +194,7 @@ export default function ScriptDetail() {
   });
 
   const isOwner = user && script && script.modder_id === user.id;
-  const hasAccess = !!existingLicense || isOwner || (script && !script.is_paid);
+  const hasAccess = (!!existingLicense && !isLicenseExpired) || isOwner || (script && !script.is_paid);
 
   const reviewerIds = [...new Set(reviews?.map((r: any) => r.user_id) ?? [])];
   const { data: reviewerProfiles } = useQuery({
