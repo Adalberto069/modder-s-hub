@@ -122,7 +122,25 @@ export default function Auth() {
       toast.error("A senha deve ter pelo menos 6 caracteres.");
       return;
     }
+    if (!signupUsername.trim() || signupUsername.trim().length < 3) {
+      toast.error("O username deve ter pelo menos 3 caracteres.");
+      return;
+    }
     setLoading(true);
+
+    // Check if username is already taken
+    const { data: existingProfile } = await supabase
+      .from("profiles")
+      .select("id")
+      .eq("username", signupUsername.trim())
+      .maybeSingle();
+
+    if (existingProfile) {
+      toast.error("Este username já está em uso. Escolha outro.");
+      setLoading(false);
+      return;
+    }
+
     const { data, error } = await supabase.auth.signUp({
       email: signupEmail,
       password: signupPassword,
