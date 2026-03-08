@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { Navigate, useNavigate } from "react-router-dom";
 import { Users, Code, CheckCircle, XCircle, Trash2, Plus, Pencil, Eye, Clock, FileX, Send } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { AdminBadges } from "@/components/admin/AdminBadges";
 
 const publishStatusConfig: Record<string, { label: string; className: string }> = {
   draft: { label: "Rascunho", className: "bg-muted text-muted-foreground border-border" },
