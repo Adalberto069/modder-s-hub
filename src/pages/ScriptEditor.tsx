@@ -84,12 +84,12 @@ export default function ScriptEditor() {
     enabled: isEditing,
   });
 
-  // Check if script has purchases (lock license settings)
+  // Check if script has purchases (lock license settings) - uses SECURITY DEFINER function to bypass RLS
   const { data: hasPurchases } = useQuery({
     queryKey: ["script-has-purchases", id],
     queryFn: async () => {
-      const { count } = await supabase.from("purchases").select("*", { count: "exact", head: true }).eq("script_id", id!);
-      return (count ?? 0) > 0;
+      const { data } = await supabase.rpc("script_has_purchases", { _script_id: id! });
+      return data === true;
     },
     enabled: isEditing,
   });

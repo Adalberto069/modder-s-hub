@@ -123,9 +123,9 @@ export default function Dashboard() {
   };
 
   const handleDelete = async (scriptId: string) => {
-    // Check if script has purchases
-    const { count } = await supabase.from("purchases").select("*", { count: "exact", head: true }).eq("script_id", scriptId);
-    if ((count ?? 0) > 0) {
+    // Check if script has purchases using SECURITY DEFINER function
+    const { data: scriptHasPurchases } = await supabase.rpc("script_has_purchases", { _script_id: scriptId });
+    if (scriptHasPurchases) {
       toast.error("Este script possui compras e não pode ser excluído. Você pode desativá-lo.");
       return;
     }
