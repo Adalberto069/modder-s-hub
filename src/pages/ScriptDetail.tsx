@@ -260,8 +260,29 @@ export default function ScriptDetail() {
             <div>
               <div className="flex items-start gap-3 mb-2 flex-wrap">
                 <h1 className="text-2xl font-bold flex-1">{script.title}</h1>
-                <div className="flex gap-2 shrink-0">
-                  {script.is_verified && (
+                <div className="flex gap-2 shrink-0 flex-wrap">
+                  {/* Security Status Badges */}
+                  {(script as any).security_status === "verified" && (
+                    <Badge className="bg-accent/20 text-accent border-accent/30 gap-1">
+                      <ShieldCheck className="h-3 w-3" /> Verificado
+                    </Badge>
+                  )}
+                  {(script as any).security_status === "under_review" && (
+                    <Badge className="bg-primary/20 text-primary border-primary/30 gap-1">
+                      <Clock className="h-3 w-3" /> Em Revisão
+                    </Badge>
+                  )}
+                  {(script as any).security_status === "flagged" && (
+                    <Badge className="bg-destructive/20 text-destructive border-destructive/30 gap-1">
+                      <ShieldX className="h-3 w-3" /> Flagrado
+                    </Badge>
+                  )}
+                  {(script as any).security_status === "rejected" && (
+                    <Badge className="bg-destructive/20 text-destructive border-destructive/30 gap-1">
+                      <ShieldAlert className="h-3 w-3" /> Rejeitado
+                    </Badge>
+                  )}
+                  {script.is_verified && !(script as any).security_status && (
                     <Badge className="bg-primary/20 text-primary border-primary/30 gap-1">
                       <ShieldCheck className="h-3 w-3" /> Verificado
                     </Badge>
