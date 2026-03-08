@@ -541,10 +541,19 @@ export default function ScriptEditor() {
             {isAdmin && (
               <Button
                 onClick={() => handleSave("published")}
-                disabled={submitting}
-                className="flex-1 neon-glow-green bg-accent text-accent-foreground hover:bg-accent/90"
+                disabled={submitting || lastAnalysis?.classification === "malicious"}
+                className={`flex-1 ${
+                  lastAnalysis?.classification === "malicious"
+                    ? "bg-destructive/20 text-destructive border-destructive/30 cursor-not-allowed"
+                    : "neon-glow-green bg-accent text-accent-foreground hover:bg-accent/90"
+                }`}
+                title={lastAnalysis?.classification === "malicious" ? "Bloqueado: script malicioso detectado" : undefined}
               >
-                <Eye className="h-4 w-4 mr-2" /> Publicar
+                {lastAnalysis?.classification === "malicious" ? (
+                  <><ShieldX className="h-4 w-4 mr-2" /> Publicação Bloqueada</>
+                ) : (
+                  <><Eye className="h-4 w-4 mr-2" /> Publicar</>
+                )}
               </Button>
             )}
 
