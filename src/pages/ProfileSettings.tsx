@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { validateFileWithToast } from "@/lib/secure-upload";
 import { Layout } from "@/components/layout/Layout";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
@@ -134,18 +135,12 @@ export default function ProfileSettings() {
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (!file.type.startsWith("image/")) {
-      toast.error("Selecione um arquivo de imagem");
-      return;
-    }
-    if (file.size > 2 * 1024 * 1024) {
-      toast.error("A imagem deve ter no máximo 2MB");
-      return;
-    }
+
+    const safeName = await validateFileWithToast({ file, type: "image", maxSizeMB: 2 });
+    if (!safeName) return;
 
     setUploadingAvatar(true);
-    const ext = file.name.split(".").pop();
-    const filePath = `avatars/${user.id}-${Date.now()}.${ext}`;
+    const filePath = `avatars/${user.id}/${safeName}`;
 
     const { error: uploadError } = await supabase.storage
       .from("scripts")

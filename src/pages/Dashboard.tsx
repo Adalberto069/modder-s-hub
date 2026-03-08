@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { validateFileWithToast } from "@/lib/secure-upload";
 import { Layout } from "@/components/layout/Layout";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
@@ -87,7 +88,9 @@ export default function Dashboard() {
 
     let fileUrl = null;
     if (file) {
-      const path = `${user.id}/${Date.now()}_${file.name}`;
+      const safeName = await validateFileWithToast({ file, type: "script", maxSizeMB: 20 });
+      if (!safeName) { setSubmitting(false); return; }
+      const path = `${user.id}/${safeName}`;
       const { error: uploadError } = await supabase.storage.from("scripts").upload(path, file);
       if (uploadError) {
         toast.error("Erro no upload: " + uploadError.message);

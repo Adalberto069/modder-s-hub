@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { validateFileWithToast } from "@/lib/secure-upload";
 import LuaCodeEditor from "@/components/LuaCodeEditor";
 import { useParams, useNavigate } from "react-router-dom";
 import { Layout } from "@/components/layout/Layout";
@@ -135,7 +136,9 @@ export default function ScriptEditor() {
 
     let fileUrl = existingScript?.file_url ?? null;
     if (file) {
-      const path = `${user.id}/${Date.now()}_${file.name}`;
+      const safeName = await validateFileWithToast({ file, type: "script", maxSizeMB: 20 });
+      if (!safeName) { setSubmitting(false); return; }
+      const path = `${user.id}/${safeName}`;
       const { error: uploadError } = await supabase.storage.from("scripts").upload(path, file);
       if (uploadError) {
         toast.error("Erro no upload: " + uploadError.message);
