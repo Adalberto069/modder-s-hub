@@ -364,7 +364,7 @@ export default function ScriptDetail() {
                   <FileCode className="h-4 w-4 text-neon-green" /> Código
                 </h3>
                 <CodeBlock code={luaCode} />
-                <ScriptAnalysis code={luaCode} />
+                <ScriptAnalysis code={luaCode} scriptId={id} />
               </div>
             )}
 
