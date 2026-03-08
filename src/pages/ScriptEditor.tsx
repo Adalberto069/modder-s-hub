@@ -84,6 +84,18 @@ export default function ScriptEditor() {
     enabled: isEditing,
   });
 
+  // Check if script has purchases (lock license settings)
+  const { data: hasPurchases } = useQuery({
+    queryKey: ["script-has-purchases", id],
+    queryFn: async () => {
+      const { count } = await supabase.from("purchases").select("*", { count: "exact", head: true }).eq("script_id", id!);
+      return (count ?? 0) > 0;
+    },
+    enabled: isEditing,
+  });
+
+  const licenseFieldsLocked = isEditing && hasPurchases && !isAdmin;
+
   useEffect(() => {
     if (existingScript) {
       setTitle(existingScript.title);
@@ -251,6 +263,13 @@ export default function ScriptEditor() {
       related_tutorial_id: relatedTutorialId && relatedTutorialId !== "none" ? relatedTutorialId : null,
       license_duration_days: isPaid && !licensePermanent && licenseDurationDays ? parseInt(licenseDurationDays) : null,
     };
+
+    // Block license changes if script has purchases (unless admin)
+    if (isEditing && hasPurchases && !isAdmin) {
+      delete scriptData.license_duration_days;
+      delete scriptData.is_paid;
+      delete scriptData.price;
+    }
 
     let error;
     let savedScriptId = id;
@@ -549,26 +568,32 @@ export default function ScriptEditor() {
                 <Lock className="h-4 w-4 text-primary" /> Preço & Proteção
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
+           <CardContent className="space-y-4">
               <div className="flex items-center gap-4">
-                <Switch checked={isPaid} onCheckedChange={setIsPaid} />
+                <Switch checked={isPaid} onCheckedChange={setIsPaid} disabled={!!licenseFieldsLocked} />
                 <Label className="text-sm">{isPaid ? "Script Pago" : "Script Gratuito"}</Label>
               </div>
+
+              {licenseFieldsLocked && (
+                <div className="p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
+                  <p className="text-xs text-yellow-400">🔒 Este script já possui compras. As configurações de preço e licença não podem ser alteradas. Apenas administradores podem modificar esses campos.</p>
+                </div>
+              )}
 
               {isPaid && (
                 <div className="space-y-4">
                   <div>
                     <Label>Preço (R$)</Label>
-                    <Input type="number" value={price} onChange={(e) => setPrice(e.target.value)} placeholder="0.00" min="0" step="0.01" />
+                    <Input type="number" value={price} onChange={(e) => setPrice(e.target.value)} placeholder="0.00" min="0" step="0.01" disabled={!!licenseFieldsLocked} />
                   </div>
                   <div className="flex items-center gap-4">
-                    <Switch checked={licensePermanent} onCheckedChange={setLicensePermanent} />
+                    <Switch checked={licensePermanent} onCheckedChange={setLicensePermanent} disabled={!!licenseFieldsLocked} />
                     <Label className="text-sm">{licensePermanent ? "🔑 Licença Permanente" : "⏳ Licença com Prazo"}</Label>
                   </div>
                   {!licensePermanent && (
                     <div>
                       <Label>Duração da licença (dias)</Label>
-                      <Input type="number" value={licenseDurationDays} onChange={(e) => setLicenseDurationDays(e.target.value)} placeholder="30" min="1" />
+                      <Input type="number" value={licenseDurationDays} onChange={(e) => setLicenseDurationDays(e.target.value)} placeholder="30" min="1" disabled={!!licenseFieldsLocked} />
                       <p className="text-[10px] text-muted-foreground mt-1">O comprador será informado do prazo antes da compra.</p>
                     </div>
                   )}
