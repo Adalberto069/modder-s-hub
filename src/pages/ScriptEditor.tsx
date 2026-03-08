@@ -23,7 +23,7 @@ import { Navigate } from "react-router-dom";
 export default function ScriptEditor() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { user, isAdmin, isModder, loading } = useAuth();
+  const { user, isAdmin, isModder, loading, rolesLoading } = useAuth();
   const queryClient = useQueryClient();
   const isEditing = !!id;
 
