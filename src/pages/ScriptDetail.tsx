@@ -359,11 +359,12 @@ export default function ScriptDetail() {
 
             {/* Code Block */}
             {luaCode && (
-              <div>
+              <div className="space-y-4">
                 <h3 className="text-sm font-semibold mb-2 flex items-center gap-2">
                   <FileCode className="h-4 w-4 text-neon-green" /> Código
                 </h3>
                 <CodeBlock code={luaCode} />
+                <ScriptAnalysis code={luaCode} />
               </div>
             )}
 
