@@ -19,7 +19,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import {
   Save, Eye, Send, ArrowLeft, Plus, X, Code, Package,
-  Upload, Lock, EyeOff, Gamepad2, Tag, List, FileCode, BookOpen,
+  Upload, Lock, EyeOff, Gamepad2, Tag, List, FileCode, BookOpen, ShieldX,
 } from "lucide-react";
 import { Navigate } from "react-router-dom";
 
