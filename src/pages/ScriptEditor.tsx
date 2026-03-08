@@ -134,6 +134,23 @@ export default function ScriptEditor() {
       return;
     }
 
+    // Block publication if script was flagged as malicious
+    if (
+      targetPublishStatus === "published" &&
+      lastAnalysis?.classification === "malicious"
+    ) {
+      toast.error("🚫 Script classificado como MALICIOSO. A publicação foi bloqueada. Corrija as ameaças detectadas e reanalize.");
+      return;
+    }
+
+    // Warn on suspicious scripts being published
+    if (
+      targetPublishStatus === "published" &&
+      lastAnalysis?.classification === "suspicious"
+    ) {
+      toast.warning("⚠️ Script classificado como SUSPEITO. Revise as ameaças antes de publicar.");
+    }
+
     setSubmitting(true);
 
     let fileUrl = existingScript?.file_url ?? null;
