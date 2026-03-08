@@ -9,6 +9,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { UserBadges } from "@/components/UserBadges";
+import { RoleBadge } from "@/components/RoleBadge";
 
 export default function ModderProfile() {
   const { userId } = useParams<{ userId: string }>();
@@ -48,6 +50,22 @@ export default function ModderProfile() {
     },
     enabled: !!userId,
   });
+
+  const { data: userRoles } = useQuery({
+    queryKey: ["user-roles-public", userId],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("user_roles")
+        .select("role, approved")
+        .eq("user_id", userId!);
+      return data?.filter((r: any) => r.approved).map((r: any) => r.role) ?? [];
+    },
+    enabled: !!userId,
+  });
+
+  const displayRole: "admin" | "modder" | "member" = 
+    userRoles?.includes("admin") ? "admin" : 
+    userRoles?.includes("modder") ? "modder" : "member";
 
   const totalDownloads = scripts?.reduce((sum, s: any) => sum + (s.download_count || 0), 0) ?? 0;
   const avgRating = scripts && scripts.length > 0
@@ -105,10 +123,14 @@ export default function ModderProfile() {
 
               {/* Info */}
               <div className="text-center sm:text-left flex-1 space-y-1">
-                <h1 className="text-3xl font-bold tracking-tight">
-                  {profile.display_name ?? profile.username}
-                </h1>
+                <div className="flex items-center gap-2 justify-center sm:justify-start flex-wrap">
+                  <h1 className="text-3xl font-bold tracking-tight">
+                    {profile.display_name ?? profile.username}
+                  </h1>
+                  <RoleBadge role={displayRole} />
+                </div>
                 <p className="text-sm text-muted-foreground font-mono">@{profile.username}</p>
+                <UserBadges userId={userId!} />
                 {profile.bio && (
                   <p className="text-sm text-muted-foreground mt-2 max-w-lg">{profile.bio}</p>
                 )}
