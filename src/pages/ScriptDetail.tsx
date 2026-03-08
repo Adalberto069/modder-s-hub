@@ -1,4 +1,5 @@
 import { useState } from "react";
+import LuaCodeEditor from "@/components/LuaCodeEditor";
 import { useParams, Link } from "react-router-dom";
 import { Layout } from "@/components/layout/Layout";
 import { Badge } from "@/components/ui/badge";
@@ -92,9 +93,7 @@ function CodeBlock({ code }: { code: string }) {
           {copied ? "Copiado!" : "Copiar"}
         </Button>
       </div>
-      <pre className="p-4 overflow-x-auto">
-        <code className="text-sm font-mono text-accent leading-relaxed whitespace-pre">{code}</code>
-      </pre>
+      <LuaCodeEditor value={code} readOnly minHeight="200px" />
     </div>
   );
 }
