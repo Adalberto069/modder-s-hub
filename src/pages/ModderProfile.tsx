@@ -51,6 +51,22 @@ export default function ModderProfile() {
     enabled: !!userId,
   });
 
+  const { data: userRoles } = useQuery({
+    queryKey: ["user-roles-public", userId],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("user_roles")
+        .select("role, approved")
+        .eq("user_id", userId!);
+      return data?.filter((r: any) => r.approved).map((r: any) => r.role) ?? [];
+    },
+    enabled: !!userId,
+  });
+
+  const displayRole: "admin" | "modder" | "member" = 
+    userRoles?.includes("admin") ? "admin" : 
+    userRoles?.includes("modder") ? "modder" : "member";
+
   const totalDownloads = scripts?.reduce((sum, s: any) => sum + (s.download_count || 0), 0) ?? 0;
   const avgRating = scripts && scripts.length > 0
     ? scripts.reduce((sum, s: any) => sum + Number(s.average_rating || 0), 0) / scripts.length
