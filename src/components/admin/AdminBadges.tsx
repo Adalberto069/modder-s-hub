@@ -68,6 +68,8 @@ export function AdminBadges() {
   const [assignOpen, setAssignOpen] = useState(false);
   const [assignBadgeId, setAssignBadgeId] = useState<string | null>(null);
   const [userSearch, setUserSearch] = useState("");
+  const [confirmDeleteBadge, setConfirmDeleteBadge] = useState<{ id: string; name: string } | null>(null);
+  const [confirmRemoveUB, setConfirmRemoveUB] = useState<{ id: string; userName: string; badgeName: string } | null>(null);
 
   // Fetch badge definitions
   const { data: badges = [] } = useQuery({
