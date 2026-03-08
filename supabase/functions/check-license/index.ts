@@ -26,12 +26,17 @@ Deno.serve(async (req) => {
 
     const { data: license } = await supabase
       .from("licenses")
-      .select("id, status")
+      .select("id, status, expires_at")
       .eq("license_key", key)
       .single();
 
     if (!license || license.status !== "active") {
       return new Response("invalid", { headers: corsHeaders });
+    }
+
+    // Check expiration
+    if (license.expires_at && new Date(license.expires_at) < new Date()) {
+      return new Response("expired", { headers: corsHeaders });
     }
 
     return new Response("valid", { headers: corsHeaders });

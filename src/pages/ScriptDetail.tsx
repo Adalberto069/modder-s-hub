@@ -229,6 +229,8 @@ export default function ScriptDetail() {
 
       // Generate license key
       const licenseKey = generateLicenseKey();
+      const durationDays = (script as any).license_duration_days;
+      const expiresAt = durationDays ? new Date(Date.now() + durationDays * 86400000).toISOString() : null;
       const { error: licenseError } = await supabase
         .from("licenses")
         .insert({
@@ -237,7 +239,8 @@ export default function ScriptDetail() {
           purchase_id: purchase.id,
           license_key: licenseKey,
           status: "active",
-        });
+          expires_at: expiresAt,
+        } as any);
 
       if (licenseError) throw licenseError;
 
@@ -270,7 +273,17 @@ local license = "${(license as any).license_key}"
 local checkUrl = "${baseUrl}/check-license?key=" .. license
 local checkResponse = gg.makeRequest(checkUrl)
 
-if checkResponse == nil or checkResponse.content ~= "valid" then
+if checkResponse == nil then
+  gg.alert("❌ Erro de conexão. Verifique sua internet.")
+  os.exit()
+end
+
+if checkResponse.content == "expired" then
+  gg.alert("⏳ Sua licença expirou!\\n\\nRenove no marketplace.")
+  os.exit()
+end
+
+if checkResponse.content ~= "valid" then
   gg.alert("❌ Licença inválida ou banida!\\n\\nVerifique sua licença no dashboard.")
   os.exit()
 end
@@ -646,6 +659,17 @@ end
                 {script.is_paid ? (
                   <div className="space-y-3">
                     <p className="text-2xl font-bold font-mono text-primary text-center">R$ {Number(script.price).toFixed(2)}</p>
+                    <div className="text-center">
+                      {(script as any).license_duration_days ? (
+                        <Badge variant="outline" className="text-[10px] border-yellow-500/30 text-yellow-400">
+                          <Clock className="h-3 w-3 mr-1" /> Licença: {(script as any).license_duration_days} dias
+                        </Badge>
+                      ) : (
+                        <Badge variant="outline" className="text-[10px] border-accent/30 text-accent">
+                          ♾️ Licença Permanente
+                        </Badge>
+                      )}
+                    </div>
 
                     {/* Purchase success state */}
                     {purchaseSuccess && (
