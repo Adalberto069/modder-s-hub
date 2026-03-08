@@ -171,6 +171,7 @@ export type Database = {
       licenses: {
         Row: {
           created_at: string
+          expires_at: string | null
           id: string
           license_key: string
           purchase_id: string
@@ -180,6 +181,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          expires_at?: string | null
           id?: string
           license_key: string
           purchase_id: string
@@ -189,6 +191,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          expires_at?: string | null
           id?: string
           license_key?: string
           purchase_id?: string
@@ -604,6 +607,7 @@ export type Database = {
           is_active: boolean
           is_paid: boolean
           is_verified: boolean
+          license_duration_days: number | null
           lua_code: string | null
           modder_id: string
           price: number | null
@@ -634,6 +638,7 @@ export type Database = {
           is_active?: boolean
           is_paid?: boolean
           is_verified?: boolean
+          license_duration_days?: number | null
           lua_code?: string | null
           modder_id: string
           price?: number | null
@@ -664,6 +669,7 @@ export type Database = {
           is_active?: boolean
           is_paid?: boolean
           is_verified?: boolean
+          license_duration_days?: number | null
           lua_code?: string | null
           modder_id?: string
           price?: number | null
