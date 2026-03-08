@@ -17,6 +17,8 @@ import { ptBR } from "date-fns/locale";
 import { MessageSquare, Plus, Send, ArrowLeft, Search, ThumbsUp } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { LoginPromptDialog } from "@/components/LoginPromptDialog";
+import { UserRoleBadge } from "@/components/UserRoleBadge";
+import { UserBadges } from "@/components/UserBadges";
 
 const CATEGORIES = [
   { value: "geral", label: "Geral" },
@@ -224,6 +226,8 @@ export default function Forum() {
                 <div className="flex-1 min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="text-sm font-medium">{author?.display_name ?? author?.username ?? "Usuário"}</span>
+                    <UserRoleBadge userId={activePost.user_id} />
+                    <UserBadges userId={activePost.user_id} compact />
                     <Badge variant="outline" className={`text-[10px] ${categoryColor(activePost.category)}`}>
                       {CATEGORIES.find((c) => c.value === activePost.category)?.label ?? activePost.category}
                     </Badge>
@@ -256,6 +260,8 @@ export default function Forum() {
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2">
                               <span className="text-xs font-medium">{rAuthor?.display_name ?? rAuthor?.username ?? "Usuário"}</span>
+                              <UserRoleBadge userId={reply.user_id} />
+                              <UserBadges userId={reply.user_id} compact />
                               <span className="text-[10px] text-muted-foreground">
                                 {formatDistanceToNow(new Date(reply.created_at), { addSuffix: true, locale: ptBR })}
                               </span>
@@ -399,6 +405,8 @@ export default function Forum() {
                             <span className="text-xs text-muted-foreground">
                               {author?.display_name ?? author?.username ?? "Usuário"} · {formatDistanceToNow(new Date(post.created_at), { addSuffix: true, locale: ptBR })}
                             </span>
+                            <UserRoleBadge userId={post.user_id} />
+                            <UserBadges userId={post.user_id} compact />
                           </div>
                           <h3 className="text-sm font-semibold mt-1 truncate">{post.title}</h3>
                           <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{post.content}</p>
