@@ -229,6 +229,8 @@ export default function ScriptDetail() {
 
       // Generate license key
       const licenseKey = generateLicenseKey();
+      const durationDays = (script as any).license_duration_days;
+      const expiresAt = durationDays ? new Date(Date.now() + durationDays * 86400000).toISOString() : null;
       const { error: licenseError } = await supabase
         .from("licenses")
         .insert({
@@ -237,7 +239,8 @@ export default function ScriptDetail() {
           purchase_id: purchase.id,
           license_key: licenseKey,
           status: "active",
-        });
+          expires_at: expiresAt,
+        } as any);
 
       if (licenseError) throw licenseError;
 
