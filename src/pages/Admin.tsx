@@ -337,6 +337,18 @@ export default function Admin() {
           <AdminBadges />
         </div>
       </div>
+
+      {/* Code Viewer Dialog */}
+      <Dialog open={codeDialogOpen} onOpenChange={setCodeDialogOpen}>
+        <DialogContent className="max-w-4xl max-h-[80vh]">
+          <DialogHeader>
+            <DialogTitle>Código: {codeDialogTitle}</DialogTitle>
+          </DialogHeader>
+          <ScrollArea className="max-h-[60vh]">
+            <LuaCodeEditor value={codeDialogContent} readOnly onChange={() => {}} minHeight="300px" />
+          </ScrollArea>
+        </DialogContent>
+      </Dialog>
     </Layout>
   );
 }
