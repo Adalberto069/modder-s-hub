@@ -165,12 +165,19 @@ export default function Admin() {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
           <Card className="neon-border bg-card/80">
             <CardContent className="p-4 text-center">
               <Users className="h-5 w-5 mx-auto text-neon-purple mb-1" />
               <p className="text-2xl font-bold font-mono">{stats?.users}</p>
-              <p className="text-xs text-muted-foreground">Usuários</p>
+              <p className="text-xs text-muted-foreground">Usuários Total</p>
+            </CardContent>
+          </Card>
+          <Card className="neon-border bg-card/80">
+            <CardContent className="p-4 text-center">
+              <UserCheck className="h-5 w-5 mx-auto text-neon-cyan mb-1" />
+              <p className="text-2xl font-bold font-mono">{stats?.modders}</p>
+              <p className="text-xs text-muted-foreground">Modders</p>
             </CardContent>
           </Card>
           <Card className="neon-border bg-card/80">
@@ -189,7 +196,7 @@ export default function Admin() {
           </Card>
           <Card className="neon-border bg-card/80">
             <CardContent className="p-4 text-center">
-              <Users className="h-5 w-5 mx-auto text-neon-cyan mb-1" />
+              <Shield className="h-5 w-5 mx-auto text-primary mb-1" />
               <p className="text-2xl font-bold font-mono">{pendingModders?.length}</p>
               <p className="text-xs text-muted-foreground">Modders Pendentes</p>
             </CardContent>
