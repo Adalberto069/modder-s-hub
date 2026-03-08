@@ -141,9 +141,21 @@ export default function Admin() {
   };
 
   const deleteScript = async (scriptId: string) => {
+    // Check if script has purchases - warn admin
+    const { count } = await supabase.from("purchases").select("*", { count: "exact", head: true }).eq("script_id", scriptId);
+    if ((count ?? 0) > 0) {
+      if (!window.confirm(`⚠️ Este script possui ${count} compra(s). Excluir permanentemente apagará o acesso dos compradores. Deseja continuar?`)) return;
+    }
     const { error } = await supabase.from("scripts").delete().eq("id", scriptId);
     if (error) toast.error(error.message);
-    else { toast.success("Script removido!"); queryClient.invalidateQueries({ queryKey: ["admin-scripts"] }); }
+    else { toast.success("Script removido permanentemente!"); queryClient.invalidateQueries({ queryKey: ["admin-scripts"] }); }
+  };
+
+  const toggleScriptActive = async (scriptId: string, currentActive: boolean) => {
+    const { error } = await supabase.from("scripts").update({ is_active: !currentActive } as any).eq("id", scriptId);
+    if (error) { toast.error(error.message); return; }
+    toast.success(currentActive ? "Script desativado. Compradores existentes mantêm acesso." : "Script reativado!");
+    queryClient.invalidateQueries({ queryKey: ["admin-scripts"] });
   };
 
   const updatePublishStatus = async (scriptId: string, newStatus: string) => {
