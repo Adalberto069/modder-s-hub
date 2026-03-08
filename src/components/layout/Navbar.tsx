@@ -57,7 +57,8 @@ export function Navbar() {
               </Button>
             </div>
           ) : (
-            <DropdownMenu>
+            <div className="flex items-center gap-1">
+              <NotificationBell />
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="sm" className="gap-2">
                   <Avatar className="h-6 w-6">
