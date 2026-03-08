@@ -395,6 +395,9 @@ export default function ScriptDetail() {
               </div>
             )}
 
+            {/* Moderation Messages (visible to script owner) */}
+            {isOwner && <ModerationMessages scriptId={script.id} />}
+
             {/* Tags */}
             {scriptTags.length > 0 && (
               <div className="flex flex-wrap gap-2">
