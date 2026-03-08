@@ -9,6 +9,7 @@ import Auth from "./pages/Auth";
 import Marketplace from "./pages/Marketplace";
 import TutorialDetail from "./pages/TutorialDetail";
 import ScriptDetail from "./pages/ScriptDetail";
+import ScriptEditor from "./pages/ScriptEditor";
 import ModderProfile from "./pages/ModderProfile";
 import Dashboard from "./pages/Dashboard";
 import Admin from "./pages/Admin";
@@ -33,6 +34,8 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/marketplace" element={<Marketplace />} />
+            <Route path="/script/new" element={<ScriptEditor />} />
+            <Route path="/script/:id/edit" element={<ScriptEditor />} />
             <Route path="/script/:id" element={<ScriptDetail />} />
             <Route path="/modder/:userId" element={<ModderProfile />} />
             <Route path="/dashboard" element={<Dashboard />} />
