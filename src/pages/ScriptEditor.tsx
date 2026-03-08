@@ -84,6 +84,18 @@ export default function ScriptEditor() {
     enabled: isEditing,
   });
 
+  // Check if script has purchases (lock license settings)
+  const { data: hasPurchases } = useQuery({
+    queryKey: ["script-has-purchases", id],
+    queryFn: async () => {
+      const { count } = await supabase.from("purchases").select("*", { count: "exact", head: true }).eq("script_id", id!);
+      return (count ?? 0) > 0;
+    },
+    enabled: isEditing,
+  });
+
+  const licenseFieldsLocked = isEditing && hasPurchases && !isAdmin;
+
   useEffect(() => {
     if (existingScript) {
       setTitle(existingScript.title);
