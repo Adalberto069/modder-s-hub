@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { validateFileWithToast } from "@/lib/secure-upload";
 import LuaCodeEditor from "@/components/LuaCodeEditor";
-import ScriptAnalysis from "@/components/ScriptAnalysis";
+import ScriptAnalysis, { type AnalysisResult } from "@/components/ScriptAnalysis";
 import { useParams, useNavigate } from "react-router-dom";
 import { Layout } from "@/components/layout/Layout";
 import { useAuth } from "@/lib/auth";
@@ -19,7 +19,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import {
   Save, Eye, Send, ArrowLeft, Plus, X, Code, Package,
-  Upload, Lock, EyeOff, Gamepad2, Tag, List, FileCode, BookOpen,
+  Upload, Lock, EyeOff, Gamepad2, Tag, List, FileCode, BookOpen, ShieldX,
 } from "lucide-react";
 import { Navigate } from "react-router-dom";
 
@@ -52,6 +52,7 @@ export default function ScriptEditor() {
   const [relatedTutorialId, setRelatedTutorialId] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [lastAnalysis, setLastAnalysis] = useState<AnalysisResult | null>(null);
 
   // Password protection
   const [scriptPassword, setScriptPassword] = useState("");
@@ -131,6 +132,23 @@ export default function ScriptEditor() {
     if (!user || !title.trim()) {
       toast.error("Título é obrigatório");
       return;
+    }
+
+    // Block publication if script was flagged as malicious
+    if (
+      targetPublishStatus === "published" &&
+      lastAnalysis?.classification === "malicious"
+    ) {
+      toast.error("🚫 Script classificado como MALICIOSO. A publicação foi bloqueada. Corrija as ameaças detectadas e reanalize.");
+      return;
+    }
+
+    // Warn on suspicious scripts being published
+    if (
+      targetPublishStatus === "published" &&
+      lastAnalysis?.classification === "suspicious"
+    ) {
+      toast.warning("⚠️ Script classificado como SUSPEITO. Revise as ameaças antes de publicar.");
     }
 
     setSubmitting(true);
@@ -391,7 +409,7 @@ export default function ScriptEditor() {
               {/* Script Analysis */}
               {luaCode.trim().length > 10 && (
                 <div className="mt-4">
-                  <ScriptAnalysis code={luaCode} scriptId={id} />
+                  <ScriptAnalysis code={luaCode} scriptId={id} onAnalysisComplete={setLastAnalysis} />
                 </div>
               )}
 
@@ -523,10 +541,19 @@ export default function ScriptEditor() {
             {isAdmin && (
               <Button
                 onClick={() => handleSave("published")}
-                disabled={submitting}
-                className="flex-1 neon-glow-green bg-accent text-accent-foreground hover:bg-accent/90"
+                disabled={submitting || lastAnalysis?.classification === "malicious"}
+                className={`flex-1 ${
+                  lastAnalysis?.classification === "malicious"
+                    ? "bg-destructive/20 text-destructive border-destructive/30 cursor-not-allowed"
+                    : "neon-glow-green bg-accent text-accent-foreground hover:bg-accent/90"
+                }`}
+                title={lastAnalysis?.classification === "malicious" ? "Bloqueado: script malicioso detectado" : undefined}
               >
-                <Eye className="h-4 w-4 mr-2" /> Publicar
+                {lastAnalysis?.classification === "malicious" ? (
+                  <><ShieldX className="h-4 w-4 mr-2" /> Publicação Bloqueada</>
+                ) : (
+                  <><Eye className="h-4 w-4 mr-2" /> Publicar</>
+                )}
               </Button>
             )}
 
