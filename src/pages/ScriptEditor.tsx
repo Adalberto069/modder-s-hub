@@ -23,7 +23,7 @@ import { Navigate } from "react-router-dom";
 export default function ScriptEditor() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { user, isAdmin, isModder, loading } = useAuth();
+  const { user, isAdmin, isModder, loading, rolesLoading } = useAuth();
   const queryClient = useQueryClient();
   const isEditing = !!id;
 
@@ -106,7 +106,7 @@ export default function ScriptEditor() {
 
   const canEdit = isAdmin || (isModder && existingScript?.modder_id === user?.id);
 
-  if (loading) return <Layout><div className="container py-16 text-center">Carregando...</div></Layout>;
+  if (loading || rolesLoading) return <Layout><div className="container py-16 text-center">Carregando...</div></Layout>;
   if (!user || (!isAdmin && !isModder)) return <Navigate to="/" />;
   if (isEditing && existingScript && !canEdit) return <Navigate to="/" />;
 
