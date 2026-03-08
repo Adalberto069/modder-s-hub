@@ -19,6 +19,7 @@ import { Navigate, useNavigate } from "react-router-dom";
 export default function Dashboard() {
   const { user, isModder, loading, profile } = useAuth();
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const [showForm, setShowForm] = useState(false);
 
   // Form state
