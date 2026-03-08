@@ -390,10 +390,6 @@ export default function Auth() {
                     <Label htmlFor="signup-password">Senha</Label>
                     <PasswordInput id="signup-password" value={signupPassword} onChange={setSignupPassword} show={showSignupPw} onToggle={() => setShowSignupPw(!showSignupPw)} required minLength={6} />
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Checkbox id="want-modder" checked={wantModder} onCheckedChange={(v) => setWantModder(!!v)} />
-                    <Label htmlFor="want-modder" className="text-sm">Quero ser Modder (requer aprovação)</Label>
-                  </div>
                   <Button type="submit" className="w-full neon-glow-purple" disabled={loading}>
                     {loading ? "Criando..." : "Criar Conta"}
                   </Button>
