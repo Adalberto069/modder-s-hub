@@ -54,11 +54,9 @@ export default function ScriptEditor() {
   const [submitting, setSubmitting] = useState(false);
   const [lastAnalysis, setLastAnalysis] = useState<AnalysisResult | null>(null);
 
-  // Password protection
-  const [scriptPassword, setScriptPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [passwordPermanent, setPasswordPermanent] = useState(true);
-  const [passwordExpiry, setPasswordExpiry] = useState("");
+  // License duration
+  const [licensePermanent, setLicensePermanent] = useState(true);
+  const [licenseDurationDays, setLicenseDurationDays] = useState("");
 
   const { data: categories } = useQuery({
     queryKey: ["categories"],
