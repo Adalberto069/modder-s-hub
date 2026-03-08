@@ -1,5 +1,6 @@
 import { useState } from "react";
 import LuaCodeEditor from "@/components/LuaCodeEditor";
+import ScriptAnalysis from "@/components/ScriptAnalysis";
 import { useParams, Link } from "react-router-dom";
 import { Layout } from "@/components/layout/Layout";
 import { Badge } from "@/components/ui/badge";
