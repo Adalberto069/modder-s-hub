@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Terminal, Menu, X, User, LogOut, LayoutDashboard, Shield, Settings, Wrench } from "lucide-react";
 import { useState } from "react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { NotificationBell } from "@/components/NotificationBell";
 import {
   DropdownMenu,
   DropdownMenuContent,
