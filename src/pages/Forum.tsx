@@ -226,6 +226,8 @@ export default function Forum() {
                 <div className="flex-1 min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="text-sm font-medium">{author?.display_name ?? author?.username ?? "Usuário"}</span>
+                    <UserRoleBadge userId={activePost.user_id} />
+                    <UserBadges userId={activePost.user_id} compact />
                     <Badge variant="outline" className={`text-[10px] ${categoryColor(activePost.category)}`}>
                       {CATEGORIES.find((c) => c.value === activePost.category)?.label ?? activePost.category}
                     </Badge>
