@@ -7,11 +7,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { Navigate, useNavigate } from "react-router-dom";
-import { Users, Code, CheckCircle, XCircle, Trash2, Plus, Pencil, Eye, Clock, FileX, Send, Shield, UserCheck } from "lucide-react";
+import { Users, Code, CheckCircle, XCircle, Trash2, Plus, Pencil, Eye, Clock, FileX, Send, Shield, UserCheck, ShieldCheck, ShieldOff } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { AdminBadges } from "@/components/admin/AdminBadges";
 import { AdminFlaggedScripts } from "@/components/admin/AdminFlaggedScripts";
 import { AdminModerationQueue } from "@/components/admin/AdminModerationQueue";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import LuaCodeEditor from "@/components/LuaCodeEditor";
+import { useState } from "react";
 
 const publishStatusConfig: Record<string, { label: string; className: string }> = {
   draft: { label: "Rascunho", className: "bg-muted text-muted-foreground border-border" },
@@ -24,6 +28,9 @@ export default function Admin() {
   const { user, isAdmin, loading } = useAuth();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const [codeDialogOpen, setCodeDialogOpen] = useState(false);
+  const [codeDialogContent, setCodeDialogContent] = useState("");
+  const [codeDialogTitle, setCodeDialogTitle] = useState("");
 
   const { data: pendingModders } = useQuery({
     queryKey: ["pending-modders"],
@@ -112,6 +119,35 @@ export default function Admin() {
     }
   };
 
+  const viewCode = async (script: any) => {
+    setCodeDialogTitle(script.title);
+    if (script.lua_code) {
+      setCodeDialogContent(script.lua_code);
+      setCodeDialogOpen(true);
+      return;
+    }
+    if (script.file_url) {
+      try {
+        const res = await fetch(script.file_url);
+        const text = await res.text();
+        setCodeDialogContent(text);
+        setCodeDialogOpen(true);
+      } catch {
+        toast.error("Não foi possível carregar o arquivo.");
+      }
+      return;
+    }
+    toast.error("Este script não possui código disponível.");
+  };
+
+  const toggleVerify = async (script: any) => {
+    const newValue = !script.is_verified;
+    const { error } = await supabase.from("scripts").update({ is_verified: newValue }).eq("id", script.id);
+    if (error) { toast.error(error.message); return; }
+    toast.success(newValue ? "Script verificado! ✅" : "Verificação removida.");
+    queryClient.invalidateQueries({ queryKey: ["admin-scripts"] });
+  };
+
   const pendingReview = allScripts?.filter((s: any) => s.publish_status === "pending_review") ?? [];
   const published = allScripts?.filter((s: any) => s.publish_status === "published" || !s.publish_status) ?? [];
   const drafts = allScripts?.filter((s: any) => s.publish_status === "draft") ?? [];
@@ -125,6 +161,7 @@ export default function Admin() {
           <div className="flex items-center gap-2 flex-wrap">
             <p className="font-semibold text-sm truncate">{script.title}</p>
             <Badge variant="outline" className={`text-[10px] ${ps.className}`}>{ps.label}</Badge>
+            {script.is_verified && <Badge variant="outline" className="text-[10px] bg-accent/20 text-accent border-accent/30">✅ Verificado</Badge>}
           </div>
           <div className="flex gap-3 text-[10px] text-muted-foreground mt-1">
             {(script as any).game_name && <span>🎮 {(script as any).game_name}</span>}
@@ -133,6 +170,18 @@ export default function Admin() {
           </div>
         </div>
         <div className="flex gap-1 shrink-0">
+          <Button size="icon" variant="ghost" className="h-8 w-8 text-primary" onClick={() => viewCode(script)} title="Ver Código">
+            <Code className="h-4 w-4" />
+          </Button>
+          <Button
+            size="icon"
+            variant="ghost"
+            className={`h-8 w-8 ${script.is_verified ? "text-accent" : "text-muted-foreground"}`}
+            onClick={() => toggleVerify(script)}
+            title={script.is_verified ? "Remover Verificação" : "Verificar Script"}
+          >
+            {script.is_verified ? <ShieldCheck className="h-4 w-4" /> : <ShieldOff className="h-4 w-4" />}
+          </Button>
           {(script as any).publish_status === "pending_review" && (
             <Button size="icon" variant="ghost" className="h-8 w-8 text-accent" onClick={() => updatePublishStatus(script.id, "published")} title="Aprovar">
               <CheckCircle className="h-4 w-4" />
@@ -288,6 +337,18 @@ export default function Admin() {
           <AdminBadges />
         </div>
       </div>
+
+      {/* Code Viewer Dialog */}
+      <Dialog open={codeDialogOpen} onOpenChange={setCodeDialogOpen}>
+        <DialogContent className="max-w-4xl max-h-[80vh]">
+          <DialogHeader>
+            <DialogTitle>Código: {codeDialogTitle}</DialogTitle>
+          </DialogHeader>
+          <ScrollArea className="max-h-[60vh]">
+            <LuaCodeEditor value={codeDialogContent} readOnly onChange={() => {}} minHeight="300px" />
+          </ScrollArea>
+        </DialogContent>
+      </Dialog>
     </Layout>
   );
 }
