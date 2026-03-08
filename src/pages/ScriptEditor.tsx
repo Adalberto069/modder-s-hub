@@ -391,7 +391,7 @@ export default function ScriptEditor() {
               {/* Script Analysis */}
               {luaCode.trim().length > 10 && (
                 <div className="mt-4">
-                  <ScriptAnalysis code={luaCode} />
+                  <ScriptAnalysis code={luaCode} scriptId={id} />
                 </div>
               )}
 

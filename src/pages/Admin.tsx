@@ -10,6 +10,7 @@ import { Navigate, useNavigate } from "react-router-dom";
 import { Users, Code, CheckCircle, XCircle, Trash2, Plus, Pencil, Eye, Clock, FileX, Send } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { AdminBadges } from "@/components/admin/AdminBadges";
+import { AdminFlaggedScripts } from "@/components/admin/AdminFlaggedScripts";
 
 const publishStatusConfig: Record<string, { label: string; className: string }> = {
   draft: { label: "Rascunho", className: "bg-muted text-muted-foreground border-border" },
@@ -242,6 +243,11 @@ export default function Admin() {
             </Tabs>
           </CardContent>
         </Card>
+
+        {/* Flagged Scripts */}
+        <div className="mt-8">
+          <AdminFlaggedScripts />
+        </div>
 
         {/* Badge Management */}
         <div className="mt-8">
