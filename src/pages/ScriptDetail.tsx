@@ -400,6 +400,11 @@ end
               <div className="flex items-start gap-3 mb-2 flex-wrap">
                 <h1 className="text-2xl font-bold flex-1">{script.title}</h1>
                 <div className="flex gap-2 shrink-0 flex-wrap">
+                  {!scriptIsActive && (
+                    <Badge className="bg-destructive/20 text-destructive border-destructive/30 gap-1">
+                      Inativo
+                    </Badge>
+                  )}
                   {(script as any).security_status === "verified" && (
                     <Badge className="bg-accent/20 text-accent border-accent/30 gap-1">
                       <ShieldCheck className="h-3 w-3" /> Verificado
