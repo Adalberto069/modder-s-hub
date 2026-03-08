@@ -666,6 +666,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      auto_assign_badge: {
+        Args: { _badge_slug: string; _user_id: string }
+        Returns: undefined
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
