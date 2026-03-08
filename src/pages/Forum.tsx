@@ -405,6 +405,8 @@ export default function Forum() {
                             <span className="text-xs text-muted-foreground">
                               {author?.display_name ?? author?.username ?? "Usuário"} · {formatDistanceToNow(new Date(post.created_at), { addSuffix: true, locale: ptBR })}
                             </span>
+                            <UserRoleBadge userId={post.user_id} />
+                            <UserBadges userId={post.user_id} compact />
                           </div>
                           <h3 className="text-sm font-semibold mt-1 truncate">{post.title}</h3>
                           <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{post.content}</p>
