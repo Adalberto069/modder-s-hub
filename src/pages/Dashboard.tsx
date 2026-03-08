@@ -14,7 +14,7 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { Upload, Download, Star, DollarSign, Plus, Trash2, Code, Package, Pencil, Key, Copy, ShoppingBag, EyeOff, Eye } from "lucide-react";
+import { Upload, Download, Star, DollarSign, Plus, Trash2, Code, Package, Pencil, Key, Copy, ShoppingBag, EyeOff, Eye, Clock, RefreshCw } from "lucide-react";
 import { Navigate, useNavigate } from "react-router-dom";
 
 export default function Dashboard() {
@@ -328,11 +328,17 @@ end
                       </div>
                     </div>
 
-                    {/* Download Loader */}
+                    {/* Download Loader or Renew */}
                     {license.status === "active" && (
-                      <Button className="w-full mt-3 neon-glow-green" size="sm" onClick={() => handleDownloadLoader(license)}>
-                        <Download className="mr-2 h-4 w-4" /> Baixar Loader (.lua)
-                      </Button>
+                      license.expires_at && new Date(license.expires_at) < new Date() ? (
+                        <Button className="w-full mt-3 neon-glow-purple" size="sm" onClick={() => navigate(`/script/${license.scripts?.id}`)}>
+                          <RefreshCw className="mr-2 h-4 w-4" /> Renovar Licença
+                        </Button>
+                      ) : (
+                        <Button className="w-full mt-3 neon-glow-green" size="sm" onClick={() => handleDownloadLoader(license)}>
+                          <Download className="mr-2 h-4 w-4" /> Baixar Loader (.lua)
+                        </Button>
+                      )
                     )}
                   </CardContent>
                 </Card>

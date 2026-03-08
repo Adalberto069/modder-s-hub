@@ -164,7 +164,7 @@ export default function ScriptDetail() {
     enabled: !!id,
   });
 
-  // Check if user already has a license for this script
+  // Check if user already has a license for this script (active or expired)
   const { data: existingLicense } = useQuery({
     queryKey: ["script-license", id, user?.id],
     queryFn: async () => {
@@ -180,6 +180,8 @@ export default function ScriptDetail() {
     enabled: !!id && !!user && !!script?.is_paid,
   });
 
+  const isLicenseExpired = existingLicense?.expires_at && new Date(existingLicense.expires_at) < new Date();
+
   // Related tutorial
   const relatedTutorialId = (script as any)?.related_tutorial_id;
   const { data: relatedTutorial } = useQuery({
@@ -192,7 +194,7 @@ export default function ScriptDetail() {
   });
 
   const isOwner = user && script && script.modder_id === user.id;
-  const hasAccess = !!existingLicense || isOwner || (script && !script.is_paid);
+  const hasAccess = (!!existingLicense && !isLicenseExpired) || isOwner || (script && !script.is_paid);
 
   const reviewerIds = [...new Set(reviews?.map((r: any) => r.user_id) ?? [])];
   const { data: reviewerProfiles } = useQuery({
@@ -249,6 +251,49 @@ export default function ScriptDetail() {
       queryClient.invalidateQueries({ queryKey: ["script-license", id, user.id] });
     } catch (err: any) {
       toast.error("Erro na compra: " + err.message);
+    } finally {
+      setPurchasing(false);
+    }
+  };
+
+  const handleRenew = async () => {
+    if (!user || !script || !existingLicense) return;
+    setPurchasing(true);
+
+    try {
+      const durationDays = (script as any).license_duration_days;
+      if (!durationDays) return;
+
+      // Create renewal purchase
+      const { data: purchase, error: purchaseError } = await supabase
+        .from("purchases")
+        .insert({
+          user_id: user.id,
+          script_id: script.id,
+          amount: Number(script.price) || 0,
+          status: "completed",
+        })
+        .select("id")
+        .single();
+
+      if (purchaseError) throw purchaseError;
+
+      // Extend from now (if expired) or from current expiration (if still active)
+      const baseDate = isLicenseExpired ? new Date() : new Date(existingLicense.expires_at!);
+      const newExpiresAt = new Date(baseDate.getTime() + durationDays * 86400000).toISOString();
+
+      const { error: updateError } = await supabase
+        .from("licenses")
+        .update({ expires_at: newExpiresAt } as any)
+        .eq("id", existingLicense.id);
+
+      if (updateError) throw updateError;
+
+      toast.success(`Licença renovada! Nova expiração: ${new Date(newExpiresAt).toLocaleDateString("pt-BR")}`);
+      queryClient.invalidateQueries({ queryKey: ["script-license", id, user.id] });
+      queryClient.invalidateQueries({ queryKey: ["my-licenses"] });
+    } catch (err: any) {
+      toast.error("Erro na renovação: " + err.message);
     } finally {
       setPurchasing(false);
     }
@@ -699,24 +744,64 @@ end
                     )}
 
                     {!purchaseSuccess && existingLicense ? (
-                      <div className="space-y-2">
-                        <div className="flex items-center gap-2 justify-center text-accent text-sm">
-                          <CheckCircle className="h-4 w-4" /><span>Já adquirido</span>
-                        </div>
-                        <div className="bg-secondary/50 rounded p-2">
-                          <p className="text-[10px] text-muted-foreground mb-1">Sua Licença:</p>
-                          <div className="flex items-center gap-2">
-                            <Key className="h-3 w-3 text-primary shrink-0" />
-                            <code className="text-xs font-mono text-primary flex-1">{(existingLicense as any).license_key}</code>
-                            <Button variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={() => { navigator.clipboard.writeText((existingLicense as any).license_key); toast.success("Licença copiada!"); }}>
-                              <Copy className="h-3 w-3" />
-                            </Button>
+                      isLicenseExpired ? (
+                        <div className="space-y-2">
+                          <div className="p-3 rounded-lg bg-destructive/10 border border-destructive/20 text-center">
+                            <p className="text-sm font-semibold text-destructive">❌ Licença Expirada</p>
+                            <p className="text-[10px] text-muted-foreground mt-1">
+                              Expirou em {new Date(existingLicense.expires_at!).toLocaleDateString("pt-BR")}
+                            </p>
                           </div>
+                          <div className="bg-secondary/50 rounded p-2">
+                            <p className="text-[10px] text-muted-foreground mb-1">Sua Licença:</p>
+                            <div className="flex items-center gap-2">
+                              <Key className="h-3 w-3 text-muted-foreground shrink-0" />
+                              <code className="text-xs font-mono text-muted-foreground flex-1">{(existingLicense as any).license_key}</code>
+                            </div>
+                          </div>
+                          {scriptIsActive && (
+                            <Button className="w-full neon-glow-purple" onClick={handleRenew} disabled={purchasing}>
+                              <Clock className="mr-2 h-4 w-4" />
+                              {purchasing ? "Processando..." : `Renovar por R$ ${Number(script.price).toFixed(2)}`}
+                            </Button>
+                          )}
+                          <p className="text-[10px] text-muted-foreground text-center">
+                            +{(script as any).license_duration_days} dias adicionais
+                          </p>
                         </div>
-                        <Button className="w-full neon-glow-green" onClick={handleDownloadLoader}>
-                          <Download className="mr-2 h-4 w-4" /> Baixar Loader (.lua)
-                        </Button>
-                      </div>
+                      ) : (
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2 justify-center text-accent text-sm">
+                            <CheckCircle className="h-4 w-4" /><span>Já adquirido</span>
+                          </div>
+                          <div className="bg-secondary/50 rounded p-2">
+                            <p className="text-[10px] text-muted-foreground mb-1">Sua Licença:</p>
+                            <div className="flex items-center gap-2">
+                              <Key className="h-3 w-3 text-primary shrink-0" />
+                              <code className="text-xs font-mono text-primary flex-1">{(existingLicense as any).license_key}</code>
+                              <Button variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={() => { navigator.clipboard.writeText((existingLicense as any).license_key); toast.success("Licença copiada!"); }}>
+                                <Copy className="h-3 w-3" />
+                              </Button>
+                            </div>
+                          </div>
+                          {existingLicense.expires_at && (
+                            <div className="text-center space-y-2">
+                              <Badge variant="outline" className="text-[10px] border-yellow-500/30 text-yellow-400">
+                                ⏳ Expira: {new Date(existingLicense.expires_at).toLocaleDateString("pt-BR")}
+                              </Badge>
+                              {scriptIsActive && (script as any).license_duration_days && (
+                                <Button variant="outline" size="sm" className="w-full" onClick={handleRenew} disabled={purchasing}>
+                                  <Clock className="mr-2 h-3 w-3" />
+                                  {purchasing ? "..." : `Estender (+${(script as any).license_duration_days} dias)`}
+                                </Button>
+                              )}
+                            </div>
+                          )}
+                          <Button className="w-full neon-glow-green" onClick={handleDownloadLoader}>
+                            <Download className="mr-2 h-4 w-4" /> Baixar Loader (.lua)
+                          </Button>
+                        </div>
+                      )
                     ) : !purchaseSuccess ? (
                       scriptIsActive ? (
                         <Button className="w-full neon-glow-purple" onClick={handlePurchase} disabled={purchasing}>
