@@ -58,6 +58,14 @@ export default function Marketplace() {
     enabled: !!categories,
   });
 
+  const modderIds = useMemo(() => {
+    const ids = scripts?.map((s: any) => s.modder_id) ?? [];
+    return [...new Set(ids)];
+  }, [scripts]);
+
+  const { data: modderProfiles } = useModderProfiles(modderIds);
+  });
+
   const setFilter = (key: string, value: string) => {
     const params = new URLSearchParams(searchParams);
     if (value === "all") params.delete(key);
