@@ -98,7 +98,7 @@ export function Navbar() {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-          )}
+            </div>
         </div>
 
         {/* Mobile toggle */}
