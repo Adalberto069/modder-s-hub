@@ -144,11 +144,9 @@ export function Navbar() {
               <Link to="/profile/settings" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground" onClick={() => setMobileOpen(false)}>
                 <Settings className="h-4 w-4" /> Configurações
               </Link>
-              {isModder && (
-                <Link to="/dashboard" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground" onClick={() => setMobileOpen(false)}>
-                  <LayoutDashboard className="h-4 w-4" /> Dashboard
-                </Link>
-              )}
+              <Link to="/dashboard" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground" onClick={() => setMobileOpen(false)}>
+                <LayoutDashboard className="h-4 w-4" /> Dashboard
+              </Link>
               {isAdmin && (
                 <Link to="/admin" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground" onClick={() => setMobileOpen(false)}>
                   <Shield className="h-4 w-4" /> Admin
