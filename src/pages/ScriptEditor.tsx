@@ -52,6 +52,7 @@ export default function ScriptEditor() {
   const [relatedTutorialId, setRelatedTutorialId] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [lastAnalysis, setLastAnalysis] = useState<AnalysisResult | null>(null);
 
   // Password protection
   const [scriptPassword, setScriptPassword] = useState("");
