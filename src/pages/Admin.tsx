@@ -11,6 +11,7 @@ import { Users, Code, CheckCircle, XCircle, Trash2, Plus, Pencil, Eye, Clock, Fi
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { AdminBadges } from "@/components/admin/AdminBadges";
 import { AdminFlaggedScripts } from "@/components/admin/AdminFlaggedScripts";
+import { AdminModerationQueue } from "@/components/admin/AdminModerationQueue";
 
 const publishStatusConfig: Record<string, { label: string; className: string }> = {
   draft: { label: "Rascunho", className: "bg-muted text-muted-foreground border-border" },
