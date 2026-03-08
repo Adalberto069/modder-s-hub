@@ -260,6 +260,8 @@ export default function Forum() {
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2">
                               <span className="text-xs font-medium">{rAuthor?.display_name ?? rAuthor?.username ?? "Usuário"}</span>
+                              <UserRoleBadge userId={reply.user_id} />
+                              <UserBadges userId={reply.user_id} compact />
                               <span className="text-[10px] text-muted-foreground">
                                 {formatDistanceToNow(new Date(reply.created_at), { addSuffix: true, locale: ptBR })}
                               </span>
