@@ -32,6 +32,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [rolesLoading, setRolesLoading] = useState(true);
   const [profile, setProfile] = useState<any | null>(null);
   const [roles, setRoles] = useState<string[]>([]);
 
@@ -47,6 +48,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       } else {
         setProfile(null);
         setRoles([]);
+        setRolesLoading(false);
       }
       setLoading(false);
     });
@@ -57,6 +59,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (session?.user) {
         fetchProfile(session.user.id);
         fetchRoles(session.user.id);
+      } else {
+        setRolesLoading(false);
       }
       setLoading(false);
     });
@@ -79,6 +83,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .select("role, approved")
       .eq("user_id", userId);
     setRoles(data?.filter((r: any) => r.approved).map((r: any) => r.role) ?? []);
+    setRolesLoading(false);
   };
 
   const signOut = async () => {
@@ -89,7 +94,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const isAdmin = roles.includes("admin");
 
   return (
-    <AuthContext.Provider value={{ user, session, loading, profile, roles, isModder, isAdmin, signOut }}>
+    <AuthContext.Provider value={{ user, session, loading, rolesLoading, profile, roles, isModder, isAdmin, signOut }}>
       {children}
     </AuthContext.Provider>
   );
