@@ -316,18 +316,25 @@ export type Database = {
           description: string | null
           download_count: number
           external_link: string | null
+          features: string[] | null
           file_url: string | null
+          game_name: string | null
           id: string
           is_paid: boolean
           is_verified: boolean
+          lua_code: string | null
           modder_id: string
           price: number | null
+          publish_status: string
+          related_tutorial_id: string | null
           script_type: string
           status: Database["public"]["Enums"]["script_status"]
+          tags: string[] | null
           thumbnail_url: string | null
           title: string
           total_ratings: number
           updated_at: string
+          version: string | null
           video_url: string | null
         }
         Insert: {
@@ -337,18 +344,25 @@ export type Database = {
           description?: string | null
           download_count?: number
           external_link?: string | null
+          features?: string[] | null
           file_url?: string | null
+          game_name?: string | null
           id?: string
           is_paid?: boolean
           is_verified?: boolean
+          lua_code?: string | null
           modder_id: string
           price?: number | null
+          publish_status?: string
+          related_tutorial_id?: string | null
           script_type?: string
           status?: Database["public"]["Enums"]["script_status"]
+          tags?: string[] | null
           thumbnail_url?: string | null
           title: string
           total_ratings?: number
           updated_at?: string
+          version?: string | null
           video_url?: string | null
         }
         Update: {
@@ -358,18 +372,25 @@ export type Database = {
           description?: string | null
           download_count?: number
           external_link?: string | null
+          features?: string[] | null
           file_url?: string | null
+          game_name?: string | null
           id?: string
           is_paid?: boolean
           is_verified?: boolean
+          lua_code?: string | null
           modder_id?: string
           price?: number | null
+          publish_status?: string
+          related_tutorial_id?: string | null
           script_type?: string
           status?: Database["public"]["Enums"]["script_status"]
+          tags?: string[] | null
           thumbnail_url?: string | null
           title?: string
           total_ratings?: number
           updated_at?: string
+          version?: string | null
           video_url?: string | null
         }
         Relationships: [
@@ -378,6 +399,13 @@ export type Database = {
             columns: ["category_id"]
             isOneToOne: false
             referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "scripts_related_tutorial_id_fkey"
+            columns: ["related_tutorial_id"]
+            isOneToOne: false
+            referencedRelation: "tutorials"
             referencedColumns: ["id"]
           },
         ]
