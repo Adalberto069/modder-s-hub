@@ -64,7 +64,6 @@ export default function Marketplace() {
   }, [scripts]);
 
   const { data: modderProfiles } = useModderProfiles(modderIds);
-  });
 
   const setFilter = (key: string, value: string) => {
     const params = new URLSearchParams(searchParams);
