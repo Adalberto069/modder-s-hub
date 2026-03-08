@@ -12,7 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
-import { Terminal, Mail, CheckCircle, Eye, EyeOff } from "lucide-react";
+import { Terminal, Mail, CheckCircle, Eye, EyeOff, AlertTriangle } from "lucide-react";
 
 function PasswordInput({
   id, value, onChange, show, onToggle, ...props
@@ -52,8 +52,10 @@ export default function Auth() {
   const [forgotEmail, setForgotEmail] = useState("");
   const [showEmailSent, setShowEmailSent] = useState(false);
   const [sentEmail, setSentEmail] = useState("");
+  const [showDuplicateEmail, setShowDuplicateEmail] = useState(false);
+  const [duplicateEmail, setDuplicateEmail] = useState("");
 
-  const [loginEmail, setLoginEmail] = useState("");
+  const [loginIdentifier, setLoginIdentifier] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
   const [showLoginPw, setShowLoginPw] = useState(false);
 
@@ -82,7 +84,29 @@ export default function Auth() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({ email: loginEmail, password: loginPassword });
+    
+    let email = loginIdentifier;
+    
+    // If input doesn't look like an email, resolve username via edge function
+    if (!loginIdentifier.includes("@")) {
+      try {
+        const { data, error } = await supabase.functions.invoke("resolve-username", {
+          body: { username: loginIdentifier },
+        });
+        if (error || !data?.email) {
+          toast.error("Usuário não encontrado.");
+          setLoading(false);
+          return;
+        }
+        email = data.email;
+      } catch {
+        toast.error("Erro ao buscar usuário.");
+        setLoading(false);
+        return;
+      }
+    }
+    
+    const { error } = await supabase.auth.signInWithPassword({ email, password: loginPassword });
     if (error) {
       toast.error(error.message);
     } else {
@@ -108,17 +132,29 @@ export default function Auth() {
       },
     });
     if (error) {
-      toast.error(error.message);
-    } else {
-      if (wantModder && data.user) {
-        await supabase.from("user_roles").insert({
-          user_id: data.user.id,
-          role: "modder" as any,
-          approved: false,
-        });
+      if (error.message?.toLowerCase().includes("already registered") || error.message?.toLowerCase().includes("already been registered")) {
+        setDuplicateEmail(signupEmail);
+        setShowDuplicateEmail(true);
+      } else {
+        toast.error(error.message);
       }
-      setSentEmail(signupEmail);
-      setShowEmailSent(true);
+    } else {
+      // Supabase may return a user with fake id when email already exists (no error but identities empty)
+      const isRealNewUser = data.user && data.user.identities && data.user.identities.length > 0;
+      if (!isRealNewUser) {
+        setDuplicateEmail(signupEmail);
+        setShowDuplicateEmail(true);
+      } else {
+        if (wantModder && data.user) {
+          await supabase.from("user_roles").insert({
+            user_id: data.user.id,
+            role: "modder" as any,
+            approved: false,
+          });
+        }
+        setSentEmail(signupEmail);
+        setShowEmailSent(true);
+      }
     }
     setLoading(false);
   };
@@ -144,6 +180,58 @@ export default function Auth() {
       <Layout>
         <div className="container flex items-center justify-center py-16">
           <p className="text-muted-foreground">Carregando...</p>
+        </div>
+      </Layout>
+    );
+  }
+
+  if (showDuplicateEmail) {
+    return (
+      <Layout>
+        <div className="container flex items-center justify-center py-16">
+          <Card className="w-full max-w-md neon-border bg-card/80 backdrop-blur-sm">
+            <CardContent className="pt-8 text-center space-y-4">
+              <div className="mx-auto w-16 h-16 rounded-full bg-destructive/10 flex items-center justify-center">
+                <AlertTriangle className="h-8 w-8 text-destructive" />
+              </div>
+              <h2 className="text-xl font-bold font-mono">Email já cadastrado</h2>
+              <p className="text-sm text-muted-foreground">
+                O email <span className="font-medium text-foreground break-all">{duplicateEmail}</span> já está registrado na plataforma.
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Faça login com sua conta existente ou redefina sua senha.
+              </p>
+              <div className="flex flex-col gap-2">
+                <Button
+                  className="w-full neon-glow-purple"
+                  onClick={() => {
+                    setShowDuplicateEmail(false);
+                    setLoginIdentifier(duplicateEmail);
+                  }}
+                >
+                  Fazer Login
+                </Button>
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => {
+                    setShowDuplicateEmail(false);
+                    setForgotEmail(duplicateEmail);
+                    setShowForgot(true);
+                  }}
+                >
+                  Redefinir Senha
+                </Button>
+                <button
+                  type="button"
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                  onClick={() => setShowDuplicateEmail(false)}
+                >
+                  Voltar
+                </button>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </Layout>
     );
@@ -259,8 +347,8 @@ export default function Auth() {
               <TabsContent value="login">
                 <form onSubmit={handleLogin} className="space-y-4">
                   <div>
-                    <Label htmlFor="login-email">Email</Label>
-                    <Input id="login-email" type="email" value={loginEmail} onChange={(e) => setLoginEmail(e.target.value)} required autoComplete="email" />
+                    <Label htmlFor="login-identifier">Email ou Username</Label>
+                    <Input id="login-identifier" type="text" value={loginIdentifier} onChange={(e) => setLoginIdentifier(e.target.value)} required autoComplete="username" placeholder="email@exemplo.com ou username" />
                   </div>
                   <div>
                     <Label htmlFor="login-password">Senha</Label>
