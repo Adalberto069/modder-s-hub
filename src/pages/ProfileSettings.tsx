@@ -82,6 +82,7 @@ export default function ProfileSettings() {
   const [newEmail, setNewEmail] = useState("");
   const [changingEmail, setChangingEmail] = useState(false);
   const [resendingVerification, setResendingVerification] = useState(false);
+  const [sendingResetEmail, setSendingResetEmail] = useState(false);
 
   // Preferences (local state for now)
   const [theme, setTheme] = useState<"dark" | "light">("dark");
@@ -550,6 +551,44 @@ export default function ProfileSettings() {
                   className="w-full neon-glow-purple"
                 >
                   {changingPassword ? "Alterando..." : isOAuthUser ? "Definir Senha" : "Alterar Senha"}
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Reset via Email */}
+            <Card className="neon-border bg-card/80">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Mail className="h-4 w-4 text-primary" /> Redefinir Senha por Email
+                </CardTitle>
+                <CardDescription>
+                  Receba um link no seu email para redefinir sua senha de forma segura
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  disabled={sendingResetEmail}
+                  onClick={async () => {
+                    if (!user.email) {
+                      toast.error("Nenhum email vinculado à conta");
+                      return;
+                    }
+                    setSendingResetEmail(true);
+                    const { error } = await supabase.auth.resetPasswordForEmail(user.email, {
+                      redirectTo: `${window.location.origin}/reset-password`,
+                    });
+                    if (error) {
+                      toast.error("Erro ao enviar email: " + error.message);
+                    } else {
+                      toast.success("Email de redefinição enviado! Verifique sua caixa de entrada.");
+                    }
+                    setSendingResetEmail(false);
+                  }}
+                >
+                  <Send className="h-4 w-4 mr-2" />
+                  {sendingResetEmail ? "Enviando..." : "Enviar Link de Redefinição"}
                 </Button>
               </CardContent>
             </Card>
