@@ -103,6 +103,9 @@ export default function ScriptEditor() {
       setFeatures((existingScript as any).features ?? []);
       setTags((existingScript as any).tags ?? []);
       setRelatedTutorialId((existingScript as any).related_tutorial_id ?? "");
+      const days = (existingScript as any).license_duration_days;
+      setLicensePermanent(days == null);
+      setLicenseDurationDays(days?.toString() ?? "");
     }
   }, [existingScript]);
 
