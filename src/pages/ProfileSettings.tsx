@@ -82,6 +82,7 @@ export default function ProfileSettings() {
   const [newEmail, setNewEmail] = useState("");
   const [changingEmail, setChangingEmail] = useState(false);
   const [resendingVerification, setResendingVerification] = useState(false);
+  const [sendingResetEmail, setSendingResetEmail] = useState(false);
 
   // Preferences (local state for now)
   const [theme, setTheme] = useState<"dark" | "light">("dark");
