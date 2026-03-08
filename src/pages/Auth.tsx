@@ -63,7 +63,7 @@ export default function Auth() {
   const [signupPassword, setSignupPassword] = useState("");
   const [showSignupPw, setShowSignupPw] = useState(false);
   const [signupUsername, setSignupUsername] = useState("");
-  const [wantModder, setWantModder] = useState(false);
+  
 
   // Redirect if already logged in
   useEffect(() => {
