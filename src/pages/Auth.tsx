@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Checkbox } from "@/components/ui/checkbox";
+
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import { Terminal, Mail, CheckCircle, Eye, EyeOff, AlertTriangle } from "lucide-react";
@@ -63,7 +63,7 @@ export default function Auth() {
   const [signupPassword, setSignupPassword] = useState("");
   const [showSignupPw, setShowSignupPw] = useState(false);
   const [signupUsername, setSignupUsername] = useState("");
-  const [wantModder, setWantModder] = useState(false);
+  
 
   // Redirect if already logged in
   useEffect(() => {
@@ -163,13 +163,6 @@ export default function Auth() {
         setDuplicateEmail(signupEmail);
         setShowDuplicateEmail(true);
       } else {
-        if (wantModder && data.user) {
-          await supabase.from("user_roles").insert({
-            user_id: data.user.id,
-            role: "modder" as any,
-            approved: false,
-          });
-        }
         setSentEmail(signupEmail);
         setShowEmailSent(true);
       }
@@ -396,10 +389,6 @@ export default function Auth() {
                   <div>
                     <Label htmlFor="signup-password">Senha</Label>
                     <PasswordInput id="signup-password" value={signupPassword} onChange={setSignupPassword} show={showSignupPw} onToggle={() => setShowSignupPw(!showSignupPw)} required minLength={6} />
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Checkbox id="want-modder" checked={wantModder} onCheckedChange={(v) => setWantModder(!!v)} />
-                    <Label htmlFor="want-modder" className="text-sm">Quero ser Modder (requer aprovação)</Label>
                   </div>
                   <Button type="submit" className="w-full neon-glow-purple" disabled={loading}>
                     {loading ? "Criando..." : "Criar Conta"}

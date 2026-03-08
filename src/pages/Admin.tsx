@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { Navigate, useNavigate } from "react-router-dom";
-import { Users, Code, CheckCircle, XCircle, Trash2, Plus, Pencil, Eye, Clock, FileX, Send } from "lucide-react";
+import { Users, Code, CheckCircle, XCircle, Trash2, Plus, Pencil, Eye, Clock, FileX, Send, Shield, UserCheck } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { AdminBadges } from "@/components/admin/AdminBadges";
 import { AdminFlaggedScripts } from "@/components/admin/AdminFlaggedScripts";
@@ -55,7 +55,13 @@ export default function Admin() {
     queryFn: async () => {
       const { count: usersCount } = await supabase.from("profiles").select("*", { count: "exact", head: true });
       const { count: scriptsCount } = await supabase.from("scripts").select("*", { count: "exact", head: true });
-      return { users: usersCount ?? 0, scripts: scriptsCount ?? 0 };
+      const { data: modderRoles } = await supabase
+        .from("user_roles")
+        .select("id", { count: "exact", head: false })
+        .eq("role", "modder" as any)
+        .eq("approved", true);
+      const moddersCount = modderRoles?.length ?? 0;
+      return { users: usersCount ?? 0, scripts: scriptsCount ?? 0, modders: moddersCount };
     },
     enabled: isAdmin,
   });
@@ -159,12 +165,19 @@ export default function Admin() {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
           <Card className="neon-border bg-card/80">
             <CardContent className="p-4 text-center">
               <Users className="h-5 w-5 mx-auto text-neon-purple mb-1" />
               <p className="text-2xl font-bold font-mono">{stats?.users}</p>
-              <p className="text-xs text-muted-foreground">Usuários</p>
+              <p className="text-xs text-muted-foreground">Usuários Total</p>
+            </CardContent>
+          </Card>
+          <Card className="neon-border bg-card/80">
+            <CardContent className="p-4 text-center">
+              <UserCheck className="h-5 w-5 mx-auto text-neon-cyan mb-1" />
+              <p className="text-2xl font-bold font-mono">{stats?.modders}</p>
+              <p className="text-xs text-muted-foreground">Modders</p>
             </CardContent>
           </Card>
           <Card className="neon-border bg-card/80">
@@ -183,7 +196,7 @@ export default function Admin() {
           </Card>
           <Card className="neon-border bg-card/80">
             <CardContent className="p-4 text-center">
-              <Users className="h-5 w-5 mx-auto text-neon-cyan mb-1" />
+              <Shield className="h-5 w-5 mx-auto text-primary mb-1" />
               <p className="text-2xl font-bold font-mono">{pendingModders?.length}</p>
               <p className="text-xs text-muted-foreground">Modders Pendentes</p>
             </CardContent>
