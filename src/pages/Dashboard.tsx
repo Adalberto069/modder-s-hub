@@ -291,6 +291,21 @@ end
                             <Badge variant={license.status === "active" ? "default" : "destructive"} className="text-[10px]">
                               {license.status === "active" ? "✅ Ativa" : "🚫 Banida"}
                             </Badge>
+                            {license.expires_at ? (
+                              new Date(license.expires_at) > new Date() ? (
+                                <Badge variant="outline" className="text-[10px] border-yellow-500/30 text-yellow-400">
+                                  ⏳ Expira: {new Date(license.expires_at).toLocaleDateString("pt-BR")}
+                                </Badge>
+                              ) : (
+                                <Badge variant="destructive" className="text-[10px]">
+                                  ❌ Expirada
+                                </Badge>
+                              )
+                            ) : (
+                              <Badge variant="outline" className="text-[10px] border-accent/30 text-accent">
+                                ♾️ Permanente
+                              </Badge>
+                            )}
                           </div>
                         </div>
                       </div>

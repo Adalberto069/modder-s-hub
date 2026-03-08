@@ -649,6 +649,17 @@ end
                 {script.is_paid ? (
                   <div className="space-y-3">
                     <p className="text-2xl font-bold font-mono text-primary text-center">R$ {Number(script.price).toFixed(2)}</p>
+                    <div className="text-center">
+                      {(script as any).license_duration_days ? (
+                        <Badge variant="outline" className="text-[10px] border-yellow-500/30 text-yellow-400">
+                          <Clock className="h-3 w-3 mr-1" /> Licença: {(script as any).license_duration_days} dias
+                        </Badge>
+                      ) : (
+                        <Badge variant="outline" className="text-[10px] border-accent/30 text-accent">
+                          ♾️ Licença Permanente
+                        </Badge>
+                      )}
+                    </div>
 
                     {/* Purchase success state */}
                     {purchaseSuccess && (

@@ -570,32 +570,15 @@ export default function ScriptEditor() {
                     <Label>Preço (R$)</Label>
                     <Input type="number" value={price} onChange={(e) => setPrice(e.target.value)} placeholder="0.00" min="0" step="0.01" />
                   </div>
-                  <div>
-                    <Label>Senha de acesso</Label>
-                    <div className="relative">
-                      <Input
-                        type={showPassword ? "text" : "password"}
-                        value={scriptPassword}
-                        onChange={(e) => setScriptPassword(e.target.value)}
-                        placeholder="Senha para desbloquear o script"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground"
-                      >
-                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                      </button>
-                    </div>
-                  </div>
                   <div className="flex items-center gap-4">
-                    <Switch checked={passwordPermanent} onCheckedChange={setPasswordPermanent} />
-                    <Label className="text-sm">{passwordPermanent ? "Senha permanente" : "Senha com prazo"}</Label>
+                    <Switch checked={licensePermanent} onCheckedChange={setLicensePermanent} />
+                    <Label className="text-sm">{licensePermanent ? "🔑 Licença Permanente" : "⏳ Licença com Prazo"}</Label>
                   </div>
-                  {!passwordPermanent && (
+                  {!licensePermanent && (
                     <div>
-                      <Label>Expira em</Label>
-                      <Input type="datetime-local" value={passwordExpiry} onChange={(e) => setPasswordExpiry(e.target.value)} />
+                      <Label>Duração da licença (dias)</Label>
+                      <Input type="number" value={licenseDurationDays} onChange={(e) => setLicenseDurationDays(e.target.value)} placeholder="30" min="1" />
+                      <p className="text-[10px] text-muted-foreground mt-1">O comprador será informado do prazo antes da compra.</p>
                     </div>
                   )}
                 </div>
