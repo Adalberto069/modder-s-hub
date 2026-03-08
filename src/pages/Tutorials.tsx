@@ -82,7 +82,8 @@ export default function Tutorials() {
     onError: (e: any) => toast.error(e.message),
   });
 
-  if (!loading && !user) {
+
+
   const filtered = useMemo(() => {
     let result = tutorials;
     if (activeCategory !== "all") {
