@@ -328,11 +328,17 @@ end
                       </div>
                     </div>
 
-                    {/* Download Loader */}
+                    {/* Download Loader or Renew */}
                     {license.status === "active" && (
-                      <Button className="w-full mt-3 neon-glow-green" size="sm" onClick={() => handleDownloadLoader(license)}>
-                        <Download className="mr-2 h-4 w-4" /> Baixar Loader (.lua)
-                      </Button>
+                      license.expires_at && new Date(license.expires_at) < new Date() ? (
+                        <Button className="w-full mt-3 neon-glow-purple" size="sm" onClick={() => navigate(`/script/${license.scripts?.id}`)}>
+                          <RefreshCw className="mr-2 h-4 w-4" /> Renovar Licença
+                        </Button>
+                      ) : (
+                        <Button className="w-full mt-3 neon-glow-green" size="sm" onClick={() => handleDownloadLoader(license)}>
+                          <Download className="mr-2 h-4 w-4" /> Baixar Loader (.lua)
+                        </Button>
+                      )
                     )}
                   </CardContent>
                 </Card>
