@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import LuaCodeEditor from "@/components/LuaCodeEditor";
 import { useParams, useNavigate } from "react-router-dom";
 import { Layout } from "@/components/layout/Layout";
 import { useAuth } from "@/lib/auth";
