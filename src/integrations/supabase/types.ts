@@ -601,6 +601,7 @@ export type Database = {
           file_url: string | null
           game_name: string | null
           id: string
+          is_active: boolean
           is_paid: boolean
           is_verified: boolean
           lua_code: string | null
@@ -630,6 +631,7 @@ export type Database = {
           file_url?: string | null
           game_name?: string | null
           id?: string
+          is_active?: boolean
           is_paid?: boolean
           is_verified?: boolean
           lua_code?: string | null
@@ -659,6 +661,7 @@ export type Database = {
           file_url?: string | null
           game_name?: string | null
           id?: string
+          is_active?: boolean
           is_paid?: boolean
           is_verified?: boolean
           lua_code?: string | null
@@ -928,6 +931,7 @@ export type Database = {
       }
       is_admin: { Args: { _user_id: string }; Returns: boolean }
       is_modder: { Args: { _user_id: string }; Returns: boolean }
+      script_has_purchases: { Args: { _script_id: string }; Returns: boolean }
       validate_script_password: {
         Args: { _password: string; _script_id: string }
         Returns: boolean
