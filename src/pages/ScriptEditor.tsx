@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { validateFileWithToast } from "@/lib/secure-upload";
 import LuaCodeEditor from "@/components/LuaCodeEditor";
 import { useParams, useNavigate } from "react-router-dom";
 import { Layout } from "@/components/layout/Layout";

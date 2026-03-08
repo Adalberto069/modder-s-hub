@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { validateFileWithToast } from "@/lib/secure-upload";
 import { Layout } from "@/components/layout/Layout";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
