@@ -2,6 +2,8 @@ import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Download, Star, Code, Package } from "lucide-react";
+import { UserRoleBadge } from "@/components/UserRoleBadge";
+import { UserBadges } from "@/components/UserBadges";
 
 interface ScriptCardProps {
   id: string;
