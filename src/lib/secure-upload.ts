@@ -1,4 +1,3 @@
-import { v4 as uuidv4 } from "crypto";
 import { toast } from "sonner";
 
 // --- Allowed MIME types & extensions ---
