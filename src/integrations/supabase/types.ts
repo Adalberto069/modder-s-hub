@@ -168,6 +168,85 @@ export type Database = {
           },
         ]
       }
+      moderation_logs: {
+        Row: {
+          action: string
+          created_at: string
+          details: string | null
+          id: string
+          moderator_id: string
+          new_status: string | null
+          previous_status: string | null
+          script_id: string
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          details?: string | null
+          id?: string
+          moderator_id: string
+          new_status?: string | null
+          previous_status?: string | null
+          script_id: string
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          details?: string | null
+          id?: string
+          moderator_id?: string
+          new_status?: string | null
+          previous_status?: string | null
+          script_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "moderation_logs_script_id_fkey"
+            columns: ["script_id"]
+            isOneToOne: false
+            referencedRelation: "scripts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      moderation_messages: {
+        Row: {
+          created_at: string
+          id: string
+          is_read: boolean
+          message: string
+          recipient_id: string
+          script_id: string
+          sender_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          message: string
+          recipient_id: string
+          script_id: string
+          sender_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          message?: string
+          recipient_id?: string
+          script_id?: string
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "moderation_messages_script_id_fkey"
+            columns: ["script_id"]
+            isOneToOne: false
+            referencedRelation: "scripts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -417,6 +496,7 @@ export type Database = {
           publish_status: string
           related_tutorial_id: string | null
           script_type: string
+          security_status: string
           status: Database["public"]["Enums"]["script_status"]
           tags: string[] | null
           thumbnail_url: string | null
@@ -445,6 +525,7 @@ export type Database = {
           publish_status?: string
           related_tutorial_id?: string | null
           script_type?: string
+          security_status?: string
           status?: Database["public"]["Enums"]["script_status"]
           tags?: string[] | null
           thumbnail_url?: string | null
@@ -473,6 +554,7 @@ export type Database = {
           publish_status?: string
           related_tutorial_id?: string | null
           script_type?: string
+          security_status?: string
           status?: Database["public"]["Enums"]["script_status"]
           tags?: string[] | null
           thumbnail_url?: string | null

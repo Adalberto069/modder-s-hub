@@ -19,7 +19,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import {
   Save, Eye, Send, ArrowLeft, Plus, X, Code, Package,
-  Upload, Lock, EyeOff, Gamepad2, Tag, List, FileCode, BookOpen, ShieldX,
+  Upload, Lock, EyeOff, Gamepad2, Tag, List, FileCode, BookOpen, ShieldX, Loader2,
 } from "lucide-react";
 import { Navigate } from "react-router-dom";
 
@@ -128,27 +128,88 @@ export default function ScriptEditor() {
     }
   };
 
+  // Auto-scan script and determine publish routing
+  const autoScanAndRoute = async (scriptId: string, code: string, requestedStatus: string): Promise<string> => {
+    if (!code || code.trim().length < 10) return requestedStatus;
+
+    try {
+      const { data: scanResult, error } = await supabase.functions.invoke("analyze-script", {
+        body: { code },
+      });
+
+      if (error || scanResult?.error) {
+        console.error("Auto-scan failed:", error || scanResult?.error);
+        return requestedStatus; // Don't block on scan failure
+      }
+
+      // Save analysis
+      await supabase.from("script_analyses" as any).insert({
+        script_id: scriptId,
+        analyzed_by: user!.id,
+        classification: scanResult.classification,
+        security_score: scanResult.securityScore,
+        threats: scanResult.threats,
+        summary: scanResult.summary,
+        functionality: scanResult.functionality,
+      } as any);
+
+      setLastAnalysis(scanResult);
+
+      // Route based on classification
+      if (scanResult.classification === "malicious") {
+        // Block: force to draft and flag
+        await supabase.from("scripts").update({
+          publish_status: "draft",
+          security_status: "flagged",
+        } as any).eq("id", scriptId);
+        toast.error("🚫 Script MALICIOSO detectado! Publicação bloqueada automaticamente.");
+        return "draft";
+      }
+
+      if (scanResult.classification === "suspicious") {
+        // Hold for review
+        const finalStatus = requestedStatus === "published" ? "pending_review" : requestedStatus;
+        await supabase.from("scripts").update({
+          publish_status: finalStatus,
+          security_status: "under_review",
+        } as any).eq("id", scriptId);
+        toast.warning("⚠️ Padrões suspeitos detectados. Script enviado para moderação.");
+        return finalStatus;
+      }
+
+      // Safe: publish as requested and mark verified
+      if (requestedStatus === "published") {
+        await supabase.from("scripts").update({
+          security_status: "verified",
+          is_verified: true,
+        } as any).eq("id", scriptId);
+        toast.success("✅ Script verificado e publicado automaticamente!");
+      } else {
+        await supabase.from("scripts").update({
+          security_status: "safe",
+        } as any).eq("id", scriptId);
+      }
+
+      return requestedStatus;
+    } catch (err) {
+      console.error("Scan error:", err);
+      return requestedStatus;
+    }
+  };
+
   const handleSave = async (targetPublishStatus: string) => {
     if (!user || !title.trim()) {
       toast.error("Título é obrigatório");
       return;
     }
 
-    // Block publication if script was flagged as malicious
+    // Block publication if already flagged as malicious
     if (
       targetPublishStatus === "published" &&
       lastAnalysis?.classification === "malicious"
     ) {
-      toast.error("🚫 Script classificado como MALICIOSO. A publicação foi bloqueada. Corrija as ameaças detectadas e reanalize.");
+      toast.error("🚫 Script classificado como MALICIOSO. Corrija as ameaças e reanalize.");
       return;
-    }
-
-    // Warn on suspicious scripts being published
-    if (
-      targetPublishStatus === "published" &&
-      lastAnalysis?.classification === "suspicious"
-    ) {
-      toast.warning("⚠️ Script classificado como SUSPEITO. Revise as ameaças antes de publicar.");
     }
 
     setSubmitting(true);
@@ -190,12 +251,15 @@ export default function ScriptEditor() {
     };
 
     let error;
+    let savedScriptId = id;
+
     if (isEditing) {
       ({ error } = await supabase.from("scripts").update(scriptData).eq("id", id!));
     } else {
       scriptData.modder_id = user.id;
       const { data: inserted, error: insErr } = await supabase.from("scripts").insert(scriptData).select("id").single();
       error = insErr;
+      savedScriptId = inserted?.id;
 
       // Handle password for paid scripts
       if (!insErr && isPaid && scriptPassword.trim() && inserted) {
@@ -211,13 +275,21 @@ export default function ScriptEditor() {
     if (error) {
       toast.error("Erro: " + error.message);
     } else {
-      const statusLabels: Record<string, string> = {
-        draft: "Salvo como rascunho!",
-        pending_review: "Enviado para revisão!",
-        published: "Publicado com sucesso!",
-        archived: "Arquivado!",
-      };
-      toast.success(statusLabels[targetPublishStatus] ?? "Salvo!");
+      // Auto-scan if publishing or submitting for review, and script has Lua code
+      if (savedScriptId && luaCode && luaCode.trim().length > 10 &&
+          (targetPublishStatus === "published" || targetPublishStatus === "pending_review")) {
+        toast.info("🔍 Escaneando script automaticamente...");
+        await autoScanAndRoute(savedScriptId, luaCode, targetPublishStatus);
+      } else {
+        const statusLabels: Record<string, string> = {
+          draft: "Salvo como rascunho!",
+          pending_review: "Enviado para revisão!",
+          published: "Publicado com sucesso!",
+          archived: "Arquivado!",
+        };
+        toast.success(statusLabels[targetPublishStatus] ?? "Salvo!");
+      }
+
       queryClient.invalidateQueries({ queryKey: ["admin-scripts"] });
       queryClient.invalidateQueries({ queryKey: ["my-scripts"] });
       navigate(isAdmin ? "/admin" : "/dashboard");
@@ -453,7 +525,7 @@ export default function ScriptEditor() {
             </CardHeader>
             <CardContent>
               <Select value={relatedTutorialId} onValueChange={setRelatedTutorialId}>
-                <SelectTrigger><SelectValue placeholder="Nenhum tutorial vinculado" /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder="Selecione um tutorial (opcional)" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="none">Nenhum</SelectItem>
                   {tutorials?.map((t: any) => (
@@ -464,7 +536,7 @@ export default function ScriptEditor() {
             </CardContent>
           </Card>
 
-          {/* Pricing & Protection */}
+          {/* Pricing & Password */}
           <Card className="neon-border bg-card/80">
             <CardHeader>
               <CardTitle className="text-base flex items-center gap-2">
@@ -474,28 +546,28 @@ export default function ScriptEditor() {
             <CardContent className="space-y-4">
               <div className="flex items-center gap-4">
                 <Switch checked={isPaid} onCheckedChange={setIsPaid} />
-                <Label>Script Pago</Label>
-                {isPaid && (
-                  <Input type="number" placeholder="Preço (R$)" value={price} onChange={(e) => setPrice(e.target.value)} className="w-32" step="0.01" />
-                )}
+                <Label className="text-sm">{isPaid ? "Script Pago" : "Script Gratuito"}</Label>
               </div>
 
-              {isPaid && !isEditing && (
-                <div className="space-y-3 p-4 rounded-lg border border-primary/20 bg-primary/5">
+              {isPaid && (
+                <div className="space-y-4">
                   <div>
-                    <Label>Senha do Script</Label>
+                    <Label>Preço (R$)</Label>
+                    <Input type="number" value={price} onChange={(e) => setPrice(e.target.value)} placeholder="0.00" min="0" step="0.01" />
+                  </div>
+                  <div>
+                    <Label>Senha de acesso</Label>
                     <div className="relative">
                       <Input
                         type={showPassword ? "text" : "password"}
                         value={scriptPassword}
                         onChange={(e) => setScriptPassword(e.target.value)}
-                        placeholder="Crie uma senha forte"
-                        className="pr-10"
+                        placeholder="Senha para desbloquear o script"
                       />
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                        className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground"
                       >
                         {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                       </button>
@@ -524,7 +596,8 @@ export default function ScriptEditor() {
               disabled={submitting}
               className="flex-1"
             >
-              <Save className="h-4 w-4 mr-2" /> Salvar Rascunho
+              {submitting ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
+              Salvar Rascunho
             </Button>
 
             {!isAdmin && (
@@ -534,7 +607,8 @@ export default function ScriptEditor() {
                 disabled={submitting}
                 className="flex-1 border-primary/30 text-primary hover:bg-primary/10"
               >
-                <Send className="h-4 w-4 mr-2" /> Enviar para Revisão
+                {submitting ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Send className="h-4 w-4 mr-2" />}
+                Enviar para Revisão
               </Button>
             )}
 
@@ -549,11 +623,14 @@ export default function ScriptEditor() {
                 }`}
                 title={lastAnalysis?.classification === "malicious" ? "Bloqueado: script malicioso detectado" : undefined}
               >
-                {lastAnalysis?.classification === "malicious" ? (
-                  <><ShieldX className="h-4 w-4 mr-2" /> Publicação Bloqueada</>
+                {submitting ? (
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                ) : lastAnalysis?.classification === "malicious" ? (
+                  <ShieldX className="h-4 w-4 mr-2" />
                 ) : (
-                  <><Eye className="h-4 w-4 mr-2" /> Publicar</>
+                  <Eye className="h-4 w-4 mr-2" />
                 )}
+                {lastAnalysis?.classification === "malicious" ? "Publicação Bloqueada" : "Publicar"}
               </Button>
             )}
 

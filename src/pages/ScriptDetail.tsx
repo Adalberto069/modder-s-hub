@@ -1,6 +1,7 @@
 import { useState } from "react";
 import LuaCodeEditor from "@/components/LuaCodeEditor";
 import ScriptAnalysis from "@/components/ScriptAnalysis";
+import { ModerationMessages } from "@/components/ModerationMessages";
 import { useParams, Link } from "react-router-dom";
 import { Layout } from "@/components/layout/Layout";
 import { Badge } from "@/components/ui/badge";
@@ -13,8 +14,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth";
 import {
-  Download, Star, ExternalLink, ArrowLeft, User, ShieldCheck,
-  ChevronLeft, ChevronRight, Play, MessageSquare, Lock, Eye, EyeOff, CheckCircle,
+  Download, Star, ExternalLink, ArrowLeft, User, ShieldCheck, ShieldAlert, ShieldX,
+  ChevronLeft, ChevronRight, Play, MessageSquare, Lock, Eye, EyeOff, CheckCircle, Clock,
   Copy, Check, Gamepad2, Tag, List, BookOpen, FileCode,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -204,6 +205,12 @@ export default function ScriptDetail() {
   const handleDownload = async () => {
     if (!script) return;
     if (!user) { setShowLoginPrompt(true); return; }
+    // Block download on flagged/under_review scripts
+    const secStatus = (script as any).security_status;
+    if (secStatus === "flagged" || secStatus === "under_review" || secStatus === "rejected") {
+      toast.error("Este script está em análise de segurança e não pode ser baixado no momento.");
+      return;
+    }
     await supabase.from("scripts").update({ download_count: script.download_count + 1 }).eq("id", script.id);
     if (script.file_url) window.open(script.file_url, "_blank");
     else if (script.external_link) window.open(script.external_link, "_blank");
@@ -260,8 +267,29 @@ export default function ScriptDetail() {
             <div>
               <div className="flex items-start gap-3 mb-2 flex-wrap">
                 <h1 className="text-2xl font-bold flex-1">{script.title}</h1>
-                <div className="flex gap-2 shrink-0">
-                  {script.is_verified && (
+                <div className="flex gap-2 shrink-0 flex-wrap">
+                  {/* Security Status Badges */}
+                  {(script as any).security_status === "verified" && (
+                    <Badge className="bg-accent/20 text-accent border-accent/30 gap-1">
+                      <ShieldCheck className="h-3 w-3" /> Verificado
+                    </Badge>
+                  )}
+                  {(script as any).security_status === "under_review" && (
+                    <Badge className="bg-primary/20 text-primary border-primary/30 gap-1">
+                      <Clock className="h-3 w-3" /> Em Revisão
+                    </Badge>
+                  )}
+                  {(script as any).security_status === "flagged" && (
+                    <Badge className="bg-destructive/20 text-destructive border-destructive/30 gap-1">
+                      <ShieldX className="h-3 w-3" /> Flagrado
+                    </Badge>
+                  )}
+                  {(script as any).security_status === "rejected" && (
+                    <Badge className="bg-destructive/20 text-destructive border-destructive/30 gap-1">
+                      <ShieldAlert className="h-3 w-3" /> Rejeitado
+                    </Badge>
+                  )}
+                  {script.is_verified && !(script as any).security_status && (
                     <Badge className="bg-primary/20 text-primary border-primary/30 gap-1">
                       <ShieldCheck className="h-3 w-3" /> Verificado
                     </Badge>
@@ -367,6 +395,9 @@ export default function ScriptDetail() {
                 <ScriptAnalysis code={luaCode} scriptId={id} />
               </div>
             )}
+
+            {/* Moderation Messages (visible to script owner) */}
+            {isOwner && <ModerationMessages scriptId={script.id} />}
 
             {/* Tags */}
             {scriptTags.length > 0 && (
