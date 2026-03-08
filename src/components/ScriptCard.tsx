@@ -47,9 +47,13 @@ export function ScriptCard({
               {st.label}
             </Badge>
           </div>
-          <Link to={`/modder/${modderId}`} className="text-xs text-muted-foreground hover:text-neon-purple transition-colors" onClick={(e) => e.stopPropagation()}>
-            @{modderName}
-          </Link>
+          <div className="flex flex-wrap items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
+            <Link to={`/modder/${modderId}`} className="text-xs text-muted-foreground hover:text-neon-purple transition-colors">
+              @{modderName}
+            </Link>
+            <UserRoleBadge userId={modderId} />
+            <UserBadges userId={modderId} compact />
+          </div>
           <div className="flex items-center justify-between text-xs text-muted-foreground">
             <div className="flex items-center gap-3">
               <span className="flex items-center gap-1"><Download className="h-3 w-3" />{downloadCount}</span>

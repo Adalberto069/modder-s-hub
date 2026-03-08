@@ -17,6 +17,8 @@ import { ptBR } from "date-fns/locale";
 import { MessageSquare, Plus, Send, ArrowLeft, Search, ThumbsUp } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { LoginPromptDialog } from "@/components/LoginPromptDialog";
+import { UserRoleBadge } from "@/components/UserRoleBadge";
+import { UserBadges } from "@/components/UserBadges";
 
 const CATEGORIES = [
   { value: "geral", label: "Geral" },
