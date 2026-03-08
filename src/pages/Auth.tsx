@@ -12,7 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
-import { Terminal, Mail, CheckCircle, Eye, EyeOff } from "lucide-react";
+import { Terminal, Mail, CheckCircle, Eye, EyeOff, AlertTriangle } from "lucide-react";
 
 function PasswordInput({
   id, value, onChange, show, onToggle, ...props
