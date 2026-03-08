@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -67,6 +68,8 @@ export function AdminBadges() {
   const [assignOpen, setAssignOpen] = useState(false);
   const [assignBadgeId, setAssignBadgeId] = useState<string | null>(null);
   const [userSearch, setUserSearch] = useState("");
+  const [confirmDeleteBadge, setConfirmDeleteBadge] = useState<{ id: string; name: string } | null>(null);
+  const [confirmRemoveUB, setConfirmRemoveUB] = useState<{ id: string; userName: string; badgeName: string } | null>(null);
 
   // Fetch badge definitions
   const { data: badges = [] } = useQuery({
@@ -143,13 +146,15 @@ export function AdminBadges() {
     queryClient.invalidateQueries({ queryKey: ["admin-badge-definitions"] });
   };
 
-  const deleteBadge = async (id: string) => {
-    const { error } = await supabase.from("badge_definitions").delete().eq("id", id);
+  const deleteBadge = async () => {
+    if (!confirmDeleteBadge) return;
+    const { error } = await supabase.from("badge_definitions").delete().eq("id", confirmDeleteBadge.id);
     if (error) toast.error(error.message);
     else {
       toast.success("Badge removido!");
       queryClient.invalidateQueries({ queryKey: ["admin-badge-definitions"] });
     }
+    setConfirmDeleteBadge(null);
   };
 
   const openEdit = (badge: any) => {
@@ -199,14 +204,16 @@ export function AdminBadges() {
     }
   };
 
-  const removeBadgeFromUser = async (userBadgeId: string) => {
-    const { error } = await supabase.from("user_badges").delete().eq("id", userBadgeId);
+  const removeBadgeFromUser = async () => {
+    if (!confirmRemoveUB) return;
+    const { error } = await supabase.from("user_badges").delete().eq("id", confirmRemoveUB.id);
     if (error) toast.error(error.message);
     else {
       toast.success("Badge removido do usuário!");
       queryClient.invalidateQueries({ queryKey: ["admin-user-badges"] });
       queryClient.invalidateQueries({ queryKey: ["user-badges"] });
     }
+    setConfirmRemoveUB(null);
   };
 
   const getIconComponent = (iconName: string) => {
@@ -276,7 +283,7 @@ export function AdminBadges() {
                         >
                           <UserPlus className="h-4 w-4" />
                         </Button>
-                        <Button size="icon" variant="ghost" className="h-8 w-8 text-destructive" onClick={() => deleteBadge(badge.id)}>
+                        <Button size="icon" variant="ghost" className="h-8 w-8 text-destructive" onClick={() => setConfirmDeleteBadge({ id: badge.id, name: badge.name })}>
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
@@ -311,7 +318,7 @@ export function AdminBadges() {
                         <span className="text-xs text-muted-foreground ml-2">{badge.name}</span>
                       </div>
                     </div>
-                    <Button size="icon" variant="ghost" className="h-7 w-7 text-destructive shrink-0" onClick={() => removeBadgeFromUser(ub.id)}>
+                    <Button size="icon" variant="ghost" className="h-7 w-7 text-destructive shrink-0" onClick={() => setConfirmRemoveUB({ id: ub.id, userName: profile?.display_name ?? profile?.username ?? "Usuário", badgeName: badge.name })}>
                       <X className="h-3.5 w-3.5" />
                     </Button>
                   </div>
@@ -485,6 +492,42 @@ export function AdminBadges() {
             </div>
           </DialogContent>
         </Dialog>
+
+        {/* Confirm delete badge definition */}
+        <AlertDialog open={!!confirmDeleteBadge} onOpenChange={(open) => !open && setConfirmDeleteBadge(null)}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Excluir badge "{confirmDeleteBadge?.name}"?</AlertDialogTitle>
+              <AlertDialogDescription>
+                Esta ação é irreversível. Todas as atribuições deste badge serão removidas.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancelar</AlertDialogCancel>
+              <AlertDialogAction onClick={deleteBadge} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                Excluir
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+
+        {/* Confirm remove badge from user */}
+        <AlertDialog open={!!confirmRemoveUB} onOpenChange={(open) => !open && setConfirmRemoveUB(null)}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Remover badge?</AlertDialogTitle>
+              <AlertDialogDescription>
+                Remover o badge "{confirmRemoveUB?.badgeName}" de {confirmRemoveUB?.userName}?
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancelar</AlertDialogCancel>
+              <AlertDialogAction onClick={removeBadgeFromUser} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                Remover
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </CardContent>
     </Card>
   );
