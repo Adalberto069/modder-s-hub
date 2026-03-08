@@ -204,14 +204,16 @@ export function AdminBadges() {
     }
   };
 
-  const removeBadgeFromUser = async (userBadgeId: string) => {
-    const { error } = await supabase.from("user_badges").delete().eq("id", userBadgeId);
+  const removeBadgeFromUser = async () => {
+    if (!confirmRemoveUB) return;
+    const { error } = await supabase.from("user_badges").delete().eq("id", confirmRemoveUB.id);
     if (error) toast.error(error.message);
     else {
       toast.success("Badge removido do usuário!");
       queryClient.invalidateQueries({ queryKey: ["admin-user-badges"] });
       queryClient.invalidateQueries({ queryKey: ["user-badges"] });
     }
+    setConfirmRemoveUB(null);
   };
 
   const getIconComponent = (iconName: string) => {
