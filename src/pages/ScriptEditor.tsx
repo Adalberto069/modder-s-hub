@@ -453,40 +453,41 @@ export default function ScriptEditor() {
             </CardContent>
           </Card>
 
-          {/* Lua Code Editor */}
-          <Card className="neon-border bg-card/80">
-            <CardHeader>
-              <CardTitle className="text-base flex items-center gap-2">
-                <Code className="h-4 w-4 text-neon-green" /> Código Lua
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="relative rounded-lg overflow-hidden border border-border bg-[hsl(240,15%,3%)]">
-                <div className="flex items-center gap-2 px-3 py-2 bg-secondary/50 border-b border-border">
-                  <div className="flex gap-1.5">
-                    <span className="w-3 h-3 rounded-full bg-destructive/60" />
-                    <span className="w-3 h-3 rounded-full bg-primary/60" />
-                    <span className="w-3 h-3 rounded-full bg-accent/60" />
+          {/* Code Preview (auto-extracted from file) */}
+          {luaCode && (
+            <Card className="neon-border bg-card/80">
+              <CardHeader>
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Code className="h-4 w-4 text-neon-green" /> Preview do Código
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="relative rounded-lg overflow-hidden border border-border bg-[hsl(240,15%,3%)]">
+                  <div className="flex items-center gap-2 px-3 py-2 bg-secondary/50 border-b border-border">
+                    <div className="flex gap-1.5">
+                      <span className="w-3 h-3 rounded-full bg-destructive/60" />
+                      <span className="w-3 h-3 rounded-full bg-primary/60" />
+                      <span className="w-3 h-3 rounded-full bg-accent/60" />
+                    </div>
+                    <span className="text-[10px] text-muted-foreground font-mono ml-2">preview (primeiras 20 linhas)</span>
                   </div>
-                  <span className="text-[10px] text-muted-foreground font-mono ml-2">script.lua</span>
+                  <LuaCodeEditor
+                    value={luaCode.split("\n").slice(0, 20).join("\n") + (luaCode.split("\n").length > 20 ? "\n-- ..." : "")}
+                    readOnly
+                    minHeight="200px"
+                  />
                 </div>
-                <LuaCodeEditor
-                  value={luaCode}
-                  onChange={setLuaCode}
-                  placeholder="-- Cole ou escreva seu código Lua aqui\n\nlocal player = game.Players.LocalPlayer\nlocal character = player.Character\n\n-- Seu script aqui..."
-                />
-              </div>
-              <p className="text-[10px] text-muted-foreground mt-2">Cole o código Lua do script. Será exibido com formatação na página do script.</p>
+                <p className="text-[10px] text-muted-foreground mt-2">Preview automático das primeiras 20 linhas do arquivo enviado.</p>
 
-              {/* Script Analysis */}
-              {luaCode.trim().length > 10 && (
-                <div className="mt-4">
-                  <ScriptAnalysis code={luaCode} scriptId={id} onAnalysisComplete={setLastAnalysis} />
-                </div>
-              )}
-
-            </CardContent>
-          </Card>
+                {/* Script Analysis */}
+                {luaCode.trim().length > 10 && (
+                  <div className="mt-4">
+                    <ScriptAnalysis code={luaCode} scriptId={id} onAnalysisComplete={setLastAnalysis} />
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
 
           {/* Video & Files */}
           <Card className="neon-border bg-card/80">
