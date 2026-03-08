@@ -185,6 +185,58 @@ export default function Auth() {
     );
   }
 
+  if (showDuplicateEmail) {
+    return (
+      <Layout>
+        <div className="container flex items-center justify-center py-16">
+          <Card className="w-full max-w-md neon-border bg-card/80 backdrop-blur-sm">
+            <CardContent className="pt-8 text-center space-y-4">
+              <div className="mx-auto w-16 h-16 rounded-full bg-destructive/10 flex items-center justify-center">
+                <AlertTriangle className="h-8 w-8 text-destructive" />
+              </div>
+              <h2 className="text-xl font-bold font-mono">Email já cadastrado</h2>
+              <p className="text-sm text-muted-foreground">
+                O email <span className="font-medium text-foreground break-all">{duplicateEmail}</span> já está registrado na plataforma.
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Faça login com sua conta existente ou redefina sua senha.
+              </p>
+              <div className="flex flex-col gap-2">
+                <Button
+                  className="w-full neon-glow-purple"
+                  onClick={() => {
+                    setShowDuplicateEmail(false);
+                    setLoginIdentifier(duplicateEmail);
+                  }}
+                >
+                  Fazer Login
+                </Button>
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => {
+                    setShowDuplicateEmail(false);
+                    setForgotEmail(duplicateEmail);
+                    setShowForgot(true);
+                  }}
+                >
+                  Redefinir Senha
+                </Button>
+                <button
+                  type="button"
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                  onClick={() => setShowDuplicateEmail(false)}
+                >
+                  Voltar
+                </button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </Layout>
+    );
+  }
+
   if (showEmailSent) {
     return (
       <Layout>
