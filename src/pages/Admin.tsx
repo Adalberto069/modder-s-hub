@@ -213,12 +213,13 @@ export default function Admin() {
   const ScriptRow = ({ script }: { script: any }) => {
     const ps = publishStatusConfig[(script as any).publish_status ?? "published"] ?? publishStatusConfig.published;
     return (
-      <div className="flex items-center justify-between p-3 rounded-lg bg-secondary/30 gap-2">
+      <div className={`flex items-center justify-between p-3 rounded-lg bg-secondary/30 gap-2 ${!script.is_active ? 'opacity-60' : ''}`}>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
             <p className="font-semibold text-sm truncate">{script.title}</p>
             <Badge variant="outline" className={`text-[10px] ${ps.className}`}>{ps.label}</Badge>
             {script.is_verified && <Badge variant="outline" className="text-[10px] bg-accent/20 text-accent border-accent/30">✅ Verificado</Badge>}
+            {!script.is_active && <Badge variant="destructive" className="text-[10px]">Inativo</Badge>}
           </div>
           <div className="flex gap-3 text-[10px] text-muted-foreground mt-1">
             {(script as any).game_name && <span>🎮 {(script as any).game_name}</span>}
@@ -239,6 +240,15 @@ export default function Admin() {
           >
             {script.is_verified ? <ShieldCheck className="h-4 w-4" /> : <ShieldOff className="h-4 w-4" />}
           </Button>
+          <Button
+            size="icon"
+            variant="ghost"
+            className={`h-8 w-8 ${script.is_active ? "text-primary" : "text-accent"}`}
+            onClick={() => toggleScriptActive(script.id, script.is_active ?? true)}
+            title={script.is_active ? "Desativar Script" : "Reativar Script"}
+          >
+            {script.is_active ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+          </Button>
           {(script as any).publish_status === "pending_review" && (
             <Button size="icon" variant="ghost" className="h-8 w-8 text-accent" onClick={() => updatePublishStatus(script.id, "published")} title="Aprovar">
               <CheckCircle className="h-4 w-4" />
@@ -252,7 +262,7 @@ export default function Admin() {
           <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => navigate(`/script/${script.id}/edit`)} title="Editar">
             <Pencil className="h-4 w-4" />
           </Button>
-          <Button size="icon" variant="ghost" className="h-8 w-8 text-destructive" onClick={() => deleteScript(script.id)} title="Excluir">
+          <Button size="icon" variant="ghost" className="h-8 w-8 text-destructive" onClick={() => deleteScript(script.id)} title="Excluir Permanentemente">
             <Trash2 className="h-4 w-4" />
           </Button>
         </div>
