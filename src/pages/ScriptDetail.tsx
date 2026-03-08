@@ -13,6 +13,7 @@ import { useAuth } from "@/lib/auth";
 import {
   Download, Star, ExternalLink, ArrowLeft, User, ShieldCheck,
   ChevronLeft, ChevronRight, Play, MessageSquare, Lock, Eye, EyeOff, CheckCircle,
+  Copy, Check, Gamepad2, Tag, List, BookOpen, FileCode,
 } from "lucide-react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
@@ -60,6 +61,44 @@ function StarRating({ rating, onRate, interactive = false }: { rating: number; o
   );
 }
 
+function CodeBlock({ code }: { code: string }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(code);
+    setCopied(true);
+    toast.success("Código copiado!");
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <div className="relative rounded-lg overflow-hidden border border-border bg-[hsl(240,15%,3%)]">
+      <div className="flex items-center justify-between px-3 py-2 bg-secondary/50 border-b border-border">
+        <div className="flex items-center gap-2">
+          <div className="flex gap-1.5">
+            <span className="w-3 h-3 rounded-full bg-destructive/60" />
+            <span className="w-3 h-3 rounded-full bg-primary/60" />
+            <span className="w-3 h-3 rounded-full bg-accent/60" />
+          </div>
+          <span className="text-[10px] text-muted-foreground font-mono ml-2">script.lua</span>
+        </div>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={handleCopy}
+          className="h-7 text-xs gap-1.5 text-muted-foreground hover:text-foreground"
+        >
+          {copied ? <Check className="h-3.5 w-3.5 text-accent" /> : <Copy className="h-3.5 w-3.5" />}
+          {copied ? "Copiado!" : "Copiar"}
+        </Button>
+      </div>
+      <pre className="p-4 overflow-x-auto">
+        <code className="text-sm font-mono text-accent leading-relaxed whitespace-pre">{code}</code>
+      </pre>
+    </div>
+  );
+}
+
 export default function ScriptDetail() {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
@@ -68,8 +107,6 @@ export default function ScriptDetail() {
   const [newRating, setNewRating] = useState(0);
   const [newComment, setNewComment] = useState("");
   const [submitting, setSubmitting] = useState(false);
-
-  // Password unlock state
   const [enteredPassword, setEnteredPassword] = useState("");
   const [showPwInput, setShowPwInput] = useState(false);
   const [unlocking, setUnlocking] = useState(false);
@@ -101,11 +138,7 @@ export default function ScriptDetail() {
   const { data: images } = useQuery({
     queryKey: ["script-images", id],
     queryFn: async () => {
-      const { data } = await supabase
-        .from("script_images")
-        .select("*")
-        .eq("script_id", id!)
-        .order("sort_order");
+      const { data } = await supabase.from("script_images").select("*").eq("script_id", id!).order("sort_order");
       return data ?? [];
     },
     enabled: !!id,
@@ -114,32 +147,32 @@ export default function ScriptDetail() {
   const { data: reviews } = useQuery({
     queryKey: ["script-reviews", id],
     queryFn: async () => {
-      const { data } = await supabase
-        .from("reviews")
-        .select("*")
-        .eq("script_id", id!)
-        .order("created_at", { ascending: false });
+      const { data } = await supabase.from("reviews").select("*").eq("script_id", id!).order("created_at", { ascending: false });
       return data ?? [];
     },
     enabled: !!id,
   });
 
-  // Check if user already has access
   const { data: existingAccess } = useQuery({
     queryKey: ["script-access", id, user?.id],
     queryFn: async () => {
-      const { data } = await supabase
-        .from("script_access")
-        .select("id")
-        .eq("script_id", id!)
-        .eq("user_id", user!.id)
-        .maybeSingle();
+      const { data } = await supabase.from("script_access").select("id").eq("script_id", id!).eq("user_id", user!.id).maybeSingle();
       return data;
     },
     enabled: !!id && !!user && !!script?.is_paid,
   });
 
-  // Check if user is the owner
+  // Related tutorial
+  const relatedTutorialId = (script as any)?.related_tutorial_id;
+  const { data: relatedTutorial } = useQuery({
+    queryKey: ["related-tutorial", relatedTutorialId],
+    queryFn: async () => {
+      const { data } = await supabase.from("tutorials").select("id, title, description, thumbnail_url").eq("id", relatedTutorialId).single();
+      return data;
+    },
+    enabled: !!relatedTutorialId,
+  });
+
   const isOwner = user && script && script.modder_id === user.id;
   const hasAccess = !!existingAccess || unlocked || isOwner;
 
@@ -154,47 +187,23 @@ export default function ScriptDetail() {
     enabled: reviewerIds.length > 0,
   });
 
-  const profileMap = (reviewerProfiles ?? []).reduce((acc: any, p: any) => {
-    acc[p.user_id] = p;
-    return acc;
-  }, {});
+  const profileMap = (reviewerProfiles ?? []).reduce((acc: any, p: any) => { acc[p.user_id] = p; return acc; }, {});
 
   const handleUnlockWithPassword = async () => {
     if (!user || !script || !enteredPassword.trim()) return;
     setUnlocking(true);
-
-    // Validate password using DB function
-    const { data: isValid, error } = await supabase.rpc("validate_script_password", {
-      _script_id: script.id,
-      _password: enteredPassword.trim(),
-    });
-
-    if (error || !isValid) {
-      toast.error("Senha incorreta ou expirada!");
-      setUnlocking(false);
-      return;
-    }
-
-    // Grant access
-    await supabase.from("script_access").insert({
-      script_id: script.id,
-      user_id: user.id,
-    });
-
+    const { data: isValid, error } = await supabase.rpc("validate_script_password", { _script_id: script.id, _password: enteredPassword.trim() });
+    if (error || !isValid) { toast.error("Senha incorreta ou expirada!"); setUnlocking(false); return; }
+    await supabase.from("script_access").insert({ script_id: script.id, user_id: user.id });
     setUnlocked(true);
-    toast.success("Acesso desbloqueado! Agora você pode baixar.");
-    setEnteredPassword("");
-    setShowPwInput(false);
-    setUnlocking(false);
+    toast.success("Acesso desbloqueado!");
+    setEnteredPassword(""); setShowPwInput(false); setUnlocking(false);
     queryClient.invalidateQueries({ queryKey: ["script-access", id, user.id] });
   };
 
   const handleDownload = async () => {
     if (!script) return;
-    if (!user) {
-      setShowLoginPrompt(true);
-      return;
-    }
+    if (!user) { setShowLoginPrompt(true); return; }
     await supabase.from("scripts").update({ download_count: script.download_count + 1 }).eq("id", script.id);
     if (script.file_url) window.open(script.file_url, "_blank");
     else if (script.external_link) window.open(script.external_link, "_blank");
@@ -203,48 +212,27 @@ export default function ScriptDetail() {
 
   const handleReview = async () => {
     if (!user) { setShowLoginPrompt(true); return; }
-    if (!script || newRating === 0) {
-      toast.error("Selecione uma avaliação de 1 a 5 estrelas.");
-      return;
-    }
+    if (!script || newRating === 0) { toast.error("Selecione uma avaliação."); return; }
     setSubmitting(true);
-
     const existing = reviews?.find((r: any) => r.user_id === user.id);
     if (existing) {
       await supabase.from("reviews").update({ rating: newRating, comment: newComment || null }).eq("id", existing.id);
       toast.success("Avaliação atualizada!");
     } else {
-      const { error } = await supabase.from("reviews").insert({
-        script_id: script.id,
-        user_id: user.id,
-        rating: newRating,
-        comment: newComment || null,
-      });
-      if (error) {
-        toast.error(error.message);
-        setSubmitting(false);
-        return;
-      }
+      const { error } = await supabase.from("reviews").insert({ script_id: script.id, user_id: user.id, rating: newRating, comment: newComment || null });
+      if (error) { toast.error(error.message); setSubmitting(false); return; }
       toast.success("Avaliação enviada!");
     }
-
     const allReviews = [...(reviews ?? []).filter((r: any) => r.user_id !== user.id), { rating: newRating }];
     const avg = allReviews.reduce((s: number, r: any) => s + r.rating, 0) / allReviews.length;
     await supabase.from("scripts").update({ average_rating: avg, total_ratings: allReviews.length }).eq("id", script.id);
-
-    setNewComment("");
-    setNewRating(0);
-    setSubmitting(false);
+    setNewComment(""); setNewRating(0); setSubmitting(false);
     queryClient.invalidateQueries({ queryKey: ["script-reviews", id] });
     queryClient.invalidateQueries({ queryKey: ["script", id] });
   };
 
   if (!script) {
-    return (
-      <Layout>
-        <div className="container py-16 text-center text-muted-foreground">Carregando...</div>
-      </Layout>
-    );
+    return <Layout><div className="container py-16 text-center text-muted-foreground">Carregando...</div></Layout>;
   }
 
   const st = statusConfig[script.status] ?? statusConfig.working;
@@ -252,6 +240,11 @@ export default function ScriptDetail() {
     ...(script.thumbnail_url ? [{ type: "image" as const, url: script.thumbnail_url }] : []),
     ...(images ?? []).map((img: any) => ({ type: "image" as const, url: img.image_url })),
   ];
+  const scriptFeatures = (script as any).features ?? [];
+  const scriptTags = (script as any).tags ?? [];
+  const luaCode = (script as any).lua_code;
+  const gameName = (script as any).game_name;
+  const scriptVersion = (script as any).version;
 
   return (
     <Layout>
@@ -263,6 +256,7 @@ export default function ScriptDetail() {
         <div className="grid md:grid-cols-3 gap-6">
           {/* Main content */}
           <div className="md:col-span-2 space-y-6">
+            {/* Header */}
             <div>
               <div className="flex items-start gap-3 mb-2 flex-wrap">
                 <h1 className="text-2xl font-bold flex-1">{script.title}</h1>
@@ -275,9 +269,21 @@ export default function ScriptDetail() {
                   <Badge variant="outline" className={st.className}>{st.label}</Badge>
                 </div>
               </div>
-              {script.categories && (
-                <Badge variant="secondary" className="text-xs">{(script.categories as any).name}</Badge>
-              )}
+
+              {/* Meta info row */}
+              <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                {gameName && (
+                  <Badge variant="secondary" className="gap-1 text-[10px]">
+                    <Gamepad2 className="h-3 w-3" /> {gameName}
+                  </Badge>
+                )}
+                {script.categories && (
+                  <Badge variant="secondary" className="text-[10px]">{(script.categories as any).name}</Badge>
+                )}
+                {scriptVersion && (
+                  <Badge variant="outline" className="text-[10px]">v{scriptVersion}</Badge>
+                )}
+              </div>
             </div>
 
             {/* Image Gallery */}
@@ -297,25 +303,15 @@ export default function ScriptDetail() {
                 </AnimatePresence>
                 {allMedia.length > 1 && (
                   <>
-                    <button
-                      onClick={() => setGalleryIndex((p) => (p === 0 ? allMedia.length - 1 : p - 1))}
-                      className="absolute left-2 top-1/2 -translate-y-1/2 bg-background/70 rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                    >
+                    <button onClick={() => setGalleryIndex((p) => (p === 0 ? allMedia.length - 1 : p - 1))} className="absolute left-2 top-1/2 -translate-y-1/2 bg-background/70 rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity">
                       <ChevronLeft className="h-5 w-5" />
                     </button>
-                    <button
-                      onClick={() => setGalleryIndex((p) => (p === allMedia.length - 1 ? 0 : p + 1))}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 bg-background/70 rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                    >
+                    <button onClick={() => setGalleryIndex((p) => (p === allMedia.length - 1 ? 0 : p + 1))} className="absolute right-2 top-1/2 -translate-y-1/2 bg-background/70 rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity">
                       <ChevronRight className="h-5 w-5" />
                     </button>
                     <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
                       {allMedia.map((_, i) => (
-                        <button
-                          key={i}
-                          onClick={() => setGalleryIndex(i)}
-                          className={`w-2 h-2 rounded-full transition-colors ${i === galleryIndex ? "bg-primary" : "bg-muted-foreground/40"}`}
-                        />
+                        <button key={i} onClick={() => setGalleryIndex(i)} className={`w-2 h-2 rounded-full transition-colors ${i === galleryIndex ? "bg-primary" : "bg-muted-foreground/40"}`} />
                       ))}
                     </div>
                   </>
@@ -332,10 +328,83 @@ export default function ScriptDetail() {
               </div>
             )}
 
+            {/* Description */}
             <div>
-              <h3 className="text-sm font-semibold mb-2">Descrição</h3>
+              <h3 className="text-sm font-semibold mb-2 flex items-center gap-2">
+                <FileCode className="h-4 w-4 text-primary" /> Descrição
+              </h3>
               <p className="text-muted-foreground whitespace-pre-wrap text-sm">{script.description ?? "Sem descrição."}</p>
             </div>
+
+            {/* Features */}
+            {scriptFeatures.length > 0 && (
+              <Card className="neon-border bg-card/80">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <List className="h-4 w-4 text-accent" /> Features
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-2">
+                    {scriptFeatures.map((f: string, i: number) => (
+                      <li key={i} className="flex items-start gap-2 text-sm">
+                        <CheckCircle className="h-4 w-4 text-accent shrink-0 mt-0.5" />
+                        <span className="text-foreground">{f}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Code Block */}
+            {luaCode && (
+              <div>
+                <h3 className="text-sm font-semibold mb-2 flex items-center gap-2">
+                  <FileCode className="h-4 w-4 text-neon-green" /> Código
+                </h3>
+                <CodeBlock code={luaCode} />
+              </div>
+            )}
+
+            {/* Tags */}
+            {scriptTags.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {scriptTags.map((t: string, i: number) => (
+                  <Badge key={i} variant="outline" className="text-[10px] text-neon-cyan border-neon-cyan/30">
+                    <Tag className="h-3 w-3 mr-1" /> #{t}
+                  </Badge>
+                ))}
+              </div>
+            )}
+
+            {/* Related Tutorial */}
+            {relatedTutorial && (
+              <Card className="neon-border bg-card/80">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <BookOpen className="h-4 w-4 text-neon-pink" /> Tutorial Relacionado
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <Link to={`/tutorial/${relatedTutorial.id}`} className="flex items-center gap-3 p-3 rounded-lg bg-secondary/30 hover:bg-secondary/50 transition-colors">
+                    {relatedTutorial.thumbnail_url ? (
+                      <img src={relatedTutorial.thumbnail_url} alt="" className="w-16 h-10 rounded object-cover" />
+                    ) : (
+                      <div className="w-16 h-10 rounded bg-secondary flex items-center justify-center">
+                        <BookOpen className="h-5 w-5 text-muted-foreground/30" />
+                      </div>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold truncate">{relatedTutorial.title}</p>
+                      {relatedTutorial.description && (
+                        <p className="text-[10px] text-muted-foreground truncate">{relatedTutorial.description}</p>
+                      )}
+                    </div>
+                  </Link>
+                </CardContent>
+              </Card>
+            )}
 
             {/* Reviews */}
             <Card className="neon-border bg-card/80">
@@ -350,21 +419,16 @@ export default function ScriptDetail() {
                   <div className="space-y-3 p-3 rounded-lg bg-secondary/30 border border-border/50">
                     <p className="text-xs text-muted-foreground">Sua avaliação:</p>
                     <StarRating rating={newRating} onRate={setNewRating} interactive />
-                    <Textarea
-                      placeholder="Comentário (opcional)"
-                      value={newComment}
-                      onChange={(e) => setNewComment(e.target.value)}
-                      rows={2}
-                      className="text-sm"
-                    />
+                    <Textarea placeholder="Comentário (opcional)" value={newComment} onChange={(e) => setNewComment(e.target.value)} rows={2} className="text-sm" />
                     <Button size="sm" onClick={handleReview} disabled={submitting || newRating === 0} className="neon-glow-purple">
                       {submitting ? "Enviando..." : "Enviar Avaliação"}
                     </Button>
                   </div>
                 ) : (
-                  <p className="text-xs text-muted-foreground">
-                    <Link to="/auth" className="text-primary hover:underline">Faça login</Link> para avaliar.
-                  </p>
+                  <div className="p-3 rounded-lg bg-secondary/20 text-center">
+                    <p className="text-xs text-muted-foreground mb-2">Faça login para avaliar este script.</p>
+                    <Button size="sm" variant="outline" onClick={() => setShowLoginPrompt(true)}>Entrar</Button>
+                  </div>
                 )}
 
                 <div className="space-y-3">
@@ -401,15 +465,11 @@ export default function ScriptDetail() {
             <Card className="neon-border bg-card/80">
               <CardContent className="p-4 space-y-4">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="flex items-center gap-1 text-muted-foreground">
-                    <Download className="h-4 w-4" /> Downloads
-                  </span>
+                  <span className="flex items-center gap-1 text-muted-foreground"><Download className="h-4 w-4" /> Downloads</span>
                   <span className="font-mono font-bold">{script.download_count}</span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
-                  <span className="flex items-center gap-1 text-muted-foreground">
-                    <Star className="h-4 w-4" /> Avaliação
-                  </span>
+                  <span className="flex items-center gap-1 text-muted-foreground"><Star className="h-4 w-4" /> Avaliação</span>
                   <div className="flex items-center gap-1">
                     <StarRating rating={Math.round(Number(script.average_rating))} />
                     <span className="font-mono font-bold text-xs">({script.total_ratings})</span>
@@ -419,12 +479,10 @@ export default function ScriptDetail() {
                 {script.is_paid ? (
                   <div className="space-y-3">
                     <p className="text-2xl font-bold font-mono text-primary text-center">R$ {Number(script.price).toFixed(2)}</p>
-
                     {hasAccess ? (
                       <div className="space-y-2">
                         <div className="flex items-center gap-2 justify-center text-accent text-sm">
-                          <CheckCircle className="h-4 w-4" />
-                          <span>Acesso desbloqueado</span>
+                          <CheckCircle className="h-4 w-4" /><span>Acesso desbloqueado</span>
                         </div>
                         <Button className="w-full neon-glow-green" onClick={handleDownload}>
                           <Download className="mr-2 h-4 w-4" /> Download
@@ -433,50 +491,19 @@ export default function ScriptDetail() {
                     ) : (
                       <div className="space-y-2">
                         {!showPwInput ? (
-                          <Button
-                            className="w-full neon-glow-purple"
-                            onClick={() => {
-                              if (!user) {
-                                toast.error("Faça login para desbloquear");
-                                return;
-                              }
-                              setShowPwInput(true);
-                            }}
-                          >
+                          <Button className="w-full neon-glow-purple" onClick={() => { if (!user) { setShowLoginPrompt(true); return; } setShowPwInput(true); }}>
                             <Lock className="mr-2 h-4 w-4" /> Desbloquear com Senha
                           </Button>
                         ) : (
                           <div className="space-y-2">
-                            <div className="relative">
-                              <Input
-                                type="password"
-                                value={enteredPassword}
-                                onChange={(e) => setEnteredPassword(e.target.value)}
-                                placeholder="Digite a senha"
-                                className="pr-10"
-                                onKeyDown={(e) => e.key === "Enter" && handleUnlockWithPassword()}
-                              />
-                            </div>
+                            <Input type="password" value={enteredPassword} onChange={(e) => setEnteredPassword(e.target.value)} placeholder="Digite a senha" onKeyDown={(e) => e.key === "Enter" && handleUnlockWithPassword()} />
                             <div className="flex gap-2">
-                              <Button
-                                size="sm"
-                                className="flex-1 neon-glow-purple"
-                                onClick={handleUnlockWithPassword}
-                                disabled={unlocking || !enteredPassword.trim()}
-                              >
+                              <Button size="sm" className="flex-1 neon-glow-purple" onClick={handleUnlockWithPassword} disabled={unlocking || !enteredPassword.trim()}>
                                 {unlocking ? "Validando..." : "Confirmar"}
                               </Button>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => { setShowPwInput(false); setEnteredPassword(""); }}
-                              >
-                                Cancelar
-                              </Button>
+                              <Button size="sm" variant="outline" onClick={() => { setShowPwInput(false); setEnteredPassword(""); }}>Cancelar</Button>
                             </div>
-                            <p className="text-[10px] text-muted-foreground text-center">
-                              Insira a senha fornecida pelo modder após o pagamento
-                            </p>
+                            <p className="text-[10px] text-muted-foreground text-center">Insira a senha fornecida pelo modder</p>
                           </div>
                         )}
                       </div>
@@ -490,7 +517,7 @@ export default function ScriptDetail() {
 
                 {script.external_link && !script.is_paid && (
                   <Button variant="outline" className="w-full" onClick={() => {
-                    if (!user) { toast.error("Faça login para acessar."); return; }
+                    if (!user) { setShowLoginPrompt(true); return; }
                     window.open(script.external_link!, "_blank");
                   }}>
                     <ExternalLink className="mr-2 h-4 w-4" /> Link Externo
@@ -505,9 +532,7 @@ export default function ScriptDetail() {
                 <Link to={`/modder/${script.modder_id}`} className="flex items-center gap-3 hover:opacity-80 transition-opacity">
                   <Avatar className="h-10 w-10">
                     {modderProfile?.avatar_url && <AvatarImage src={modderProfile.avatar_url} />}
-                    <AvatarFallback className="bg-secondary">
-                      <User className="h-5 w-5 text-muted-foreground" />
-                    </AvatarFallback>
+                    <AvatarFallback className="bg-secondary"><User className="h-5 w-5 text-muted-foreground" /></AvatarFallback>
                   </Avatar>
                   <div>
                     <p className="font-semibold text-sm">{modderProfile?.display_name ?? modderProfile?.username}</p>

@@ -13,12 +13,13 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { Upload, Download, Star, DollarSign, Plus, Trash2, Code, Package, Lock, Eye, EyeOff } from "lucide-react";
-import { Navigate } from "react-router-dom";
+import { Upload, Download, Star, DollarSign, Plus, Trash2, Code, Package, Lock, Eye, EyeOff, Pencil } from "lucide-react";
+import { Navigate, useNavigate } from "react-router-dom";
 
 export default function Dashboard() {
   const { user, isModder, loading, profile } = useAuth();
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const [showForm, setShowForm] = useState(false);
 
   // Form state
@@ -155,7 +156,7 @@ export default function Dashboard() {
       <div className="container py-8">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold">Dashboard</h1>
-          <Button onClick={() => setShowForm(!showForm)} className="neon-glow-purple">
+          <Button onClick={() => navigate("/script/new")} className="neon-glow-purple">
             <Plus className="mr-2 h-4 w-4" /> Novo Conteúdo
           </Button>
         </div>
@@ -348,9 +349,14 @@ export default function Dashboard() {
                     <Badge variant="secondary" className="text-[10px]">{script.script_type === "apk" ? "APK" : "Script"}</Badge>
                   </div>
                 </div>
-                <Button variant="ghost" size="icon" className="text-destructive" onClick={() => handleDelete(script.id)}>
-                  <Trash2 className="h-4 w-4" />
-                </Button>
+                <div className="flex gap-1">
+                  <Button variant="ghost" size="icon" onClick={() => navigate(`/script/${script.id}/edit`)}>
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                  <Button variant="ghost" size="icon" className="text-destructive" onClick={() => handleDelete(script.id)}>
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           ))}
