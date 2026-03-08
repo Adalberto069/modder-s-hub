@@ -205,15 +205,38 @@ export default function ScriptDetail() {
   const handleDownload = async () => {
     if (!script) return;
     if (!user) { setShowLoginPrompt(true); return; }
-    // Block download on flagged/under_review scripts
     const secStatus = (script as any).security_status;
     if (secStatus === "flagged" || secStatus === "under_review" || secStatus === "rejected") {
       toast.error("Este script está em análise de segurança e não pode ser baixado no momento.");
       return;
     }
     await supabase.from("scripts").update({ download_count: script.download_count + 1 }).eq("id", script.id);
-    if (script.file_url) window.open(script.file_url, "_blank");
-    else if (script.external_link) window.open(script.external_link, "_blank");
+    
+    const downloadUrl = script.file_url || script.external_link;
+    if (downloadUrl) {
+      // Build a friendly filename from game name + title
+      const safeName = [gameName, script.title]
+        .filter(Boolean)
+        .join(" - ")
+        .replace(/[^a-zA-Z0-9\s\-_().àáâãéêíóôõúçÀÁÂÃÉÊÍÓÔÕÚÇ]/g, "")
+        .trim();
+      const ext = script.file_url?.match(/\.(\w+)$/)?.[1] || "lua";
+      
+      try {
+        const response = await fetch(downloadUrl);
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `${safeName || "script"}.${ext}`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      } catch {
+        window.open(downloadUrl, "_blank");
+      }
+    }
     toast.success("Download iniciado!");
   };
 
@@ -385,13 +408,13 @@ export default function ScriptDetail() {
               </Card>
             )}
 
-            {/* Code Block */}
+            {/* Code Preview */}
             {luaCode && (
               <div className="space-y-4">
                 <h3 className="text-sm font-semibold mb-2 flex items-center gap-2">
-                  <FileCode className="h-4 w-4 text-neon-green" /> Código
+                  <FileCode className="h-4 w-4 text-neon-green" /> Preview do Código
                 </h3>
-                <CodeBlock code={luaCode} />
+                <CodeBlock code={luaCode.split("\n").slice(0, 20).join("\n") + (luaCode.split("\n").length > 20 ? "\n-- ..." : "")} />
                 <ScriptAnalysis code={luaCode} scriptId={id} />
               </div>
             )}
