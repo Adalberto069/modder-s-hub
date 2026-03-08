@@ -408,13 +408,13 @@ export default function ScriptDetail() {
               </Card>
             )}
 
-            {/* Code Block */}
+            {/* Code Preview */}
             {luaCode && (
               <div className="space-y-4">
                 <h3 className="text-sm font-semibold mb-2 flex items-center gap-2">
-                  <FileCode className="h-4 w-4 text-neon-green" /> Código
+                  <FileCode className="h-4 w-4 text-neon-green" /> Preview do Código
                 </h3>
-                <CodeBlock code={luaCode} />
+                <CodeBlock code={luaCode.split("\n").slice(0, 20).join("\n") + (luaCode.split("\n").length > 20 ? "\n-- ..." : "")} />
                 <ScriptAnalysis code={luaCode} scriptId={id} />
               </div>
             )}
