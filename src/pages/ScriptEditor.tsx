@@ -504,7 +504,19 @@ export default function ScriptEditor() {
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
                   <Label>Arquivo para download</Label>
-                  <Input type="file" onChange={(e) => setFile(e.target.files?.[0] ?? null)} accept=".lua,.zip,.rar,.apk" />
+                  <Input type="file" onChange={(e) => {
+                    const f = e.target.files?.[0] ?? null;
+                    setFile(f);
+                    // Auto-extract lua code from .lua files for preview
+                    if (f && f.name.endsWith(".lua")) {
+                      const reader = new FileReader();
+                      reader.onload = (ev) => {
+                        const content = ev.target?.result as string;
+                        if (content) setLuaCode(content);
+                      };
+                      reader.readAsText(f);
+                    }
+                  }} accept=".lua,.zip,.rar,.apk" />
                   {existingScript?.file_url && !file && (
                     <p className="text-[10px] text-muted-foreground mt-1">Arquivo atual mantido. Selecione novo para substituir.</p>
                   )}
