@@ -32,10 +32,10 @@ export function AdminModerationQueue() {
   const { data: moderationScripts, isLoading } = useQuery({
     queryKey: ["moderation-queue"],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase
         .from("scripts")
-        .select("*, categories(name)")
-        .in("security_status" as any, ["under_review", "flagged"])
+        .select("*, categories(name)") as any)
+        .in("security_status", ["under_review", "flagged"])
         .order("created_at", { ascending: false });
       if (error) throw error;
       return (data ?? []) as any[];
