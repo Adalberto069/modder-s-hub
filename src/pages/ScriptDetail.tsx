@@ -204,6 +204,12 @@ export default function ScriptDetail() {
   const handleDownload = async () => {
     if (!script) return;
     if (!user) { setShowLoginPrompt(true); return; }
+    // Block download on flagged/under_review scripts
+    const secStatus = (script as any).security_status;
+    if (secStatus === "flagged" || secStatus === "under_review" || secStatus === "rejected") {
+      toast.error("Este script está em análise de segurança e não pode ser baixado no momento.");
+      return;
+    }
     await supabase.from("scripts").update({ download_count: script.download_count + 1 }).eq("id", script.id);
     if (script.file_url) window.open(script.file_url, "_blank");
     else if (script.external_link) window.open(script.external_link, "_blank");
