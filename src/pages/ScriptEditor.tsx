@@ -264,6 +264,13 @@ export default function ScriptEditor() {
       license_duration_days: isPaid && !licensePermanent && licenseDurationDays ? parseInt(licenseDurationDays) : null,
     };
 
+    // Block license changes if script has purchases (unless admin)
+    if (isEditing && hasPurchases && !isAdmin) {
+      delete scriptData.license_duration_days;
+      delete scriptData.is_paid;
+      delete scriptData.price;
+    }
+
     let error;
     let savedScriptId = id;
 
