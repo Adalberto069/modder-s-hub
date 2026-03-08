@@ -24,11 +24,28 @@ const CATEGORIES = [
 const categoryLabels: Record<string, string> = Object.fromEntries(CATEGORIES.map(c => [c.value, c.label]));
 
 export default function Tutorials() {
-  const { user, isAdmin } = useAuth();
+  const { user, isAdmin, loading } = useAuth();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [activeCategory, setActiveCategory] = useState("all");
   const [search, setSearch] = useState("");
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
+
+  if (!loading && !user) {
+    return (
+      <Layout>
+        <div className="container py-20 max-w-lg text-center">
+          <Lock className="h-16 w-16 mx-auto mb-6 text-muted-foreground" />
+          <h1 className="text-2xl font-bold mb-3">Acesso Restrito</h1>
+          <p className="text-muted-foreground mb-6">
+            Você precisa estar logado para acessar os tutoriais e guias.
+          </p>
+          <Button onClick={() => navigate("/auth?tab=login")}>Entrar</Button>
+          <LoginPromptDialog open={showLoginPrompt} onOpenChange={setShowLoginPrompt} />
+        </div>
+      </Layout>
+    );
+  }
 
   const { data: tutorials = [], isLoading } = useQuery({
     queryKey: ["tutorials"],
