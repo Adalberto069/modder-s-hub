@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { validateFileWithToast } from "@/lib/secure-upload";
 import LuaCodeEditor from "@/components/LuaCodeEditor";
+import ScriptAnalysis from "@/components/ScriptAnalysis";
 import { useParams, useNavigate } from "react-router-dom";
 import { Layout } from "@/components/layout/Layout";
 import { useAuth } from "@/lib/auth";
@@ -386,6 +387,14 @@ export default function ScriptEditor() {
                 />
               </div>
               <p className="text-[10px] text-muted-foreground mt-2">Cole o código Lua do script. Será exibido com formatação na página do script.</p>
+
+              {/* Script Analysis */}
+              {luaCode.trim().length > 10 && (
+                <div className="mt-4">
+                  <ScriptAnalysis code={luaCode} />
+                </div>
+              )}
+
             </CardContent>
           </Card>
 
