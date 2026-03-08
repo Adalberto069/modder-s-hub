@@ -146,13 +146,15 @@ export function AdminBadges() {
     queryClient.invalidateQueries({ queryKey: ["admin-badge-definitions"] });
   };
 
-  const deleteBadge = async (id: string) => {
-    const { error } = await supabase.from("badge_definitions").delete().eq("id", id);
+  const deleteBadge = async () => {
+    if (!confirmDeleteBadge) return;
+    const { error } = await supabase.from("badge_definitions").delete().eq("id", confirmDeleteBadge.id);
     if (error) toast.error(error.message);
     else {
       toast.success("Badge removido!");
       queryClient.invalidateQueries({ queryKey: ["admin-badge-definitions"] });
     }
+    setConfirmDeleteBadge(null);
   };
 
   const openEdit = (badge: any) => {
