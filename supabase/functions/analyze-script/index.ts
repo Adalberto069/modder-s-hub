@@ -60,36 +60,16 @@ Script to analyze:
 ${code.substring(0, 50000)}
 \`\`\``;
 
-    const aiResponse = await fetch("https://rdagqukqmphvlxbrefil.supabase.co/functions/v1/proxy-ai", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")}`,
-      },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: [{ role: "user", content: prompt }],
-      }),
-    });
-
-    if (!aiResponse.ok) {
-      // Fallback: static analysis without AI
-      const result = performStaticAnalysis(code);
-      return new Response(JSON.stringify(result), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
-
-    const aiData = await aiResponse.json();
-    const content = aiData.choices?.[0]?.message?.content ?? "";
-    
-    // Extract JSON from response
+    // Try AI analysis first, fallback to static
     let parsed;
     try {
+      const session = new Supabase.ai.Session('google/gemini-2.5-flash');
+      const aiOutput = await session.run(prompt, { stream: false });
+      const content = typeof aiOutput === 'string' ? aiOutput : (aiOutput as any)?.content ?? JSON.stringify(aiOutput);
       const jsonMatch = content.match(/\{[\s\S]*\}/);
       parsed = JSON.parse(jsonMatch ? jsonMatch[0] : content);
-    } catch {
-      // Fallback to static analysis
+    } catch (aiError) {
+      console.error("AI analysis failed, using static fallback:", aiError);
       parsed = performStaticAnalysis(code);
     }
 
