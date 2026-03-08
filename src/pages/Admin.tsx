@@ -63,16 +63,31 @@ export default function Admin() {
   if (loading) return <Layout><div className="container py-16 text-center">Carregando...</div></Layout>;
   if (!user || !isAdmin) return <Navigate to="/" />;
 
-  const approveModder = async (roleId: string) => {
+  const approveModder = async (roleId: string, userId: string) => {
     const { error } = await supabase.from("user_roles").update({ approved: true, approved_at: new Date().toISOString() }).eq("id", roleId);
-    if (error) toast.error(error.message);
-    else { toast.success("Modder aprovado!"); queryClient.invalidateQueries({ queryKey: ["pending-modders"] }); }
+    if (error) { toast.error(error.message); return; }
+    await supabase.from("notifications" as any).insert({
+      user_id: userId,
+      title: "Solicitação Aprovada! 🎉",
+      message: "Parabéns! Sua solicitação de Modder foi aprovada. Agora você pode publicar scripts no marketplace.",
+      type: "success",
+      link: "/dashboard",
+    });
+    toast.success("Modder aprovado!");
+    queryClient.invalidateQueries({ queryKey: ["pending-modders"] });
   };
 
-  const rejectModder = async (roleId: string) => {
+  const rejectModder = async (roleId: string, userId: string) => {
+    await supabase.from("notifications" as any).insert({
+      user_id: userId,
+      title: "Solicitação Recusada",
+      message: "Sua solicitação de Modder foi recusada. Entre em contato com a administração para mais informações.",
+      type: "error",
+    });
     const { error } = await supabase.from("user_roles").delete().eq("id", roleId);
-    if (error) toast.error(error.message);
-    else { toast.success("Solicitação rejeitada."); queryClient.invalidateQueries({ queryKey: ["pending-modders"] }); }
+    if (error) { toast.error(error.message); return; }
+    toast.success("Solicitação rejeitada.");
+    queryClient.invalidateQueries({ queryKey: ["pending-modders"] });
   };
 
   const deleteScript = async (scriptId: string) => {
@@ -187,10 +202,10 @@ export default function Admin() {
                     <p className="text-xs text-muted-foreground">Solicitado em {new Date(req.requested_at).toLocaleDateString("pt-BR")}</p>
                   </div>
                   <div className="flex gap-2">
-                    <Button size="sm" variant="outline" className="text-accent border-accent/30" onClick={() => approveModder(req.id)}>
+                    <Button size="sm" variant="outline" className="text-accent border-accent/30" onClick={() => approveModder(req.id, req.user_id)}>
                       <CheckCircle className="h-4 w-4 mr-1" /> Aprovar
                     </Button>
-                    <Button size="sm" variant="outline" className="text-destructive border-destructive/30" onClick={() => rejectModder(req.id)}>
+                    <Button size="sm" variant="outline" className="text-destructive border-destructive/30" onClick={() => rejectModder(req.id, req.user_id)}>
                       <XCircle className="h-4 w-4 mr-1" /> Rejeitar
                     </Button>
                   </div>

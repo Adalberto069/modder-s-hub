@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Terminal, Menu, X, User, LogOut, LayoutDashboard, Shield, Settings, Wrench } from "lucide-react";
 import { useState } from "react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { NotificationBell } from "@/components/NotificationBell";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -56,46 +57,49 @@ export function Navbar() {
               </Button>
             </div>
           ) : (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="gap-2">
-                  <Avatar className="h-6 w-6">
-                    {profile?.avatar_url ? <AvatarImage src={profile.avatar_url} alt="" /> : null}
-                    <AvatarFallback className="bg-secondary text-[10px]">
-                      {(profile?.username ?? "U").charAt(0).toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                  {profile?.display_name ?? profile?.username ?? "Usuário"}
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
-                {isModder && (
-                  <DropdownMenuItem onClick={() => navigate("/dashboard")}>
-                    <LayoutDashboard className="mr-2 h-4 w-4" />
-                    Dashboard
+            <div className="flex items-center gap-1">
+              <NotificationBell />
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="gap-2">
+                    <Avatar className="h-6 w-6">
+                      {profile?.avatar_url ? <AvatarImage src={profile.avatar_url} alt="" /> : null}
+                      <AvatarFallback className="bg-secondary text-[10px]">
+                        {(profile?.username ?? "U").charAt(0).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    {profile?.display_name ?? profile?.username ?? "Usuário"}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  {isModder && (
+                    <DropdownMenuItem onClick={() => navigate("/dashboard")}>
+                      <LayoutDashboard className="mr-2 h-4 w-4" />
+                      Dashboard
+                    </DropdownMenuItem>
+                  )}
+                  {isAdmin && (
+                    <DropdownMenuItem onClick={() => navigate("/admin")}>
+                      <Shield className="mr-2 h-4 w-4" />
+                      Admin
+                    </DropdownMenuItem>
+                  )}
+                  <DropdownMenuItem onClick={() => navigate(`/modder/${user.id}`)}>
+                    <User className="mr-2 h-4 w-4" />
+                    Meu Perfil
                   </DropdownMenuItem>
-                )}
-                {isAdmin && (
-                  <DropdownMenuItem onClick={() => navigate("/admin")}>
-                    <Shield className="mr-2 h-4 w-4" />
-                    Admin
+                  <DropdownMenuItem onClick={() => navigate("/profile/settings")}>
+                    <Settings className="mr-2 h-4 w-4" />
+                    Configurações
                   </DropdownMenuItem>
-                )}
-                <DropdownMenuItem onClick={() => navigate(`/modder/${user.id}`)}>
-                  <User className="mr-2 h-4 w-4" />
-                  Meu Perfil
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate("/profile/settings")}>
-                  <Settings className="mr-2 h-4 w-4" />
-                  Configurações
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleSignOut}>
-                  <LogOut className="mr-2 h-4 w-4" />
-                  Sair
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleSignOut}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Sair
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           )}
         </div>
 
