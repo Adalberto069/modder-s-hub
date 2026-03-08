@@ -202,10 +202,10 @@ export default function Admin() {
                     <p className="text-xs text-muted-foreground">Solicitado em {new Date(req.requested_at).toLocaleDateString("pt-BR")}</p>
                   </div>
                   <div className="flex gap-2">
-                    <Button size="sm" variant="outline" className="text-accent border-accent/30" onClick={() => approveModder(req.id)}>
+                    <Button size="sm" variant="outline" className="text-accent border-accent/30" onClick={() => approveModder(req.id, req.user_id)}>
                       <CheckCircle className="h-4 w-4 mr-1" /> Aprovar
                     </Button>
-                    <Button size="sm" variant="outline" className="text-destructive border-destructive/30" onClick={() => rejectModder(req.id)}>
+                    <Button size="sm" variant="outline" className="text-destructive border-destructive/30" onClick={() => rejectModder(req.id, req.user_id)}>
                       <XCircle className="h-4 w-4 mr-1" /> Rejeitar
                     </Button>
                   </div>
