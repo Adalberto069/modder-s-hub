@@ -13,8 +13,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth";
 import {
-  Download, Star, ExternalLink, ArrowLeft, User, ShieldCheck,
-  ChevronLeft, ChevronRight, Play, MessageSquare, Lock, Eye, EyeOff, CheckCircle,
+  Download, Star, ExternalLink, ArrowLeft, User, ShieldCheck, ShieldAlert, ShieldX,
+  ChevronLeft, ChevronRight, Play, MessageSquare, Lock, Eye, EyeOff, CheckCircle, Clock,
   Copy, Check, Gamepad2, Tag, List, BookOpen, FileCode,
 } from "lucide-react";
 import { toast } from "sonner";
