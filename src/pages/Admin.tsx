@@ -7,11 +7,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { Navigate, useNavigate } from "react-router-dom";
-import { Users, Code, CheckCircle, XCircle, Trash2, Plus, Pencil, Eye, Clock, FileX, Send, Shield, UserCheck } from "lucide-react";
+import { Users, Code, CheckCircle, XCircle, Trash2, Plus, Pencil, Eye, Clock, FileX, Send, Shield, UserCheck, ShieldCheck, ShieldOff } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { AdminBadges } from "@/components/admin/AdminBadges";
 import { AdminFlaggedScripts } from "@/components/admin/AdminFlaggedScripts";
 import { AdminModerationQueue } from "@/components/admin/AdminModerationQueue";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { LuaCodeEditor } from "@/components/LuaCodeEditor";
+import { useState } from "react";
 
 const publishStatusConfig: Record<string, { label: string; className: string }> = {
   draft: { label: "Rascunho", className: "bg-muted text-muted-foreground border-border" },
