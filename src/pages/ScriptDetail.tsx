@@ -694,10 +694,17 @@ end
                         </Button>
                       </div>
                     ) : !purchaseSuccess ? (
-                      <Button className="w-full neon-glow-purple" onClick={handlePurchase} disabled={purchasing}>
-                        <ShoppingCart className="mr-2 h-4 w-4" />
-                        {purchasing ? "Processando..." : "Comprar Script"}
-                      </Button>
+                      scriptIsActive ? (
+                        <Button className="w-full neon-glow-purple" onClick={handlePurchase} disabled={purchasing}>
+                          <ShoppingCart className="mr-2 h-4 w-4" />
+                          {purchasing ? "Processando..." : "Comprar Script"}
+                        </Button>
+                      ) : (
+                        <div className="text-center p-3 rounded-lg bg-destructive/10 border border-destructive/20">
+                          <p className="text-sm text-destructive font-semibold">Script Indisponível</p>
+                          <p className="text-[10px] text-muted-foreground mt-1">Este script foi desativado pelo criador.</p>
+                        </div>
+                      )
                     ) : null}
                   </div>
                 ) : (
