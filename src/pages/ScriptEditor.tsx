@@ -375,12 +375,10 @@ export default function ScriptEditor() {
                   </div>
                   <span className="text-[10px] text-muted-foreground font-mono ml-2">script.lua</span>
                 </div>
-                <textarea
+                <LuaCodeEditor
                   value={luaCode}
-                  onChange={(e) => setLuaCode(e.target.value)}
-                  className="w-full min-h-[300px] p-4 bg-transparent text-accent font-mono text-sm leading-relaxed resize-y focus:outline-none placeholder:text-muted-foreground/40"
-                  placeholder={`-- Cole ou escreva seu código Lua aqui\n\nlocal player = game.Players.LocalPlayer\nlocal character = player.Character\n\n-- Seu script aqui...`}
-                  spellCheck={false}
+                  onChange={setLuaCode}
+                  placeholder="-- Cole ou escreva seu código Lua aqui\n\nlocal player = game.Players.LocalPlayer\nlocal character = player.Character\n\n-- Seu script aqui..."
                 />
               </div>
               <p className="text-[10px] text-muted-foreground mt-2">Cole o código Lua do script. Será exibido com formatação na página do script.</p>
