@@ -168,7 +168,8 @@ function renderInline(text: string) {
 
 export default function TutorialDetail() {
   const { id } = useParams<{ id: string }>();
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [commentText, setCommentText] = useState("");
   const [userRating, setUserRating] = useState(0);
