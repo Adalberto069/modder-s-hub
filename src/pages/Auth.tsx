@@ -52,6 +52,8 @@ export default function Auth() {
   const [forgotEmail, setForgotEmail] = useState("");
   const [showEmailSent, setShowEmailSent] = useState(false);
   const [sentEmail, setSentEmail] = useState("");
+  const [showDuplicateEmail, setShowDuplicateEmail] = useState(false);
+  const [duplicateEmail, setDuplicateEmail] = useState("");
 
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
