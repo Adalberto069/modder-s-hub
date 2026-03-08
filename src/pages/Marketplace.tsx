@@ -38,6 +38,7 @@ export default function Marketplace() {
         .from("scripts")
         .select("*, categories(slug, name)")
         .eq("script_type", activeTab)
+        .eq("is_verified", true)
         .order("created_at", { ascending: false });
 
       if (activeCategory !== "all") {
