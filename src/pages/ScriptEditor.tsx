@@ -163,7 +163,7 @@ export default function ScriptEditor() {
       features,
       tags,
       lua_code: luaCode || null,
-      related_tutorial_id: relatedTutorialId || null,
+      related_tutorial_id: relatedTutorialId && relatedTutorialId !== "none" ? relatedTutorialId : null,
     };
 
     let error;
