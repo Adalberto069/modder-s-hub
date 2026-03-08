@@ -371,6 +371,9 @@ end
     return <Layout><div className="container py-16 text-center text-muted-foreground">Carregando...</div></Layout>;
   }
 
+  const scriptIsActive = (script as any).is_active !== false;
+  const isInactiveBuyer = !scriptIsActive && existingLicense;
+
   const st = statusConfig[script.status] ?? statusConfig.working;
   const allMedia = [
     ...(script.thumbnail_url ? [{ type: "image" as const, url: script.thumbnail_url }] : []),
