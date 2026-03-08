@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { Layout } from "@/components/layout/Layout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -13,7 +13,7 @@ import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
 import {
   ArrowLeft, BookOpen, Clock, Star, Play, MessageSquare, Send,
-  Loader2, Lightbulb, AlertTriangle, ChevronRight,
+  Loader2, Lightbulb, AlertTriangle, ChevronRight, Lock,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { formatDistanceToNow } from "date-fns";
@@ -168,7 +168,8 @@ function renderInline(text: string) {
 
 export default function TutorialDetail() {
   const { id } = useParams<{ id: string }>();
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [commentText, setCommentText] = useState("");
   const [userRating, setUserRating] = useState(0);
@@ -296,6 +297,22 @@ export default function TutorialDetail() {
     if (!commentText.trim()) return;
     submitComment.mutate();
   };
+
+  if (!loading && !user) {
+    return (
+      <Layout>
+        <div className="container py-20 max-w-lg text-center">
+          <Lock className="h-16 w-16 mx-auto mb-6 text-muted-foreground" />
+          <h1 className="text-2xl font-bold mb-3">Acesso Restrito</h1>
+          <p className="text-muted-foreground mb-6">
+            Você precisa estar logado para acessar este tutorial.
+          </p>
+          <Button onClick={() => navigate("/auth?tab=login")}>Entrar</Button>
+          <LoginPromptDialog open={showLoginPrompt} onOpenChange={setShowLoginPrompt} />
+        </div>
+      </Layout>
+    );
+  }
 
   if (!tutorial) {
     return (

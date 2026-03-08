@@ -9,8 +9,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
-import { BookOpen, Play, Clock, Plus, Pencil, Trash2, Loader2, Search, Star } from "lucide-react";
+import { BookOpen, Play, Clock, Plus, Pencil, Trash2, Loader2, Search, Star, Lock } from "lucide-react";
 import { motion } from "framer-motion";
+import { LoginPromptDialog } from "@/components/LoginPromptDialog";
 
 const CATEGORIES = [
   { value: "geral", label: "Geral", icon: "📖" },
@@ -23,11 +24,12 @@ const CATEGORIES = [
 const categoryLabels: Record<string, string> = Object.fromEntries(CATEGORIES.map(c => [c.value, c.label]));
 
 export default function Tutorials() {
-  const { user, isAdmin } = useAuth();
+  const { user, isAdmin, loading } = useAuth();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [activeCategory, setActiveCategory] = useState("all");
   const [search, setSearch] = useState("");
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
 
   const { data: tutorials = [], isLoading } = useQuery({
     queryKey: ["tutorials"],
@@ -38,6 +40,7 @@ export default function Tutorials() {
         .order("created_at", { ascending: false });
       return data ?? [];
     },
+    enabled: !!user,
   });
 
   const tutorialIds = tutorials.map((t: any) => t.id);
@@ -51,7 +54,7 @@ export default function Tutorials() {
         .in("tutorial_id", tutorialIds);
       return data ?? [];
     },
-    enabled: tutorialIds.length > 0,
+    enabled: !!user && tutorialIds.length > 0,
   });
 
   const ratingMap = useMemo(() => {
@@ -79,6 +82,8 @@ export default function Tutorials() {
     onError: (e: any) => toast.error(e.message),
   });
 
+
+
   const filtered = useMemo(() => {
     let result = tutorials;
     if (activeCategory !== "all") {
@@ -101,6 +106,22 @@ export default function Tutorials() {
     });
     return counts;
   }, [tutorials]);
+
+  if (!loading && !user) {
+    return (
+      <Layout>
+        <div className="container py-20 max-w-lg text-center">
+          <Lock className="h-16 w-16 mx-auto mb-6 text-muted-foreground" />
+          <h1 className="text-2xl font-bold mb-3">Acesso Restrito</h1>
+          <p className="text-muted-foreground mb-6">
+            Você precisa estar logado para acessar os tutoriais e guias.
+          </p>
+          <Button onClick={() => navigate("/auth?tab=login")}>Entrar</Button>
+          <LoginPromptDialog open={showLoginPrompt} onOpenChange={setShowLoginPrompt} />
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
