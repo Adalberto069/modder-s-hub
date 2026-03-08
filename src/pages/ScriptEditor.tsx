@@ -386,6 +386,14 @@ export default function ScriptEditor() {
                 />
               </div>
               <p className="text-[10px] text-muted-foreground mt-2">Cole o código Lua do script. Será exibido com formatação na página do script.</p>
+
+              {/* Script Analysis */}
+              {luaCode.trim().length > 10 && (
+                <div className="mt-4">
+                  <ScriptAnalysis code={luaCode} />
+                </div>
+              )}
+
             </CardContent>
           </Card>
 
