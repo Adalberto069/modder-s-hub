@@ -249,6 +249,7 @@ export default function ScriptEditor() {
       tags,
       lua_code: luaCode || null,
       related_tutorial_id: relatedTutorialId && relatedTutorialId !== "none" ? relatedTutorialId : null,
+      license_duration_days: isPaid && !licensePermanent && licenseDurationDays ? parseInt(licenseDurationDays) : null,
     };
 
     let error;
