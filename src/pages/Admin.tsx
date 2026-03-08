@@ -28,6 +28,9 @@ export default function Admin() {
   const { user, isAdmin, loading } = useAuth();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const [codeDialogOpen, setCodeDialogOpen] = useState(false);
+  const [codeDialogContent, setCodeDialogContent] = useState("");
+  const [codeDialogTitle, setCodeDialogTitle] = useState("");
 
   const { data: pendingModders } = useQuery({
     queryKey: ["pending-modders"],
