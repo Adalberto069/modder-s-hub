@@ -123,12 +123,25 @@ export default function Dashboard() {
   };
 
   const handleDelete = async (scriptId: string) => {
+    // Check if script has purchases
+    const { count } = await supabase.from("purchases").select("*", { count: "exact", head: true }).eq("script_id", scriptId);
+    if ((count ?? 0) > 0) {
+      toast.error("Este script possui compras e não pode ser excluído. Você pode desativá-lo.");
+      return;
+    }
     const { error } = await supabase.from("scripts").delete().eq("id", scriptId);
     if (error) toast.error(error.message);
     else {
       toast.success("Removido com sucesso!");
       queryClient.invalidateQueries({ queryKey: ["my-scripts"] });
     }
+  };
+
+  const handleToggleActive = async (scriptId: string, currentActive: boolean) => {
+    const { error } = await supabase.from("scripts").update({ is_active: !currentActive } as any).eq("id", scriptId);
+    if (error) { toast.error(error.message); return; }
+    toast.success(currentActive ? "Script desativado. Compradores existentes ainda têm acesso." : "Script reativado!");
+    queryClient.invalidateQueries({ queryKey: ["my-scripts"] });
   };
 
   const handleDownloadLoader = (license: any) => {
