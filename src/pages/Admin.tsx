@@ -14,7 +14,7 @@ import { AdminFlaggedScripts } from "@/components/admin/AdminFlaggedScripts";
 import { AdminModerationQueue } from "@/components/admin/AdminModerationQueue";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { LuaCodeEditor } from "@/components/LuaCodeEditor";
+import LuaCodeEditor from "@/components/LuaCodeEditor";
 import { useState } from "react";
 
 const publishStatusConfig: Record<string, { label: string; className: string }> = {
