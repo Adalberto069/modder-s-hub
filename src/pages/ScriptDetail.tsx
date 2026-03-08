@@ -93,9 +93,7 @@ function CodeBlock({ code }: { code: string }) {
           {copied ? "Copiado!" : "Copiar"}
         </Button>
       </div>
-      <pre className="p-4 overflow-x-auto">
-        <code className="text-sm font-mono text-accent leading-relaxed whitespace-pre">{code}</code>
-      </pre>
+      <LuaCodeEditor value={code} readOnly minHeight="200px" />
     </div>
   );
 }
