@@ -568,29 +568,37 @@ export default function ScriptEditor() {
                 <Lock className="h-4 w-4 text-primary" /> Preço & Proteção
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
+           <CardContent className="space-y-4">
               <div className="flex items-center gap-4">
-                <Switch checked={isPaid} onCheckedChange={setIsPaid} />
+                <Switch checked={isPaid} onCheckedChange={setIsPaid} disabled={!!licenseFieldsLocked} />
                 <Label className="text-sm">{isPaid ? "Script Pago" : "Script Gratuito"}</Label>
               </div>
+
+              {licenseFieldsLocked && (
+                <div className="p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
+                  <p className="text-xs text-yellow-400">🔒 Este script já possui compras. As configurações de preço e licença não podem ser alteradas. Apenas administradores podem modificar esses campos.</p>
+                </div>
+              )}
 
               {isPaid && (
                 <div className="space-y-4">
                   <div>
                     <Label>Preço (R$)</Label>
-                    <Input type="number" value={price} onChange={(e) => setPrice(e.target.value)} placeholder="0.00" min="0" step="0.01" />
+                    <Input type="number" value={price} onChange={(e) => setPrice(e.target.value)} placeholder="0.00" min="0" step="0.01" disabled={!!licenseFieldsLocked} />
                   </div>
                   <div className="flex items-center gap-4">
-                    <Switch checked={licensePermanent} onCheckedChange={setLicensePermanent} />
+                    <Switch checked={licensePermanent} onCheckedChange={setLicensePermanent} disabled={!!licenseFieldsLocked} />
                     <Label className="text-sm">{licensePermanent ? "🔑 Licença Permanente" : "⏳ Licença com Prazo"}</Label>
                   </div>
                   {!licensePermanent && (
                     <div>
                       <Label>Duração da licença (dias)</Label>
-                      <Input type="number" value={licenseDurationDays} onChange={(e) => setLicenseDurationDays(e.target.value)} placeholder="30" min="1" />
+                      <Input type="number" value={licenseDurationDays} onChange={(e) => setLicenseDurationDays(e.target.value)} placeholder="30" min="1" disabled={!!licenseFieldsLocked} />
                       <p className="text-[10px] text-muted-foreground mt-1">O comprador será informado do prazo antes da compra.</p>
                     </div>
                   )}
+                </div>
+              )}
                 </div>
               )}
             </CardContent>
