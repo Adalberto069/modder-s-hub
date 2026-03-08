@@ -106,7 +106,7 @@ export default function ScriptEditor() {
 
   const canEdit = isAdmin || (isModder && existingScript?.modder_id === user?.id);
 
-  if (loading) return <Layout><div className="container py-16 text-center">Carregando...</div></Layout>;
+  if (loading || rolesLoading) return <Layout><div className="container py-16 text-center">Carregando...</div></Layout>;
   if (!user || (!isAdmin && !isModder)) return <Navigate to="/" />;
   if (isEditing && existingScript && !canEdit) return <Navigate to="/" />;
 
