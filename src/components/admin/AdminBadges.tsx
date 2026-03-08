@@ -492,6 +492,42 @@ export function AdminBadges() {
             </div>
           </DialogContent>
         </Dialog>
+
+        {/* Confirm delete badge definition */}
+        <AlertDialog open={!!confirmDeleteBadge} onOpenChange={(open) => !open && setConfirmDeleteBadge(null)}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Excluir badge "{confirmDeleteBadge?.name}"?</AlertDialogTitle>
+              <AlertDialogDescription>
+                Esta ação é irreversível. Todas as atribuições deste badge serão removidas.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancelar</AlertDialogCancel>
+              <AlertDialogAction onClick={deleteBadge} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                Excluir
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+
+        {/* Confirm remove badge from user */}
+        <AlertDialog open={!!confirmRemoveUB} onOpenChange={(open) => !open && setConfirmRemoveUB(null)}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Remover badge?</AlertDialogTitle>
+              <AlertDialogDescription>
+                Remover o badge "{confirmRemoveUB?.badgeName}" de {confirmRemoveUB?.userName}?
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancelar</AlertDialogCancel>
+              <AlertDialogAction onClick={removeBadgeFromUser} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                Remover
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </CardContent>
     </Card>
   );
