@@ -599,8 +599,6 @@ export default function ScriptEditor() {
                   )}
                 </div>
               )}
-                </div>
-              )}
             </CardContent>
           </Card>
 
