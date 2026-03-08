@@ -244,6 +244,11 @@ export default function Admin() {
           </CardContent>
         </Card>
 
+        {/* Flagged Scripts */}
+        <div className="mt-8">
+          <AdminFlaggedScripts />
+        </div>
+
         {/* Badge Management */}
         <div className="mt-8">
           <AdminBadges />
