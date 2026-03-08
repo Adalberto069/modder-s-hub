@@ -318,7 +318,7 @@ export function AdminBadges() {
                         <span className="text-xs text-muted-foreground ml-2">{badge.name}</span>
                       </div>
                     </div>
-                    <Button size="icon" variant="ghost" className="h-7 w-7 text-destructive shrink-0" onClick={() => removeBadgeFromUser(ub.id)}>
+                    <Button size="icon" variant="ghost" className="h-7 w-7 text-destructive shrink-0" onClick={() => setConfirmRemoveUB({ id: ub.id, userName: profile?.display_name ?? profile?.username ?? "Usuário", badgeName: badge.name })}>
                       <X className="h-3.5 w-3.5" />
                     </Button>
                   </div>
