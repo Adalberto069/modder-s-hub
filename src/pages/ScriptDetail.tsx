@@ -164,7 +164,7 @@ export default function ScriptDetail() {
     enabled: !!id,
   });
 
-  // Check if user already has a license for this script
+  // Check if user already has a license for this script (active or expired)
   const { data: existingLicense } = useQuery({
     queryKey: ["script-license", id, user?.id],
     queryFn: async () => {
@@ -179,6 +179,8 @@ export default function ScriptDetail() {
     },
     enabled: !!id && !!user && !!script?.is_paid,
   });
+
+  const isLicenseExpired = existingLicense?.expires_at && new Date(existingLicense.expires_at) < new Date();
 
   // Related tutorial
   const relatedTutorialId = (script as any)?.related_tutorial_id;
