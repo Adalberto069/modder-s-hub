@@ -263,15 +263,6 @@ export default function ScriptEditor() {
       error = insErr;
       savedScriptId = inserted?.id;
 
-      // Handle password for paid scripts
-      if (!insErr && isPaid && scriptPassword.trim() && inserted) {
-        await supabase.from("script_passwords").insert({
-          script_id: inserted.id,
-          password: scriptPassword.trim(),
-          is_permanent: passwordPermanent,
-          expires_at: !passwordPermanent && passwordExpiry ? new Date(passwordExpiry).toISOString() : null,
-        });
-      }
     }
 
     if (error) {
