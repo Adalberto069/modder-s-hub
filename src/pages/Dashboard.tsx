@@ -349,9 +349,14 @@ export default function Dashboard() {
                     <Badge variant="secondary" className="text-[10px]">{script.script_type === "apk" ? "APK" : "Script"}</Badge>
                   </div>
                 </div>
-                <Button variant="ghost" size="icon" className="text-destructive" onClick={() => handleDelete(script.id)}>
-                  <Trash2 className="h-4 w-4" />
-                </Button>
+                <div className="flex gap-1">
+                  <Button variant="ghost" size="icon" onClick={() => navigate(`/script/${script.id}/edit`)}>
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                  <Button variant="ghost" size="icon" className="text-destructive" onClick={() => handleDelete(script.id)}>
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           ))}
