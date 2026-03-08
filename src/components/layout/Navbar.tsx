@@ -72,12 +72,10 @@ export function Navbar() {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
-                  {isModder && (
-                    <DropdownMenuItem onClick={() => navigate("/dashboard")}>
-                      <LayoutDashboard className="mr-2 h-4 w-4" />
-                      Dashboard
-                    </DropdownMenuItem>
-                  )}
+                  <DropdownMenuItem onClick={() => navigate("/dashboard")}>
+                    <LayoutDashboard className="mr-2 h-4 w-4" />
+                    Dashboard
+                  </DropdownMenuItem>
                   {isAdmin && (
                     <DropdownMenuItem onClick={() => navigate("/admin")}>
                       <Shield className="mr-2 h-4 w-4" />
@@ -146,11 +144,9 @@ export function Navbar() {
               <Link to="/profile/settings" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground" onClick={() => setMobileOpen(false)}>
                 <Settings className="h-4 w-4" /> Configurações
               </Link>
-              {isModder && (
-                <Link to="/dashboard" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground" onClick={() => setMobileOpen(false)}>
-                  <LayoutDashboard className="h-4 w-4" /> Dashboard
-                </Link>
-              )}
+              <Link to="/dashboard" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground" onClick={() => setMobileOpen(false)}>
+                <LayoutDashboard className="h-4 w-4" /> Dashboard
+              </Link>
               {isAdmin && (
                 <Link to="/admin" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground" onClick={() => setMobileOpen(false)}>
                   <Shield className="h-4 w-4" /> Admin

@@ -168,6 +168,51 @@ export type Database = {
           },
         ]
       }
+      licenses: {
+        Row: {
+          created_at: string
+          id: string
+          license_key: string
+          purchase_id: string
+          script_id: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          license_key: string
+          purchase_id: string
+          script_id: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          license_key?: string
+          purchase_id?: string
+          script_id?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "licenses_purchase_id_fkey"
+            columns: ["purchase_id"]
+            isOneToOne: false
+            referencedRelation: "purchases"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "licenses_script_id_fkey"
+            columns: ["script_id"]
+            isOneToOne: false
+            referencedRelation: "scripts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       moderation_logs: {
         Row: {
           action: string
@@ -321,6 +366,41 @@ export type Database = {
           username?: string
         }
         Relationships: []
+      }
+      purchases: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          script_id: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          amount?: number
+          created_at?: string
+          id?: string
+          script_id: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          script_id?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "purchases_script_id_fkey"
+            columns: ["script_id"]
+            isOneToOne: false
+            referencedRelation: "scripts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       reviews: {
         Row: {
@@ -838,6 +918,7 @@ export type Database = {
         Args: { _badge_slug: string; _user_id: string }
         Returns: undefined
       }
+      generate_license_key: { Args: never; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
