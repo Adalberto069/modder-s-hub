@@ -55,7 +55,13 @@ export default function Admin() {
     queryFn: async () => {
       const { count: usersCount } = await supabase.from("profiles").select("*", { count: "exact", head: true });
       const { count: scriptsCount } = await supabase.from("scripts").select("*", { count: "exact", head: true });
-      return { users: usersCount ?? 0, scripts: scriptsCount ?? 0 };
+      const { data: modderRoles } = await supabase
+        .from("user_roles")
+        .select("id", { count: "exact", head: false })
+        .eq("role", "modder" as any)
+        .eq("approved", true);
+      const moddersCount = modderRoles?.length ?? 0;
+      return { users: usersCount ?? 0, scripts: scriptsCount ?? 0, modders: moddersCount };
     },
     enabled: isAdmin,
   });
