@@ -123,7 +123,6 @@ export default function ScriptDetail() {
   const [purchasing, setPurchasing] = useState(false);
   const [purchaseSuccess, setPurchaseSuccess] = useState<string | null>(null);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
-  const [showReport, setShowReport] = useState(false);
 
   const { data: script } = useQuery({
     queryKey: ["script", id],
