@@ -130,7 +130,7 @@ export default function Index() {
             <motion.p
               variants={fadeUp}
               custom={2}
-              className="text-lg sm:text-xl text-muted-foreground max-w-xl mb-10 leading-relaxed"
+              className="text-base sm:text-xl text-muted-foreground max-w-xl mb-8 sm:mb-10 leading-relaxed"
             >
               Baixe hoje e proteja suas criações. Marketplace profissional com sistema de licenças, 
               ofuscação avançada e suporte dedicado.
