@@ -115,8 +115,9 @@ export default function ScriptEditor() {
       setTags((existingScript as any).tags ?? []);
       setRelatedTutorialId((existingScript as any).related_tutorial_id ?? "");
       const days = (existingScript as any).license_duration_days;
-      setLicensePermanent(days == null);
-      setLicenseDurationDays(days?.toString() ?? "");
+      if (days == null) setLicenseType("permanent");
+      else if (days === 7) setLicenseType("weekly");
+      else setLicenseType("monthly");
     }
   }, [existingScript]);
 
