@@ -119,11 +119,11 @@ export default function Index() {
             <motion.h1
               variants={fadeUp}
               custom={1}
-              className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1] mb-6"
+              className="text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1] mb-5 sm:mb-6"
             >
               Scripts exclusivos para{" "}
               <span className="text-neon-purple">Game Guardian</span>
-              <br />
+              <span className="hidden sm:inline"><br /></span>{" "}
               <span className="text-neon-green">seguros, ofuscados</span> e com licenças únicas
             </motion.h1>
 
