@@ -120,6 +120,15 @@ export function AdminModerationQueue() {
         .eq("id", analysis.id);
     }
 
+    // Notify modder
+    await supabase.from("notifications" as any).insert({
+      user_id: script.modder_id,
+      title: "✅ Script aprovado!",
+      message: `Seu script "${script.title}" foi aprovado pela moderação e está publicado.`,
+      type: "success",
+      link: `/script/${script.id}`,
+    } as any);
+
     toast.success("✅ Script aprovado e publicado com selo Verificado!");
     queryClient.invalidateQueries({ queryKey: ["moderation-queue"] });
     queryClient.invalidateQueries({ queryKey: ["admin-scripts"] });
@@ -141,6 +150,15 @@ export function AdminModerationQueue() {
       sender_id: user!.id,
       recipient_id: script.modder_id,
       message: `Seu script "${script.title}" foi rejeitado pela moderação devido a padrões de segurança detectados. Revise o código e reenvie.`,
+    } as any);
+
+    // Notify modder
+    await supabase.from("notifications" as any).insert({
+      user_id: script.modder_id,
+      title: "❌ Script rejeitado",
+      message: `Seu script "${script.title}" foi rejeitado pela moderação. Verifique as mensagens para mais detalhes.`,
+      type: "error",
+      link: `/script/${script.id}`,
     } as any);
 
     toast.success("Script rejeitado. Autor notificado.");

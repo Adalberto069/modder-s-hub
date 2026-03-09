@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.get-script]
 verify_jwt = false
+
+[functions.check-expiring-licenses]
+verify_jwt = false
