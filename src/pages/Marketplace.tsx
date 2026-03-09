@@ -9,7 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { useModderProfiles } from "@/hooks/use-modder-profiles";
 import { Search, Code, Shield, Monitor, Package } from "lucide-react";
-import { PlatformWarningDialog } from "@/components/PlatformWarningDialog";
+
 
 const categoryIcons: Record<string, any> = {
   root: Shield,
