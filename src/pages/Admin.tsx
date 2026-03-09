@@ -500,6 +500,8 @@ export default function Admin() {
                       <div className="flex gap-3 text-[10px] text-muted-foreground mt-1">
                         <span>👤 {(purchase as any).profiles?.display_name ?? (purchase as any).profiles?.username ?? "?"}</span>
                         <span>R$ {Number(purchase.amount).toFixed(2)}</span>
+                        <span className="text-primary">Comissão: R$ {Number((purchase as any).platform_commission || 0).toFixed(2)}</span>
+                        <span className="text-accent">Modder: R$ {Number((purchase as any).modder_earnings || 0).toFixed(2)}</span>
                         <span>{new Date(purchase.created_at).toLocaleDateString("pt-BR")}</span>
                       </div>
                     </div>

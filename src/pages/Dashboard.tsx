@@ -253,16 +253,16 @@ end
             </Card>
             <Card className="neon-border bg-card/80">
               <CardContent className="p-4 text-center">
-                <Star className="h-5 w-5 mx-auto text-primary mb-1" />
-                <p className="text-2xl font-bold font-mono">{profile?.reputation_score ?? 0}</p>
-                <p className="text-xs text-muted-foreground">Reputação</p>
+                <ShoppingBag className="h-5 w-5 mx-auto text-primary mb-1" />
+                <p className="text-2xl font-bold font-mono">{totalSales}</p>
+                <p className="text-xs text-muted-foreground">Vendas</p>
               </CardContent>
             </Card>
             <Card className="neon-border bg-card/80">
               <CardContent className="p-4 text-center">
-                <DollarSign className="h-5 w-5 mx-auto text-destructive mb-1" />
-                <p className="text-2xl font-bold font-mono">R$ {simulatedEarnings.toFixed(2)}</p>
-                <p className="text-xs text-muted-foreground">Ganhos (simulado)</p>
+                <DollarSign className="h-5 w-5 mx-auto text-accent mb-1" />
+                <p className="text-2xl font-bold font-mono text-accent">R$ {totalEarnings.toFixed(2)}</p>
+                <p className="text-xs text-muted-foreground">Ganhos (80%)</p>
               </CardContent>
             </Card>
           </div>
