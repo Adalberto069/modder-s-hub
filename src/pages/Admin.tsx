@@ -35,6 +35,10 @@ export default function Admin() {
   const [codeDialogOpen, setCodeDialogOpen] = useState(false);
   const [codeDialogContent, setCodeDialogContent] = useState("");
   const [codeDialogTitle, setCodeDialogTitle] = useState("");
+  const [leakCode, setLeakCode] = useState("");
+  const [leakResult, setLeakResult] = useState<null | { userId: string; username?: string; displayName?: string; email?: string }>(null);
+  const [leakSearching, setLeakSearching] = useState(false);
+  const [leakError, setLeakError] = useState("");
 
   const { data: pendingModders } = useQuery({
     queryKey: ["pending-modders"],
