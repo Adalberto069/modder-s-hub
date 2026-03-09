@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import LuaCodeEditor from "@/components/LuaCodeEditor";
 import ScriptAnalysis from "@/components/ScriptAnalysis";
 import { ModerationMessages } from "@/components/ModerationMessages";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useSearchParams } from "react-router-dom";
 import { Layout } from "@/components/layout/Layout";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -114,6 +114,7 @@ function generateLicenseKey(): string {
 
 export default function ScriptDetail() {
   const { id } = useParams<{ id: string }>();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [galleryIndex, setGalleryIndex] = useState(0);
@@ -123,6 +124,21 @@ export default function ScriptDetail() {
   const [purchasing, setPurchasing] = useState(false);
   const [purchaseSuccess, setPurchaseSuccess] = useState<string | null>(null);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
+
+  // Handle Stripe payment success redirect
+  useEffect(() => {
+    const payment = searchParams.get("payment");
+    if (payment === "success") {
+      toast.success("Pagamento realizado com sucesso! Sua licença será ativada em instantes.");
+      queryClient.invalidateQueries({ queryKey: ["script-license", id, user?.id] });
+      queryClient.invalidateQueries({ queryKey: ["my-licenses"] });
+      // Clean URL
+      setSearchParams({}, { replace: true });
+    } else if (payment === "cancelled") {
+      toast.info("Pagamento cancelado.");
+      setSearchParams({}, { replace: true });
+    }
+  }, [searchParams]);
 
   const { data: script } = useQuery({
     queryKey: ["script", id],
@@ -209,53 +225,29 @@ export default function ScriptDetail() {
 
   const profileMap = (reviewerProfiles ?? []).reduce((acc: any, p: any) => { acc[p.user_id] = p; return acc; }, {});
 
-  const handlePurchase = async () => {
+  const handlePurchase = async (isRenewal = false) => {
     if (!user) { setShowLoginPrompt(true); return; }
     if (!script) return;
-    toast.info("Sistema de pagamento em implementação. Em breve via Stripe!");
+    setPurchasing(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("create-stripe-checkout", {
+        body: { script_id: script.id, is_renewal: isRenewal },
+      });
+      if (error) throw error;
+      if (data?.url) {
+        window.location.href = data.url;
+      } else {
+        throw new Error("No checkout URL returned");
+      }
+    } catch (err: any) {
+      toast.error("Erro ao iniciar pagamento: " + (err.message || "Tente novamente"));
+      setPurchasing(false);
+    }
   };
 
   const handleRenew = async () => {
     if (!user || !script || !existingLicense) return;
-    setPurchasing(true);
-
-    try {
-      const durationDays = (script as any).license_duration_days;
-      if (!durationDays) return;
-
-      // Create renewal purchase
-      const { data: purchase, error: purchaseError } = await supabase
-        .from("purchases")
-        .insert({
-          user_id: user.id,
-          script_id: script.id,
-          amount: Number(script.price) || 0,
-          status: "completed",
-        })
-        .select("id")
-        .single();
-
-      if (purchaseError) throw purchaseError;
-
-      // Extend from now (if expired) or from current expiration (if still active)
-      const baseDate = isLicenseExpired ? new Date() : new Date(existingLicense.expires_at!);
-      const newExpiresAt = new Date(baseDate.getTime() + durationDays * 86400000).toISOString();
-
-      const { error: updateError } = await supabase
-        .from("licenses")
-        .update({ expires_at: newExpiresAt } as any)
-        .eq("id", existingLicense.id);
-
-      if (updateError) throw updateError;
-
-      toast.success(`Licença renovada! Nova expiração: ${new Date(newExpiresAt).toLocaleDateString("pt-BR")}`);
-      queryClient.invalidateQueries({ queryKey: ["script-license", id, user.id] });
-      queryClient.invalidateQueries({ queryKey: ["my-licenses"] });
-    } catch (err: any) {
-      toast.error("Erro na renovação: " + err.message);
-    } finally {
-      setPurchasing(false);
-    }
+    handlePurchase(true);
   };
 
   const handleDownloadLoader = () => {
@@ -765,7 +757,7 @@ end
                       )
                     ) : !purchaseSuccess ? (
                       scriptIsActive ? (
-                        <Button className="w-full neon-glow-purple" onClick={handlePurchase} disabled={purchasing}>
+                        <Button className="w-full neon-glow-purple" onClick={() => handlePurchase(false)} disabled={purchasing}>
                           <ShoppingCart className="mr-2 h-4 w-4" />
                           {purchasing ? "Processando..." : "Comprar Script"}
                         </Button>
