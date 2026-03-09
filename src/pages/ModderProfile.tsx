@@ -4,7 +4,7 @@ import { Layout } from "@/components/layout/Layout";
 import { ScriptCard } from "@/components/ScriptCard";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
-import { User, Download, Star, Trophy, Calendar, Code, BookOpen, Info, ShieldAlert, Flag } from "lucide-react";
+import { User, Download, Star, Trophy, Calendar, Code, BookOpen, Info, Flag } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -13,7 +13,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { UserBadges } from "@/components/UserBadges";
 import { RoleBadge } from "@/components/RoleBadge";
-import { PlatformWarningDialog } from "@/components/PlatformWarningDialog";
 import { ReportDialog } from "@/components/ReportDialog";
 
 export default function ModderProfile() {
@@ -133,6 +132,13 @@ export default function ModderProfile() {
                     {profile.display_name ?? profile.username}
                   </h1>
                   <RoleBadge role={displayRole} />
+                  <button
+                    onClick={() => setShowReport(true)}
+                    className="text-muted-foreground hover:text-destructive transition-colors ml-1"
+                    title="Denunciar usuário"
+                  >
+                    <Flag className="h-4 w-4" />
+                  </button>
                 </div>
                 <p className="text-sm text-muted-foreground font-mono">@{profile.username}</p>
                 <UserBadges userId={userId!} />
@@ -157,26 +163,6 @@ export default function ModderProfile() {
           </div>
         </div>
 
-        {/* Transaction warning + report */}
-        <div className="flex items-start gap-3 rounded-lg border border-border bg-secondary/40 p-4">
-          <ShieldAlert className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
-          <div className="flex-1">
-            <p className="text-sm text-muted-foreground">
-              <span className="font-semibold text-foreground">Aviso:</span> Todas as transações devem ser realizadas exclusivamente pela plataforma. Negociações externas não possuem garantia nem suporte.
-            </p>
-          </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="shrink-0 gap-1.5 text-destructive hover:text-destructive hover:bg-destructive/10"
-            onClick={() => setShowReport(true)}
-          >
-            <Flag className="h-4 w-4" />
-            Denunciar
-          </Button>
-        </div>
-
-        <PlatformWarningDialog />
         <ReportDialog
           open={showReport}
           onOpenChange={setShowReport}
