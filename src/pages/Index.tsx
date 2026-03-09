@@ -136,10 +136,10 @@ export default function Index() {
               ofuscação avançada e suporte dedicado.
             </motion.p>
 
-            <motion.div variants={fadeUp} custom={3} className="flex flex-col sm:flex-row gap-4">
+            <motion.div variants={fadeUp} custom={3} className="flex flex-col sm:flex-row gap-3 sm:gap-4">
               <Button
                 size="lg"
-                className="neon-glow-purple font-semibold text-base h-13 px-8"
+                className="neon-glow-purple font-semibold text-base h-12 sm:h-13 px-6 sm:px-8 w-full sm:w-auto"
                 onClick={() => navigate("/marketplace")}
               >
                 <Store className="mr-2 h-5 w-5" /> Ver Scripts
@@ -147,7 +147,7 @@ export default function Index() {
               <Button
                 size="lg"
                 variant="outline"
-                className="neon-border font-semibold text-base h-13 px-8 hover:bg-primary/10"
+                className="neon-border font-semibold text-base h-12 sm:h-13 px-6 sm:px-8 hover:bg-primary/10 w-full sm:w-auto"
                 onClick={() => navigate("/dashboard")}
               >
                 Painel do Usuário <ArrowRight className="ml-2 h-4 w-4" />
