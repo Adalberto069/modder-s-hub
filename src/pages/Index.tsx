@@ -155,19 +155,19 @@ export default function Index() {
             </motion.div>
 
             {/* Quick stats */}
-            <motion.div variants={fadeUp} custom={4} className="flex gap-8 mt-14">
+            <motion.div variants={fadeUp} custom={4} className="flex flex-wrap gap-4 sm:gap-8 mt-10 sm:mt-14">
               {[
                 { icon: Code, value: stats?.scripts ?? 0, label: "Scripts" },
                 { icon: Users, value: stats?.users ?? 0, label: "Usuários" },
                 { icon: Download, value: stats?.downloads ?? 0, label: "Downloads" },
               ].map((stat) => (
-                <div key={stat.label} className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center">
-                    <stat.icon className="h-5 w-5 text-primary" />
+                <div key={stat.label} className="flex items-center gap-2 sm:gap-3">
+                  <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center">
+                    <stat.icon className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                   </div>
                   <div>
-                    <p className="text-xl font-bold font-mono">{stat.value.toLocaleString("pt-BR")}</p>
-                    <p className="text-xs text-muted-foreground">{stat.label}</p>
+                    <p className="text-lg sm:text-xl font-bold font-mono">{stat.value.toLocaleString("pt-BR")}</p>
+                    <p className="text-[10px] sm:text-xs text-muted-foreground">{stat.label}</p>
                   </div>
                 </div>
               ))}
