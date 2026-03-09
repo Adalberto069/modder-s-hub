@@ -763,11 +763,11 @@ end
                           </Button>
                         </div>
                       )
-                    ) : !purchaseSuccess && !pixData ? (
+                    ) : !purchaseSuccess ? (
                       scriptIsActive ? (
                         <Button className="w-full neon-glow-purple" onClick={handlePurchase} disabled={purchasing}>
                           <ShoppingCart className="mr-2 h-4 w-4" />
-                          {purchasing ? "Gerando PIX..." : "Comprar Script"}
+                          {purchasing ? "Processando..." : "Comprar Script"}
                         </Button>
                       ) : (
                         <div className="text-center p-3 rounded-lg bg-destructive/10 border border-destructive/20">
