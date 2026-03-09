@@ -128,13 +128,6 @@ export default function ModderProfile() {
                     {profile.display_name ?? profile.username}
                   </h1>
                   <RoleBadge role={displayRole} />
-                  <button
-                    onClick={() => setShowReport(true)}
-                    className="text-muted-foreground hover:text-destructive transition-colors ml-1"
-                    title="Denunciar usuário"
-                  >
-                    <Flag className="h-4 w-4" />
-                  </button>
                 </div>
                 <p className="text-sm text-muted-foreground font-mono">@{profile.username}</p>
                 <UserBadges userId={userId!} />
