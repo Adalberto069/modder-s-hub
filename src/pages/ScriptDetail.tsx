@@ -863,6 +863,13 @@ end
         </div>
       </div>
       <LoginPromptDialog open={showLoginPrompt} onOpenChange={setShowLoginPrompt} />
+      <ReportDialog
+        open={showReport}
+        onOpenChange={setShowReport}
+        reportedUserId={script.modder_id}
+        scriptId={script.id}
+        targetName={script.title}
+      />
     </Layout>
   );
 }
