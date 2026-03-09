@@ -3,7 +3,7 @@ import { Layout } from "@/components/layout/Layout";
 import { ScriptCard } from "@/components/ScriptCard";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
-import { User, Download, Star, Trophy, Calendar, Code, BookOpen, Info } from "lucide-react";
+import { User, Download, Star, Trophy, Calendar, Code, BookOpen, Info, ShieldAlert } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
