@@ -212,59 +212,7 @@ export default function ScriptDetail() {
   const handlePurchase = async () => {
     if (!user) { setShowLoginPrompt(true); return; }
     if (!script) return;
-    setPurchasing(true);
-
-    try {
-      const { data, error } = await supabase.functions.invoke("create-pix-payment", {
-        body: { script_id: script.id },
-      });
-
-      if (error) throw new Error(error.message || "Erro ao criar pagamento");
-      if (data?.error) throw new Error(data.error);
-
-      // Use sandbox_init_point for test, init_point for production
-      const paymentUrl = data.sandbox_init_point || data.init_point;
-
-      setPixData({
-        init_point: data.init_point,
-        sandbox_init_point: data.sandbox_init_point,
-        purchase_id: data.purchase_id,
-      });
-
-      // Open Mercado Pago checkout in new tab
-      window.open(paymentUrl, "_blank");
-      toast.success("Checkout do Mercado Pago aberto! Complete o pagamento lá.");
-    } catch (err: any) {
-      toast.error("Erro na compra: " + err.message);
-    } finally {
-      setPurchasing(false);
-    }
-  };
-
-  // Poll for payment confirmation via edge function
-  const handleCheckPayment = async () => {
-    if (!pixData || !user) return;
-    setCheckingPayment(true);
-    try {
-      const { data, error } = await supabase.functions.invoke("check-pix-payment", {
-        body: { purchase_id: pixData.purchase_id },
-      });
-
-      if (error) throw new Error(error.message);
-
-      if (data?.status === "approved" && data?.license_key) {
-        setPurchaseSuccess(data.license_key);
-        setPixData(null);
-        toast.success("Pagamento confirmado! 🎉");
-        queryClient.invalidateQueries({ queryKey: ["script-license", id, user.id] });
-      } else {
-        toast.info("Pagamento ainda não confirmado. Aguarde alguns segundos após pagar.");
-      }
-    } catch {
-      toast.error("Erro ao verificar pagamento");
-    } finally {
-      setCheckingPayment(false);
-    }
+    toast.info("Sistema de pagamento em implementação. Em breve via Stripe!");
   };
 
   const handleRenew = async () => {
