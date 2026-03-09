@@ -54,9 +54,8 @@ export default function ScriptEditor() {
   const [submitting, setSubmitting] = useState(false);
   const [lastAnalysis, setLastAnalysis] = useState<AnalysisResult | null>(null);
 
-  // License duration
-  const [licensePermanent, setLicensePermanent] = useState(true);
-  const [licenseDurationDays, setLicenseDurationDays] = useState("");
+  // License type: "permanent" | "monthly" | "weekly"
+  const [licenseType, setLicenseType] = useState<string>("permanent");
 
   const { data: categories } = useQuery({
     queryKey: ["categories"],
