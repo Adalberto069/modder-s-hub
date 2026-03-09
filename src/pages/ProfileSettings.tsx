@@ -398,19 +398,6 @@ export default function ProfileSettings() {
                   <p className="text-[11px] text-muted-foreground text-right">{bio.length}/500</p>
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="website">
-                    <Globe className="h-3.5 w-3.5 inline mr-1" />
-                    Website
-                  </Label>
-                  <Input
-                    id="website"
-                    value={website}
-                    onChange={(e) => setWebsite(e.target.value)}
-                    placeholder="https://seu-site.com"
-                    type="url"
-                  />
-                </div>
 
                 <Button onClick={handleSave} disabled={saving} className="neon-glow-purple w-full">
                   {saving ? "Salvando..." : "Salvar Perfil"}
