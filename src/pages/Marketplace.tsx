@@ -82,8 +82,8 @@ export default function Marketplace() {
 
   return (
     <Layout>
-      <div className="container py-8">
-        <h1 className="text-3xl font-bold mb-6">Marketplace</h1>
+      <div className="container py-6 sm:py-8 px-4 sm:px-6">
+        <h1 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6">Marketplace</h1>
 
         {/* Tabs Scripts / APKs */}
         <Tabs value={activeTab} onValueChange={handleTabChange} className="mb-6">
