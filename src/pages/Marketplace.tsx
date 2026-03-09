@@ -180,7 +180,7 @@ export default function Marketplace() {
           </div>
         )}
       </div>
-      <PlatformWarningDialog />
+      
     </Layout>
   );
 }

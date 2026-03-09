@@ -152,13 +152,8 @@ export default function ModderProfile() {
           </div>
         </div>
 
-        <ReportDialog
-          open={showReport}
-          onOpenChange={setShowReport}
-          reportedUserId={userId}
-          targetName={profile.display_name ?? profile.username}
-        />
 
+        {/* Tabs */}
         {/* Tabs */}
         <Tabs defaultValue="scripts" className="space-y-4">
           <TabsList className="w-full grid grid-cols-3 bg-secondary/50">
