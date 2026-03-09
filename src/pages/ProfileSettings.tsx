@@ -21,7 +21,7 @@ import {
 import { toast } from "sonner";
 import { Navigate } from "react-router-dom";
 import {
-  User, Lock, Eye, EyeOff, Shield, Mail, Camera, Globe,
+  User, Lock, Eye, EyeOff, Shield, Mail, Camera,
   Settings, Bell, Download, Trash2, UserX, CheckCircle, XCircle,
   Send, Palette, Languages, Upload,
 } from "lucide-react";
