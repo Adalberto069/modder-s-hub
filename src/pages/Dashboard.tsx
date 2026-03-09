@@ -201,7 +201,26 @@ end
   };
 
   const totalDownloads = myScripts?.reduce((sum: number, s: any) => sum + s.download_count, 0) ?? 0;
-  const simulatedEarnings = myScripts?.reduce((sum: number, s: any) => sum + (s.is_paid ? s.download_count * Number(s.price) * 0.7 : 0), 0) ?? 0;
+
+  // Real earnings from purchases
+  const { data: modderPurchases } = useQuery({
+    queryKey: ["modder-earnings", user?.id],
+    queryFn: async () => {
+      // Get all script IDs from this modder
+      const scriptIds = myScripts?.map((s: any) => s.id) ?? [];
+      if (scriptIds.length === 0) return [];
+      const { data } = await supabase
+        .from("purchases")
+        .select("amount, platform_commission, modder_earnings")
+        .in("script_id", scriptIds);
+      return data ?? [];
+    },
+    enabled: !!user && isModder && (myScripts?.length ?? 0) > 0,
+  });
+
+  const totalEarnings = modderPurchases?.reduce((sum: number, p: any) => sum + Number(p.modder_earnings || 0), 0) ?? 0;
+  const totalCommission = modderPurchases?.reduce((sum: number, p: any) => sum + Number(p.platform_commission || 0), 0) ?? 0;
+  const totalSales = modderPurchases?.length ?? 0;
 
   return (
     <Layout>
@@ -234,16 +253,16 @@ end
             </Card>
             <Card className="neon-border bg-card/80">
               <CardContent className="p-4 text-center">
-                <Star className="h-5 w-5 mx-auto text-primary mb-1" />
-                <p className="text-2xl font-bold font-mono">{profile?.reputation_score ?? 0}</p>
-                <p className="text-xs text-muted-foreground">Reputação</p>
+                <ShoppingBag className="h-5 w-5 mx-auto text-primary mb-1" />
+                <p className="text-2xl font-bold font-mono">{totalSales}</p>
+                <p className="text-xs text-muted-foreground">Vendas</p>
               </CardContent>
             </Card>
             <Card className="neon-border bg-card/80">
               <CardContent className="p-4 text-center">
-                <DollarSign className="h-5 w-5 mx-auto text-destructive mb-1" />
-                <p className="text-2xl font-bold font-mono">R$ {simulatedEarnings.toFixed(2)}</p>
-                <p className="text-xs text-muted-foreground">Ganhos (simulado)</p>
+                <DollarSign className="h-5 w-5 mx-auto text-accent mb-1" />
+                <p className="text-2xl font-bold font-mono text-accent">R$ {totalEarnings.toFixed(2)}</p>
+                <p className="text-xs text-muted-foreground">Ganhos (80%)</p>
               </CardContent>
             </Card>
           </div>

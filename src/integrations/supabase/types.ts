@@ -373,24 +373,33 @@ export type Database = {
       purchases: {
         Row: {
           amount: number
+          commission_rate: number
           created_at: string
           id: string
+          modder_earnings: number
+          platform_commission: number
           script_id: string
           status: string
           user_id: string
         }
         Insert: {
           amount?: number
+          commission_rate?: number
           created_at?: string
           id?: string
+          modder_earnings?: number
+          platform_commission?: number
           script_id: string
           status?: string
           user_id: string
         }
         Update: {
           amount?: number
+          commission_rate?: number
           created_at?: string
           id?: string
+          modder_earnings?: number
+          platform_commission?: number
           script_id?: string
           status?: string
           user_id?: string

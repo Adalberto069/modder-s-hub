@@ -9,7 +9,7 @@ import { toast } from "sonner";
 import { Navigate, useNavigate } from "react-router-dom";
 import {
   Users, Code, CheckCircle, XCircle, Trash2, Plus, Pencil, Eye, EyeOff, Clock, FileX, Send, Shield,
-  UserCheck, ShieldCheck, ShieldOff, Key, Ban, ShoppingCart, Copy,
+  UserCheck, ShieldCheck, ShieldOff, Key, Ban, ShoppingCart, Copy, DollarSign, Percent,
 } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { AdminBadges } from "@/components/admin/AdminBadges";
@@ -73,12 +73,20 @@ export default function Admin() {
       const moddersCount = modderRoles?.length ?? 0;
       const { count: purchasesCount } = await supabase.from("purchases").select("*", { count: "exact", head: true });
       const { count: licensesCount } = await supabase.from("licenses").select("*", { count: "exact", head: true });
+      // Fetch financial totals
+      const { data: purchaseData } = await supabase.from("purchases").select("amount, platform_commission, modder_earnings");
+      const totalSales = purchaseData?.reduce((sum: number, p: any) => sum + Number(p.amount), 0) ?? 0;
+      const totalCommission = purchaseData?.reduce((sum: number, p: any) => sum + Number(p.platform_commission || 0), 0) ?? 0;
+      const totalModderEarnings = purchaseData?.reduce((sum: number, p: any) => sum + Number(p.modder_earnings || 0), 0) ?? 0;
       return {
         users: usersCount ?? 0,
         scripts: scriptsCount ?? 0,
         modders: moddersCount,
         purchases: purchasesCount ?? 0,
         licenses: licensesCount ?? 0,
+        totalSales,
+        totalCommission,
+        totalModderEarnings,
       };
     },
     enabled: isAdmin,
@@ -281,7 +289,7 @@ export default function Admin() {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
           <Card className="neon-border bg-card/80">
             <CardContent className="p-4 text-center">
               <Users className="h-5 w-5 mx-auto text-neon-purple mb-1" />
@@ -305,16 +313,34 @@ export default function Admin() {
           </Card>
           <Card className="neon-border bg-card/80">
             <CardContent className="p-4 text-center">
-              <Key className="h-5 w-5 mx-auto text-accent mb-1" />
-              <p className="text-2xl font-bold font-mono">{stats?.licenses}</p>
-              <p className="text-xs text-muted-foreground">Licenças</p>
-            </CardContent>
-          </Card>
-          <Card className="neon-border bg-card/80">
-            <CardContent className="p-4 text-center">
               <Shield className="h-5 w-5 mx-auto text-primary mb-1" />
               <p className="text-2xl font-bold font-mono">{pendingModders?.length}</p>
               <p className="text-xs text-muted-foreground">Pendentes</p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Financial Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+          <Card className="neon-border bg-card/80 border-accent/30">
+            <CardContent className="p-4 text-center">
+              <DollarSign className="h-5 w-5 mx-auto text-accent mb-1" />
+              <p className="text-2xl font-bold font-mono text-accent">R$ {(stats?.totalSales ?? 0).toFixed(2)}</p>
+              <p className="text-xs text-muted-foreground">Total de Vendas</p>
+            </CardContent>
+          </Card>
+          <Card className="neon-border bg-card/80 border-primary/30">
+            <CardContent className="p-4 text-center">
+              <Percent className="h-5 w-5 mx-auto text-primary mb-1" />
+              <p className="text-2xl font-bold font-mono text-primary">R$ {(stats?.totalCommission ?? 0).toFixed(2)}</p>
+              <p className="text-xs text-muted-foreground">Comissão Plataforma (20%)</p>
+            </CardContent>
+          </Card>
+          <Card className="neon-border bg-card/80 border-neon-green/30">
+            <CardContent className="p-4 text-center">
+              <Key className="h-5 w-5 mx-auto text-neon-green mb-1" />
+              <p className="text-2xl font-bold font-mono text-neon-green">R$ {(stats?.totalModderEarnings ?? 0).toFixed(2)}</p>
+              <p className="text-xs text-muted-foreground">Ganhos dos Modders</p>
             </CardContent>
           </Card>
         </div>
@@ -474,6 +500,8 @@ export default function Admin() {
                       <div className="flex gap-3 text-[10px] text-muted-foreground mt-1">
                         <span>👤 {(purchase as any).profiles?.display_name ?? (purchase as any).profiles?.username ?? "?"}</span>
                         <span>R$ {Number(purchase.amount).toFixed(2)}</span>
+                        <span className="text-primary">Comissão: R$ {Number((purchase as any).platform_commission || 0).toFixed(2)}</span>
+                        <span className="text-accent">Modder: R$ {Number((purchase as any).modder_earnings || 0).toFixed(2)}</span>
                         <span>{new Date(purchase.created_at).toLocaleDateString("pt-BR")}</span>
                       </div>
                     </div>

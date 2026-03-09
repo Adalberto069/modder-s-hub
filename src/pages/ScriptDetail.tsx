@@ -215,15 +215,23 @@ export default function ScriptDetail() {
     setPurchasing(true);
 
     try {
-      // Simulated payment - create purchase record
+      // Simulated payment - create purchase record with commission
+      const amount = Number(script.price) || 0;
+      const commissionRate = 0.20; // 20% platform commission
+      const platformCommission = Math.round(amount * commissionRate * 100) / 100;
+      const modderEarnings = Math.round((amount - platformCommission) * 100) / 100;
+
       const { data: purchase, error: purchaseError } = await supabase
         .from("purchases")
         .insert({
           user_id: user.id,
           script_id: script.id,
-          amount: Number(script.price) || 0,
+          amount,
           status: "completed",
-        })
+          platform_commission: platformCommission,
+          modder_earnings: modderEarnings,
+          commission_rate: commissionRate,
+        } as any)
         .select("id")
         .single();
 
