@@ -152,6 +152,14 @@ export default function ModderProfile() {
           </div>
         </div>
 
+        {/* Transaction warning */}
+        <div className="flex items-start gap-3 rounded-lg border border-border bg-secondary/40 p-4">
+          <ShieldAlert className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
+          <p className="text-sm text-muted-foreground">
+            <span className="font-semibold text-foreground">Aviso:</span> Todas as transações devem ser realizadas exclusivamente pela plataforma. Negociações externas não possuem garantia nem suporte.
+          </p>
+        </div>
+
         {/* Tabs */}
         <Tabs defaultValue="scripts" className="space-y-4">
           <TabsList className="w-full grid grid-cols-3 bg-secondary/50">
