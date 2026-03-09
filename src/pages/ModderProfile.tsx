@@ -157,26 +157,6 @@ export default function ModderProfile() {
           </div>
         </div>
 
-        {/* Transaction warning + report */}
-        <div className="flex items-start gap-3 rounded-lg border border-border bg-secondary/40 p-4">
-          <ShieldAlert className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
-          <div className="flex-1">
-            <p className="text-sm text-muted-foreground">
-              <span className="font-semibold text-foreground">Aviso:</span> Todas as transações devem ser realizadas exclusivamente pela plataforma. Negociações externas não possuem garantia nem suporte.
-            </p>
-          </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="shrink-0 gap-1.5 text-destructive hover:text-destructive hover:bg-destructive/10"
-            onClick={() => setShowReport(true)}
-          >
-            <Flag className="h-4 w-4" />
-            Denunciar
-          </Button>
-        </div>
-
-        <PlatformWarningDialog />
         <ReportDialog
           open={showReport}
           onOpenChange={setShowReport}
