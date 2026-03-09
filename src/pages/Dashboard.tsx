@@ -291,17 +291,31 @@ end
                             <Badge variant={license.status === "active" ? "default" : "destructive"} className="text-[10px]">
                               {license.status === "active" ? "✅ Ativa" : "🚫 Banida"}
                             </Badge>
-                            {license.expires_at ? (
-                              new Date(license.expires_at) > new Date() ? (
-                                <Badge variant="outline" className="text-[10px] border-yellow-500/30 text-yellow-400">
-                                  ⏳ Expira: {new Date(license.expires_at).toLocaleDateString("pt-BR")}
+                            {license.expires_at ? (() => {
+                              const now = new Date();
+                              const expires = new Date(license.expires_at);
+                              const diffMs = expires.getTime() - now.getTime();
+                              if (diffMs <= 0) {
+                                return (
+                                  <Badge variant="destructive" className="text-[10px]">
+                                    ❌ Expirada
+                                  </Badge>
+                                );
+                              }
+                              const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+                              const diffHours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                              const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+                              let timeLabel = "";
+                              if (diffDays > 0) timeLabel = `${diffDays}d ${diffHours}h restantes`;
+                              else if (diffHours > 0) timeLabel = `${diffHours}h ${diffMinutes}min restantes`;
+                              else timeLabel = `${diffMinutes}min restantes`;
+                              const urgentClass = diffDays <= 3 ? "border-destructive/50 text-destructive" : "border-yellow-500/30 text-yellow-400";
+                              return (
+                                <Badge variant="outline" className={`text-[10px] ${urgentClass}`}>
+                                  ⏳ {timeLabel}
                                 </Badge>
-                              ) : (
-                                <Badge variant="destructive" className="text-[10px]">
-                                  ❌ Expirada
-                                </Badge>
-                              )
-                            ) : (
+                              );
+                            })() : (
                               <Badge variant="outline" className="text-[10px] border-accent/30 text-accent">
                                 ♾️ Permanente
                               </Badge>
