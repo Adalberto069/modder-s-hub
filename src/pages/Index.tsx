@@ -238,7 +238,7 @@ export default function Index() {
                 <Card
                   className={`${benefit.border} ${benefit.bg} h-full group hover:${benefit.glow} transition-all duration-300 cursor-default`}
                 >
-                  <CardContent className="p-8 space-y-4">
+                  <CardContent className="p-5 sm:p-8 space-y-4">
                     <div
                       className={`h-14 w-14 rounded-xl ${benefit.bg} border ${benefit.border} flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}
                     >
