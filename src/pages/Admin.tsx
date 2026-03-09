@@ -73,12 +73,20 @@ export default function Admin() {
       const moddersCount = modderRoles?.length ?? 0;
       const { count: purchasesCount } = await supabase.from("purchases").select("*", { count: "exact", head: true });
       const { count: licensesCount } = await supabase.from("licenses").select("*", { count: "exact", head: true });
+      // Fetch financial totals
+      const { data: purchaseData } = await supabase.from("purchases").select("amount, platform_commission, modder_earnings");
+      const totalSales = purchaseData?.reduce((sum: number, p: any) => sum + Number(p.amount), 0) ?? 0;
+      const totalCommission = purchaseData?.reduce((sum: number, p: any) => sum + Number(p.platform_commission || 0), 0) ?? 0;
+      const totalModderEarnings = purchaseData?.reduce((sum: number, p: any) => sum + Number(p.modder_earnings || 0), 0) ?? 0;
       return {
         users: usersCount ?? 0,
         scripts: scriptsCount ?? 0,
         modders: moddersCount,
         purchases: purchasesCount ?? 0,
         licenses: licensesCount ?? 0,
+        totalSales,
+        totalCommission,
+        totalModderEarnings,
       };
     },
     enabled: isAdmin,
