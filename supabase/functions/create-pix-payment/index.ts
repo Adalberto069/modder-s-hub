@@ -156,8 +156,13 @@ Deno.serve(async (req) => {
         email: userEmail,
       },
       external_reference: purchase.id,
-      notification_url: `${Deno.env.get("SUPABASE_URL")}/functions/v1/mercadopago-webhook`,
     };
+
+    // Only add notification_url in production (test tokens reject it)
+    const isTestToken = MP_ACCESS_TOKEN.startsWith("TEST-");
+    if (!isTestToken) {
+      paymentBody.notification_url = `${Deno.env.get("SUPABASE_URL")}/functions/v1/mercadopago-webhook`;
+    }
 
     // If modder has connected MP account, use marketplace split
     if (modderProfile?.mercadopago_access_token) {
