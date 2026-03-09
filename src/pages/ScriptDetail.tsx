@@ -114,6 +114,7 @@ function generateLicenseKey(): string {
 
 export default function ScriptDetail() {
   const { id } = useParams<{ id: string }>();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [galleryIndex, setGalleryIndex] = useState(0);
@@ -123,6 +124,21 @@ export default function ScriptDetail() {
   const [purchasing, setPurchasing] = useState(false);
   const [purchaseSuccess, setPurchaseSuccess] = useState<string | null>(null);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
+
+  // Handle Stripe payment success redirect
+  useEffect(() => {
+    const payment = searchParams.get("payment");
+    if (payment === "success") {
+      toast.success("Pagamento realizado com sucesso! Sua licença será ativada em instantes.");
+      queryClient.invalidateQueries({ queryKey: ["script-license", id, user?.id] });
+      queryClient.invalidateQueries({ queryKey: ["my-licenses"] });
+      // Clean URL
+      setSearchParams({}, { replace: true });
+    } else if (payment === "cancelled") {
+      toast.info("Pagamento cancelado.");
+      setSearchParams({}, { replace: true });
+    }
+  }, [searchParams]);
 
   const { data: script } = useQuery({
     queryKey: ["script", id],
