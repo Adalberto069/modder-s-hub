@@ -715,11 +715,12 @@ end
                     <div className="text-center">
                       {(script as any).license_duration_days ? (
                         <Badge variant="outline" className="text-[10px] border-yellow-500/30 text-yellow-400">
-                          <Clock className="h-3 w-3 mr-1" /> Licença: {(script as any).license_duration_days} dias
+                          <Clock className="h-3 w-3 mr-1" /> 
+                          {(script as any).license_duration_days === 7 ? "Licença Semanal (7 dias)" : `Licença Mensal (${(script as any).license_duration_days} dias)`}
                         </Badge>
                       ) : (
                         <Badge variant="outline" className="text-[10px] border-accent/30 text-accent">
-                          ♾️ Licença Permanente
+                          🔑 Licença Permanente
                         </Badge>
                       )}
                     </div>
