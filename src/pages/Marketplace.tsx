@@ -109,7 +109,7 @@ export default function Marketplace() {
         </div>
 
         {/* Filters */}
-        <div className="flex flex-wrap gap-2 mb-6">
+        <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-4 sm:mb-6">
           <Badge
             variant={activeCategory === "all" ? "default" : "outline"}
             className="cursor-pointer"
