@@ -9,7 +9,7 @@ import { toast } from "sonner";
 import { Navigate, useNavigate } from "react-router-dom";
 import {
   Users, Code, CheckCircle, XCircle, Trash2, Plus, Pencil, Eye, EyeOff, Clock, FileX, Send, Shield,
-  UserCheck, ShieldCheck, ShieldOff, Key, Ban, ShoppingCart, Copy,
+  UserCheck, ShieldCheck, ShieldOff, Key, Ban, ShoppingCart, Copy, DollarSign, Percent,
 } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { AdminBadges } from "@/components/admin/AdminBadges";
