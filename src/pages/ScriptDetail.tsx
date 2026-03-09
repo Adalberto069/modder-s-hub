@@ -239,22 +239,19 @@ export default function ScriptDetail() {
     }
   };
 
-  // Poll for payment confirmation
+  // Poll for payment confirmation via edge function
   const handleCheckPayment = async () => {
     if (!pixData || !user) return;
     setCheckingPayment(true);
     try {
-      // Check if license was created (webhook processed)
-      const { data: license } = await supabase
-        .from("licenses")
-        .select("*")
-        .eq("script_id", id!)
-        .eq("user_id", user.id)
-        .eq("status", "active")
-        .maybeSingle();
+      const { data, error } = await supabase.functions.invoke("check-pix-payment", {
+        body: { purchase_id: pixData.purchase_id },
+      });
 
-      if (license) {
-        setPurchaseSuccess((license as any).license_key);
+      if (error) throw new Error(error.message);
+
+      if (data?.status === "approved" && data?.license_key) {
+        setPurchaseSuccess(data.license_key);
         setPixData(null);
         toast.success("Pagamento confirmado! 🎉");
         queryClient.invalidateQueries({ queryKey: ["script-license", id, user.id] });
@@ -266,6 +263,7 @@ export default function ScriptDetail() {
     } finally {
       setCheckingPayment(false);
     }
+  };
   };
 
   const handleRenew = async () => {
