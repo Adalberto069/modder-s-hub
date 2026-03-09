@@ -289,7 +289,7 @@ export default function Admin() {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
           <Card className="neon-border bg-card/80">
             <CardContent className="p-4 text-center">
               <Users className="h-5 w-5 mx-auto text-neon-purple mb-1" />
@@ -313,16 +313,34 @@ export default function Admin() {
           </Card>
           <Card className="neon-border bg-card/80">
             <CardContent className="p-4 text-center">
-              <Key className="h-5 w-5 mx-auto text-accent mb-1" />
-              <p className="text-2xl font-bold font-mono">{stats?.licenses}</p>
-              <p className="text-xs text-muted-foreground">Licenças</p>
-            </CardContent>
-          </Card>
-          <Card className="neon-border bg-card/80">
-            <CardContent className="p-4 text-center">
               <Shield className="h-5 w-5 mx-auto text-primary mb-1" />
               <p className="text-2xl font-bold font-mono">{pendingModders?.length}</p>
               <p className="text-xs text-muted-foreground">Pendentes</p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Financial Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+          <Card className="neon-border bg-card/80 border-accent/30">
+            <CardContent className="p-4 text-center">
+              <DollarSign className="h-5 w-5 mx-auto text-accent mb-1" />
+              <p className="text-2xl font-bold font-mono text-accent">R$ {(stats?.totalSales ?? 0).toFixed(2)}</p>
+              <p className="text-xs text-muted-foreground">Total de Vendas</p>
+            </CardContent>
+          </Card>
+          <Card className="neon-border bg-card/80 border-primary/30">
+            <CardContent className="p-4 text-center">
+              <Percent className="h-5 w-5 mx-auto text-primary mb-1" />
+              <p className="text-2xl font-bold font-mono text-primary">R$ {(stats?.totalCommission ?? 0).toFixed(2)}</p>
+              <p className="text-xs text-muted-foreground">Comissão Plataforma (20%)</p>
+            </CardContent>
+          </Card>
+          <Card className="neon-border bg-card/80 border-neon-green/30">
+            <CardContent className="p-4 text-center">
+              <Key className="h-5 w-5 mx-auto text-neon-green mb-1" />
+              <p className="text-2xl font-bold font-mono text-neon-green">R$ {(stats?.totalModderEarnings ?? 0).toFixed(2)}</p>
+              <p className="text-xs text-muted-foreground">Ganhos dos Modders</p>
             </CardContent>
           </Card>
         </div>
