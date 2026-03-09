@@ -420,7 +420,7 @@ export default function Admin() {
 
         {/* Main admin tabs */}
         <Tabs defaultValue="scripts">
-          <TabsList className="mb-4 grid w-full grid-cols-3">
+          <TabsList className="mb-4 grid w-full grid-cols-4">
             <TabsTrigger value="scripts" className="text-xs gap-1">
               <Code className="h-3 w-3" /> Scripts
             </TabsTrigger>
@@ -429,6 +429,9 @@ export default function Admin() {
             </TabsTrigger>
             <TabsTrigger value="purchases" className="text-xs gap-1">
               <ShoppingCart className="h-3 w-3" /> Compras
+            </TabsTrigger>
+            <TabsTrigger value="leaks" className="text-xs gap-1">
+              <AlertTriangle className="h-3 w-3" /> Vazamentos
             </TabsTrigger>
           </TabsList>
 
