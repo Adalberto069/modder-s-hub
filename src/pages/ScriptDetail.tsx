@@ -264,7 +264,6 @@ export default function ScriptDetail() {
       setCheckingPayment(false);
     }
   };
-  };
 
   const handleRenew = async () => {
     if (!user || !script || !existingLicense) return;
