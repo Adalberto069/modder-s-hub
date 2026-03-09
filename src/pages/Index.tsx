@@ -46,9 +46,9 @@ export default function Index() {
     },
   });
 
-  const modderIds = [...new Set(scripts?.map((s: any) => s.modder_id) ?? [])];
+  const modderIds = [...new Set(scripts?.map((s: any) => s.modder_id as string) ?? [])];
   const { data: modderProfiles } = useModderProfiles(modderIds);
-  const profileMap = (modderProfiles ?? []).reduce((acc: any, p: any) => {
+  const profileMap = (modderProfiles ?? []).reduce<Record<string, any>>((acc, p: any) => {
     acc[p.user_id] = p;
     return acc;
   }, {});
