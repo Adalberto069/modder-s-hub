@@ -335,6 +335,7 @@ export type Database = {
           created_at: string
           display_name: string | null
           id: string
+          mercadopago_access_token: string | null
           reputation_score: number
           total_downloads: number
           total_positive_reviews: number
@@ -348,6 +349,7 @@ export type Database = {
           created_at?: string
           display_name?: string | null
           id?: string
+          mercadopago_access_token?: string | null
           reputation_score?: number
           total_downloads?: number
           total_positive_reviews?: number
@@ -361,6 +363,7 @@ export type Database = {
           created_at?: string
           display_name?: string | null
           id?: string
+          mercadopago_access_token?: string | null
           reputation_score?: number
           total_downloads?: number
           total_positive_reviews?: number
@@ -377,6 +380,10 @@ export type Database = {
           created_at: string
           id: string
           modder_earnings: number
+          payment_id: string | null
+          payment_method: string | null
+          pix_qr_code: string | null
+          pix_qr_code_base64: string | null
           platform_commission: number
           script_id: string
           status: string
@@ -388,6 +395,10 @@ export type Database = {
           created_at?: string
           id?: string
           modder_earnings?: number
+          payment_id?: string | null
+          payment_method?: string | null
+          pix_qr_code?: string | null
+          pix_qr_code_base64?: string | null
           platform_commission?: number
           script_id: string
           status?: string
@@ -399,6 +410,10 @@ export type Database = {
           created_at?: string
           id?: string
           modder_earnings?: number
+          payment_id?: string | null
+          payment_method?: string | null
+          pix_qr_code?: string | null
+          pix_qr_code_base64?: string | null
           platform_commission?: number
           script_id?: string
           status?: string
