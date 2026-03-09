@@ -206,10 +206,10 @@ end
   return (
     <Layout>
       <div className="container py-8">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold">Dashboard</h1>
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6">
+          <h1 className="text-xl sm:text-2xl font-bold">Dashboard</h1>
           {isModder && (
-            <Button onClick={() => navigate("/script/new")} className="neon-glow-purple">
+            <Button onClick={() => navigate("/script/new")} className="neon-glow-purple w-full sm:w-auto">
               <Plus className="mr-2 h-4 w-4" /> Novo Conteúdo
             </Button>
           )}
