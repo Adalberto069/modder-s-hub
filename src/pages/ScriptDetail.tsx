@@ -231,45 +231,7 @@ export default function ScriptDetail() {
 
   const handleRenew = async () => {
     if (!user || !script || !existingLicense) return;
-    setPurchasing(true);
-
-    try {
-      const durationDays = (script as any).license_duration_days;
-      if (!durationDays) return;
-
-      // Create renewal purchase
-      const { data: purchase, error: purchaseError } = await supabase
-        .from("purchases")
-        .insert({
-          user_id: user.id,
-          script_id: script.id,
-          amount: Number(script.price) || 0,
-          status: "completed",
-        })
-        .select("id")
-        .single();
-
-      if (purchaseError) throw purchaseError;
-
-      // Extend from now (if expired) or from current expiration (if still active)
-      const baseDate = isLicenseExpired ? new Date() : new Date(existingLicense.expires_at!);
-      const newExpiresAt = new Date(baseDate.getTime() + durationDays * 86400000).toISOString();
-
-      const { error: updateError } = await supabase
-        .from("licenses")
-        .update({ expires_at: newExpiresAt } as any)
-        .eq("id", existingLicense.id);
-
-      if (updateError) throw updateError;
-
-      toast.success(`Licença renovada! Nova expiração: ${new Date(newExpiresAt).toLocaleDateString("pt-BR")}`);
-      queryClient.invalidateQueries({ queryKey: ["script-license", id, user.id] });
-      queryClient.invalidateQueries({ queryKey: ["my-licenses"] });
-    } catch (err: any) {
-      toast.error("Erro na renovação: " + err.message);
-    } finally {
-      setPurchasing(false);
-    }
+    handlePurchase(true);
   };
 
   const handleDownloadLoader = () => {
