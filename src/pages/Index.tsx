@@ -391,7 +391,7 @@ export default function Index() {
             <div className="absolute inset-0 bg-gradient-to-br from-primary/15 via-card to-accent/10" />
             <div className="absolute inset-0 bg-grid-pattern opacity-50" />
 
-            <div className="relative z-10 px-8 py-16 sm:px-16 sm:py-20 text-center">
+            <div className="relative z-10 px-5 py-12 sm:px-16 sm:py-20 text-center">
               <h2 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4">
                 Pronto para começar?
               </h2>
