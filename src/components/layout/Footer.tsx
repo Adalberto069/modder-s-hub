@@ -5,7 +5,7 @@ export function Footer() {
   return (
     <footer className="border-t border-border/50 bg-card/30 py-8 sm:py-12">
       <div className="container">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 mb-10">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 mb-8 sm:mb-10">
           {/* Brand */}
           <div className="space-y-3">
             <div className="flex items-center gap-2">
