@@ -209,10 +209,24 @@ export default function ScriptDetail() {
 
   const profileMap = (reviewerProfiles ?? []).reduce((acc: any, p: any) => { acc[p.user_id] = p; return acc; }, {});
 
-  const handlePurchase = async () => {
+  const handlePurchase = async (isRenewal = false) => {
     if (!user) { setShowLoginPrompt(true); return; }
     if (!script) return;
-    toast.info("Sistema de pagamento em implementação. Em breve via Stripe!");
+    setPurchasing(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("create-stripe-checkout", {
+        body: { script_id: script.id, is_renewal: isRenewal },
+      });
+      if (error) throw error;
+      if (data?.url) {
+        window.location.href = data.url;
+      } else {
+        throw new Error("No checkout URL returned");
+      }
+    } catch (err: any) {
+      toast.error("Erro ao iniciar pagamento: " + (err.message || "Tente novamente"));
+      setPurchasing(false);
+    }
   };
 
   const handleRenew = async () => {
