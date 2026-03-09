@@ -99,7 +99,7 @@ export default function ProfileSettings() {
       setUsername(profile.username ?? "");
       setBio(profile.bio ?? "");
       setAvatarUrl(profile.avatar_url ?? "");
-      setMpAccessToken((profile as any).mercadopago_access_token ?? "");
+      
     }
   }, [profile]);
 
