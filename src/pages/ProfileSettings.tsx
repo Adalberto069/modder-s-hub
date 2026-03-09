@@ -68,7 +68,7 @@ export default function ProfileSettings() {
   const [username, setUsername] = useState("");
   const [bio, setBio] = useState("");
   const [avatarUrl, setAvatarUrl] = useState("");
-  const [website, setWebsite] = useState("");
+  
 
   // Password
   const [currentPassword, setCurrentPassword] = useState("");
