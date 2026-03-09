@@ -18,6 +18,7 @@ import { ReportDialog } from "@/components/ReportDialog";
 
 export default function ModderProfile() {
   const { userId } = useParams<{ userId: string }>();
+  const [showReport, setShowReport] = useState(false);
 
   const { data: profile, isLoading: profileLoading } = useQuery({
     queryKey: ["modder-profile", userId],
