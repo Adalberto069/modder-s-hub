@@ -757,32 +757,25 @@ end
                       </Card>
                     )}
 
-                    {/* PIX QR Code waiting for payment */}
+                    {/* Payment pending - checkout opened */}
                     {pixData && !purchaseSuccess && (
                       <Card className="border-primary/30 bg-primary/5">
                         <CardContent className="p-4 space-y-3">
                           <div className="text-center">
-                            <p className="text-sm font-semibold text-primary mb-2">📱 Pague com PIX</p>
-                            {pixData.qr_code_base64 && (
-                              <img
-                                src={`data:image/png;base64,${pixData.qr_code_base64}`}
-                                alt="QR Code PIX"
-                                className="mx-auto w-48 h-48 rounded-lg border border-border"
-                              />
-                            )}
+                            <p className="text-sm font-semibold text-primary mb-2">💳 Pagamento em andamento</p>
+                            <p className="text-[11px] text-muted-foreground">
+                              Complete o pagamento na página do Mercado Pago que foi aberta.
+                            </p>
                           </div>
-                          {pixData.qr_code && (
-                            <div>
-                              <p className="text-[10px] text-muted-foreground mb-1">Ou copie o código PIX:</p>
-                              <div className="flex items-center gap-2 bg-secondary/50 rounded p-2">
-                                <code className="text-[10px] font-mono text-foreground flex-1 break-all line-clamp-2">{pixData.qr_code}</code>
-                                <Button variant="ghost" size="sm" className="h-6 w-6 p-0 shrink-0" onClick={() => { navigator.clipboard.writeText(pixData.qr_code); toast.success("Código PIX copiado!"); }}>
-                                  <Copy className="h-3 w-3" />
-                                </Button>
-                              </div>
-                            </div>
-                          )}
-                          <Button className="w-full" variant="outline" onClick={handleCheckPayment} disabled={checkingPayment}>
+                          <Button
+                            className="w-full"
+                            variant="outline"
+                            onClick={() => window.open(pixData.sandbox_init_point || pixData.init_point, "_blank")}
+                          >
+                            <ExternalLink className="mr-2 h-4 w-4" />
+                            Abrir checkout novamente
+                          </Button>
+                          <Button className="w-full neon-glow-green" onClick={handleCheckPayment} disabled={checkingPayment}>
                             <CheckCircle className="mr-2 h-4 w-4" />
                             {checkingPayment ? "Verificando..." : "Já paguei, verificar"}
                           </Button>
