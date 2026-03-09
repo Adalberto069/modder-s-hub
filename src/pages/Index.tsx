@@ -103,9 +103,9 @@ export default function Index() {
         <div className="absolute top-20 left-4 sm:left-10 w-40 sm:w-72 h-40 sm:h-72 bg-primary/20 rounded-full blur-[80px] sm:blur-[120px] animate-pulse-neon" />
         <div className="absolute bottom-20 right-4 sm:right-10 w-52 sm:w-96 h-52 sm:h-96 bg-accent/15 rounded-full blur-[100px] sm:blur-[150px] animate-pulse-neon" />
 
-        <div className="container relative z-10 py-20">
+        <div className="container relative z-10 py-12 sm:py-20 px-4 sm:px-6">
           <motion.div
-            className="max-w-3xl"
+            className="max-w-3xl mx-auto sm:mx-0"
             initial="hidden"
             animate="visible"
             variants={stagger}
