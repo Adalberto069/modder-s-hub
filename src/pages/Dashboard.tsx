@@ -251,12 +251,12 @@ end
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className={`mb-6 grid w-full ${isModder ? "grid-cols-2" : "grid-cols-1"}`}>
-            <TabsTrigger value="purchases" className="gap-2">
-              <ShoppingBag className="h-4 w-4" /> Meus Scripts Comprados
+            <TabsTrigger value="purchases" className="gap-1.5 text-xs sm:text-sm">
+              <ShoppingBag className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> <span className="hidden sm:inline">Meus </span>Scripts Comprados
             </TabsTrigger>
             {isModder && (
-              <TabsTrigger value="my-scripts" className="gap-2">
-                <Code className="h-4 w-4" /> Minhas Publicações
+              <TabsTrigger value="my-scripts" className="gap-1.5 text-xs sm:text-sm">
+                <Code className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> <span className="hidden sm:inline">Minhas </span>Publicações
               </TabsTrigger>
             )}
           </TabsList>
