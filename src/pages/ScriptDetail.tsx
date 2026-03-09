@@ -704,7 +704,7 @@ end
                     )}
 
 
-                    {!purchaseSuccess && !pixData && existingLicense ? (
+                    {!purchaseSuccess && existingLicense ? (
                       isLicenseExpired ? (
                         <div className="space-y-2">
                           <div className="p-3 rounded-lg bg-destructive/10 border border-destructive/20 text-center">
