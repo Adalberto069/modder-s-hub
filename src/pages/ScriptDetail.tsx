@@ -123,6 +123,8 @@ export default function ScriptDetail() {
   const [purchasing, setPurchasing] = useState(false);
   const [purchaseSuccess, setPurchaseSuccess] = useState<string | null>(null);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
+  const [pixData, setPixData] = useState<{ qr_code: string; qr_code_base64: string; purchase_id: string; payment_id: string } | null>(null);
+  const [checkingPayment, setCheckingPayment] = useState(false);
 
   const { data: script } = useQuery({
     queryKey: ["script", id],
@@ -215,52 +217,54 @@ export default function ScriptDetail() {
     setPurchasing(true);
 
     try {
-      // Simulated payment - create purchase record with commission
-      const amount = Number(script.price) || 0;
-      const commissionRate = 0.20; // 20% platform commission
-      const platformCommission = Math.round(amount * commissionRate * 100) / 100;
-      const modderEarnings = Math.round((amount - platformCommission) * 100) / 100;
+      const { data, error } = await supabase.functions.invoke("create-pix-payment", {
+        body: { script_id: script.id },
+      });
 
-      const { data: purchase, error: purchaseError } = await supabase
-        .from("purchases")
-        .insert({
-          user_id: user.id,
-          script_id: script.id,
-          amount,
-          status: "completed",
-          platform_commission: platformCommission,
-          modder_earnings: modderEarnings,
-          commission_rate: commissionRate,
-        } as any)
-        .select("id")
-        .single();
+      if (error) throw new Error(error.message || "Erro ao criar pagamento");
+      if (data?.error) throw new Error(data.error);
 
-      if (purchaseError) throw purchaseError;
+      setPixData({
+        qr_code: data.qr_code,
+        qr_code_base64: data.qr_code_base64,
+        purchase_id: data.purchase_id,
+        payment_id: data.payment_id,
+      });
 
-      // Generate license key
-      const licenseKey = generateLicenseKey();
-      const durationDays = (script as any).license_duration_days;
-      const expiresAt = durationDays ? new Date(Date.now() + durationDays * 86400000).toISOString() : null;
-      const { error: licenseError } = await supabase
-        .from("licenses")
-        .insert({
-          user_id: user.id,
-          script_id: script.id,
-          purchase_id: purchase.id,
-          license_key: licenseKey,
-          status: "active",
-          expires_at: expiresAt,
-        } as any);
-
-      if (licenseError) throw licenseError;
-
-      setPurchaseSuccess(licenseKey);
-      toast.success("Compra realizada com sucesso!");
-      queryClient.invalidateQueries({ queryKey: ["script-license", id, user.id] });
+      toast.success("QR Code PIX gerado! Escaneie para pagar.");
     } catch (err: any) {
       toast.error("Erro na compra: " + err.message);
     } finally {
       setPurchasing(false);
+    }
+  };
+
+  // Poll for payment confirmation
+  const handleCheckPayment = async () => {
+    if (!pixData || !user) return;
+    setCheckingPayment(true);
+    try {
+      // Check if license was created (webhook processed)
+      const { data: license } = await supabase
+        .from("licenses")
+        .select("*")
+        .eq("script_id", id!)
+        .eq("user_id", user.id)
+        .eq("status", "active")
+        .maybeSingle();
+
+      if (license) {
+        setPurchaseSuccess((license as any).license_key);
+        setPixData(null);
+        toast.success("Pagamento confirmado! 🎉");
+        queryClient.invalidateQueries({ queryKey: ["script-license", id, user.id] });
+      } else {
+        toast.info("Pagamento ainda não confirmado. Aguarde alguns segundos após pagar.");
+      }
+    } catch {
+      toast.error("Erro ao verificar pagamento");
+    } finally {
+      setCheckingPayment(false);
     }
   };
 
@@ -752,7 +756,46 @@ end
                       </Card>
                     )}
 
-                    {!purchaseSuccess && existingLicense ? (
+                    {/* PIX QR Code waiting for payment */}
+                    {pixData && !purchaseSuccess && (
+                      <Card className="border-primary/30 bg-primary/5">
+                        <CardContent className="p-4 space-y-3">
+                          <div className="text-center">
+                            <p className="text-sm font-semibold text-primary mb-2">📱 Pague com PIX</p>
+                            {pixData.qr_code_base64 && (
+                              <img
+                                src={`data:image/png;base64,${pixData.qr_code_base64}`}
+                                alt="QR Code PIX"
+                                className="mx-auto w-48 h-48 rounded-lg border border-border"
+                              />
+                            )}
+                          </div>
+                          {pixData.qr_code && (
+                            <div>
+                              <p className="text-[10px] text-muted-foreground mb-1">Ou copie o código PIX:</p>
+                              <div className="flex items-center gap-2 bg-secondary/50 rounded p-2">
+                                <code className="text-[10px] font-mono text-foreground flex-1 break-all line-clamp-2">{pixData.qr_code}</code>
+                                <Button variant="ghost" size="sm" className="h-6 w-6 p-0 shrink-0" onClick={() => { navigator.clipboard.writeText(pixData.qr_code); toast.success("Código PIX copiado!"); }}>
+                                  <Copy className="h-3 w-3" />
+                                </Button>
+                              </div>
+                            </div>
+                          )}
+                          <Button className="w-full" variant="outline" onClick={handleCheckPayment} disabled={checkingPayment}>
+                            <CheckCircle className="mr-2 h-4 w-4" />
+                            {checkingPayment ? "Verificando..." : "Já paguei, verificar"}
+                          </Button>
+                          <Button variant="ghost" size="sm" className="w-full text-muted-foreground" onClick={() => setPixData(null)}>
+                            Cancelar
+                          </Button>
+                          <p className="text-[10px] text-muted-foreground text-center">
+                            Após o pagamento, clique em "Já paguei" para liberar sua licença
+                          </p>
+                        </CardContent>
+                      </Card>
+                    )}
+
+                    {!purchaseSuccess && !pixData && existingLicense ? (
                       isLicenseExpired ? (
                         <div className="space-y-2">
                           <div className="p-3 rounded-lg bg-destructive/10 border border-destructive/20 text-center">
@@ -811,11 +854,11 @@ end
                           </Button>
                         </div>
                       )
-                    ) : !purchaseSuccess ? (
+                    ) : !purchaseSuccess && !pixData ? (
                       scriptIsActive ? (
                         <Button className="w-full neon-glow-purple" onClick={handlePurchase} disabled={purchasing}>
                           <ShoppingCart className="mr-2 h-4 w-4" />
-                          {purchasing ? "Processando..." : "Comprar Script"}
+                          {purchasing ? "Gerando PIX..." : "Comprar Script"}
                         </Button>
                       ) : (
                         <div className="text-center p-3 rounded-lg bg-destructive/10 border border-destructive/20">

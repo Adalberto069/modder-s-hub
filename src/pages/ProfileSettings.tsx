@@ -59,7 +59,7 @@ function PasswordField({
 }
 
 export default function ProfileSettings() {
-  const { user, profile, loading } = useAuth();
+  const { user, profile, loading, isModder } = useAuth();
   const isOAuthUser = user?.app_metadata?.provider && user.app_metadata.provider !== "email";
   const [saving, setSaving] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -68,7 +68,7 @@ export default function ProfileSettings() {
   const [username, setUsername] = useState("");
   const [bio, setBio] = useState("");
   const [avatarUrl, setAvatarUrl] = useState("");
-  
+  const [mpAccessToken, setMpAccessToken] = useState("");
 
   // Password
   const [currentPassword, setCurrentPassword] = useState("");
@@ -99,6 +99,7 @@ export default function ProfileSettings() {
       setUsername(profile.username ?? "");
       setBio(profile.bio ?? "");
       setAvatarUrl(profile.avatar_url ?? "");
+      setMpAccessToken((profile as any).mercadopago_access_token ?? "");
     }
   }, [profile]);
 
@@ -481,6 +482,57 @@ export default function ProfileSettings() {
                 </Button>
               </CardContent>
             </Card>
+
+            {/* Mercado Pago - only for modders */}
+            {isModder && (
+              <Card className="neon-border bg-card/80">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base flex items-center gap-2">
+                    💰 Mercado Pago (Recebimentos)
+                  </CardTitle>
+                  <CardDescription>
+                    Conecte seu Access Token do Mercado Pago para receber pagamentos automaticamente via split (80% para você, 20% comissão da plataforma)
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="mp-token">Access Token do Mercado Pago</Label>
+                    <Input
+                      id="mp-token"
+                      type="password"
+                      value={mpAccessToken}
+                      onChange={(e) => setMpAccessToken(e.target.value)}
+                      placeholder="APP_USR-... ou TEST-..."
+                    />
+                    <p className="text-[10px] text-muted-foreground">
+                      Encontre em: mercadopago.com.br/developers → Sua aplicação → Credenciais
+                    </p>
+                  </div>
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={async () => {
+                      const { error } = await supabase
+                        .from("profiles")
+                        .update({ mercadopago_access_token: mpAccessToken || null } as any)
+                        .eq("user_id", user.id);
+                      if (error) {
+                        toast.error("Erro ao salvar: " + error.message);
+                      } else {
+                        toast.success(mpAccessToken ? "Token do Mercado Pago salvo!" : "Token removido");
+                      }
+                    }}
+                  >
+                    {mpAccessToken ? "Salvar Token" : "Remover Token"}
+                  </Button>
+                  {mpAccessToken && (
+                    <Badge variant="outline" className="text-[10px] border-accent/30 text-accent gap-1">
+                      <CheckCircle className="h-3 w-3" /> Token configurado
+                    </Badge>
+                  )}
+                </CardContent>
+              </Card>
+            )}
           </TabsContent>
 
           {/* ======================== SECURITY TAB ======================== */}
