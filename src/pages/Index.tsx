@@ -255,7 +255,7 @@ export default function Index() {
       </section>
 
       {/* ══════════════ MARKETPLACE HIGHLIGHTS ══════════════ */}
-      <section className="py-24">
+      <section className="py-14 sm:py-24">
         <div className="container">
           <motion.div
             className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-10 gap-4"
