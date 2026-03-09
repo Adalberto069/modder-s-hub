@@ -586,17 +586,24 @@ export default function ScriptEditor() {
                     <Label>Preço (R$)</Label>
                     <Input type="number" value={price} onChange={(e) => setPrice(e.target.value)} placeholder="0.00" min="0" step="0.01" disabled={!!licenseFieldsLocked} />
                   </div>
-                  <div className="flex items-center gap-4">
-                    <Switch checked={licensePermanent} onCheckedChange={setLicensePermanent} disabled={!!licenseFieldsLocked} />
-                    <Label className="text-sm">{licensePermanent ? "🔑 Licença Permanente" : "⏳ Licença com Prazo"}</Label>
+                  <div>
+                    <Label>Tipo de Licença</Label>
+                    <Select value={licenseType} onValueChange={setLicenseType} disabled={!!licenseFieldsLocked}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="permanent">🔑 Permanente</SelectItem>
+                        <SelectItem value="monthly">📅 Mensal (30 dias)</SelectItem>
+                        <SelectItem value="weekly">⏳ Semanal (7 dias)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <p className="text-[10px] text-muted-foreground mt-1">
+                      {licenseType === "permanent" && "O comprador terá acesso vitalício ao script."}
+                      {licenseType === "monthly" && "A licença expira após 30 dias. O comprador pode renovar."}
+                      {licenseType === "weekly" && "A licença expira após 7 dias. O comprador pode renovar."}
+                    </p>
                   </div>
-                  {!licensePermanent && (
-                    <div>
-                      <Label>Duração da licença (dias)</Label>
-                      <Input type="number" value={licenseDurationDays} onChange={(e) => setLicenseDurationDays(e.target.value)} placeholder="30" min="1" disabled={!!licenseFieldsLocked} />
-                      <p className="text-[10px] text-muted-foreground mt-1">O comprador será informado do prazo antes da compra.</p>
-                    </div>
-                  )}
                 </div>
               )}
             </CardContent>
