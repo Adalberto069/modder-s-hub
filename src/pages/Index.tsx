@@ -379,7 +379,7 @@ export default function Index() {
       </section>
 
       {/* ══════════════ CTA FINAL ══════════════ */}
-      <section className="py-24">
+      <section className="py-14 sm:py-24">
         <div className="container">
           <motion.div
             className="relative rounded-2xl overflow-hidden neon-border"
