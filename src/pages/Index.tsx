@@ -177,7 +177,7 @@ export default function Index() {
       </section>
 
       {/* ══════════════ BENEFITS ══════════════ */}
-      <section className="relative py-24 overflow-hidden">
+      <section className="relative py-14 sm:py-24 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-background via-card/30 to-background" />
         <div className="container relative z-10">
           <motion.div
