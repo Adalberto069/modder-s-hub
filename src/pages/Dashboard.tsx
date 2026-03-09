@@ -64,7 +64,7 @@ export default function Dashboard() {
     queryFn: async () => {
       const { data } = await supabase
         .from("licenses")
-        .select("*, scripts(id, title, game_name, thumbnail_url, version)")
+        .select("*, scripts(id, title, description, game_name, thumbnail_url, version)")
         .eq("user_id", user!.id)
         .order("created_at", { ascending: false });
       return data ?? [];
@@ -321,6 +321,9 @@ end
                               </Badge>
                             )}
                           </div>
+                          {license.scripts?.description && (
+                            <p className="text-xs text-muted-foreground mt-1.5 line-clamp-2">{license.scripts.description}</p>
+                          )}
                         </div>
                       </div>
                     </div>
