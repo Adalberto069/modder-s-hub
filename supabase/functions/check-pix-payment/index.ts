@@ -95,11 +95,13 @@ Deno.serve(async (req) => {
       });
     }
 
+    // For Checkout Pro, payment_id is the preference ID - search payments by external_reference
     const mpResponse = await fetch(
-      `https://api.mercadopago.com/v1/payments/${purchase.payment_id}`,
+      `https://api.mercadopago.com/v1/payments/search?external_reference=${purchase_id}&sort=date_created&criteria=desc`,
       { headers: { Authorization: `Bearer ${MP_ACCESS_TOKEN}` } }
     );
-    const payment = await mpResponse.json();
+    const searchResult = await mpResponse.json();
+    const payment = searchResult.results?.[0];
 
     if (payment.status === "approved") {
       // Update purchase
