@@ -321,6 +321,9 @@ end
                               </Badge>
                             )}
                           </div>
+                          {license.scripts?.description && (
+                            <p className="text-xs text-muted-foreground mt-1.5 line-clamp-2">{license.scripts.description}</p>
+                          )}
                         </div>
                       </div>
                     </div>
