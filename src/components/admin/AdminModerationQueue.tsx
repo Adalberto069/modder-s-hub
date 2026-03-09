@@ -120,6 +120,15 @@ export function AdminModerationQueue() {
         .eq("id", analysis.id);
     }
 
+    // Notify modder
+    await supabase.from("notifications" as any).insert({
+      user_id: script.modder_id,
+      title: "✅ Script aprovado!",
+      message: `Seu script "${script.title}" foi aprovado pela moderação e está publicado.`,
+      type: "success",
+      link: `/script/${script.id}`,
+    } as any);
+
     toast.success("✅ Script aprovado e publicado com selo Verificado!");
     queryClient.invalidateQueries({ queryKey: ["moderation-queue"] });
     queryClient.invalidateQueries({ queryKey: ["admin-scripts"] });
