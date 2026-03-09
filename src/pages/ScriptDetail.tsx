@@ -224,14 +224,18 @@ export default function ScriptDetail() {
       if (error) throw new Error(error.message || "Erro ao criar pagamento");
       if (data?.error) throw new Error(data.error);
 
+      // Use sandbox_init_point for test, init_point for production
+      const paymentUrl = data.sandbox_init_point || data.init_point;
+
       setPixData({
-        qr_code: data.qr_code,
-        qr_code_base64: data.qr_code_base64,
+        init_point: data.init_point,
+        sandbox_init_point: data.sandbox_init_point,
         purchase_id: data.purchase_id,
-        payment_id: data.payment_id,
       });
 
-      toast.success("QR Code PIX gerado! Escaneie para pagar.");
+      // Open Mercado Pago checkout in new tab
+      window.open(paymentUrl, "_blank");
+      toast.success("Checkout do Mercado Pago aberto! Complete o pagamento lá.");
     } catch (err: any) {
       toast.error("Erro na compra: " + err.message);
     } finally {
