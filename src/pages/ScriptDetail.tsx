@@ -15,12 +15,11 @@ import { useAuth } from "@/lib/auth";
 import {
   Download, Star, ExternalLink, ArrowLeft, User, ShieldCheck, ShieldAlert, ShieldX,
   ChevronLeft, ChevronRight, Play, MessageSquare, Lock, CheckCircle, Clock,
-  Copy, Check, Gamepad2, Tag, List, BookOpen, FileCode, ShoppingCart, Key, Flag,
+  Copy, Check, Gamepad2, Tag, List, BookOpen, FileCode, ShoppingCart, Key,
 } from "lucide-react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import { LoginPromptDialog } from "@/components/LoginPromptDialog";
-import { ReportDialog } from "@/components/ReportDialog";
 
 const statusConfig: Record<string, { label: string; className: string }> = {
   working: { label: "Working", className: "bg-accent/20 text-accent border-accent/30" },
@@ -124,7 +123,6 @@ export default function ScriptDetail() {
   const [purchasing, setPurchasing] = useState(false);
   const [purchaseSuccess, setPurchaseSuccess] = useState<string | null>(null);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
-  const [showReport, setShowReport] = useState(false);
 
   const { data: script } = useQuery({
     queryKey: ["script", id],
@@ -491,15 +489,6 @@ end
                     </Badge>
                   )}
                   <Badge variant="outline" className={st.className}>{st.label}</Badge>
-                  {!isOwner && (
-                    <button
-                      onClick={() => setShowReport(true)}
-                      className="text-muted-foreground hover:text-destructive transition-colors"
-                      title="Denunciar script"
-                    >
-                      <Flag className="h-4 w-4" />
-                    </button>
-                  )}
                 </div>
               </div>
 
@@ -863,13 +852,6 @@ end
         </div>
       </div>
       <LoginPromptDialog open={showLoginPrompt} onOpenChange={setShowLoginPrompt} />
-      <ReportDialog
-        open={showReport}
-        onOpenChange={setShowReport}
-        reportedUserId={script.modder_id}
-        scriptId={script.id}
-        targetName={script.title}
-      />
     </Layout>
   );
 }

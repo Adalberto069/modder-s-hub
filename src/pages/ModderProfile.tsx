@@ -1,23 +1,19 @@
-import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { Layout } from "@/components/layout/Layout";
 import { ScriptCard } from "@/components/ScriptCard";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
-import { User, Download, Star, Trophy, Calendar, Code, BookOpen, Info, Flag } from "lucide-react";
+import { User, Download, Star, Trophy, Calendar, Code, BookOpen, Info } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Button } from "@/components/ui/button";
 import { UserBadges } from "@/components/UserBadges";
 import { RoleBadge } from "@/components/RoleBadge";
-import { ReportDialog } from "@/components/ReportDialog";
 
 export default function ModderProfile() {
   const { userId } = useParams<{ userId: string }>();
-  const [showReport, setShowReport] = useState(false);
 
   const { data: profile, isLoading: profileLoading } = useQuery({
     queryKey: ["modder-profile", userId],
@@ -132,13 +128,6 @@ export default function ModderProfile() {
                     {profile.display_name ?? profile.username}
                   </h1>
                   <RoleBadge role={displayRole} />
-                  <button
-                    onClick={() => setShowReport(true)}
-                    className="text-muted-foreground hover:text-destructive transition-colors ml-1"
-                    title="Denunciar usuário"
-                  >
-                    <Flag className="h-4 w-4" />
-                  </button>
                 </div>
                 <p className="text-sm text-muted-foreground font-mono">@{profile.username}</p>
                 <UserBadges userId={userId!} />
@@ -163,13 +152,8 @@ export default function ModderProfile() {
           </div>
         </div>
 
-        <ReportDialog
-          open={showReport}
-          onOpenChange={setShowReport}
-          reportedUserId={userId}
-          targetName={profile.display_name ?? profile.username}
-        />
 
+        {/* Tabs */}
         {/* Tabs */}
         <Tabs defaultValue="scripts" className="space-y-4">
           <TabsList className="w-full grid grid-cols-3 bg-secondary/50">
