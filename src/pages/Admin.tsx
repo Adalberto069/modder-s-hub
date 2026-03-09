@@ -9,8 +9,9 @@ import { toast } from "sonner";
 import { Navigate, useNavigate } from "react-router-dom";
 import {
   Users, Code, CheckCircle, XCircle, Trash2, Plus, Pencil, Eye, EyeOff, Clock, FileX, Send, Shield,
-  UserCheck, ShieldCheck, ShieldOff, Key, Ban, ShoppingCart, Copy, DollarSign, Percent,
+  UserCheck, ShieldCheck, ShieldOff, Key, Ban, ShoppingCart, Copy, DollarSign, Percent, Search, AlertTriangle,
 } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { AdminBadges } from "@/components/admin/AdminBadges";
 import { AdminFlaggedScripts } from "@/components/admin/AdminFlaggedScripts";
@@ -34,6 +35,10 @@ export default function Admin() {
   const [codeDialogOpen, setCodeDialogOpen] = useState(false);
   const [codeDialogContent, setCodeDialogContent] = useState("");
   const [codeDialogTitle, setCodeDialogTitle] = useState("");
+  const [leakCode, setLeakCode] = useState("");
+  const [leakResult, setLeakResult] = useState<null | { userId: string; username?: string; displayName?: string; email?: string }>(null);
+  const [leakSearching, setLeakSearching] = useState(false);
+  const [leakError, setLeakError] = useState("");
 
   const { data: pendingModders } = useQuery({
     queryKey: ["pending-modders"],
@@ -213,6 +218,49 @@ export default function Admin() {
     queryClient.invalidateQueries({ queryKey: ["admin-licenses"] });
   };
 
+  // Leak tracker: extract watermark from obfuscated code
+  const extractWatermark = async () => {
+    setLeakResult(null);
+    setLeakError("");
+    if (!leakCode.trim()) { setLeakError("Cole o código ofuscado acima."); return; }
+
+    // The watermark is a hex-encoded user_id stored in a local variable assignment at the top
+    // Pattern: local _varname="hexstring"
+    const match = leakCode.match(/local\s+\w+\s*=\s*"([0-9a-f]{32,})"/);
+    if (!match) { setLeakError("Nenhum watermark encontrado. O código pode não ter sido ofuscado pelo marketplace."); return; }
+
+    const hex = match[1];
+    // Decode hex to string (UUID)
+    let userId = "";
+    try {
+      for (let i = 0; i < hex.length; i += 2) {
+        userId += String.fromCharCode(parseInt(hex.substring(i, i + 2), 16));
+      }
+    } catch {
+      setLeakError("Watermark encontrado mas não pôde ser decodificado."); return;
+    }
+
+    if (!userId || userId.length < 30) { setLeakError("Watermark decodificado inválido: " + userId); return; }
+
+    setLeakSearching(true);
+    try {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("username, display_name, user_id")
+        .eq("user_id", userId)
+        .single();
+
+      setLeakResult({
+        userId,
+        username: profile?.username,
+        displayName: profile?.display_name ?? undefined,
+      });
+    } catch {
+      setLeakResult({ userId });
+    }
+    setLeakSearching(false);
+  };
+
   const pendingReview = allScripts?.filter((s: any) => s.publish_status === "pending_review") ?? [];
   const published = allScripts?.filter((s: any) => s.publish_status === "published" || !s.publish_status) ?? [];
   const drafts = allScripts?.filter((s: any) => s.publish_status === "draft") ?? [];
@@ -372,7 +420,7 @@ export default function Admin() {
 
         {/* Main admin tabs */}
         <Tabs defaultValue="scripts">
-          <TabsList className="mb-4 grid w-full grid-cols-3">
+          <TabsList className="mb-4 grid w-full grid-cols-4">
             <TabsTrigger value="scripts" className="text-xs gap-1">
               <Code className="h-3 w-3" /> Scripts
             </TabsTrigger>
@@ -381,6 +429,9 @@ export default function Admin() {
             </TabsTrigger>
             <TabsTrigger value="purchases" className="text-xs gap-1">
               <ShoppingCart className="h-3 w-3" /> Compras
+            </TabsTrigger>
+            <TabsTrigger value="leaks" className="text-xs gap-1">
+              <AlertTriangle className="h-3 w-3" /> Vazamentos
             </TabsTrigger>
           </TabsList>
 
@@ -512,6 +563,69 @@ export default function Admin() {
                 ))}
                 {(allPurchases?.length ?? 0) === 0 && (
                   <p className="text-sm text-muted-foreground py-4 text-center">Nenhuma compra registrada.</p>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Leak Tracker Tab */}
+          <TabsContent value="leaks">
+            <Card className="neon-border bg-card/80">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <AlertTriangle className="h-5 w-5 text-destructive" /> Rastrear Vazamentos
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <p className="text-sm text-muted-foreground">
+                  Cole o código ofuscado vazado abaixo. O sistema extrairá o watermark embutido e identificará o comprador responsável.
+                </p>
+                <Textarea
+                  placeholder="Cole aqui o código Lua ofuscado encontrado..."
+                  value={leakCode}
+                  onChange={(e) => setLeakCode(e.target.value)}
+                  rows={8}
+                  className="font-mono text-xs"
+                />
+                <Button onClick={extractWatermark} disabled={leakSearching} className="neon-glow-purple">
+                  <Search className="h-4 w-4 mr-2" />
+                  {leakSearching ? "Buscando..." : "Extrair Watermark"}
+                </Button>
+
+                {leakError && (
+                  <div className="p-3 rounded-lg bg-destructive/10 border border-destructive/30 text-destructive text-sm">
+                    {leakError}
+                  </div>
+                )}
+
+                {leakResult && (
+                  <div className="p-4 rounded-lg bg-secondary/30 border border-primary/30 space-y-2">
+                    <h4 className="font-bold text-sm flex items-center gap-2">
+                      <Shield className="h-4 w-4 text-primary" /> Comprador Identificado
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+                      <div>
+                        <span className="text-muted-foreground">User ID:</span>
+                        <p className="font-mono text-xs break-all">{leakResult.userId}</p>
+                      </div>
+                      {leakResult.username && (
+                        <div>
+                          <span className="text-muted-foreground">Usuário:</span>
+                          <p className="font-semibold">{leakResult.displayName || leakResult.username}</p>
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex gap-2 mt-3">
+                      <Button size="sm" variant="outline" onClick={() => { navigator.clipboard.writeText(leakResult.userId); toast.success("User ID copiado!"); }}>
+                        <Copy className="h-3 w-3 mr-1" /> Copiar ID
+                      </Button>
+                      {leakResult.username && (
+                        <Button size="sm" variant="outline" onClick={() => navigate(`/modder/${leakResult.username}`)}>
+                          <Eye className="h-3 w-3 mr-1" /> Ver Perfil
+                        </Button>
+                      )}
+                    </div>
+                  </div>
                 )}
               </CardContent>
             </Card>
