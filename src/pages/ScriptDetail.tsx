@@ -217,52 +217,54 @@ export default function ScriptDetail() {
     setPurchasing(true);
 
     try {
-      // Simulated payment - create purchase record with commission
-      const amount = Number(script.price) || 0;
-      const commissionRate = 0.20; // 20% platform commission
-      const platformCommission = Math.round(amount * commissionRate * 100) / 100;
-      const modderEarnings = Math.round((amount - platformCommission) * 100) / 100;
+      const { data, error } = await supabase.functions.invoke("create-pix-payment", {
+        body: { script_id: script.id },
+      });
 
-      const { data: purchase, error: purchaseError } = await supabase
-        .from("purchases")
-        .insert({
-          user_id: user.id,
-          script_id: script.id,
-          amount,
-          status: "completed",
-          platform_commission: platformCommission,
-          modder_earnings: modderEarnings,
-          commission_rate: commissionRate,
-        } as any)
-        .select("id")
-        .single();
+      if (error) throw new Error(error.message || "Erro ao criar pagamento");
+      if (data?.error) throw new Error(data.error);
 
-      if (purchaseError) throw purchaseError;
+      setPixData({
+        qr_code: data.qr_code,
+        qr_code_base64: data.qr_code_base64,
+        purchase_id: data.purchase_id,
+        payment_id: data.payment_id,
+      });
 
-      // Generate license key
-      const licenseKey = generateLicenseKey();
-      const durationDays = (script as any).license_duration_days;
-      const expiresAt = durationDays ? new Date(Date.now() + durationDays * 86400000).toISOString() : null;
-      const { error: licenseError } = await supabase
-        .from("licenses")
-        .insert({
-          user_id: user.id,
-          script_id: script.id,
-          purchase_id: purchase.id,
-          license_key: licenseKey,
-          status: "active",
-          expires_at: expiresAt,
-        } as any);
-
-      if (licenseError) throw licenseError;
-
-      setPurchaseSuccess(licenseKey);
-      toast.success("Compra realizada com sucesso!");
-      queryClient.invalidateQueries({ queryKey: ["script-license", id, user.id] });
+      toast.success("QR Code PIX gerado! Escaneie para pagar.");
     } catch (err: any) {
       toast.error("Erro na compra: " + err.message);
     } finally {
       setPurchasing(false);
+    }
+  };
+
+  // Poll for payment confirmation
+  const handleCheckPayment = async () => {
+    if (!pixData || !user) return;
+    setCheckingPayment(true);
+    try {
+      // Check if license was created (webhook processed)
+      const { data: license } = await supabase
+        .from("licenses")
+        .select("*")
+        .eq("script_id", id!)
+        .eq("user_id", user.id)
+        .eq("status", "active")
+        .maybeSingle();
+
+      if (license) {
+        setPurchaseSuccess((license as any).license_key);
+        setPixData(null);
+        toast.success("Pagamento confirmado! 🎉");
+        queryClient.invalidateQueries({ queryKey: ["script-license", id, user.id] });
+      } else {
+        toast.info("Pagamento ainda não confirmado. Aguarde alguns segundos após pagar.");
+      }
+    } catch {
+      toast.error("Erro ao verificar pagamento");
+    } finally {
+      setCheckingPayment(false);
     }
   };
 
