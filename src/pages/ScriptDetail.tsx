@@ -703,37 +703,6 @@ end
                       </Card>
                     )}
 
-                    {/* Payment pending - checkout opened */}
-                    {pixData && !purchaseSuccess && (
-                      <Card className="border-primary/30 bg-primary/5">
-                        <CardContent className="p-4 space-y-3">
-                          <div className="text-center">
-                            <p className="text-sm font-semibold text-primary mb-2">💳 Pagamento em andamento</p>
-                            <p className="text-[11px] text-muted-foreground">
-                              Complete o pagamento na página do Mercado Pago que foi aberta.
-                            </p>
-                          </div>
-                          <Button
-                            className="w-full"
-                            variant="outline"
-                            onClick={() => window.open(pixData.sandbox_init_point || pixData.init_point, "_blank")}
-                          >
-                            <ExternalLink className="mr-2 h-4 w-4" />
-                            Abrir checkout novamente
-                          </Button>
-                          <Button className="w-full neon-glow-green" onClick={handleCheckPayment} disabled={checkingPayment}>
-                            <CheckCircle className="mr-2 h-4 w-4" />
-                            {checkingPayment ? "Verificando..." : "Já paguei, verificar"}
-                          </Button>
-                          <Button variant="ghost" size="sm" className="w-full text-muted-foreground" onClick={() => setPixData(null)}>
-                            Cancelar
-                          </Button>
-                          <p className="text-[10px] text-muted-foreground text-center">
-                            Após o pagamento, clique em "Já paguei" para liberar sua licença
-                          </p>
-                        </CardContent>
-                      </Card>
-                    )}
 
                     {!purchaseSuccess && !pixData && existingLicense ? (
                       isLicenseExpired ? (
