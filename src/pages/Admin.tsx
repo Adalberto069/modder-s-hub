@@ -567,6 +567,69 @@ export default function Admin() {
               </CardContent>
             </Card>
           </TabsContent>
+
+          {/* Leak Tracker Tab */}
+          <TabsContent value="leaks">
+            <Card className="neon-border bg-card/80">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <AlertTriangle className="h-5 w-5 text-destructive" /> Rastrear Vazamentos
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <p className="text-sm text-muted-foreground">
+                  Cole o código ofuscado vazado abaixo. O sistema extrairá o watermark embutido e identificará o comprador responsável.
+                </p>
+                <Textarea
+                  placeholder="Cole aqui o código Lua ofuscado encontrado..."
+                  value={leakCode}
+                  onChange={(e) => setLeakCode(e.target.value)}
+                  rows={8}
+                  className="font-mono text-xs"
+                />
+                <Button onClick={extractWatermark} disabled={leakSearching} className="neon-glow-purple">
+                  <Search className="h-4 w-4 mr-2" />
+                  {leakSearching ? "Buscando..." : "Extrair Watermark"}
+                </Button>
+
+                {leakError && (
+                  <div className="p-3 rounded-lg bg-destructive/10 border border-destructive/30 text-destructive text-sm">
+                    {leakError}
+                  </div>
+                )}
+
+                {leakResult && (
+                  <div className="p-4 rounded-lg bg-secondary/30 border border-primary/30 space-y-2">
+                    <h4 className="font-bold text-sm flex items-center gap-2">
+                      <Shield className="h-4 w-4 text-primary" /> Comprador Identificado
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+                      <div>
+                        <span className="text-muted-foreground">User ID:</span>
+                        <p className="font-mono text-xs break-all">{leakResult.userId}</p>
+                      </div>
+                      {leakResult.username && (
+                        <div>
+                          <span className="text-muted-foreground">Usuário:</span>
+                          <p className="font-semibold">{leakResult.displayName || leakResult.username}</p>
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex gap-2 mt-3">
+                      <Button size="sm" variant="outline" onClick={() => { navigator.clipboard.writeText(leakResult.userId); toast.success("User ID copiado!"); }}>
+                        <Copy className="h-3 w-3 mr-1" /> Copiar ID
+                      </Button>
+                      {leakResult.username && (
+                        <Button size="sm" variant="outline" onClick={() => navigate(`/modder/${leakResult.username}`)}>
+                          <Eye className="h-3 w-3 mr-1" /> Ver Perfil
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
         </Tabs>
 
         {/* Moderation Queue */}
