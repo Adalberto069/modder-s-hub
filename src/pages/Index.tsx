@@ -90,22 +90,22 @@ export default function Index() {
   return (
     <Layout>
       {/* ══════════════ HERO ══════════════ */}
-      <section className="relative min-h-[90vh] flex items-center overflow-hidden">
+      <section className="relative min-h-[85vh] sm:min-h-[90vh] flex items-center overflow-hidden">
         {/* Background image + overlays */}
         <div className="absolute inset-0">
           <img src={heroBg} alt="" className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-background/70" />
+          <div className="absolute inset-0 bg-background/75 sm:bg-background/70" />
           <div className="absolute inset-0 bg-grid-pattern" />
           <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent" />
         </div>
 
-        {/* Animated orbs */}
-        <div className="absolute top-20 left-10 w-72 h-72 bg-primary/20 rounded-full blur-[120px] animate-pulse-neon" />
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-accent/15 rounded-full blur-[150px] animate-pulse-neon" />
+        {/* Animated orbs - smaller on mobile */}
+        <div className="absolute top-20 left-4 sm:left-10 w-40 sm:w-72 h-40 sm:h-72 bg-primary/20 rounded-full blur-[80px] sm:blur-[120px] animate-pulse-neon" />
+        <div className="absolute bottom-20 right-4 sm:right-10 w-52 sm:w-96 h-52 sm:h-96 bg-accent/15 rounded-full blur-[100px] sm:blur-[150px] animate-pulse-neon" />
 
-        <div className="container relative z-10 py-20">
+        <div className="container relative z-10 py-12 sm:py-20 px-4 sm:px-6">
           <motion.div
-            className="max-w-3xl"
+            className="max-w-3xl mx-auto sm:mx-0"
             initial="hidden"
             animate="visible"
             variants={stagger}
@@ -119,27 +119,27 @@ export default function Index() {
             <motion.h1
               variants={fadeUp}
               custom={1}
-              className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1] mb-6"
+              className="text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1] mb-5 sm:mb-6"
             >
               Scripts exclusivos para{" "}
               <span className="text-neon-purple">Game Guardian</span>
-              <br />
+              <span className="hidden sm:inline"><br /></span>{" "}
               <span className="text-neon-green">seguros, ofuscados</span> e com licenças únicas
             </motion.h1>
 
             <motion.p
               variants={fadeUp}
               custom={2}
-              className="text-lg sm:text-xl text-muted-foreground max-w-xl mb-10 leading-relaxed"
+              className="text-base sm:text-xl text-muted-foreground max-w-xl mb-8 sm:mb-10 leading-relaxed"
             >
               Baixe hoje e proteja suas criações. Marketplace profissional com sistema de licenças, 
               ofuscação avançada e suporte dedicado.
             </motion.p>
 
-            <motion.div variants={fadeUp} custom={3} className="flex flex-col sm:flex-row gap-4">
+            <motion.div variants={fadeUp} custom={3} className="flex flex-col sm:flex-row gap-3 sm:gap-4">
               <Button
                 size="lg"
-                className="neon-glow-purple font-semibold text-base h-13 px-8"
+                className="neon-glow-purple font-semibold text-base h-12 sm:h-13 px-6 sm:px-8 w-full sm:w-auto"
                 onClick={() => navigate("/marketplace")}
               >
                 <Store className="mr-2 h-5 w-5" /> Ver Scripts
@@ -147,7 +147,7 @@ export default function Index() {
               <Button
                 size="lg"
                 variant="outline"
-                className="neon-border font-semibold text-base h-13 px-8 hover:bg-primary/10"
+                className="neon-border font-semibold text-base h-12 sm:h-13 px-6 sm:px-8 hover:bg-primary/10 w-full sm:w-auto"
                 onClick={() => navigate("/dashboard")}
               >
                 Painel do Usuário <ArrowRight className="ml-2 h-4 w-4" />
@@ -155,19 +155,19 @@ export default function Index() {
             </motion.div>
 
             {/* Quick stats */}
-            <motion.div variants={fadeUp} custom={4} className="flex gap-8 mt-14">
+            <motion.div variants={fadeUp} custom={4} className="flex flex-wrap gap-4 sm:gap-8 mt-10 sm:mt-14">
               {[
                 { icon: Code, value: stats?.scripts ?? 0, label: "Scripts" },
                 { icon: Users, value: stats?.users ?? 0, label: "Usuários" },
                 { icon: Download, value: stats?.downloads ?? 0, label: "Downloads" },
               ].map((stat) => (
-                <div key={stat.label} className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center">
-                    <stat.icon className="h-5 w-5 text-primary" />
+                <div key={stat.label} className="flex items-center gap-2 sm:gap-3">
+                  <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center">
+                    <stat.icon className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                   </div>
                   <div>
-                    <p className="text-xl font-bold font-mono">{stat.value.toLocaleString("pt-BR")}</p>
-                    <p className="text-xs text-muted-foreground">{stat.label}</p>
+                    <p className="text-lg sm:text-xl font-bold font-mono">{stat.value.toLocaleString("pt-BR")}</p>
+                    <p className="text-[10px] sm:text-xs text-muted-foreground">{stat.label}</p>
                   </div>
                 </div>
               ))}
@@ -177,11 +177,11 @@ export default function Index() {
       </section>
 
       {/* ══════════════ BENEFITS ══════════════ */}
-      <section className="relative py-24 overflow-hidden">
+      <section className="relative py-14 sm:py-24 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-background via-card/30 to-background" />
         <div className="container relative z-10">
           <motion.div
-            className="text-center mb-16"
+            className="text-center mb-10 sm:mb-16"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -238,7 +238,7 @@ export default function Index() {
                 <Card
                   className={`${benefit.border} ${benefit.bg} h-full group hover:${benefit.glow} transition-all duration-300 cursor-default`}
                 >
-                  <CardContent className="p-8 space-y-4">
+                  <CardContent className="p-5 sm:p-8 space-y-4">
                     <div
                       className={`h-14 w-14 rounded-xl ${benefit.bg} border ${benefit.border} flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}
                     >
@@ -255,7 +255,7 @@ export default function Index() {
       </section>
 
       {/* ══════════════ MARKETPLACE HIGHLIGHTS ══════════════ */}
-      <section className="py-24">
+      <section className="py-14 sm:py-24">
         <div className="container">
           <motion.div
             className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-10 gap-4"
@@ -323,7 +323,7 @@ export default function Index() {
       </section>
 
       {/* ══════════════ TESTIMONIALS ══════════════ */}
-      <section className="relative py-24 overflow-hidden">
+      <section className="relative py-14 sm:py-24 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-background via-card/20 to-background" />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full blur-[200px]" />
 
@@ -379,7 +379,7 @@ export default function Index() {
       </section>
 
       {/* ══════════════ CTA FINAL ══════════════ */}
-      <section className="py-24">
+      <section className="py-14 sm:py-24">
         <div className="container">
           <motion.div
             className="relative rounded-2xl overflow-hidden neon-border"
@@ -391,7 +391,7 @@ export default function Index() {
             <div className="absolute inset-0 bg-gradient-to-br from-primary/15 via-card to-accent/10" />
             <div className="absolute inset-0 bg-grid-pattern opacity-50" />
 
-            <div className="relative z-10 px-8 py-16 sm:px-16 sm:py-20 text-center">
+            <div className="relative z-10 px-5 py-12 sm:px-16 sm:py-20 text-center">
               <h2 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4">
                 Pronto para começar?
               </h2>

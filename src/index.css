@@ -57,9 +57,15 @@
     @apply border-border;
   }
 
+  html {
+    overflow-x: hidden;
+  }
+
   body {
     @apply bg-background text-foreground font-sans;
     font-family: 'Space Grotesk', sans-serif;
+    overflow-x: hidden;
+    -webkit-tap-highlight-color: transparent;
   }
 
   code, pre, .font-mono {

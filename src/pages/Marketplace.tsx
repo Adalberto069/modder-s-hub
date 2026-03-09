@@ -82,8 +82,8 @@ export default function Marketplace() {
 
   return (
     <Layout>
-      <div className="container py-8">
-        <h1 className="text-3xl font-bold mb-6">Marketplace</h1>
+      <div className="container py-6 sm:py-8 px-4 sm:px-6">
+        <h1 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6">Marketplace</h1>
 
         {/* Tabs Scripts / APKs */}
         <Tabs value={activeTab} onValueChange={handleTabChange} className="mb-6">
@@ -109,7 +109,7 @@ export default function Marketplace() {
         </div>
 
         {/* Filters */}
-        <div className="flex flex-wrap gap-2 mb-6">
+        <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-4 sm:mb-6">
           <Badge
             variant={activeCategory === "all" ? "default" : "outline"}
             className="cursor-pointer"

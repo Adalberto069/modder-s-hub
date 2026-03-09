@@ -206,10 +206,10 @@ end
   return (
     <Layout>
       <div className="container py-8">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold">Dashboard</h1>
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6">
+          <h1 className="text-xl sm:text-2xl font-bold">Dashboard</h1>
           {isModder && (
-            <Button onClick={() => navigate("/script/new")} className="neon-glow-purple">
+            <Button onClick={() => navigate("/script/new")} className="neon-glow-purple w-full sm:w-auto">
               <Plus className="mr-2 h-4 w-4" /> Novo Conteúdo
             </Button>
           )}
@@ -251,12 +251,12 @@ end
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className={`mb-6 grid w-full ${isModder ? "grid-cols-2" : "grid-cols-1"}`}>
-            <TabsTrigger value="purchases" className="gap-2">
-              <ShoppingBag className="h-4 w-4" /> Meus Scripts Comprados
+            <TabsTrigger value="purchases" className="gap-1.5 text-xs sm:text-sm">
+              <ShoppingBag className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> <span className="hidden sm:inline">Meus </span>Scripts Comprados
             </TabsTrigger>
             {isModder && (
-              <TabsTrigger value="my-scripts" className="gap-2">
-                <Code className="h-4 w-4" /> Minhas Publicações
+              <TabsTrigger value="my-scripts" className="gap-1.5 text-xs sm:text-sm">
+                <Code className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> <span className="hidden sm:inline">Minhas </span>Publicações
               </TabsTrigger>
             )}
           </TabsList>
@@ -461,7 +461,7 @@ end
               <div className="space-y-3">
                 {myScripts?.map((script: any) => (
                   <Card key={script.id} className={`neon-border bg-card/80 ${!script.is_active ? 'opacity-60' : ''}`}>
-                    <CardContent className="p-4 flex items-center justify-between">
+                    <CardContent className="p-3 sm:p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                       <div>
                         <div className="flex items-center gap-2 mb-1">
                           {script.script_type === "apk" ? (
@@ -473,12 +473,12 @@ end
                           {script.is_paid && <Badge variant="secondary" className="text-[10px]">R$ {Number(script.price).toFixed(2)}</Badge>}
                           {!script.is_active && <Badge variant="destructive" className="text-[10px]">Inativo</Badge>}
                         </div>
-                        <div className="flex gap-3 text-xs text-muted-foreground mt-1">
-                          <span>{script.categories?.name}</span>
-                          <span>{script.download_count} downloads</span>
-                          <Badge variant="outline" className="text-[10px]">{script.status}</Badge>
-                          <Badge variant="secondary" className="text-[10px]">{script.script_type === "apk" ? "APK" : "Script"}</Badge>
-                        </div>
+                         <div className="flex flex-wrap gap-2 sm:gap-3 text-xs text-muted-foreground mt-1">
+                           <span>{script.categories?.name}</span>
+                           <span>{script.download_count} downloads</span>
+                           <Badge variant="outline" className="text-[10px]">{script.status}</Badge>
+                           <Badge variant="secondary" className="text-[10px]">{script.script_type === "apk" ? "APK" : "Script"}</Badge>
+                         </div>
                       </div>
                       <div className="flex gap-1">
                         <Button variant="ghost" size="icon" onClick={() => navigate(`/script/${script.id}/edit`)}>
