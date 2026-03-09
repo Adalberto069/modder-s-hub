@@ -741,7 +741,7 @@ end
                       )
                     ) : !purchaseSuccess ? (
                       scriptIsActive ? (
-                        <Button className="w-full neon-glow-purple" onClick={handlePurchase} disabled={purchasing}>
+                        <Button className="w-full neon-glow-purple" onClick={() => handlePurchase(false)} disabled={purchasing}>
                           <ShoppingCart className="mr-2 h-4 w-4" />
                           {purchasing ? "Processando..." : "Comprar Script"}
                         </Button>
