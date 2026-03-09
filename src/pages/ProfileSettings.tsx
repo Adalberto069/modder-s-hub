@@ -59,7 +59,7 @@ function PasswordField({
 }
 
 export default function ProfileSettings() {
-  const { user, profile, loading } = useAuth();
+  const { user, profile, loading, isModder } = useAuth();
   const isOAuthUser = user?.app_metadata?.provider && user.app_metadata.provider !== "email";
   const [saving, setSaving] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
