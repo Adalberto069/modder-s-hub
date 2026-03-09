@@ -461,7 +461,7 @@ end
               <div className="space-y-3">
                 {myScripts?.map((script: any) => (
                   <Card key={script.id} className={`neon-border bg-card/80 ${!script.is_active ? 'opacity-60' : ''}`}>
-                    <CardContent className="p-4 flex items-center justify-between">
+                    <CardContent className="p-3 sm:p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                       <div>
                         <div className="flex items-center gap-2 mb-1">
                           {script.script_type === "apk" ? (
