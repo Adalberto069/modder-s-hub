@@ -489,15 +489,6 @@ end
                     </Badge>
                   )}
                   <Badge variant="outline" className={st.className}>{st.label}</Badge>
-                  {!isOwner && (
-                    <button
-                      onClick={() => setShowReport(true)}
-                      className="text-muted-foreground hover:text-destructive transition-colors"
-                      title="Denunciar script"
-                    >
-                      <Flag className="h-4 w-4" />
-                    </button>
-                  )}
                 </div>
               </div>
 
