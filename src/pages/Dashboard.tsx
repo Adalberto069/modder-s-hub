@@ -473,12 +473,12 @@ end
                           {script.is_paid && <Badge variant="secondary" className="text-[10px]">R$ {Number(script.price).toFixed(2)}</Badge>}
                           {!script.is_active && <Badge variant="destructive" className="text-[10px]">Inativo</Badge>}
                         </div>
-                        <div className="flex gap-3 text-xs text-muted-foreground mt-1">
-                          <span>{script.categories?.name}</span>
-                          <span>{script.download_count} downloads</span>
-                          <Badge variant="outline" className="text-[10px]">{script.status}</Badge>
-                          <Badge variant="secondary" className="text-[10px]">{script.script_type === "apk" ? "APK" : "Script"}</Badge>
-                        </div>
+                         <div className="flex flex-wrap gap-2 sm:gap-3 text-xs text-muted-foreground mt-1">
+                           <span>{script.categories?.name}</span>
+                           <span>{script.download_count} downloads</span>
+                           <Badge variant="outline" className="text-[10px]">{script.status}</Badge>
+                           <Badge variant="secondary" className="text-[10px]">{script.script_type === "apk" ? "APK" : "Script"}</Badge>
+                         </div>
                       </div>
                       <div className="flex gap-1">
                         <Button variant="ghost" size="icon" onClick={() => navigate(`/script/${script.id}/edit`)}>
