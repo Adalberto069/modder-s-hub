@@ -3,7 +3,7 @@ import { Layout } from "@/components/layout/Layout";
 import { ScriptCard } from "@/components/ScriptCard";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
-import { User, Download, Star, Trophy, Calendar, Code, BookOpen, Info } from "lucide-react";
+import { User, Download, Star, Trophy, Calendar, Code, BookOpen, Info, ShieldAlert } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -150,6 +150,14 @@ export default function ModderProfile() {
             <StatItem icon={<Star className="h-4 w-4" />} value={avgRating.toFixed(1)} label="Média" color="text-[hsl(var(--neon-cyan))]" />
             <StatItem icon={<Trophy className="h-4 w-4" />} value={profile.reputation_score} label="Reputação" color="text-[hsl(var(--neon-pink))]" />
           </div>
+        </div>
+
+        {/* Transaction warning */}
+        <div className="flex items-start gap-3 rounded-lg border border-border bg-secondary/40 p-4">
+          <ShieldAlert className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
+          <p className="text-sm text-muted-foreground">
+            <span className="font-semibold text-foreground">Aviso:</span> Todas as transações devem ser realizadas exclusivamente pela plataforma. Negociações externas não possuem garantia nem suporte.
+          </p>
         </div>
 
         {/* Tabs */}
