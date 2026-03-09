@@ -15,12 +15,11 @@ import { useAuth } from "@/lib/auth";
 import {
   Download, Star, ExternalLink, ArrowLeft, User, ShieldCheck, ShieldAlert, ShieldX,
   ChevronLeft, ChevronRight, Play, MessageSquare, Lock, CheckCircle, Clock,
-  Copy, Check, Gamepad2, Tag, List, BookOpen, FileCode, ShoppingCart, Key, Flag,
+  Copy, Check, Gamepad2, Tag, List, BookOpen, FileCode, ShoppingCart, Key,
 } from "lucide-react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import { LoginPromptDialog } from "@/components/LoginPromptDialog";
-import { ReportDialog } from "@/components/ReportDialog";
 
 const statusConfig: Record<string, { label: string; className: string }> = {
   working: { label: "Working", className: "bg-accent/20 text-accent border-accent/30" },
