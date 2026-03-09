@@ -218,6 +218,49 @@ export default function Admin() {
     queryClient.invalidateQueries({ queryKey: ["admin-licenses"] });
   };
 
+  // Leak tracker: extract watermark from obfuscated code
+  const extractWatermark = async () => {
+    setLeakResult(null);
+    setLeakError("");
+    if (!leakCode.trim()) { setLeakError("Cole o código ofuscado acima."); return; }
+
+    // The watermark is a hex-encoded user_id stored in a local variable assignment at the top
+    // Pattern: local _varname="hexstring"
+    const match = leakCode.match(/local\s+\w+\s*=\s*"([0-9a-f]{32,})"/);
+    if (!match) { setLeakError("Nenhum watermark encontrado. O código pode não ter sido ofuscado pelo marketplace."); return; }
+
+    const hex = match[1];
+    // Decode hex to string (UUID)
+    let userId = "";
+    try {
+      for (let i = 0; i < hex.length; i += 2) {
+        userId += String.fromCharCode(parseInt(hex.substring(i, i + 2), 16));
+      }
+    } catch {
+      setLeakError("Watermark encontrado mas não pôde ser decodificado."); return;
+    }
+
+    if (!userId || userId.length < 30) { setLeakError("Watermark decodificado inválido: " + userId); return; }
+
+    setLeakSearching(true);
+    try {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("username, display_name, user_id")
+        .eq("user_id", userId)
+        .single();
+
+      setLeakResult({
+        userId,
+        username: profile?.username,
+        displayName: profile?.display_name ?? undefined,
+      });
+    } catch {
+      setLeakResult({ userId });
+    }
+    setLeakSearching(false);
+  };
+
   const pendingReview = allScripts?.filter((s: any) => s.publish_status === "pending_review") ?? [];
   const published = allScripts?.filter((s: any) => s.publish_status === "published" || !s.publish_status) ?? [];
   const drafts = allScripts?.filter((s: any) => s.publish_status === "draft") ?? [];
