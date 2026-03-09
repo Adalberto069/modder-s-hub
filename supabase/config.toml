@@ -9,11 +9,3 @@ verify_jwt = false
 [functions.check-expiring-licenses]
 verify_jwt = false
 
-[functions.create-pix-payment]
-verify_jwt = false
-
-[functions.mercadopago-webhook]
-verify_jwt = false
-
-[functions.check-pix-payment]
-verify_jwt = false

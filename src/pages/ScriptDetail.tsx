@@ -123,8 +123,6 @@ export default function ScriptDetail() {
   const [purchasing, setPurchasing] = useState(false);
   const [purchaseSuccess, setPurchaseSuccess] = useState<string | null>(null);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
-  const [pixData, setPixData] = useState<{ init_point: string; sandbox_init_point?: string; purchase_id: string } | null>(null);
-  const [checkingPayment, setCheckingPayment] = useState(false);
 
   const { data: script } = useQuery({
     queryKey: ["script", id],
@@ -214,59 +212,7 @@ export default function ScriptDetail() {
   const handlePurchase = async () => {
     if (!user) { setShowLoginPrompt(true); return; }
     if (!script) return;
-    setPurchasing(true);
-
-    try {
-      const { data, error } = await supabase.functions.invoke("create-pix-payment", {
-        body: { script_id: script.id },
-      });
-
-      if (error) throw new Error(error.message || "Erro ao criar pagamento");
-      if (data?.error) throw new Error(data.error);
-
-      // Use sandbox_init_point for test, init_point for production
-      const paymentUrl = data.sandbox_init_point || data.init_point;
-
-      setPixData({
-        init_point: data.init_point,
-        sandbox_init_point: data.sandbox_init_point,
-        purchase_id: data.purchase_id,
-      });
-
-      // Open Mercado Pago checkout in new tab
-      window.open(paymentUrl, "_blank");
-      toast.success("Checkout do Mercado Pago aberto! Complete o pagamento lá.");
-    } catch (err: any) {
-      toast.error("Erro na compra: " + err.message);
-    } finally {
-      setPurchasing(false);
-    }
-  };
-
-  // Poll for payment confirmation via edge function
-  const handleCheckPayment = async () => {
-    if (!pixData || !user) return;
-    setCheckingPayment(true);
-    try {
-      const { data, error } = await supabase.functions.invoke("check-pix-payment", {
-        body: { purchase_id: pixData.purchase_id },
-      });
-
-      if (error) throw new Error(error.message);
-
-      if (data?.status === "approved" && data?.license_key) {
-        setPurchaseSuccess(data.license_key);
-        setPixData(null);
-        toast.success("Pagamento confirmado! 🎉");
-        queryClient.invalidateQueries({ queryKey: ["script-license", id, user.id] });
-      } else {
-        toast.info("Pagamento ainda não confirmado. Aguarde alguns segundos após pagar.");
-      }
-    } catch {
-      toast.error("Erro ao verificar pagamento");
-    } finally {
-      setCheckingPayment(false);
-    }
+    toast.info("Sistema de pagamento em implementação. Em breve via Stripe!");
   };
 
   const handleRenew = async () => {
@@ -757,39 +703,8 @@ end
                       </Card>
                     )}
 
-                    {/* Payment pending - checkout opened */}
-                    {pixData && !purchaseSuccess && (
-                      <Card className="border-primary/30 bg-primary/5">
-                        <CardContent className="p-4 space-y-3">
-                          <div className="text-center">
-                            <p className="text-sm font-semibold text-primary mb-2">💳 Pagamento em andamento</p>
-                            <p className="text-[11px] text-muted-foreground">
-                              Complete o pagamento na página do Mercado Pago que foi aberta.
-                            </p>
-                          </div>
-                          <Button
-                            className="w-full"
-                            variant="outline"
-                            onClick={() => window.open(pixData.sandbox_init_point || pixData.init_point, "_blank")}
-                          >
-                            <ExternalLink className="mr-2 h-4 w-4" />
-                            Abrir checkout novamente
-                          </Button>
-                          <Button className="w-full neon-glow-green" onClick={handleCheckPayment} disabled={checkingPayment}>
-                            <CheckCircle className="mr-2 h-4 w-4" />
-                            {checkingPayment ? "Verificando..." : "Já paguei, verificar"}
-                          </Button>
-                          <Button variant="ghost" size="sm" className="w-full text-muted-foreground" onClick={() => setPixData(null)}>
-                            Cancelar
-                          </Button>
-                          <p className="text-[10px] text-muted-foreground text-center">
-                            Após o pagamento, clique em "Já paguei" para liberar sua licença
-                          </p>
-                        </CardContent>
-                      </Card>
-                    )}
 
-                    {!purchaseSuccess && !pixData && existingLicense ? (
+                    {!purchaseSuccess && existingLicense ? (
                       isLicenseExpired ? (
                         <div className="space-y-2">
                           <div className="p-3 rounded-lg bg-destructive/10 border border-destructive/20 text-center">
@@ -848,11 +763,11 @@ end
                           </Button>
                         </div>
                       )
-                    ) : !purchaseSuccess && !pixData ? (
+                    ) : !purchaseSuccess ? (
                       scriptIsActive ? (
                         <Button className="w-full neon-glow-purple" onClick={handlePurchase} disabled={purchasing}>
                           <ShoppingCart className="mr-2 h-4 w-4" />
-                          {purchasing ? "Gerando PIX..." : "Comprar Script"}
+                          {purchasing ? "Processando..." : "Comprar Script"}
                         </Button>
                       ) : (
                         <div className="text-center p-3 rounded-lg bg-destructive/10 border border-destructive/20">
