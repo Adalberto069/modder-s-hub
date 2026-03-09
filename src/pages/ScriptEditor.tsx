@@ -261,7 +261,7 @@ export default function ScriptEditor() {
       tags,
       lua_code: luaCode || null,
       related_tutorial_id: relatedTutorialId && relatedTutorialId !== "none" ? relatedTutorialId : null,
-      license_duration_days: isPaid && !licensePermanent && licenseDurationDays ? parseInt(licenseDurationDays) : null,
+      license_duration_days: isPaid && licenseType !== "permanent" ? (licenseType === "weekly" ? 7 : 30) : null,
     };
 
     // Block license changes if script has purchases (unless admin)
