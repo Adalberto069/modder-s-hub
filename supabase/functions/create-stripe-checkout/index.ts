@@ -1,4 +1,6 @@
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import Stripe from "https://esm.sh/stripe@18.5.0";
+import { createClient } from "npm:@supabase/supabase-js@2.57.2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -6,7 +8,7 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-Deno.serve(async (req) => {
+serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
@@ -20,21 +22,21 @@ Deno.serve(async (req) => {
       });
     }
 
-    const supabase = createClient(
+    const supabaseClient = createClient(
       Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_ANON_KEY")!,
-      { global: { headers: { Authorization: authHeader } } }
+      Deno.env.get("SUPABASE_ANON_KEY")!
     );
 
     const token = authHeader.replace("Bearer ", "");
-    const { data: claimsData, error: claimsError } = await supabase.auth.getClaims(token);
-    if (claimsError || !claimsData?.claims) {
+    const { data: userData, error: userError } = await supabaseClient.auth.getUser(token);
+    if (userError || !userData.user) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-    const userId = claimsData.claims.sub as string;
+    const user = userData.user;
+    const userId = user.id;
 
     const { script_id, is_renewal } = await req.json();
     if (!script_id) {
@@ -44,8 +46,13 @@ Deno.serve(async (req) => {
       });
     }
 
+    const serviceClient = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+    );
+
     // Fetch script details
-    const { data: script, error: scriptError } = await supabase
+    const { data: script, error: scriptError } = await serviceClient
       .from("scripts")
       .select("id, title, price, is_paid, license_duration_days, modder_id")
       .eq("id", script_id)
@@ -71,11 +78,6 @@ Deno.serve(async (req) => {
     const modderEarnings = Math.round((amount - platformCommission) * 100) / 100;
 
     // Create pending purchase record
-    const serviceClient = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
-    );
-
     const { data: purchase, error: purchaseError } = await serviceClient
       .from("purchases")
       .insert({
@@ -98,18 +100,19 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Create Stripe Checkout Session
-    const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
-    if (!stripeKey) {
-      return new Response(JSON.stringify({ error: "Stripe not configured" }), {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+    // Initialize Stripe
+    const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY")!, {
+      apiVersion: "2025-08-27.basil",
+    });
+
+    // Check if customer exists
+    const customers = await stripe.customers.list({ email: user.email!, limit: 1 });
+    let customerId: string | undefined;
+    if (customers.data.length > 0) {
+      customerId = customers.data[0].id;
     }
 
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const origin = req.headers.get("origin") || "https://lovable.dev";
-
     const licenseDuration = script.license_duration_days;
     const licenseLabel = licenseDuration
       ? licenseDuration === 7
@@ -117,42 +120,34 @@ Deno.serve(async (req) => {
         : `Licença ${licenseDuration} dias`
       : "Licença Permanente";
 
-    const body = new URLSearchParams({
-      "payment_method_types[]": "card",
+    const session = await stripe.checkout.sessions.create({
+      customer: customerId,
+      customer_email: customerId ? undefined : user.email!,
+      line_items: [
+        {
+          price_data: {
+            currency: "brl",
+            unit_amount: Math.round(amount * 100),
+            product_data: {
+              name: script.title,
+              description: licenseLabel,
+            },
+          },
+          quantity: 1,
+        },
+      ],
       mode: "payment",
-      "line_items[0][price_data][currency]": "brl",
-      "line_items[0][price_data][unit_amount]": String(Math.round(amount * 100)),
-      "line_items[0][price_data][product_data][name]": script.title,
-      "line_items[0][price_data][product_data][description]": licenseLabel,
-      "line_items[0][quantity]": "1",
       success_url: `${origin}/script/${script.id}?payment=success&purchase_id=${purchase.id}`,
       cancel_url: `${origin}/script/${script.id}?payment=cancelled`,
-      "metadata[purchase_id]": purchase.id,
-      "metadata[script_id]": script.id,
-      "metadata[user_id]": userId,
-      "metadata[is_renewal]": is_renewal ? "true" : "false",
-    });
-
-    const stripeResponse = await fetch("https://api.stripe.com/v1/checkout/sessions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${stripeKey}`,
-        "Content-Type": "application/x-www-form-urlencoded",
+      metadata: {
+        purchase_id: purchase.id,
+        script_id: script.id,
+        user_id: userId,
+        is_renewal: is_renewal ? "true" : "false",
       },
-      body: body.toString(),
     });
 
-    const session = await stripeResponse.json();
-
-    if (!stripeResponse.ok) {
-      console.error("Stripe error:", session);
-      return new Response(JSON.stringify({ error: "Failed to create checkout", details: session.error?.message }), {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    // Save payment_id
+    // Save stripe session id
     await serviceClient
       .from("purchases")
       .update({ payment_id: session.id })
