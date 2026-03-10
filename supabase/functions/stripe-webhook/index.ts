@@ -1,4 +1,6 @@
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import Stripe from "https://esm.sh/stripe@18.5.0";
+import { createClient } from "npm:@supabase/supabase-js@2.57.2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -6,7 +8,7 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, stripe-signature, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-Deno.serve(async (req) => {
+serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
@@ -14,9 +16,6 @@ Deno.serve(async (req) => {
   try {
     const body = await req.text();
     const event = JSON.parse(body);
-
-    // For production, you should verify the Stripe signature
-    // const sig = req.headers.get("stripe-signature");
 
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL")!,
@@ -31,7 +30,7 @@ Deno.serve(async (req) => {
       const isRenewal = session.metadata?.is_renewal === "true";
 
       if (!purchaseId || !scriptId || !userId) {
-        console.error("Missing metadata in session:", session.metadata);
+        console.error("Missing metadata:", session.metadata);
         return new Response(JSON.stringify({ received: true }), {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
@@ -53,7 +52,6 @@ Deno.serve(async (req) => {
       const durationDays = script?.license_duration_days;
 
       if (isRenewal) {
-        // Find existing license and extend
         const { data: existingLicense } = await supabase
           .from("licenses")
           .select("*")
@@ -99,7 +97,6 @@ Deno.serve(async (req) => {
           expires_at: expiresAt,
         });
 
-        // Grant script access
         await supabase.from("script_access").insert({
           user_id: userId,
           script_id: scriptId,
