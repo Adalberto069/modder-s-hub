@@ -121,6 +121,7 @@ serve(async (req) => {
       : "Licença Permanente";
 
     const session = await stripe.checkout.sessions.create({
+      payment_method_types: ["card"],
       customer: customerId,
       customer_email: customerId ? undefined : user.email!,
       line_items: [
