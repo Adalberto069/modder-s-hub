@@ -125,37 +125,7 @@ export default function ScriptDetail() {
   const [purchaseSuccess, setPurchaseSuccess] = useState<string | null>(null);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
 
-  // Handle Stripe payment success redirect
-  useEffect(() => {
-    const payment = searchParams.get("payment");
-    const purchaseId = searchParams.get("purchase_id");
-    if (payment === "success" && purchaseId && user) {
-      // Verify payment and get license
-      const verifyPayment = async () => {
-        try {
-          const { data, error } = await supabase.functions.invoke("verify-payment", {
-            body: { purchase_id: purchaseId },
-          });
-          if (error) throw error;
-          if (data?.license_key) {
-            setPurchaseSuccess(data.license_key);
-            toast.success("Pagamento confirmado! Licença ativada.");
-          } else if (data?.status === "pending") {
-            toast.info("Pagamento sendo processado. Aguarde alguns instantes e recarregue a página.");
-          }
-        } catch (err) {
-          toast.success("Pagamento realizado! Sua licença será ativada em instantes.");
-        }
-        queryClient.invalidateQueries({ queryKey: ["script-license", id, user?.id] });
-        queryClient.invalidateQueries({ queryKey: ["my-licenses"] });
-      };
-      verifyPayment();
-      setSearchParams({}, { replace: true });
-    } else if (payment === "cancelled") {
-      toast.info("Pagamento cancelado.");
-      setSearchParams({}, { replace: true });
-    }
-  }, [searchParams, user]);
+  // TODO: Implementar novo sistema de pagamento
 
   const { data: script } = useQuery({
     queryKey: ["script", id],
