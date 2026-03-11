@@ -124,8 +124,53 @@ export default function ScriptDetail() {
   const [purchasing, setPurchasing] = useState(false);
   const [purchaseSuccess, setPurchaseSuccess] = useState<string | null>(null);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
+  const [pixData, setPixData] = useState<{
+    purchase_id: string;
+    qr_code: string | null;
+    qr_code_base64: string | null;
+  } | null>(null);
+  const [pixPolling, setPixPolling] = useState(false);
+  const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // TODO: Implementar novo sistema de pagamento
+  // Cleanup polling on unmount
+  useEffect(() => {
+    return () => {
+      if (pollingRef.current) clearInterval(pollingRef.current);
+    };
+  }, []);
+
+  // Poll PIX payment status
+  const startPolling = useCallback((purchaseId: string) => {
+    if (pollingRef.current) clearInterval(pollingRef.current);
+    setPixPolling(true);
+
+    pollingRef.current = setInterval(async () => {
+      try {
+        const { data, error } = await supabase.functions.invoke("check-pix-payment", {
+          body: { purchase_id: purchaseId },
+        });
+        if (error) return;
+        if (data?.status === "completed" && data?.license_key) {
+          if (pollingRef.current) clearInterval(pollingRef.current);
+          setPixPolling(false);
+          setPixData(null);
+          setPurchaseSuccess(data.license_key);
+          setPurchasing(false);
+          toast.success("Pagamento PIX confirmado! Licença ativada.");
+          queryClient.invalidateQueries({ queryKey: ["script-license", id, user?.id] });
+          queryClient.invalidateQueries({ queryKey: ["my-licenses"] });
+        } else if (data?.status === "rejected" || data?.status === "cancelled") {
+          if (pollingRef.current) clearInterval(pollingRef.current);
+          setPixPolling(false);
+          setPixData(null);
+          setPurchasing(false);
+          toast.error("Pagamento PIX foi rejeitado ou cancelado.");
+        }
+      } catch {
+        // continue polling
+      }
+    }, 5000); // Poll every 5 seconds
+  }, [id, user?.id, queryClient]);
 
   const { data: script } = useQuery({
     queryKey: ["script", id],
