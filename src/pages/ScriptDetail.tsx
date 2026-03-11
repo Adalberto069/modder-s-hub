@@ -842,6 +842,71 @@ end
         </div>
       </div>
       <LoginPromptDialog open={showLoginPrompt} onOpenChange={setShowLoginPrompt} />
+
+      {/* PIX QR Code Modal */}
+      {pixData && (
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4" onClick={() => {}}>
+          <Card className="w-full max-w-sm bg-card border-primary/30">
+            <CardHeader className="text-center pb-2">
+              <CardTitle className="text-lg">Pagar com PIX</CardTitle>
+              <p className="text-xs text-muted-foreground">Escaneie o QR Code ou copie o código</p>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {pixData.qr_code_base64 && (
+                <div className="flex justify-center">
+                  <img
+                    src={`data:image/png;base64,${pixData.qr_code_base64}`}
+                    alt="QR Code PIX"
+                    className="w-48 h-48 rounded-lg"
+                  />
+                </div>
+              )}
+
+              {pixData.qr_code && (
+                <div className="space-y-2">
+                  <p className="text-[10px] text-muted-foreground text-center">Código PIX (Copia e Cola):</p>
+                  <div className="flex items-center gap-2 bg-secondary/50 rounded p-2">
+                    <code className="text-[10px] font-mono text-foreground flex-1 break-all line-clamp-3">
+                      {pixData.qr_code}
+                    </code>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-7 w-7 p-0 shrink-0"
+                      onClick={() => {
+                        navigator.clipboard.writeText(pixData.qr_code!);
+                        toast.success("Código PIX copiado!");
+                      }}
+                    >
+                      <Copy className="h-3 w-3" />
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              {pixPolling && (
+                <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+                  <div className="h-4 w-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                  Aguardando pagamento...
+                </div>
+              )}
+
+              <Button
+                variant="outline"
+                className="w-full"
+                onClick={() => {
+                  if (pollingRef.current) clearInterval(pollingRef.current);
+                  setPixPolling(false);
+                  setPixData(null);
+                  setPurchasing(false);
+                }}
+              >
+                Cancelar
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </Layout>
   );
 }
