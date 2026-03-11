@@ -9,12 +9,9 @@ verify_jwt = false
 [functions.check-expiring-licenses]
 verify_jwt = false
 
-[functions.create-stripe-checkout]
+[functions.create-pix-payment]
 verify_jwt = false
 
-[functions.stripe-webhook]
-verify_jwt = false
-
-[functions.verify-payment]
+[functions.check-pix-payment]
 verify_jwt = false
 

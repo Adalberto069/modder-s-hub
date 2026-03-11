@@ -1,5 +1,3 @@
-import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import Stripe from "https://esm.sh/stripe@18.5.0";
 import { createClient } from "npm:@supabase/supabase-js@2.57.2";
 
 const corsHeaders = {
@@ -8,12 +6,13 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
+    // Auth
     const authHeader = req.headers.get("Authorization");
     if (!authHeader?.startsWith("Bearer ")) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
@@ -22,25 +21,27 @@ serve(async (req) => {
       });
     }
 
-    const supabaseClient = createClient(
+    const supabase = createClient(
       Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_ANON_KEY")!
+      Deno.env.get("SUPABASE_ANON_KEY")!,
+      { global: { headers: { Authorization: authHeader } } }
     );
 
     const token = authHeader.replace("Bearer ", "");
-    const { data: userData, error: userError } = await supabaseClient.auth.getUser(token);
-    if (userError || !userData.user) {
+    const { data: claimsData, error: claimsError } = await supabase.auth.getClaims(token);
+    if (claimsError || !claimsData?.claims) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-    const user = userData.user;
-    const userId = user.id;
+
+    const userId = claimsData.claims.sub as string;
+    const userEmail = claimsData.claims.email as string;
 
     const { script_id, is_renewal } = await req.json();
     if (!script_id) {
-      return new Response(JSON.stringify({ error: "script_id is required" }), {
+      return new Response(JSON.stringify({ error: "script_id required" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -51,10 +52,10 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
-    // Fetch script details
+    // Get script
     const { data: script, error: scriptError } = await serviceClient
       .from("scripts")
-      .select("id, title, price, is_paid, license_duration_days, modder_id")
+      .select("id, title, price, is_paid, license_duration_days")
       .eq("id", script_id)
       .single();
 
@@ -77,7 +78,7 @@ serve(async (req) => {
     const platformCommission = Math.round(amount * commissionRate * 100) / 100;
     const modderEarnings = Math.round((amount - platformCommission) * 100) / 100;
 
-    // Create pending purchase record
+    // Create purchase record
     const { data: purchase, error: purchaseError } = await serviceClient
       .from("purchases")
       .insert({
@@ -85,81 +86,86 @@ serve(async (req) => {
         script_id: script.id,
         amount,
         status: "pending",
-        payment_method: "stripe",
+        payment_method: "pix",
         commission_rate: commissionRate,
         platform_commission: platformCommission,
         modder_earnings: modderEarnings,
       })
-      .select("id")
+      .select()
       .single();
 
-    if (purchaseError) {
-      return new Response(JSON.stringify({ error: "Failed to create purchase", details: purchaseError.message }), {
+    if (purchaseError || !purchase) {
+      console.error("Purchase insert error:", purchaseError);
+      return new Response(JSON.stringify({ error: "Failed to create purchase" }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    // Initialize Stripe
-    const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY")!, {
-      apiVersion: "2025-08-27.basil",
-    });
-
-    // Check if customer exists
-    const customers = await stripe.customers.list({ email: user.email!, limit: 1 });
-    let customerId: string | undefined;
-    if (customers.data.length > 0) {
-      customerId = customers.data[0].id;
+    // Create PIX payment via Mercado Pago
+    const accessToken = Deno.env.get("MERCADOPAGO_ACCESS_TOKEN");
+    if (!accessToken) {
+      return new Response(JSON.stringify({ error: "Payment gateway not configured" }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
-    const origin = req.headers.get("origin") || "https://lovable.dev";
-    const licenseDuration = script.license_duration_days;
-    const licenseLabel = licenseDuration
-      ? licenseDuration === 7
-        ? "Licença Semanal (7 dias)"
-        : `Licença ${licenseDuration} dias`
-      : "Licença Permanente";
+    const idempotencyKey = `pix-${purchase.id}-${Date.now()}`;
 
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ["card", "boleto", "pix"],
-      customer: customerId,
-      customer_email: customerId ? undefined : user.email!,
-      line_items: [
-        {
-          price_data: {
-            currency: "brl",
-            unit_amount: Math.round(amount * 100),
-            product_data: {
-              name: script.title,
-              description: licenseLabel,
-            },
-          },
-          quantity: 1,
-        },
-      ],
-      mode: "payment",
-      success_url: `${origin}/script/${script.id}?payment=success&purchase_id=${purchase.id}`,
-      cancel_url: `${origin}/script/${script.id}?payment=cancelled`,
-      metadata: {
-        purchase_id: purchase.id,
-        script_id: script.id,
-        user_id: userId,
-        is_renewal: is_renewal ? "true" : "false",
+    const mpResponse = await fetch("https://api.mercadopago.com/v1/payments", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${accessToken}`,
+        "X-Idempotency-Key": idempotencyKey,
       },
+      body: JSON.stringify({
+        transaction_amount: amount,
+        description: `${script.title}${is_renewal ? " (Renovação)" : ""}`,
+        payment_method_id: "pix",
+        payer: {
+          email: userEmail,
+        },
+        external_reference: purchase.id,
+      }),
     });
 
-    // Save stripe session id
+    const mpData = await mpResponse.json();
+
+    if (!mpResponse.ok) {
+      console.error("Mercado Pago error:", JSON.stringify(mpData));
+      return new Response(JSON.stringify({ error: "Failed to create PIX payment", details: mpData.message }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // Save MP payment ID
     await serviceClient
       .from("purchases")
-      .update({ payment_id: session.id })
+      .update({ payment_id: String(mpData.id) })
       .eq("id", purchase.id);
 
-    return new Response(JSON.stringify({ url: session.url, session_id: session.id }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    const pixInfo = mpData.point_of_interaction?.transaction_data;
+
+    return new Response(
+      JSON.stringify({
+        purchase_id: purchase.id,
+        payment_id: mpData.id,
+        qr_code: pixInfo?.qr_code ?? null,
+        qr_code_base64: pixInfo?.qr_code_base64 ?? null,
+        ticket_url: pixInfo?.ticket_url ?? null,
+        expires_at: mpData.date_of_expiration ?? null,
+      }),
+      {
+        status: 200,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      }
+    );
   } catch (err) {
     console.error("Error:", err);
-    return new Response(JSON.stringify({ error: err.message }), {
+    return new Response(JSON.stringify({ error: (err as Error).message }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
