@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import LuaCodeEditor from "@/components/LuaCodeEditor";
 import ScriptAnalysis from "@/components/ScriptAnalysis";
 import { ModerationMessages } from "@/components/ModerationMessages";
