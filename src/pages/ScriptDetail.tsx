@@ -261,9 +261,25 @@ export default function ScriptDetail() {
     if (!user) { setShowLoginPrompt(true); return; }
     if (!script) return;
     setPurchasing(true);
-    // TODO: Implementar novo sistema de pagamento
-    toast.info("Sistema de pagamento em construção.");
-    setPurchasing(false);
+    try {
+      const { data, error } = await supabase.functions.invoke("create-pix-payment", {
+        body: { script_id: script.id, is_renewal: isRenewal },
+      });
+      if (error) throw error;
+      if (data?.qr_code || data?.qr_code_base64) {
+        setPixData({
+          purchase_id: data.purchase_id,
+          qr_code: data.qr_code,
+          qr_code_base64: data.qr_code_base64,
+        });
+        startPolling(data.purchase_id);
+      } else {
+        throw new Error("Falha ao gerar QR Code PIX");
+      }
+    } catch (err: any) {
+      toast.error("Erro ao iniciar pagamento: " + (err.message || "Tente novamente"));
+      setPurchasing(false);
+    }
   };
 
   const handleRenew = async () => {
