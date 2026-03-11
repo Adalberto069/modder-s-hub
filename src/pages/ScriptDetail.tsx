@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import LuaCodeEditor from "@/components/LuaCodeEditor";
 import ScriptAnalysis from "@/components/ScriptAnalysis";
 import { ModerationMessages } from "@/components/ModerationMessages";
-import { useParams, Link, useSearchParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { Layout } from "@/components/layout/Layout";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -114,7 +114,7 @@ function generateLicenseKey(): string {
 
 export default function ScriptDetail() {
   const { id } = useParams<{ id: string }>();
-  const [searchParams, setSearchParams] = useSearchParams();
+  
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [galleryIndex, setGalleryIndex] = useState(0);
@@ -125,37 +125,7 @@ export default function ScriptDetail() {
   const [purchaseSuccess, setPurchaseSuccess] = useState<string | null>(null);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
 
-  // Handle Stripe payment success redirect
-  useEffect(() => {
-    const payment = searchParams.get("payment");
-    const purchaseId = searchParams.get("purchase_id");
-    if (payment === "success" && purchaseId && user) {
-      // Verify payment and get license
-      const verifyPayment = async () => {
-        try {
-          const { data, error } = await supabase.functions.invoke("verify-payment", {
-            body: { purchase_id: purchaseId },
-          });
-          if (error) throw error;
-          if (data?.license_key) {
-            setPurchaseSuccess(data.license_key);
-            toast.success("Pagamento confirmado! Licença ativada.");
-          } else if (data?.status === "pending") {
-            toast.info("Pagamento sendo processado. Aguarde alguns instantes e recarregue a página.");
-          }
-        } catch (err) {
-          toast.success("Pagamento realizado! Sua licença será ativada em instantes.");
-        }
-        queryClient.invalidateQueries({ queryKey: ["script-license", id, user?.id] });
-        queryClient.invalidateQueries({ queryKey: ["my-licenses"] });
-      };
-      verifyPayment();
-      setSearchParams({}, { replace: true });
-    } else if (payment === "cancelled") {
-      toast.info("Pagamento cancelado.");
-      setSearchParams({}, { replace: true });
-    }
-  }, [searchParams, user]);
+  // TODO: Implementar novo sistema de pagamento
 
   const { data: script } = useQuery({
     queryKey: ["script", id],
@@ -246,20 +216,9 @@ export default function ScriptDetail() {
     if (!user) { setShowLoginPrompt(true); return; }
     if (!script) return;
     setPurchasing(true);
-    try {
-      const { data, error } = await supabase.functions.invoke("create-stripe-checkout", {
-        body: { script_id: script.id, is_renewal: isRenewal },
-      });
-      if (error) throw error;
-      if (data?.url) {
-        window.location.href = data.url;
-      } else {
-        throw new Error("No checkout URL returned");
-      }
-    } catch (err: any) {
-      toast.error("Erro ao iniciar pagamento: " + (err.message || "Tente novamente"));
-      setPurchasing(false);
-    }
+    // TODO: Implementar novo sistema de pagamento
+    toast.info("Sistema de pagamento em construção.");
+    setPurchasing(false);
   };
 
   const handleRenew = async () => {
