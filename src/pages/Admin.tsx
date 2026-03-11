@@ -9,13 +9,14 @@ import { toast } from "sonner";
 import { Navigate, useNavigate } from "react-router-dom";
 import {
   Users, Code, CheckCircle, XCircle, Trash2, Plus, Pencil, Eye, EyeOff, Clock, FileX, Send, Shield,
-  UserCheck, ShieldCheck, ShieldOff, Key, Ban, ShoppingCart, Copy, DollarSign, Percent, Search, AlertTriangle,
+  UserCheck, ShieldCheck, ShieldOff, Key, Ban, ShoppingCart, Copy, DollarSign, Percent, Search, AlertTriangle, Landmark
 } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { AdminBadges } from "@/components/admin/AdminBadges";
 import { AdminFlaggedScripts } from "@/components/admin/AdminFlaggedScripts";
 import { AdminModerationQueue } from "@/components/admin/AdminModerationQueue";
+import { AdminWithdrawalsTab } from "@/components/admin/AdminWithdrawalsTab";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import LuaCodeEditor from "@/components/LuaCodeEditor";
@@ -420,7 +421,7 @@ export default function Admin() {
 
         {/* Main admin tabs */}
         <Tabs defaultValue="scripts">
-          <TabsList className="mb-4 grid w-full grid-cols-4">
+          <TabsList className="mb-4 grid w-full grid-cols-5">
             <TabsTrigger value="scripts" className="text-xs gap-1">
               <Code className="h-3 w-3" /> Scripts
             </TabsTrigger>
@@ -429,6 +430,9 @@ export default function Admin() {
             </TabsTrigger>
             <TabsTrigger value="purchases" className="text-xs gap-1">
               <ShoppingCart className="h-3 w-3" /> Compras
+            </TabsTrigger>
+            <TabsTrigger value="withdrawals" className="text-xs gap-1">
+              <Landmark className="h-3 w-3" /> Saques
             </TabsTrigger>
             <TabsTrigger value="leaks" className="text-xs gap-1">
               <AlertTriangle className="h-3 w-3" /> Vazamentos
@@ -568,6 +572,11 @@ export default function Admin() {
             </Card>
           </TabsContent>
 
+          {/* Withdrawals Tab */}
+          <TabsContent value="withdrawals">
+            <AdminWithdrawalsTab />
+          </TabsContent>
+
           {/* Leak Tracker Tab */}
           <TabsContent value="leaks">
             <Card className="neon-border bg-card/80">
@@ -655,7 +664,7 @@ export default function Admin() {
             <DialogTitle>Código: {codeDialogTitle}</DialogTitle>
           </DialogHeader>
           <ScrollArea className="max-h-[60vh]">
-            <LuaCodeEditor value={codeDialogContent} readOnly onChange={() => {}} minHeight="300px" />
+            <LuaCodeEditor value={codeDialogContent} readOnly onChange={() => { }} minHeight="300px" />
           </ScrollArea>
         </DialogContent>
       </Dialog>

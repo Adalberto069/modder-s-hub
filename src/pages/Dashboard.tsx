@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { validateFileWithToast } from "@/lib/secure-upload";
 import { Layout } from "@/components/layout/Layout";
+import { ModderFinanceTab } from "@/components/modder/ModderFinanceTab";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -269,14 +270,19 @@ end
         )}
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className={`mb-6 grid w-full ${isModder ? "grid-cols-2" : "grid-cols-1"}`}>
+          <TabsList className={`mb-6 grid w-full ${isModder ? "grid-cols-3" : "grid-cols-1"}`}>
             <TabsTrigger value="purchases" className="gap-1.5 text-xs sm:text-sm">
               <ShoppingBag className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> <span className="hidden sm:inline">Meus </span>Scripts Comprados
             </TabsTrigger>
             {isModder && (
-              <TabsTrigger value="my-scripts" className="gap-1.5 text-xs sm:text-sm">
-                <Code className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> <span className="hidden sm:inline">Minhas </span>Publicações
-              </TabsTrigger>
+              <>
+                <TabsTrigger value="my-scripts" className="gap-1.5 text-xs sm:text-sm">
+                  <Code className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> <span className="hidden sm:inline">Minhas </span>Publicações
+                </TabsTrigger>
+                <TabsTrigger value="finance" className="gap-1.5 text-xs sm:text-sm">
+                  <DollarSign className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> <span className="hidden sm:inline">Meu </span>Financeiro
+                </TabsTrigger>
+              </>
             )}
           </TabsList>
 
@@ -521,6 +527,13 @@ end
                 ))}
                 {myScripts?.length === 0 && <p className="text-muted-foreground">Nenhuma publicação ainda.</p>}
               </div>
+            </TabsContent>
+          )}
+
+          {/* Finance Tab */}
+          {isModder && (
+            <TabsContent value="finance">
+              <ModderFinanceTab totalEarnings={totalEarnings} />
             </TabsContent>
           )}
         </Tabs>
