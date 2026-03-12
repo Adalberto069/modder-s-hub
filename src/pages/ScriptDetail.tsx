@@ -114,6 +114,7 @@ function generateLicenseKey(): string {
 
 export default function ScriptDetail() {
   const { id } = useParams<{ id: string }>();
+  const [searchParams, setSearchParams] = useSearchParams();
   
   const { user } = useAuth();
   const queryClient = useQueryClient();
@@ -124,6 +125,8 @@ export default function ScriptDetail() {
   const [purchasing, setPurchasing] = useState(false);
   const [purchaseSuccess, setPurchaseSuccess] = useState<string | null>(null);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
+  const [showPaymentMethodModal, setShowPaymentMethodModal] = useState(false);
+  const [pendingRenewal, setPendingRenewal] = useState(false);
   const [pixData, setPixData] = useState<{
     purchase_id: string;
     qr_code: string | null;
