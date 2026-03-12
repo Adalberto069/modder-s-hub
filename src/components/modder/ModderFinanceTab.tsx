@@ -58,9 +58,9 @@ export function ModderFinanceTab({ totalEarnings }: ModderFinanceTabProps) {
       return;
     }
     setSavingPix(true);
-    const { error } = await supabase
+    const { error } = await (supabase as any)
       .from("profiles")
-      .update({ pix_key: pixKey, pix_key_type: pixKeyType })
+      .update({ pix_key: pixKey, pix_key_type: pixKeyType } as any)
       .eq("user_id", user?.id);
 
     if (error) {
