@@ -32,7 +32,7 @@ export function ModderFinanceTab({ totalEarnings }: ModderFinanceTabProps) {
   const { data: withdrawals } = useQuery({
     queryKey: ["my-withdrawals", user?.id],
     queryFn: async () => {
-      const { data } = await supabase
+      const { data } = await (supabase as any)
         .from("withdrawals")
         .select("*")
         .eq("modder_id", user?.id)
@@ -58,9 +58,9 @@ export function ModderFinanceTab({ totalEarnings }: ModderFinanceTabProps) {
       return;
     }
     setSavingPix(true);
-    const { error } = await supabase
+    const { error } = await (supabase as any)
       .from("profiles")
-      .update({ pix_key: pixKey, pix_key_type: pixKeyType })
+      .update({ pix_key: pixKey, pix_key_type: pixKeyType } as any)
       .eq("user_id", user?.id);
 
     if (error) {
@@ -90,7 +90,7 @@ export function ModderFinanceTab({ totalEarnings }: ModderFinanceTabProps) {
     }
 
     setRequesting(true);
-    const { error } = await supabase
+    const { error } = await (supabase as any)
       .from("withdrawals")
       .insert({
         modder_id: user?.id,

@@ -15,3 +15,6 @@ verify_jwt = false
 [functions.check-pix-payment]
 verify_jwt = false
 
+[functions.mercadopago-webhook]
+verify_jwt = false
+

@@ -335,8 +335,6 @@ export type Database = {
           created_at: string
           display_name: string | null
           id: string
-          pix_key: string | null
-          pix_key_type: string | null
           reputation_score: number
           total_downloads: number
           total_positive_reviews: number
@@ -350,8 +348,6 @@ export type Database = {
           created_at?: string
           display_name?: string | null
           id?: string
-          pix_key?: string | null
-          pix_key_type?: string | null
           reputation_score?: number
           total_downloads?: number
           total_positive_reviews?: number
@@ -365,8 +361,6 @@ export type Database = {
           created_at?: string
           display_name?: string | null
           id?: string
-          pix_key?: string | null
-          pix_key_type?: string | null
           reputation_score?: number
           total_downloads?: number
           total_positive_reviews?: number
@@ -977,50 +971,6 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
-      }
-      withdrawals: {
-        Row: {
-          admin_notes: string | null
-          amount: number
-          completed_at: string | null
-          created_at: string
-          id: string
-          modder_id: string
-          pix_key: string
-          pix_key_type: string
-          status: string
-        }
-        Insert: {
-          admin_notes?: string | null
-          amount: number
-          completed_at?: string | null
-          created_at?: string
-          id?: string
-          modder_id: string
-          pix_key: string
-          pix_key_type: string
-          status?: string
-        }
-        Update: {
-          admin_notes?: string | null
-          amount?: number
-          completed_at?: string | null
-          created_at?: string
-          id?: string
-          modder_id?: string
-          pix_key?: string
-          pix_key_type?: string
-          status?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "withdrawals_modder_id_fkey"
-            columns: ["modder_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
       }
     }
     Views: {
