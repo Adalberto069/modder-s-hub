@@ -32,7 +32,7 @@ export function ModderFinanceTab({ totalEarnings }: ModderFinanceTabProps) {
   const { data: withdrawals } = useQuery({
     queryKey: ["my-withdrawals", user?.id],
     queryFn: async () => {
-      const { data } = await supabase
+      const { data } = await (supabase as any)
         .from("withdrawals")
         .select("*")
         .eq("modder_id", user?.id)
