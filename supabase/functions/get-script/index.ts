@@ -10,60 +10,79 @@ const corsHeaders = {
 function randVar(): string {
   const chars = "abcdefghijklmnopqrstuvwxyz";
   const prefix = chars[Math.floor(Math.random() * chars.length)];
-  const suffix = Math.random().toString(36).substring(2, 8);
-  return `_${prefix}${suffix}`;
+  const suffix = Math.random().toString(36).substring(2, 6);
+  return `${prefix}${suffix}`;
 }
 
-// Simple Lua obfuscation: wraps code in a loadstring with string encoding + watermark
+// Memory-efficient Lua obfuscation: encodes code as padded decimal sequences in a string literal
 function obfuscateLua(code: string, buyerId: string): string {
-  const watermarkVar = randVar();
-  const loaderVar = randVar();
-  const decoderVar = randVar();
-  const tblVar = randVar();
-  const iterVar = randVar();
-  const resultVar = randVar();
-  const keyArgVar = randVar();
-  const arrArgVar = randVar();
-
-  // Encode the buyer ID as a hidden fingerprint
   const encodedBuyerId = Array.from(new TextEncoder().encode(buyerId))
     .map((b) => b.toString(16).padStart(2, "0"))
     .join("");
 
-  // Encode the original code as a byte array string
   const codeBytes = Array.from(new TextEncoder().encode(code));
   const key = Math.floor(Math.random() * 200) + 50; // XOR key
 
-  // Split byte list into chunks of 80 per line to avoid LuaJ line length limit
-  const encrypted = codeBytes.map((b) => b ^ key);
-  const chunkSize = 80;
   const chunks: string[] = [];
-  for (let i = 0; i < encrypted.length; i += chunkSize) {
-    chunks.push(encrypted.slice(i, i + chunkSize).join(","));
+  const chunkSize = 16384; // 16KB strings to avoid line limits
+  let currentChunk = "";
+  
+  for (let i = 0; i < codeBytes.length; i++) {
+    const dec = codeBytes[i] ^ key;
+    currentChunk += "\\" + dec.toString(10).padStart(3, "0");
+    if ((i + 1) % chunkSize === 0 || i === codeBytes.length - 1) {
+      chunks.push(`    "${currentChunk}"`);
+      currentChunk = "";
+    }
   }
+  
   const byteListMultiline = chunks.join(",\n");
 
-  // Build the obfuscated Lua script
-  // All variable names are pre-generated and reused consistently
-  // Use \n (not \r\n) to avoid LuaJ line parsing issues on Android
-  const obfuscated = [
-    "-- Protected by GG Marketplace",
-    "-- Redistribution is prohibited",
-    `local ${watermarkVar}="${encodedBuyerId}"`,
-    `local ${decoderVar}=function(${arrArgVar},${keyArgVar})`,
-    `local ${resultVar}=""`,
-    `for ${iterVar}=1,#${arrArgVar} do`,
-    `${resultVar}=${resultVar}..string.char(bit32 and bit32.bxor(${arrArgVar}[${iterVar}],${keyArgVar}) or (function(a,b)local c=0;local d=1;for e=0,7 do local f=a%2;local g=b%2;if f~=g then c=c+d end;a=math.floor(a/2);b=math.floor(b/2);d=d*2 end;return c end)(${arrArgVar}[${iterVar}],${keyArgVar}))`,
-    "end",
-    `return ${resultVar}`,
-    "end",
-    `local ${tblVar}={`,
-    byteListMultiline,
-    `}`,
-    `local ${loaderVar}=load or loadstring`,
-    `${loaderVar}(${decoderVar}(${tblVar},${key}))()`,
-  ].join("\n") + "\n";
+  const vP = randVar();
+  const vK = randVar();
+  const vS = randVar();
+  const vRes = randVar();
+  const vChunk = randVar();
+  const vC = randVar();
+  const vBxor = randVar();
+  const vI = randVar();
+  const vDec = randVar();
+  const vF = randVar();
+  const vInit = randVar();
 
+  const obfuscated = [
+    `-- Protected by GG Marketplace`,
+    `-- Buyer ID: ${encodedBuyerId}`,
+    `-- Redistribution is prohibited`,
+    `local function ${vInit}()`,
+    `  local ${vP} = {`,
+    byteListMultiline,
+    `  }`,
+    `  local ${vK} = ${key}`,
+    `  local ${vS} = table.concat(${vP})`,
+    `  local ${vRes} = {}`,
+    `  local ${vChunk} = {}`,
+    `  local ${vC} = 1`,
+    `  local ${vBxor} = bit32 and bit32.bxor or function(a,b) local c,d=0,1; for e=0,7 do if a%2~=b%2 then c=c+d end; a=math.floor(a/2); b=math.floor(b/2); d=d*2 end return c end`,
+    `  for ${vI} = 1, #${vS} do`,
+    `    ${vChunk}[${vC}] = string.char(${vBxor}(string.byte(${vS}, ${vI}), ${vK}))`,
+    `    ${vC} = ${vC} + 1`,
+    `    if ${vC} > 4096 then`,
+    `      ${vRes}[#${vRes}+1] = table.concat(${vChunk})`,
+    `      ${vChunk} = {}`,
+    `      ${vC} = 1`,
+    `    end`,
+    `  end`,
+    `  if ${vC} > 1 then`,
+    `    ${vRes}[#${vRes}+1] = table.concat(${vChunk})`,
+    `  end`,
+    `  local ${vDec} = table.concat(${vRes})`,
+    `  local ${vF} = load or loadstring`,
+    `  return ${vF}(${vDec})()`,
+    `end`,
+    `return ${vInit}()`,
+    ""
+  ].join("\n");
 
   return obfuscated;
 }
