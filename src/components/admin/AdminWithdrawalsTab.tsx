@@ -56,7 +56,7 @@ export function AdminWithdrawalsTab() {
     setProcessing(true);
     const newStatus = actionType === "complete" ? "completed" : "rejected";
     
-    const { error } = await supabase
+    const { error } = await (supabase as any)
       .from("withdrawals")
       .update({
         status: newStatus,
