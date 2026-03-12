@@ -34,25 +34,36 @@ function obfuscateLua(code: string, buyerId: string): string {
   const codeBytes = Array.from(new TextEncoder().encode(code));
   const key = Math.floor(Math.random() * 200) + 50; // XOR key
 
+  // Split byte list into chunks of 80 per line to avoid LuaJ line length limit
   const encrypted = codeBytes.map((b) => b ^ key);
-  const byteList = encrypted.join(",");
+  const chunkSize = 80;
+  const chunks: string[] = [];
+  for (let i = 0; i < encrypted.length; i += chunkSize) {
+    chunks.push(encrypted.slice(i, i + chunkSize).join(","));
+  }
+  const byteListMultiline = chunks.join(",\n");
 
   // Build the obfuscated Lua script
   // All variable names are pre-generated and reused consistently
-  const obfuscated = `-- Protected by GG Marketplace
--- Redistribution is prohibited
-local ${watermarkVar}="${encodedBuyerId}"
-local ${decoderVar}=function(${arrArgVar},${keyArgVar})
-local ${resultVar}=""
-for ${iterVar}=1,#${arrArgVar} do
-${resultVar}=${resultVar}..string.char(bit32 and bit32.bxor(${arrArgVar}[${iterVar}],${keyArgVar}) or (function(a,b)local c=0;local d=1;for e=0,7 do local f=a%2;local g=b%2;if f~=g then c=c+d end;a=math.floor(a/2);b=math.floor(b/2);d=d*2 end;return c end)(${arrArgVar}[${iterVar}],${keyArgVar}))
-end
-return ${resultVar}
-end
-local ${tblVar}={${byteList}}
-local ${loaderVar}=load or loadstring
-${loaderVar}(${decoderVar}(${tblVar},${key}))()
-`;
+  // Use \n (not \r\n) to avoid LuaJ line parsing issues on Android
+  const obfuscated = [
+    "-- Protected by GG Marketplace",
+    "-- Redistribution is prohibited",
+    `local ${watermarkVar}="${encodedBuyerId}"`,
+    `local ${decoderVar}=function(${arrArgVar},${keyArgVar})`,
+    `local ${resultVar}=""`,
+    `for ${iterVar}=1,#${arrArgVar} do`,
+    `${resultVar}=${resultVar}..string.char(bit32 and bit32.bxor(${arrArgVar}[${iterVar}],${keyArgVar}) or (function(a,b)local c=0;local d=1;for e=0,7 do local f=a%2;local g=b%2;if f~=g then c=c+d end;a=math.floor(a/2);b=math.floor(b/2);d=d*2 end;return c end)(${arrArgVar}[${iterVar}],${keyArgVar}))`,
+    "end",
+    `return ${resultVar}`,
+    "end",
+    `local ${tblVar}={`,
+    byteListMultiline,
+    `}`,
+    `local ${loaderVar}=load or loadstring`,
+    `${loaderVar}(${decoderVar}(${tblVar},${key}))()`,
+  ].join("\n") + "\n";
+
 
   return obfuscated;
 }
