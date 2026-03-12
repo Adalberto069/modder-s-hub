@@ -31,7 +31,7 @@ export function AdminWithdrawalsTab() {
   const { data: withdrawals } = useQuery({
     queryKey: ["admin-withdrawals"],
     queryFn: async () => {
-      const { data } = await supabase
+      const { data } = await (supabase as any)
         .from("withdrawals")
         .select("*, profiles:modder_id(username, display_name)")
         .order("created_at", { ascending: false });
