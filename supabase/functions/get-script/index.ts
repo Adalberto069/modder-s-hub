@@ -6,13 +6,6 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-// Encode string to hex representation for Lua
-function luaEncodeString(str: string): string {
-  return Array.from(new TextEncoder().encode(str))
-    .map((b) => `\\${b}`)
-    .join("");
-}
-
 // Generate a random variable name
 function randVar(): string {
   const chars = "abcdefghijklmnopqrstuvwxyz";
@@ -26,6 +19,11 @@ function obfuscateLua(code: string, buyerId: string): string {
   const watermarkVar = randVar();
   const loaderVar = randVar();
   const decoderVar = randVar();
+  const tblVar = randVar();
+  const iterVar = randVar();
+  const resultVar = randVar();
+  const keyArgVar = randVar();
+  const arrArgVar = randVar();
 
   // Encode the buyer ID as a hidden fingerprint
   const encodedBuyerId = Array.from(new TextEncoder().encode(buyerId))
@@ -40,19 +38,20 @@ function obfuscateLua(code: string, buyerId: string): string {
   const byteList = encrypted.join(",");
 
   // Build the obfuscated Lua script
+  // All variable names are pre-generated and reused consistently
   const obfuscated = `-- Protected by GG Marketplace
 -- Redistribution is prohibited
 local ${watermarkVar}="${encodedBuyerId}"
-local ${decoderVar}=function(${randVar()},${randVar()})
-local _r=""
-for _i=1,#${randVar()} do
-_r=_r..string.char(bit32 and bit32.bxor(${randVar()}[_i],${randVar()}) or (function(a,b)local c=0;local d=1;for e=0,7 do local f=a%2;local g=b%2;if f~=g then c=c+d end;a=math.floor(a/2);b=math.floor(b/2);d=d*2 end;return c end)(${randVar()}[_i],${randVar()}))
+local ${decoderVar}=function(${arrArgVar},${keyArgVar})
+local ${resultVar}=""
+for ${iterVar}=1,#${arrArgVar} do
+${resultVar}=${resultVar}..string.char(bit32 and bit32.bxor(${arrArgVar}[${iterVar}],${keyArgVar}) or (function(a,b)local c=0;local d=1;for e=0,7 do local f=a%2;local g=b%2;if f~=g then c=c+d end;a=math.floor(a/2);b=math.floor(b/2);d=d*2 end;return c end)(${arrArgVar}[${iterVar}],${keyArgVar}))
 end
-return _r
+return ${resultVar}
 end
-local ${loaderVar}={${byteList}}
-local _fn=load or loadstring
-_fn(${decoderVar}(${loaderVar},${key}))()
+local ${tblVar}={${byteList}}
+local ${loaderVar}=load or loadstring
+${loaderVar}(${decoderVar}(${tblVar},${key}))()
 `;
 
   return obfuscated;
