@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import LuaCodeEditor from "@/components/LuaCodeEditor";
 import ScriptAnalysis from "@/components/ScriptAnalysis";
 import { ModerationMessages } from "@/components/ModerationMessages";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useSearchParams } from "react-router-dom";
 import { Layout } from "@/components/layout/Layout";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -15,7 +15,7 @@ import { useAuth } from "@/lib/auth";
 import {
   Download, Star, ExternalLink, ArrowLeft, User, ShieldCheck, ShieldAlert, ShieldX,
   ChevronLeft, ChevronRight, Play, MessageSquare, Lock, CheckCircle, Clock,
-  Copy, Check, Gamepad2, Tag, List, BookOpen, FileCode, ShoppingCart, Key,
+  Copy, Check, Gamepad2, Tag, List, BookOpen, FileCode, ShoppingCart, Key, CreditCard, QrCode,
 } from "lucide-react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
@@ -114,6 +114,7 @@ function generateLicenseKey(): string {
 
 export default function ScriptDetail() {
   const { id } = useParams<{ id: string }>();
+  const [searchParams, setSearchParams] = useSearchParams();
   
   const { user } = useAuth();
   const queryClient = useQueryClient();
@@ -124,6 +125,8 @@ export default function ScriptDetail() {
   const [purchasing, setPurchasing] = useState(false);
   const [purchaseSuccess, setPurchaseSuccess] = useState<string | null>(null);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
+  const [showPaymentMethodModal, setShowPaymentMethodModal] = useState(false);
+  const [pendingRenewal, setPendingRenewal] = useState(false);
   const [pixData, setPixData] = useState<{
     purchase_id: string;
     qr_code: string | null;
@@ -138,6 +141,23 @@ export default function ScriptDetail() {
       if (pollingRef.current) clearInterval(pollingRef.current);
     };
   }, []);
+
+  // Handle card payment return via query params
+  useEffect(() => {
+    const paymentStatus = searchParams.get("payment");
+    if (paymentStatus === "success") {
+      toast.success("Pagamento com cartão aprovado! Sua licença será ativada em instantes.");
+      queryClient.invalidateQueries({ queryKey: ["script-license", id, user?.id] });
+      queryClient.invalidateQueries({ queryKey: ["my-licenses"] });
+      setSearchParams({}, { replace: true });
+    } else if (paymentStatus === "failure") {
+      toast.error("Pagamento com cartão falhou. Tente novamente.");
+      setSearchParams({}, { replace: true });
+    } else if (paymentStatus === "pending") {
+      toast.info("Pagamento pendente. Você será notificado quando for aprovado.");
+      setSearchParams({}, { replace: true });
+    }
+  }, [searchParams, setSearchParams, queryClient, id, user?.id]);
 
   // Poll PIX payment status
   const startPolling = useCallback((purchaseId: string) => {
@@ -257,15 +277,23 @@ export default function ScriptDetail() {
 
   const profileMap = (reviewerProfiles ?? []).reduce((acc: any, p: any) => { acc[p.user_id] = p; return acc; }, {});
 
-  const handlePurchase = async (isRenewal = false) => {
+  const handlePurchase = async (isRenewal = false, paymentMethod: "pix" | "card" = "pix") => {
     if (!user) { setShowLoginPrompt(true); return; }
     if (!script) return;
     setPurchasing(true);
+    setShowPaymentMethodModal(false);
     try {
       const { data, error } = await supabase.functions.invoke("create-pix-payment", {
-        body: { script_id: script.id, is_renewal: isRenewal },
+        body: { script_id: script.id, is_renewal: isRenewal, payment_method: paymentMethod },
       });
       if (error) throw error;
+
+      if (paymentMethod === "card" && data?.init_point) {
+        // Redirect to Mercado Pago checkout
+        window.location.href = data.init_point;
+        return;
+      }
+
       if (data?.qr_code || data?.qr_code_base64) {
         setPixData({
           purchase_id: data.purchase_id,
@@ -274,7 +302,7 @@ export default function ScriptDetail() {
         });
         startPolling(data.purchase_id);
       } else {
-        throw new Error("Falha ao gerar QR Code PIX");
+        throw new Error("Falha ao gerar pagamento");
       }
     } catch (err: any) {
       toast.error("Erro ao iniciar pagamento: " + (err.message || "Tente novamente"));
@@ -284,7 +312,14 @@ export default function ScriptDetail() {
 
   const handleRenew = async () => {
     if (!user || !script || !existingLicense) return;
-    handlePurchase(true);
+    setPendingRenewal(true);
+    setShowPaymentMethodModal(true);
+  };
+
+  const openPaymentMethodModal = () => {
+    if (!user) { setShowLoginPrompt(true); return; }
+    setPendingRenewal(false);
+    setShowPaymentMethodModal(true);
   };
 
   const handleDownloadLoader = () => {
@@ -794,7 +829,7 @@ end
                       )
                     ) : !purchaseSuccess ? (
                       scriptIsActive ? (
-                        <Button className="w-full neon-glow-purple" onClick={() => handlePurchase(false)} disabled={purchasing}>
+                        <Button className="w-full neon-glow-purple" onClick={openPaymentMethodModal} disabled={purchasing}>
                           <ShoppingCart className="mr-2 h-4 w-4" />
                           {purchasing ? "Processando..." : "Comprar Script"}
                         </Button>
@@ -843,9 +878,59 @@ end
       </div>
       <LoginPromptDialog open={showLoginPrompt} onOpenChange={setShowLoginPrompt} />
 
+      {/* Payment Method Selection Modal */}
+      {showPaymentMethodModal && (
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
+          <Card className="w-full max-w-sm bg-card border-primary/30">
+            <CardHeader className="text-center pb-2">
+              <CardTitle className="text-lg">Escolha o método de pagamento</CardTitle>
+              <p className="text-xs text-muted-foreground">
+                {script?.price ? `R$ ${Number(script.price).toFixed(2)}` : ""}
+                {pendingRenewal ? " (Renovação)" : ""}
+              </p>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <Button
+                className="w-full h-14 justify-start gap-3 bg-accent/10 border border-accent/30 hover:bg-accent/20 text-foreground"
+                variant="outline"
+                onClick={() => handlePurchase(pendingRenewal, "pix")}
+                disabled={purchasing}
+              >
+                <QrCode className="h-6 w-6 text-accent shrink-0" />
+                <div className="text-left">
+                  <p className="font-semibold text-sm">PIX</p>
+                  <p className="text-[10px] text-muted-foreground">Pagamento instantâneo</p>
+                </div>
+              </Button>
+
+              <Button
+                className="w-full h-14 justify-start gap-3 bg-primary/10 border border-primary/30 hover:bg-primary/20 text-foreground"
+                variant="outline"
+                onClick={() => handlePurchase(pendingRenewal, "card")}
+                disabled={purchasing}
+              >
+                <CreditCard className="h-6 w-6 text-primary shrink-0" />
+                <div className="text-left">
+                  <p className="font-semibold text-sm">Cartão de Crédito</p>
+                  <p className="text-[10px] text-muted-foreground">Parcele em até 12x</p>
+                </div>
+              </Button>
+
+              <Button
+                variant="ghost"
+                className="w-full text-muted-foreground"
+                onClick={() => { setShowPaymentMethodModal(false); setPendingRenewal(false); }}
+              >
+                Cancelar
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
       {/* PIX QR Code Modal */}
       {pixData && (
-        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4" onClick={() => {}}>
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
           <Card className="w-full max-w-sm bg-card border-primary/30">
             <CardHeader className="text-center pb-2">
               <CardTitle className="text-lg">Pagar com PIX</CardTitle>
