@@ -878,9 +878,59 @@ end
       </div>
       <LoginPromptDialog open={showLoginPrompt} onOpenChange={setShowLoginPrompt} />
 
+      {/* Payment Method Selection Modal */}
+      {showPaymentMethodModal && (
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
+          <Card className="w-full max-w-sm bg-card border-primary/30">
+            <CardHeader className="text-center pb-2">
+              <CardTitle className="text-lg">Escolha o método de pagamento</CardTitle>
+              <p className="text-xs text-muted-foreground">
+                {script?.price ? `R$ ${Number(script.price).toFixed(2)}` : ""}
+                {pendingRenewal ? " (Renovação)" : ""}
+              </p>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <Button
+                className="w-full h-14 justify-start gap-3 bg-accent/10 border border-accent/30 hover:bg-accent/20 text-foreground"
+                variant="outline"
+                onClick={() => handlePurchase(pendingRenewal, "pix")}
+                disabled={purchasing}
+              >
+                <QrCode className="h-6 w-6 text-accent shrink-0" />
+                <div className="text-left">
+                  <p className="font-semibold text-sm">PIX</p>
+                  <p className="text-[10px] text-muted-foreground">Pagamento instantâneo</p>
+                </div>
+              </Button>
+
+              <Button
+                className="w-full h-14 justify-start gap-3 bg-primary/10 border border-primary/30 hover:bg-primary/20 text-foreground"
+                variant="outline"
+                onClick={() => handlePurchase(pendingRenewal, "card")}
+                disabled={purchasing}
+              >
+                <CreditCard className="h-6 w-6 text-primary shrink-0" />
+                <div className="text-left">
+                  <p className="font-semibold text-sm">Cartão de Crédito</p>
+                  <p className="text-[10px] text-muted-foreground">Parcele em até 12x</p>
+                </div>
+              </Button>
+
+              <Button
+                variant="ghost"
+                className="w-full text-muted-foreground"
+                onClick={() => { setShowPaymentMethodModal(false); setPendingRenewal(false); }}
+              >
+                Cancelar
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
       {/* PIX QR Code Modal */}
       {pixData && (
-        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4" onClick={() => {}}>
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
           <Card className="w-full max-w-sm bg-card border-primary/30">
             <CardHeader className="text-center pb-2">
               <CardTitle className="text-lg">Pagar com PIX</CardTitle>
