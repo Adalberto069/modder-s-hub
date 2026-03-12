@@ -142,6 +142,23 @@ export default function ScriptDetail() {
     };
   }, []);
 
+  // Handle card payment return via query params
+  useEffect(() => {
+    const paymentStatus = searchParams.get("payment");
+    if (paymentStatus === "success") {
+      toast.success("Pagamento com cartão aprovado! Sua licença será ativada em instantes.");
+      queryClient.invalidateQueries({ queryKey: ["script-license", id, user?.id] });
+      queryClient.invalidateQueries({ queryKey: ["my-licenses"] });
+      setSearchParams({}, { replace: true });
+    } else if (paymentStatus === "failure") {
+      toast.error("Pagamento com cartão falhou. Tente novamente.");
+      setSearchParams({}, { replace: true });
+    } else if (paymentStatus === "pending") {
+      toast.info("Pagamento pendente. Você será notificado quando for aprovado.");
+      setSearchParams({}, { replace: true });
+    }
+  }, [searchParams, setSearchParams, queryClient, id, user?.id]);
+
   // Poll PIX payment status
   const startPolling = useCallback((purchaseId: string) => {
     if (pollingRef.current) clearInterval(pollingRef.current);
