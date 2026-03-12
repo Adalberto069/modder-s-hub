@@ -6,15 +6,15 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-// Generate a random variable name
+// Generate a random variable name safe for all Lua versions
 function randVar(): string {
   const chars = "abcdefghijklmnopqrstuvwxyz";
-  const prefix = chars[Math.floor(Math.random() * chars.length)];
-  const suffix = Math.random().toString(36).substring(2, 6);
-  return `${prefix}${suffix}`;
+  const first = chars[Math.floor(Math.random() * chars.length)];
+  const rest = Math.random().toString(36).substring(2, 7);
+  return first + rest;
 }
 
-// Memory-efficient Lua obfuscation: encodes code as padded decimal sequences in a string literal
+// Memory-efficient Lua obfuscation compatible with LuaJ (Android/GG)
 function obfuscateLua(code: string, buyerId: string): string {
   const encodedBuyerId = Array.from(new TextEncoder().encode(buyerId))
     .map((b) => b.toString(16).padStart(2, "0"))
@@ -23,17 +23,18 @@ function obfuscateLua(code: string, buyerId: string): string {
   const codeBytes = Array.from(new TextEncoder().encode(code));
   const key = Math.floor(Math.random() * 200) + 50; // XOR key
 
+  // Use much smaller chunks per line to avoid "failed read line" (line length limits)
+  // 80 bytes = 320 characters per line after \ddd escaping
   const chunks: string[] = [];
-  const chunkSize = 16384; // 16KB strings to avoid line limits
-  let currentChunk = "";
+  const bytesPerLine = 80;
   
-  for (let i = 0; i < codeBytes.length; i++) {
-    const dec = codeBytes[i] ^ key;
-    currentChunk += "\\" + dec.toString(10).padStart(3, "0");
-    if ((i + 1) % chunkSize === 0 || i === codeBytes.length - 1) {
-      chunks.push(`    "${currentChunk}"`);
-      currentChunk = "";
+  for (let i = 0; i < codeBytes.length; i += bytesPerLine) {
+    let line = "";
+    const slice = codeBytes.slice(i, i + bytesPerLine);
+    for (const b of slice) {
+      line += "\\" + (b ^ key).toString(10).padStart(3, "0");
     }
+    chunks.push(`    "${line}"`);
   }
   
   const byteListMultiline = chunks.join(",\n");
@@ -50,10 +51,9 @@ function obfuscateLua(code: string, buyerId: string): string {
   const vF = randVar();
   const vInit = randVar();
 
-  const obfuscated = [
+  return [
     `-- Protected by GG Marketplace`,
-    `-- Buyer ID: ${encodedBuyerId}`,
-    `-- Redistribution is prohibited`,
+    `-- ID: ${encodedBuyerId}`,
     `local function ${vInit}()`,
     `  local ${vP} = {`,
     byteListMultiline,
@@ -62,29 +62,29 @@ function obfuscateLua(code: string, buyerId: string): string {
     `  local ${vS} = table.concat(${vP})`,
     `  local ${vRes} = {}`,
     `  local ${vChunk} = {}`,
-    `  local ${vC} = 1`,
+    `  local ${vC} = 0`,
     `  local ${vBxor} = bit32 and bit32.bxor or function(a,b) local c,d=0,1; for e=0,7 do if a%2~=b%2 then c=c+d end; a=math.floor(a/2); b=math.floor(b/2); d=d*2 end return c end`,
     `  for ${vI} = 1, #${vS} do`,
-    `    ${vChunk}[${vC}] = string.char(${vBxor}(string.byte(${vS}, ${vI}), ${vK}))`,
     `    ${vC} = ${vC} + 1`,
-    `    if ${vC} > 4096 then`,
+    `    ${vChunk}[${vC}] = string.char(${vBxor}(string.byte(${vS}, ${vI}), ${vK}))`,
+    `    if ${vC} >= 2000 then`,
     `      ${vRes}[#${vRes}+1] = table.concat(${vChunk})`,
     `      ${vChunk} = {}`,
-    `      ${vC} = 1`,
+    `      ${vC} = 0`,
     `    end`,
     `  end`,
-    `  if ${vC} > 1 then`,
+    `  if ${vC} > 0 then`,
     `    ${vRes}[#${vRes}+1] = table.concat(${vChunk})`,
     `  end`,
     `  local ${vDec} = table.concat(${vRes})`,
-    `  local ${vF} = load or loadstring`,
-    `  return ${vF}(${vDec})()`,
+    `  local ${vF} = loadstring or load`,
+    `  local ${vS}, ${vRes} = ${vF}(${vDec})`,
+    `  if not ${vS} then error(${vRes}) end`,
+    `  return ${vS}()`,
     `end`,
     `return ${vInit}()`,
     ""
   ].join("\n");
-
-  return obfuscated;
 }
 
 Deno.serve(async (req) => {
