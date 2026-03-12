@@ -90,7 +90,7 @@ export function ModderFinanceTab({ totalEarnings }: ModderFinanceTabProps) {
     }
 
     setRequesting(true);
-    const { error } = await supabase
+    const { error } = await (supabase as any)
       .from("withdrawals")
       .insert({
         modder_id: user?.id,
