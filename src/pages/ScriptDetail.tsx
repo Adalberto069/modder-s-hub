@@ -15,7 +15,7 @@ import { useAuth } from "@/lib/auth";
 import {
   Download, Star, ExternalLink, ArrowLeft, User, ShieldCheck, ShieldAlert, ShieldX,
   ChevronLeft, ChevronRight, Play, MessageSquare, Lock, CheckCircle, Clock,
-  Copy, Check, Gamepad2, Tag, List, BookOpen, FileCode, ShoppingCart, Key,
+  Copy, Check, Gamepad2, Tag, List, BookOpen, FileCode, ShoppingCart, Key, CreditCard, QrCode,
 } from "lucide-react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
