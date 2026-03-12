@@ -277,15 +277,23 @@ export default function ScriptDetail() {
 
   const profileMap = (reviewerProfiles ?? []).reduce((acc: any, p: any) => { acc[p.user_id] = p; return acc; }, {});
 
-  const handlePurchase = async (isRenewal = false) => {
+  const handlePurchase = async (isRenewal = false, paymentMethod: "pix" | "card" = "pix") => {
     if (!user) { setShowLoginPrompt(true); return; }
     if (!script) return;
     setPurchasing(true);
+    setShowPaymentMethodModal(false);
     try {
       const { data, error } = await supabase.functions.invoke("create-pix-payment", {
-        body: { script_id: script.id, is_renewal: isRenewal },
+        body: { script_id: script.id, is_renewal: isRenewal, payment_method: paymentMethod },
       });
       if (error) throw error;
+
+      if (paymentMethod === "card" && data?.init_point) {
+        // Redirect to Mercado Pago checkout
+        window.location.href = data.init_point;
+        return;
+      }
+
       if (data?.qr_code || data?.qr_code_base64) {
         setPixData({
           purchase_id: data.purchase_id,
@@ -294,7 +302,7 @@ export default function ScriptDetail() {
         });
         startPolling(data.purchase_id);
       } else {
-        throw new Error("Falha ao gerar QR Code PIX");
+        throw new Error("Falha ao gerar pagamento");
       }
     } catch (err: any) {
       toast.error("Erro ao iniciar pagamento: " + (err.message || "Tente novamente"));
@@ -304,7 +312,14 @@ export default function ScriptDetail() {
 
   const handleRenew = async () => {
     if (!user || !script || !existingLicense) return;
-    handlePurchase(true);
+    setPendingRenewal(true);
+    setShowPaymentMethodModal(true);
+  };
+
+  const openPaymentMethodModal = () => {
+    if (!user) { setShowLoginPrompt(true); return; }
+    setPendingRenewal(false);
+    setShowPaymentMethodModal(true);
   };
 
   const handleDownloadLoader = () => {
