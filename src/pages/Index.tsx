@@ -80,28 +80,37 @@ export default function Index() {
     : topModders;
 
   // Fetch roles for hall of fame modders
-  const hallUserIds = hallOfFameModders.map((p: any) => p.user_id).filter(Boolean);
+  const hallIds = hallOfFameModders.flatMap((p: any) => [p.user_id, p.id].filter(Boolean));
   const { data: hallRolesMap = {} } = useQuery({
-    queryKey: ["hall-roles", hallUserIds.join(",")],
+    queryKey: ["hall-roles", hallIds.join(",")],
     queryFn: async () => {
-      if (hallUserIds.length === 0) return {};
+      if (hallIds.length === 0) return {};
       const { data } = await supabase
         .from("user_roles")
         .select("user_id, role, approved")
-        .or(`user_id.in.(${hallUserIds.join(",")}),user_id.in.(select user_id from profiles where id.in.(${hallUserIds.map(id => `'${id}'`).join(",")}))`)
+        .in("user_id", hallIds)
         .eq("approved", true);
+      
       const map: Record<string, string> = {};
+      
+      // First, map roles to user_ids, priorizing admin
       for (const r of data ?? []) {
         const current = map[r.user_id];
         if (r.role === "admin" || (!current && r.role === "modder")) {
           map[r.user_id] = r.role;
-        } else if (!current) {
-          map[r.user_id] = r.role;
         }
       }
+
+      // Also map the same roles to the profile IDs so they can be looked up either way
+      for (const profile of hallOfFameModders) {
+        if (profile.user_id && map[profile.user_id]) {
+          map[profile.id] = map[profile.user_id];
+        }
+      }
+      
       return map;
     },
-    enabled: hallUserIds.length > 0,
+    enabled: hallIds.length > 0,
   });
 
   const { data: stats } = useQuery({
