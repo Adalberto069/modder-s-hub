@@ -9,8 +9,9 @@ import { motion } from "framer-motion";
 import { useModderProfiles } from "@/hooks/use-modder-profiles";
 import {
   Code, Shield, Lock, ArrowRight, Zap, ShieldCheck, Key, Store,
-  Download, Star, Users, ChevronRight, Quote,
+  Download, Star, Users, ChevronRight, Quote, MessageCircle, Trophy, Heart,
 } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
 import heroBg from "@/assets/hero-bg.jpg";
 import type { Easing } from "framer-motion";
@@ -66,27 +67,6 @@ export default function Index() {
     },
   });
 
-  const testimonials = [
-    {
-      name: "João",
-      location: "SP",
-      comment: "O loader funcionou perfeitamente! Sistema de licença muito profissional.",
-      rating: 5,
-    },
-    {
-      name: "Carlos",
-      location: "RJ",
-      comment: "Melhor marketplace de scripts que já usei. Rápido, seguro e organizado.",
-      rating: 5,
-    },
-    {
-      name: "Ana",
-      location: "MG",
-      comment: "A ofuscação dos scripts é excelente. Meus scripts ficaram 100% protegidos.",
-      rating: 5,
-    },
-  ];
-
   return (
     <Layout>
       {/* ══════════════ HERO ══════════════ */}
@@ -132,8 +112,8 @@ export default function Index() {
               custom={2}
               className="text-base sm:text-xl text-muted-foreground max-w-xl mb-8 sm:mb-10 leading-relaxed"
             >
-              Baixe hoje e proteja suas criações. Marketplace profissional com sistema de licenças, 
-              ofuscação avançada e suporte dedicado.
+              Faça parte da maior elite de modders mobile. Marketplace profissional, 
+              ofuscação avançada e uma comunidade focada em evolução constante.
             </motion.p>
 
             <motion.div variants={fadeUp} custom={3} className="flex flex-col sm:flex-row gap-3 sm:gap-4">
@@ -254,6 +234,128 @@ export default function Index() {
         </div>
       </section>
 
+      {/* ══════════════ TOP MODDERS / HALL DA FAMA ══════════════ */}
+      <section className="py-14 sm:py-24 bg-card/10">
+        <div className="container">
+          <motion.div
+            className="text-center mb-12"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            <Badge variant="outline" className="neon-border mb-4 font-mono">
+              <Trophy className="h-3.5 w-3.5 mr-1.5 text-yellow-500" /> Hall da Fama
+            </Badge>
+            <h2 className="text-3xl sm:text-4xl font-bold tracking-tight">
+              A Elite dos <span className="text-neon-purple">Criadores</span>
+            </h2>
+            <p className="text-muted-foreground mt-4 max-w-2xl mx-auto">
+              Conheça os modders que mais contribuem e elevam o nível dos scripts Game Guardian em nossa plataforma.
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {Object.values(profileMap).slice(0, 4).map((profile: any, i: number) => (
+              <motion.div
+                key={profile.id}
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                className="flex flex-col items-center p-6 rounded-xl border border-border/50 bg-background/50 hover:neon-border transition-all group"
+                onClick={() => navigate(`/profile/${profile.username || profile.id}`)}
+              >
+                <div className="relative mb-4">
+                  <Avatar className="h-20 w-20 border-2 border-primary/20 group-hover:border-primary transition-colors">
+                    <AvatarImage src={profile.avatar_url} />
+                    <AvatarFallback className="bg-primary/10 text-xl font-bold">
+                      {(profile.display_name || profile.username || "?")[0].toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="absolute -bottom-1 -right-1 bg-background border border-border rounded-full p-1">
+                    <ShieldCheck className="h-4 w-4 text-neon-green" />
+                  </div>
+                </div>
+                <h3 className="font-bold text-lg text-center line-clamp-1">
+                  {profile.display_name || profile.username || "Modder"}
+                </h3>
+                <p className="text-xs text-muted-foreground font-mono mt-1">
+                  @{profile.username || "user"}
+                </p>
+                <div className="flex items-center gap-1 mt-3">
+                  <Star className="h-3 w-3 text-accent fill-accent" />
+                  <span className="text-xs font-bold">VIP CREATOR</span>
+                </div>
+              </motion.div>
+            ))}
+            {Object.values(profileMap).length === 0 && (
+              <div className="col-span-full text-center py-10 opacity-50">
+                <Users className="h-10 w-10 mx-auto mb-2" />
+                <p>Nenhum criador em destaque no momento.</p>
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════════ COMMUNITY SOCIALS ══════════════ */}
+      <section className="relative py-14 sm:py-24 overflow-hidden border-y border-border/30">
+        <div className="absolute inset-0 bg-primary/5" />
+        <div className="container relative z-10 flex flex-col lg:flex-row items-center gap-12">
+          <div className="flex-1 space-y-6 text-center lg:text-left">
+            <Badge variant="outline" className="neon-border-green font-mono">
+              <MessageCircle className="h-3.5 w-3.5 mr-1.5" /> Nossa Comunidade
+            </Badge>
+            <h2 className="text-3xl sm:text-5xl font-bold tracking-tight">
+              Não apenas use códigos, <br />
+              <span className="text-neon-green">faça parte do movimento</span>
+            </h2>
+            <p className="text-lg text-muted-foreground max-w-xl mx-auto lg:mx-0">
+              Troque conhecimento, aprenda com os melhores modders e evolua seus códigos. Nossa casa é o lugar onde a elite se encontra.
+            </p>
+            <div className="flex flex-wrap justify-center lg:justify-start gap-4 pt-4">
+              <Button size="lg" className="bg-[#5865F2] hover:bg-[#4752C4] text-white border-none px-8">
+                <Users className="mr-2 h-5 w-5" /> Discord Oficial
+              </Button>
+              <Button size="lg" className="bg-[#0088cc] hover:bg-[#0077b5] text-white border-none px-8">
+                <MessageCircle className="mr-2 h-5 w-5" /> Grupo Telegram
+              </Button>
+            </div>
+          </div>
+          <div className="flex-1 w-full max-w-md">
+            <div className="relative aspect-square sm:aspect-video lg:aspect-square flex items-center justify-center">
+              <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 to-accent/20 rounded-3xl blur-2xl animate-pulse" />
+              <Card className="relative w-full border-2 border-primary/30 bg-background/80 backdrop-blur-xl p-8 rounded-3xl overflow-hidden shadow-2xl">
+                <div className="space-y-6">
+                  <div className="flex items-center gap-4 border-b border-border pb-6">
+                    <div className="h-12 w-12 rounded-full bg-primary/20 flex items-center justify-center">
+                      <Heart className="h-6 w-6 text-primary animate-bounce-slow" />
+                    </div>
+                    <div>
+                      <p className="font-bold">+1,200 Membros</p>
+                      <p className="text-xs text-muted-foreground uppercase tracking-widest">Ativos no chat</p>
+                    </div>
+                  </div>
+                  <div className="space-y-4">
+                    {[
+                      "Tutoriais exclusivos",
+                      "Troca de métodos de ofuscação",
+                      "Suporte direto de modders",
+                      "Eventos e competições"
+                    ].map((item) => (
+                      <div key={item} className="flex items-center gap-3">
+                        <div className="h-2 w-2 rounded-full bg-neon-green shadow-[0_0_8px_hsl(var(--neon-green))]" />
+                        <span className="text-sm font-medium">{item}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </Card>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ══════════════ MARKETPLACE HIGHLIGHTS ══════════════ */}
       <section className="py-14 sm:py-24">
         <div className="container">
@@ -322,62 +424,6 @@ export default function Index() {
         </div>
       </section>
 
-      {/* ══════════════ TESTIMONIALS ══════════════ */}
-      <section className="relative py-14 sm:py-24 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-background via-card/20 to-background" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full blur-[200px]" />
-
-        <div className="container relative z-10">
-          <motion.div
-            className="text-center mb-14"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-          >
-            <Badge variant="outline" className="neon-border mb-4 font-mono">
-              <Quote className="h-3 w-3 mr-1" /> Depoimentos
-            </Badge>
-            <h2 className="text-3xl sm:text-4xl font-bold tracking-tight">
-              O que nossos <span className="text-neon-purple">usuários</span> dizem
-            </h2>
-          </motion.div>
-
-          <div className="grid md:grid-cols-3 gap-6">
-            {testimonials.map((t, i) => (
-              <motion.div
-                key={t.name}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.12 }}
-              >
-                <Card className="neon-border bg-card/60 h-full">
-                  <CardContent className="p-6 space-y-4">
-                    <div className="flex gap-0.5">
-                      {Array.from({ length: t.rating }).map((_, j) => (
-                        <Star key={j} className="h-4 w-4 fill-accent text-accent" />
-                      ))}
-                    </div>
-                    <p className="text-foreground/90 leading-relaxed italic">
-                      "{t.comment}"
-                    </p>
-                    <div className="flex items-center gap-3 pt-2 border-t border-border/50">
-                      <div className="h-10 w-10 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center">
-                        <span className="text-sm font-bold text-primary">{t.name[0]}</span>
-                      </div>
-                      <div>
-                        <p className="font-semibold text-sm">{t.name}</p>
-                        <p className="text-xs text-muted-foreground">{t.location}</p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* ══════════════ CTA FINAL ══════════════ */}
       <section className="py-14 sm:py-24">
         <div className="container">
@@ -393,10 +439,10 @@ export default function Index() {
 
             <div className="relative z-10 px-5 py-12 sm:px-16 sm:py-20 text-center">
               <h2 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4">
-                Pronto para começar?
+                Pronto para evoluir?
               </h2>
               <p className="text-lg text-muted-foreground max-w-lg mx-auto mb-8">
-                Junte-se à comunidade de modders e tenha acesso a scripts exclusivos com proteção profissional.
+                Junte-se à nossa família de modders e tenha acesso a proteção profissional e conhecimento de elite.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button
@@ -404,7 +450,7 @@ export default function Index() {
                   className="neon-glow-purple font-semibold text-base h-13 px-10"
                   onClick={() => navigate("/marketplace")}
                 >
-                  <Store className="mr-2 h-5 w-5" /> Explorar Marketplace
+                  <Store className="mr-2 h-5 w-5" /> Explorar Hub
                 </Button>
                 <Button
                   size="lg"
@@ -412,7 +458,7 @@ export default function Index() {
                   className="neon-border font-semibold text-base h-13 px-10"
                   onClick={() => navigate("/auth?tab=signup")}
                 >
-                  Criar Conta Grátis
+                  Juntar-se à Comunidade
                 </Button>
               </div>
             </div>
