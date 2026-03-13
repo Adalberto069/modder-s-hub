@@ -63,7 +63,7 @@ ${code.substring(0, 50000)}
     // Try AI analysis first, fallback to static
     let parsed;
     try {
-      const session = new Supabase.ai.Session('google/gemini-2.5-flash');
+      const session = new (globalThis as any).Supabase.ai.Session('google/gemini-2.5-flash');
       const aiOutput = await session.run(prompt, { stream: false });
       const content = typeof aiOutput === 'string' ? aiOutput : (aiOutput as any)?.content ?? JSON.stringify(aiOutput);
       const jsonMatch = content.match(/\{[\s\S]*\}/);
