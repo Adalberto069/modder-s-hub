@@ -467,12 +467,56 @@ end
                       <div className="grid md:grid-cols-2 gap-4">
                         <div>
                           <Label>Arquivo (upload)</Label>
-                          <Input type="file" onChange={(e) => setFile(e.target.files?.[0] ?? null)} />
+                          <Input type="file" onChange={async (e) => {
+                            const f = e.target.files?.[0] ?? null;
+                            if (!f) {
+                              setFile(null);
+                              return;
+                            }
+                            const safeName = await validateFileWithToast({ file: f, type: "script", maxSizeMB: 20 });
+                            if (!safeName) {
+                              e.target.value = "";
+                              setFile(null);
+                              return;
+                            }
+                            setFile(f);
+                          }} />
                         </div>
                         <div>
-                          <Label>Link externo (opcional)</Label>
-                          <Input value={externalLink} onChange={(e) => setExternalLink(e.target.value)} placeholder="https://..." />
+                          <Label>Miniatura (upload)</Label>
+                          <div className="flex gap-2">
+                            <Input 
+                              type="file" 
+                              accept=".jpg,.jpeg,.png,.webp"
+                              className="text-xs"
+                              onChange={async (e) => {
+                                const f = e.target.files?.[0];
+                                if (!f) return;
+                                const safeName = await validateFileWithToast({ file: f, type: "image", maxSizeMB: 1 });
+                                if (!safeName) {
+                                  e.target.value = "";
+                                  return;
+                                }
+                                toast.info("Enviando miniatura...");
+                                const path = `thumbnails/${user.id}/${safeName}`;
+                                const { error: uploadError } = await supabase.storage.from("scripts").upload(path, f);
+                                if (uploadError) {
+                                  toast.error("Erro no upload: " + uploadError.message);
+                                  return;
+                                }
+                                const { data: publicData } = supabase.storage.from("scripts").getPublicUrl(path);
+                                setExternalLink(publicData.publicUrl); // Using externalLink as a temporary holder or I should add a state
+                                toast.success("Miniatura enviada!");
+                              }}
+                            />
+                          </div>
+                          <p className="text-[10px] text-muted-foreground mt-1">Apenas JPG/PNG/WebP, Máx 1MB.</p>
                         </div>
+                      </div>
+
+                      <div>
+                        <Label>Link externo ou URL da Miniatura</Label>
+                        <Input value={externalLink} onChange={(e) => setExternalLink(e.target.value)} placeholder="https://..." />
                       </div>
                       <Button type="submit" disabled={submitting} className="neon-glow-purple">
                         {submitting ? "Publicando..." : `Publicar ${scriptType === "script" ? "Script" : "APK/Mod"}`}

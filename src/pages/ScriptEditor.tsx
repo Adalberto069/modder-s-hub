@@ -392,9 +392,44 @@ export default function ScriptEditor() {
                 <Textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={3} placeholder="Descreva o que este script faz..." />
               </div>
 
-              <div>
-                <Label>Thumbnail URL</Label>
-                <Input value={thumbnailUrl} onChange={(e) => setThumbnailUrl(e.target.value)} placeholder="https://..." />
+              <div className="grid md:grid-cols-2 gap-4">
+                <div>
+                  <Label>Thumbnail URL (opcional)</Label>
+                  <Input value={thumbnailUrl} onChange={(e) => setThumbnailUrl(e.target.value)} placeholder="https://..." />
+                </div>
+                <div>
+                  <Label>Ou Enviar Imagem (Recomendado)</Label>
+                  <div className="flex gap-2">
+                    <Input 
+                      type="file" 
+                      accept=".jpg,.jpeg,.png,.webp" 
+                      onChange={async (e) => {
+                        const f = e.target.files?.[0];
+                        if (!f) return;
+                        const safeName = await validateFileWithToast({ file: f, type: "image", maxSizeMB: 1 });
+                        if (!safeName) {
+                          e.target.value = "";
+                          return;
+                        }
+
+                        toast.info("Enviando miniatura...");
+                        const path = `thumbnails/${user!.id}/${safeName}`;
+                        const { error: uploadError } = await supabase.storage.from("scripts").upload(path, f);
+                        
+                        if (uploadError) {
+                          toast.error("Erro no upload: " + uploadError.message);
+                          return;
+                        }
+
+                        const { data: { publicUrl } } = supabase.storage.from("scripts").getPublicUrl(path);
+                        setThumbnailUrl(publicUrl);
+                        toast.success("Miniatura enviada!");
+                      }}
+                      className="text-xs"
+                    />
+                  </div>
+                  <p className="text-[10px] text-muted-foreground mt-1">Máx: 1MB. Apenas JPG, PNG ou WebP (Sem GIFs).</p>
+                </div>
               </div>
             </CardContent>
           </Card>

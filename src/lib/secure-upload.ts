@@ -4,7 +4,6 @@ import { toast } from "sonner";
 const IMAGE_MIMES = new Set([
   "image/jpeg",
   "image/png",
-  "image/gif",
   "image/webp",
 ]);
 
@@ -18,7 +17,7 @@ const SCRIPT_MIMES = new Set([
 const SCRIPT_EXTENSIONS = new Set(["lua"]);
 const FORBIDDEN_DOUBLE_EXTENSIONS = new Set(["apk", "exe", "zip", "rar", "jar", "bin", "sh", "bat", "cmd"]);
 
-const IMAGE_EXTENSIONS = new Set(["jpg", "jpeg", "png", "gif", "webp"]);
+const IMAGE_EXTENSIONS = new Set(["jpg", "jpeg", "png", "webp"]);
 
 // --- Dangerous byte signatures (magic bytes) ---
 const DANGEROUS_SIGNATURES: Uint8Array[] = [
@@ -147,11 +146,11 @@ export async function validateFile({
   }
 
   // 1. Size check
-  const maxSize = (maxSizeMB ?? (type === "image" ? 2 : 20)) * 1024 * 1024;
+  const maxSize = (maxSizeMB ?? (type === "image" ? 1 : 20)) * 1024 * 1024;
   if (file.size > maxSize) {
     return {
       valid: false,
-      error: `Arquivo muito grande. Máximo: ${maxSizeMB ?? (type === "image" ? 2 : 20)}MB`,
+      error: `Arquivo muito grande. Máximo: ${maxSizeMB ?? (type === "image" ? 1 : 20)}MB`,
       sanitizedName: safeName,
       extension,
     };

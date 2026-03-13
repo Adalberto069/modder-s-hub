@@ -573,13 +573,40 @@ export default function TutorialEditor() {
                   </Select>
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-xs">URL da Thumbnail</Label>
+                  <Label className="text-xs">Thumbnail URL</Label>
                   <Input
                     value={form.thumbnail_url}
                     onChange={(e) => setForm((f) => ({ ...f, thumbnail_url: e.target.value }))}
                     placeholder="https://..."
                     className="h-9 text-sm"
                   />
+                </div>
+                <div className="space-y-1.5 text-right">
+                   <Label className="text-xs">Ou Enviar Imagem</Label>
+                   <Input 
+                      type="file" 
+                      accept=".jpg,.jpeg,.png,.webp"
+                      className="h-9 text-xs"
+                      onChange={async (e) => {
+                        const f = e.target.files?.[0];
+                        if (!f) return;
+                        const safeName = await validateFileWithToast({ file: f, type: "image", maxSizeMB: 1 });
+                        if (!safeName) {
+                          e.target.value = "";
+                          return;
+                        }
+                        toast.info("Enviando miniatura...");
+                        const path = `tutorial-thumbnails/${user!.id}/${safeName}`;
+                        const { error: uploadError } = await supabase.storage.from("scripts").upload(path, f);
+                        if (uploadError) {
+                          toast.error("Erro no upload: " + uploadError.message);
+                          return;
+                        }
+                        const { data: publicData } = supabase.storage.from("scripts").getPublicUrl(path);
+                        setForm(f => ({ ...f, thumbnail_url: publicData.publicUrl }));
+                        toast.success("Miniatura enviada!");
+                      }}
+                   />
                 </div>
               </div>
 
