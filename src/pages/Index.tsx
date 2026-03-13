@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { useModderProfiles } from "@/hooks/use-modder-profiles";
+import { useAuth } from "@/lib/auth";
 import {
   Code, Shield, Lock, ArrowRight, Zap, ShieldCheck, Key, Store,
   Download, Star, Users, ChevronRight, Quote, MessageCircle, Trophy, Heart,
@@ -33,6 +34,7 @@ const stagger = {
 
 export default function Index() {
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const { data: scripts } = useQuery({
     queryKey: ["featured-scripts"],
@@ -48,8 +50,26 @@ export default function Index() {
   });
 
   const modderIds = [...new Set(scripts?.map((s: any) => s.modder_id as string) ?? [])];
-  const { data: modderProfiles } = useModderProfiles(modderIds);
-  const profileMap = modderProfiles ?? {};
+  
+  // Also fetch top modders by reputation as fallbacks or for the hall of fame
+  const { data: topModders = [] } = useQuery({
+    queryKey: ["top-modders"],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("profiles")
+        .select("*")
+        .order("reputation_score", { ascending: false })
+        .limit(4);
+      return data ?? [];
+    },
+  });
+
+  const { data: profileMap = {} } = useModderProfiles(modderIds);
+
+  // Combine featured modders with top modders for the Hall of Fame
+  const hallOfFameModders = modderIds.length > 0 
+    ? Object.values(profileMap) 
+    : topModders;
 
   const { data: stats } = useQuery({
     queryKey: ["platform-stats"],
@@ -255,15 +275,15 @@ export default function Index() {
           </motion.div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {Object.values(profileMap).slice(0, 4).map((profile: any, i: number) => (
+            {hallOfFameModders.slice(0, 4).map((profile: any, i: number) => (
               <motion.div
                 key={profile.id}
                 initial={{ opacity: 0, scale: 0.9 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
-                className="flex flex-col items-center p-6 rounded-xl border border-border/50 bg-background/50 hover:neon-border transition-all group"
-                onClick={() => navigate(`/profile/${profile.username || profile.id}`)}
+                className="flex flex-col items-center p-6 rounded-xl border border-border/50 bg-background/50 hover:neon-border transition-all group cursor-pointer"
+                onClick={() => navigate(`/modder/${profile.id}`)}
               >
                 <div className="relative mb-4">
                   <Avatar className="h-20 w-20 border-2 border-primary/20 group-hover:border-primary transition-colors">
@@ -314,10 +334,18 @@ export default function Index() {
               Troque conhecimento, aprenda com os melhores modders e evolua seus códigos. Nossa casa é o lugar onde a elite se encontra.
             </p>
             <div className="flex flex-wrap justify-center lg:justify-start gap-4 pt-4">
-              <Button size="lg" className="bg-[#5865F2] hover:bg-[#4752C4] text-white border-none px-8">
+              <Button 
+                size="lg" 
+                className="bg-[#5865F2] hover:bg-[#4752C4] text-white border-none px-8"
+                onClick={() => window.open("https://discord.gg/your-invite", "_blank")}
+              >
                 <Users className="mr-2 h-5 w-5" /> Discord Oficial
               </Button>
-              <Button size="lg" className="bg-[#0088cc] hover:bg-[#0077b5] text-white border-none px-8">
+              <Button 
+                size="lg" 
+                className="bg-[#0088cc] hover:bg-[#0077b5] text-white border-none px-8"
+                onClick={() => window.open("https://t.me/your-group", "_blank")}
+              >
                 <MessageCircle className="mr-2 h-5 w-5" /> Grupo Telegram
               </Button>
             </div>
@@ -456,9 +484,9 @@ export default function Index() {
                   size="lg"
                   variant="outline"
                   className="neon-border font-semibold text-base h-13 px-10"
-                  onClick={() => navigate("/auth?tab=signup")}
+                  onClick={() => navigate(user ? "/forum" : "/auth?tab=signup")}
                 >
-                  Juntar-se à Comunidade
+                  {user ? "Ir para o Fórum" : "Juntar-se à Comunidade"}
                 </Button>
               </div>
             </div>
