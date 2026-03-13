@@ -9,9 +9,12 @@ export function useModderProfiles(modderIds: string[]) {
       const { data } = await supabase
         .from("profiles")
         .select("*")
-        .in("id", modderIds);
+        .or(`id.in.(${modderIds.join(",")}),user_id.in.(${modderIds.join(",")})`);
       const map: Record<string, any> = {};
-      data?.forEach((p: any) => { map[p.id] = p; });
+      data?.forEach((p: any) => { 
+        map[p.id] = p; 
+        map[p.user_id] = p; // Map by both to be extremely safe
+      });
       return map;
     },
     enabled: modderIds.length > 0,

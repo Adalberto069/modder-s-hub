@@ -18,19 +18,25 @@ export default function ModderProfile() {
   const { data: profile, isLoading: profileLoading } = useQuery({
     queryKey: ["modder-profile", userId],
     queryFn: async () => {
-      const { data } = await supabase.from("profiles").select("*").eq("user_id", userId!).single();
+      const { data } = await supabase
+        .from("profiles")
+        .select("*")
+        .or(`id.eq.${userId},user_id.eq.${userId}`)
+        .maybeSingle();
       return data;
     },
     enabled: !!userId,
   });
 
   const { data: scripts, isLoading: scriptsLoading } = useQuery({
-    queryKey: ["modder-scripts", userId],
+    queryKey: ["modder-scripts", userId, profile?.id, profile?.user_id],
     queryFn: async () => {
+      // modder_id relates to profiles.id in the schema
+      const searchId = profile?.id || userId;
       const { data } = await supabase
         .from("scripts")
         .select("*, categories(slug)")
-        .eq("modder_id", userId!)
+        .eq("modder_id", searchId!)
         .eq("publish_status", "published")
         .order("created_at", { ascending: false });
       return data ?? [];
@@ -39,12 +45,14 @@ export default function ModderProfile() {
   });
 
   const { data: tutorials } = useQuery({
-    queryKey: ["modder-tutorials", userId],
+    queryKey: ["modder-tutorials", userId, profile?.user_id],
     queryFn: async () => {
+      // tutorials author_id usually relates to auth.user_id/profiles.user_id
+      const searchId = profile?.user_id || userId;
       const { data } = await supabase
         .from("tutorials")
         .select("*")
-        .eq("author_id", userId!)
+        .or(`author_id.eq.${searchId},author_id.eq.${profile?.id}`)
         .order("created_at", { ascending: false });
       return data ?? [];
     },
@@ -52,12 +60,14 @@ export default function ModderProfile() {
   });
 
   const { data: userRoles } = useQuery({
-    queryKey: ["user-roles-public", userId],
+    queryKey: ["user-roles-public", userId, profile?.user_id],
     queryFn: async () => {
+      // user_roles definitely uses auth.user_id/profiles.user_id
+      const searchId = profile?.user_id || userId;
       const { data } = await supabase
         .from("user_roles")
         .select("role, approved")
-        .eq("user_id", userId!);
+        .or(`user_id.eq.${searchId},user_id.eq.${profile?.id}`)
       return data?.filter((r: any) => r.approved).map((r: any) => r.role) ?? [];
     },
     enabled: !!userId,

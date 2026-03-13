@@ -67,8 +67,9 @@ export default function Index() {
   const { data: profileMap = {} } = useModderProfiles(modderIds);
 
   // Combine featured modders with top modders for the Hall of Fame
-  const hallOfFameModders = modderIds.length > 0 
-    ? Object.values(profileMap) 
+  // Fallback to topModders if the specific map is empty (still loading or no matches)
+  const hallOfFameModders = Object.values(profileMap).length > 0 
+    ? Array.from(new Set(Object.values(profileMap))) 
     : topModders;
 
   const { data: stats } = useQuery({
@@ -308,7 +309,7 @@ export default function Index() {
                 </div>
               </motion.div>
             ))}
-            {Object.values(profileMap).length === 0 && (
+            {hallOfFameModders.length === 0 && (
               <div className="col-span-full text-center py-10 opacity-50">
                 <Users className="h-10 w-10 mx-auto mb-2" />
                 <p>Nenhum criador em destaque no momento.</p>
