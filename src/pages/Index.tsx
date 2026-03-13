@@ -310,9 +310,10 @@ export default function Index() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {hallOfFameModders.slice(0, 4).map((profile: any, i: number) => {
               const roleKey = hallRolesMap[profile.user_id] || hallRolesMap[profile.id];
-              const displayRole: "admin" | "modder" | "member" | "modder-elite" = 
-                roleKey === "admin" ? "admin" : 
-                roleKey === "modder" ? "modder" : "modder-elite"; 
+              // On the Home/Hall cards, we want the RoleBadge to show the ACTUAL role (Admin/Modder)
+              // because we already have the "MODDER ELITE" decorative star below.
+              const displayRole: "admin" | "modder" | "member" = 
+                roleKey === "admin" ? "admin" : "modder"; 
               return (
                 <motion.div
                   key={profile.id}
@@ -366,9 +367,8 @@ export default function Index() {
         <DialogContent className="sm:max-w-md">
           {selectedModder && (() => {
             const roleKey = hallRolesMap[selectedModder.user_id] || hallRolesMap[selectedModder.id];
-            const displayRole: "admin" | "modder" | "member" | "modder-elite" = 
-              roleKey === "admin" ? "admin" : 
-              roleKey === "modder" ? "modder" : "modder-elite";
+            const displayRole: "admin" | "modder" | "member" = 
+              roleKey === "admin" ? "admin" : "modder";
             return (
               <>
                 <DialogHeader>
