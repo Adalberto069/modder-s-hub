@@ -11,9 +11,15 @@ import { useAuth } from "@/lib/auth";
 import {
   Code, Shield, Lock, ArrowRight, Zap, ShieldCheck, Key, Store,
   Download, Star, Users, ChevronRight, Quote, MessageCircle, Trophy, Heart,
+  CalendarDays, Eye,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { UserBadges } from "@/components/UserBadges";
+import { UserRoleBadge } from "@/components/UserRoleBadge";
+import { RoleBadge } from "@/components/RoleBadge";
+import { useState } from "react";
 import heroBg from "@/assets/hero-bg.jpg";
 import type { Easing } from "framer-motion";
 
