@@ -62,15 +62,16 @@ export default function ModderProfile() {
   const { data: userRoles } = useQuery({
     queryKey: ["user-roles-public", userId, profile?.user_id],
     queryFn: async () => {
-      // user_roles definitely uses auth.user_id/profiles.user_id
       const searchId = profile?.user_id || userId;
+      if (!searchId || searchId === "undefined") return [];
+      
       const { data } = await supabase
         .from("user_roles")
         .select("role, approved")
-        .or(`user_id.eq.${searchId},user_id.eq.${profile?.id}`)
+        .or(`user_id.eq.${searchId}${profile?.id ? `,user_id.eq.${profile.id}` : ""}`)
       return data?.filter((r: any) => r.approved).map((r: any) => r.role) ?? [];
     },
-    enabled: !!userId,
+    enabled: !!userId && userId !== "undefined",
   });
 
   const displayRole: "admin" | "modder" | "member" = 

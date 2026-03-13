@@ -24,10 +24,11 @@ export function UserBadges({ userId, compact = false }: UserBadgesProps) {
   const { data: badges, isLoading } = useQuery({
     queryKey: ["user-badges", userId],
     queryFn: async () => {
+      // Search by either ID to be safe
       const { data } = await supabase
         .from("user_badges")
         .select("earned_at, badge_definitions(slug, name, description, icon, color, sort_order)")
-        .eq("user_id", userId)
+        .or(`user_id.eq.${userId},user_id.in.(select user_id from profiles where id = '${userId}')`)
         .order("earned_at", { ascending: true });
 
       return (data ?? [])
@@ -37,7 +38,7 @@ export function UserBadges({ userId, compact = false }: UserBadgesProps) {
         }))
         .sort((a: any, b: any) => a.sort_order - b.sort_order);
     },
-    enabled: !!userId,
+    enabled: !!userId && userId !== "undefined",
   });
 
   if (isLoading || !badges || badges.length === 0) return null;
