@@ -84,6 +84,9 @@ export default function ModderProfile() {
 
   const isElite = topModders?.some((m: any) => m.id === profile?.id);
 
+  // If they are elite, they are "modder-elite". 
+  // If they have scripts or the modder role, they are "modder".
+  // Otherwise, they are "member".
   const displayRole: "admin" | "modder" | "member" | "modder-elite" = 
     userRoles?.includes("admin") ? "admin" : 
     isElite ? "modder-elite" : 

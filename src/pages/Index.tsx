@@ -88,7 +88,7 @@ export default function Index() {
       const { data } = await supabase
         .from("user_roles")
         .select("user_id, role, approved")
-        .in("user_id", hallUserIds)
+        .or(`user_id.in.(${hallUserIds.join(",")}),user_id.in.(select user_id from profiles where id.in.(${hallUserIds.map(id => `'${id}'`).join(",")}))`)
         .eq("approved", true);
       const map: Record<string, string> = {};
       for (const r of data ?? []) {
@@ -309,8 +309,10 @@ export default function Index() {
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {hallOfFameModders.slice(0, 4).map((profile: any, i: number) => {
-              const roleKey = hallRolesMap[profile.user_id];
-              const displayRole: "admin" | "modder" | "member" = roleKey === "admin" ? "admin" : roleKey === "modder" ? "modder" : "member";
+              const roleKey = hallRolesMap[profile.user_id] || hallRolesMap[profile.id];
+              const displayRole: "admin" | "modder" | "member" | "modder-elite" = 
+                roleKey === "admin" ? "admin" : 
+                roleKey === "modder" ? "modder" : "modder-elite"; 
               return (
                 <motion.div
                   key={profile.id}
@@ -342,6 +344,10 @@ export default function Index() {
                     <RoleBadge role={displayRole} />
                   </div>
                   <UserBadges userId={profile.user_id} compact />
+                  <div className="flex items-center gap-1 mt-3">
+                    <Star className="h-3 w-3 text-amber-400 fill-amber-400" />
+                    <span className="text-[10px] font-bold tracking-wider text-amber-500">MODDER ELITE</span>
+                  </div>
                 </motion.div>
               );
             })}
@@ -359,8 +365,10 @@ export default function Index() {
       <Dialog open={!!selectedModder} onOpenChange={(open) => !open && setSelectedModder(null)}>
         <DialogContent className="sm:max-w-md">
           {selectedModder && (() => {
-            const roleKey = hallRolesMap[selectedModder.user_id];
-            const displayRole: "admin" | "modder" | "member" = roleKey === "admin" ? "admin" : roleKey === "modder" ? "modder" : "member";
+            const roleKey = hallRolesMap[selectedModder.user_id] || hallRolesMap[selectedModder.id];
+            const displayRole: "admin" | "modder" | "member" | "modder-elite" = 
+              roleKey === "admin" ? "admin" : 
+              roleKey === "modder" ? "modder" : "modder-elite";
             return (
               <>
                 <DialogHeader>
