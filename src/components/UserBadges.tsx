@@ -21,7 +21,7 @@ interface UserBadgesProps {
   compact?: boolean;
 }
 
-export function UserBadges({ userId, compact = false }: UserBadgesProps) {
+export function UserBadges({ userId, authId, compact = false }: UserBadgesProps) {
   const { data: badges, isLoading } = useQuery({
     queryKey: ["user-badges", userId, authId],
     queryFn: async () => {
