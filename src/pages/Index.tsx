@@ -79,6 +79,31 @@ export default function Index() {
     ? Array.from(new Set(Object.values(profileMap))) 
     : topModders;
 
+  // Fetch roles for hall of fame modders
+  const hallUserIds = hallOfFameModders.map((p: any) => p.user_id).filter(Boolean);
+  const { data: hallRolesMap = {} } = useQuery({
+    queryKey: ["hall-roles", hallUserIds.join(",")],
+    queryFn: async () => {
+      if (hallUserIds.length === 0) return {};
+      const { data } = await supabase
+        .from("user_roles")
+        .select("user_id, role, approved")
+        .in("user_id", hallUserIds)
+        .eq("approved", true);
+      const map: Record<string, string> = {};
+      for (const r of data ?? []) {
+        const current = map[r.user_id];
+        if (r.role === "admin" || (!current && r.role === "modder")) {
+          map[r.user_id] = r.role;
+        } else if (!current) {
+          map[r.user_id] = r.role;
+        }
+      }
+      return map;
+    },
+    enabled: hallUserIds.length > 0,
+  });
+
   const { data: stats } = useQuery({
     queryKey: ["platform-stats"],
     queryFn: async () => {
