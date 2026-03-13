@@ -516,11 +516,24 @@ export default function ScriptEditor() {
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
                   <Label>Arquivo para download</Label>
-                  <Input type="file" onChange={(e) => {
+                  <Input type="file" onChange={async (e) => {
                     const f = e.target.files?.[0] ?? null;
+                    if (!f) {
+                      setFile(null);
+                      return;
+                    }
+
+                    // Immediate validation
+                    const safeName = await validateFileWithToast({ file: f, type: "script", maxSizeMB: 20 });
+                    if (!safeName) {
+                      e.target.value = ""; // Clear input
+                      setFile(null);
+                      return;
+                    }
+
                     setFile(f);
                     // Auto-extract lua code from .lua files for preview
-                    if (f && f.name.toLowerCase().endsWith(".lua")) {
+                    if (f.name.toLowerCase().endsWith(".lua")) {
                       const reader = new FileReader();
                       reader.onload = (ev) => {
                         const content = ev.target?.result as string;
