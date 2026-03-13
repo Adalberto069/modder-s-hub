@@ -24,11 +24,10 @@ export function UserBadges({ userId, compact = false }: UserBadgesProps) {
   const { data: badges, isLoading } = useQuery({
     queryKey: ["user-badges", userId],
     queryFn: async () => {
-      // Search by either ID to be safe
       const { data } = await supabase
         .from("user_badges")
         .select("earned_at, badge_definitions(slug, name, description, icon, color, sort_order)")
-        .or(`user_id.eq.${userId},user_id.in.(select user_id from profiles where id = '${userId}')`)
+        .eq("user_id", userId)
         .order("earned_at", { ascending: true });
 
       return (data ?? [])
