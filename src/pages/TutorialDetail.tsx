@@ -114,8 +114,8 @@ function ContentRenderer({ content }: { content: string }) {
                 if (trimmed.startsWith("```") || trimmed.startsWith("`")) {
                   const code = trimmed.replace(/^```\w*\s*|```$/g, "").replace(/^`|`$/g, "");
                   return (
-                    <pre key={j} className="bg-secondary/60 rounded-lg p-3 text-xs font-mono overflow-x-auto border border-border">
-                      <code>{code}</code>
+                    <pre key={j} className="bg-secondary/60 rounded-lg p-3 text-xs font-mono overflow-x-auto border border-border max-w-full">
+                      <code className="block min-w-full">{code}</code>
                     </pre>
                   );
                 }

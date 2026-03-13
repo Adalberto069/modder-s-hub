@@ -298,14 +298,14 @@ end
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex items-center gap-3 flex-1 min-w-0">
                         {license.scripts?.thumbnail_url ? (
-                          <img src={license.scripts.thumbnail_url} alt="" className="w-12 h-12 rounded object-cover shrink-0" />
+                          <img src={license.scripts.thumbnail_url} alt="" className="w-10 h-10 sm:w-12 sm:h-12 rounded object-cover shrink-0" />
                         ) : (
-                          <div className="w-12 h-12 rounded bg-secondary flex items-center justify-center shrink-0">
-                            <Code className="h-5 w-5 text-muted-foreground/30" />
+                          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded bg-secondary flex items-center justify-center shrink-0">
+                            <Code className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground/30" />
                           </div>
                         )}
                         <div className="flex-1 min-w-0">
-                          <p className="font-semibold truncate">{license.scripts?.title ?? "Script"}</p>
+                          <p className="text-sm sm:font-semibold truncate">{license.scripts?.title ?? "Script"}</p>
                           <div className="flex items-center gap-2 mt-1 flex-wrap">
                             {license.scripts?.game_name && (
                               <Badge variant="secondary" className="text-[10px]">🎮 {license.scripts.game_name}</Badge>
@@ -356,16 +356,18 @@ end
                     {/* License Key */}
                     <div className="mt-3 p-3 rounded-lg bg-secondary/30 border border-border/50">
                       <p className="text-[10px] text-muted-foreground mb-1">Licença:</p>
-                      <div className="flex items-center gap-2">
-                        <Key className="h-3.5 w-3.5 text-primary shrink-0" />
-                        <code className="text-sm font-mono text-primary flex-1">{license.license_key}</code>
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                        <div className="flex items-center gap-2 flex-1">
+                          <Key className="h-3 w-3 text-primary shrink-0" />
+                          <code className="text-xs font-mono text-primary truncate flex-1">{license.license_key}</code>
+                        </div>
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="h-7 w-7 p-0"
-                          onClick={() => { navigator.clipboard.writeText(license.license_key); toast.success("Licença copiada!"); }}
+                          className="h-7 px-2 text-[10px] sm:text-xs self-end sm:self-center"
+                          onClick={() => { navigator.clipboard.writeText(license.license_key); toast.success("Copiada!"); }}
                         >
-                          <Copy className="h-3.5 w-3.5" />
+                          <Copy className="h-3 w-3 mr-1" /> Copiar
                         </Button>
                       </div>
                     </div>

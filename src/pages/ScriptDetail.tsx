@@ -477,41 +477,31 @@ end
           {/* Main content */}
           <div className="md:col-span-2 space-y-6">
             {/* Header */}
-            <div>
-              <div className="flex items-start gap-3 mb-2 flex-wrap">
-                <h1 className="text-2xl font-bold flex-1">{script.title}</h1>
-                <div className="flex gap-2 shrink-0 flex-wrap">
+            <div className="space-y-3">
+              <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+                <h1 className="text-xl sm:text-2xl font-bold leading-tight">{script.title}</h1>
+                <div className="flex flex-wrap gap-1.5 shrink-0">
                   {!scriptIsActive && (
-                    <Badge className="bg-destructive/20 text-destructive border-destructive/30 gap-1">
+                    <Badge className="bg-destructive/20 text-destructive border-destructive/30 gap-1 text-[10px]">
                       Inativo
                     </Badge>
                   )}
                   {(script as any).security_status === "verified" && (
-                    <Badge className="bg-accent/20 text-accent border-accent/30 gap-1">
+                    <Badge className="bg-accent/20 text-accent border-accent/30 gap-1 text-[10px]">
                       <ShieldCheck className="h-3 w-3" /> Verificado
                     </Badge>
                   )}
                   {(script as any).security_status === "under_review" && (
-                    <Badge className="bg-primary/20 text-primary border-primary/30 gap-1">
-                      <Clock className="h-3 w-3" /> Em Revisão
+                    <Badge className="bg-primary/20 text-primary border-primary/30 gap-1 text-[10px]">
+                      <Clock className="h-3 w-3" /> Revisão
                     </Badge>
                   )}
                   {(script as any).security_status === "flagged" && (
-                    <Badge className="bg-destructive/20 text-destructive border-destructive/30 gap-1">
-                      <ShieldX className="h-3 w-3" /> Flagrado
+                    <Badge className="bg-destructive/20 text-destructive border-destructive/30 gap-1 text-[10px]">
+                      <ShieldX className="h-3 w-3" /> Flag
                     </Badge>
                   )}
-                  {(script as any).security_status === "rejected" && (
-                    <Badge className="bg-destructive/20 text-destructive border-destructive/30 gap-1">
-                      <ShieldAlert className="h-3 w-3" /> Rejeitado
-                    </Badge>
-                  )}
-                  {script.is_verified && !(script as any).security_status && (
-                    <Badge className="bg-primary/20 text-primary border-primary/30 gap-1">
-                      <ShieldCheck className="h-3 w-3" /> Verificado
-                    </Badge>
-                  )}
-                  <Badge variant="outline" className={st.className}>{st.label}</Badge>
+                  <Badge variant="outline" className={`${st.className} text-[10px]`}>{st.label}</Badge>
                 </div>
               </div>
 

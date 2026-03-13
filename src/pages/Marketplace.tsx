@@ -109,10 +109,10 @@ export default function Marketplace() {
         </div>
 
         {/* Filters */}
-        <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-4 sm:mb-6">
+        <div className="flex items-center gap-2 mb-4 sm:mb-6 overflow-x-auto pb-2 scrollbar-none -mx-4 px-4 sm:mx-0 sm:px-0 sm:flex-wrap">
           <Badge
             variant={activeCategory === "all" ? "default" : "outline"}
-            className="cursor-pointer"
+            className="cursor-pointer whitespace-nowrap"
             onClick={() => setFilter("category", "all")}
           >
             Todos
@@ -121,30 +121,30 @@ export default function Marketplace() {
             <Badge
               key={cat.id}
               variant={activeCategory === cat.slug ? "default" : "outline"}
-              className="cursor-pointer"
+              className="cursor-pointer whitespace-nowrap"
               onClick={() => setFilter("category", cat.slug)}
             >
               {cat.name}
             </Badge>
           ))}
-          <div className="w-px bg-border mx-2" />
+          <div className="w-px h-4 bg-border shrink-0" />
           <Badge
             variant={priceFilter === "all" ? "default" : "outline"}
-            className="cursor-pointer"
+            className="cursor-pointer whitespace-nowrap"
             onClick={() => setFilter("price", "all")}
           >
-            Todos
+            Preço: Todos
           </Badge>
           <Badge
             variant={priceFilter === "free" ? "default" : "outline"}
-            className="cursor-pointer"
+            className="cursor-pointer whitespace-nowrap"
             onClick={() => setFilter("price", "free")}
           >
             Grátis
           </Badge>
           <Badge
             variant={priceFilter === "paid" ? "default" : "outline"}
-            className="cursor-pointer"
+            className="cursor-pointer whitespace-nowrap"
             onClick={() => setFilter("price", "paid")}
           >
             Pago
@@ -155,7 +155,7 @@ export default function Marketplace() {
         {isLoading ? (
           <p className="text-muted-foreground">Carregando...</p>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
             {scripts?.map((script: any) => (
               <ScriptCard
                 key={script.id}

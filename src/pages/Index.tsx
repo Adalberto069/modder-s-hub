@@ -152,8 +152,8 @@ export default function Index() {
             animate="visible"
             variants={stagger}
           >
-            <motion.div variants={fadeUp} custom={0}>
-              <Badge variant="outline" className="neon-border text-neon-green font-mono mb-6 px-4 py-1.5">
+            <motion.div variants={fadeUp} custom={0} className="flex justify-center sm:justify-start">
+              <Badge variant="outline" className="neon-border text-neon-green font-mono mb-6 px-4 py-1.5 ">
                 <Zap className="h-3.5 w-3.5 mr-1.5" /> Plataforma #1 de Scripts GG
               </Badge>
             </motion.div>
@@ -161,7 +161,7 @@ export default function Index() {
             <motion.h1
               variants={fadeUp}
               custom={1}
-              className="text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1] mb-5 sm:mb-6"
+              className="text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1] mb-5 sm:mb-6 text-center sm:text-left"
             >
               Scripts exclusivos para{" "}
               <span className="text-neon-purple">Game Guardian</span>
@@ -172,7 +172,7 @@ export default function Index() {
             <motion.p
               variants={fadeUp}
               custom={2}
-              className="text-base sm:text-xl text-muted-foreground max-w-xl mb-8 sm:mb-10 leading-relaxed"
+              className="text-sm sm:text-xl text-muted-foreground max-w-xl mb-8 sm:mb-10 leading-relaxed text-center sm:text-left"
             >
               Faça parte da maior elite de modders mobile. Marketplace profissional, 
               ofuscação avançada e uma comunidade focada em evolução constante.
@@ -197,19 +197,19 @@ export default function Index() {
             </motion.div>
 
             {/* Quick stats */}
-            <motion.div variants={fadeUp} custom={4} className="flex flex-wrap gap-4 sm:gap-8 mt-10 sm:mt-14">
+            <motion.div variants={fadeUp} custom={4} className="flex flex-wrap justify-center sm:justify-start gap-4 sm:gap-8 mt-10 sm:mt-14">
               {[
                 { icon: Code, value: stats?.scripts ?? 0, label: "Scripts" },
                 { icon: Users, value: stats?.users ?? 0, label: "Usuários" },
                 { icon: Download, value: stats?.downloads ?? 0, label: "Downloads" },
               ].map((stat) => (
-                <div key={stat.label} className="flex items-center gap-2 sm:gap-3">
-                  <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center">
-                    <stat.icon className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
+                <div key={stat.label} className="flex items-center gap-2 sm:gap-3 bg-card/40 sm:bg-transparent p-2 sm:p-0 rounded-lg border border-border/50 sm:border-transparent">
+                  <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center">
+                    <stat.icon className="h-3.5 w-3.5 sm:h-5 sm:w-5 text-primary" />
                   </div>
                   <div>
-                    <p className="text-lg sm:text-xl font-bold font-mono">{stat.value.toLocaleString("pt-BR")}</p>
-                    <p className="text-[10px] sm:text-xs text-muted-foreground">{stat.label}</p>
+                    <p className="text-sm sm:text-xl font-bold font-mono">{stat.value.toLocaleString("pt-BR")}</p>
+                    <p className="text-[10px] sm:text-xs text-muted-foreground uppercase">{stat.label}</p>
                   </div>
                 </div>
               ))}
@@ -316,11 +316,9 @@ export default function Index() {
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6">
             {hallOfFameModders.slice(0, 4).map((profile: any, i: number) => {
               const roleKey = hallRolesMap[profile.user_id] || hallRolesMap[profile.id];
-              // On the Home/Hall cards, we want the RoleBadge to show the ACTUAL role (Admin/Modder)
-              // because we already have the "MODDER ELITE" decorative star below.
               const displayRole: "admin" | "modder" | "member" = 
                 roleKey === "admin" ? "admin" : "modder"; 
               return (
@@ -330,33 +328,35 @@ export default function Index() {
                   whileInView={{ opacity: 1, scale: 1 }}
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.1 }}
-                  className="flex flex-col items-center p-6 rounded-xl border border-border/50 bg-background/50 hover:neon-border transition-all group cursor-pointer"
+                  className="flex flex-col items-center p-4 sm:p-6 rounded-xl border border-border/50 bg-background/50 hover:neon-border transition-all group cursor-pointer"
                   onClick={() => setSelectedModder(profile)}
                 >
-                  <div className="relative mb-4">
-                    <Avatar className="h-20 w-20 border-2 border-primary/20 group-hover:border-primary transition-colors">
+                  <div className="relative mb-3 sm:mb-4">
+                    <Avatar className="h-16 w-16 sm:h-20 sm:w-20 border-2 border-primary/20 group-hover:border-primary transition-colors">
                       <AvatarImage src={profile.avatar_url} />
-                      <AvatarFallback className="bg-primary/10 text-xl font-bold">
+                      <AvatarFallback className="bg-primary/10 text-lg sm:text-xl font-bold">
                         {(profile.display_name || profile.username || "?")[0].toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
                     <div className="absolute -bottom-1 -right-1 bg-background border border-border rounded-full p-1">
-                      <ShieldCheck className="h-4 w-4 text-neon-green" />
+                      <ShieldCheck className="h-3 w-3 sm:h-4 sm:w-4 text-neon-green" />
                     </div>
                   </div>
-                  <h3 className="font-bold text-lg text-center line-clamp-1">
+                  <h3 className="font-bold text-sm sm:text-lg text-center line-clamp-1">
                     {profile.display_name || profile.username || "Modder"}
                   </h3>
-                  <p className="text-xs text-muted-foreground font-mono mt-1">
+                  <p className="text-[10px] sm:text-xs text-muted-foreground font-mono mt-0.5 sm:mt-1">
                     @{profile.username || "user"}
                   </p>
-                  <div className="mt-2">
+                  <div className="mt-2 scale-90 sm:scale-100">
                     <RoleBadge role={displayRole} />
                   </div>
-                  <UserBadges userId={profile.user_id} compact />
-                  <div className="flex items-center gap-1 mt-3">
-                    <Star className="h-3 w-3 text-amber-400 fill-amber-400" />
-                    <span className="text-[10px] font-bold tracking-wider text-amber-500">MODDER ELITE</span>
+                  <div className="mt-1 flex flex-col items-center">
+                    <UserBadges userId={profile.user_id} compact />
+                    <div className="flex items-center gap-1 mt-2">
+                      <Star className="h-2.5 w-2.5 text-amber-400 fill-amber-400" />
+                      <span className="text-[8px] sm:text-[10px] font-bold tracking-wider text-amber-500">ELITE</span>
+                    </div>
                   </div>
                 </motion.div>
               );

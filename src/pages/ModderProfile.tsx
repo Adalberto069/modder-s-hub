@@ -171,7 +171,7 @@ export default function ModderProfile() {
 
           {/* Stats bar */}
           <Separator />
-          <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-border">
+          <div className="grid grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-border">
             <StatItem icon={<Code className="h-4 w-4" />} value={scripts?.length ?? 0} label="Scripts" color="text-primary" />
             <StatItem icon={<Download className="h-4 w-4" />} value={totalDownloads} label="Downloads" color="text-accent" />
             <StatItem icon={<Star className="h-4 w-4" />} value={avgRating.toFixed(1)} label="Média" color="text-[hsl(var(--neon-cyan))]" />

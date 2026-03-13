@@ -156,10 +156,10 @@ export default function Tutorials() {
           </div>
 
           {/* Category filters */}
-          <div className="flex flex-wrap gap-2">
+          <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none -mx-4 px-4 sm:mx-0 sm:px-0">
             <Badge
               variant={activeCategory === "all" ? "default" : "outline"}
-              className="cursor-pointer px-3 py-1.5 text-xs transition-all hover:scale-105"
+              className="cursor-pointer px-3 py-1.5 text-[10px] sm:text-xs transition-all hover:scale-105 whitespace-nowrap"
               onClick={() => setActiveCategory("all")}
             >
               Todos ({tutorials.length})
@@ -168,7 +168,7 @@ export default function Tutorials() {
               <Badge
                 key={cat.value}
                 variant={activeCategory === cat.value ? "default" : "outline"}
-                className="cursor-pointer px-3 py-1.5 text-xs transition-all hover:scale-105"
+                className="cursor-pointer px-3 py-1.5 text-[10px] sm:text-xs transition-all hover:scale-105 whitespace-nowrap"
                 onClick={() => setActiveCategory(cat.value)}
               >
                 {cat.icon} {cat.label} {categoryCounts[cat.value] ? `(${categoryCounts[cat.value]})` : ""}
