@@ -41,6 +41,7 @@ const stagger = {
 export default function Index() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const [selectedModder, setSelectedModder] = useState<any>(null);
 
   const { data: scripts } = useQuery({
     queryKey: ["featured-scripts"],
