@@ -15,6 +15,10 @@ const roleConfig = {
     label: "MEMBER",
     classes: "bg-muted text-muted-foreground border-border",
   },
+  "modder-elite": {
+    label: "MODDER ELITE",
+    classes: "bg-amber-500/20 text-amber-500 border-amber-500/40 neon-shadow-amber",
+  },
 };
 
 export function RoleBadge({ role }: RoleBadgeProps) {

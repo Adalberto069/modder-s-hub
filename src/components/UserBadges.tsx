@@ -16,20 +16,26 @@ const iconMap: Record<string, React.ElementType> = {
 };
 
 interface UserBadgesProps {
-  userId: string;
+  userId: string; // This can be either profiles.id or profiles.user_id
+  authId?: string; // Explicit profiles.user_id
   compact?: boolean;
 }
 
 export function UserBadges({ userId, compact = false }: UserBadgesProps) {
   const { data: badges, isLoading } = useQuery({
-    queryKey: ["user-badges", userId],
+    queryKey: ["user-badges", userId, authId],
     queryFn: async () => {
-      // Search by either ID to be safe
-      const { data } = await supabase
+      let query = supabase
         .from("user_badges")
-        .select("earned_at, badge_definitions(slug, name, description, icon, color, sort_order)")
-        .or(`user_id.eq.${userId},user_id.in.(select user_id from profiles where id = '${userId}')`)
-        .order("earned_at", { ascending: true });
+        .select("earned_at, badge_definitions(slug, name, description, icon, color, sort_order)");
+      
+      if (authId) {
+        query = query.or(`user_id.eq.${authId},user_id.eq.${userId}`);
+      } else {
+        query = query.eq("user_id", userId);
+      }
+
+      const { data } = await query.order("earned_at", { ascending: true });
 
       return (data ?? [])
         .map((b: any) => ({

@@ -74,9 +74,20 @@ export default function ModderProfile() {
     enabled: !!userId && userId !== "undefined",
   });
 
-  const displayRole: "admin" | "modder" | "member" = 
+  const { data: topModders } = useQuery({
+    queryKey: ["top-modders"],
+    queryFn: async () => {
+      const { data } = await supabase.from("profiles").select("id").order("reputation_score", { ascending: false }).limit(4);
+      return data ?? [];
+    },
+  });
+
+  const isElite = topModders?.some((m: any) => m.id === profile?.id);
+
+  const displayRole: "admin" | "modder" | "member" | "modder-elite" = 
     userRoles?.includes("admin") ? "admin" : 
-    userRoles?.includes("modder") ? "modder" : "member";
+    isElite ? "modder-elite" : 
+    (userRoles?.includes("modder") || (scripts && scripts.length > 0)) ? "modder" : "member";
 
   const totalDownloads = scripts?.reduce((sum, s: any) => sum + (s.download_count || 0), 0) ?? 0;
   const avgRating = scripts && scripts.length > 0
@@ -141,7 +152,7 @@ export default function ModderProfile() {
                   <RoleBadge role={displayRole} />
                 </div>
                 <p className="text-sm text-muted-foreground font-mono">@{profile.username}</p>
-                <UserBadges userId={userId!} />
+                <UserBadges userId={userId!} authId={profile.user_id} />
                 {profile.bio && (
                   <p className="text-sm text-muted-foreground mt-2 max-w-lg">{profile.bio}</p>
                 )}
