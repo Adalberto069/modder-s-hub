@@ -87,15 +87,12 @@ export default function ModderProfile() {
   // If they are elite, they are "modder-elite". 
   // If they have scripts or the modder role, they are "modder".
   // Otherwise, they are "member".
-  // Display logic: Admin always wins. 
-  // Then Modder Elite (if in Hall of Fame).
-  // Then Modder (if role in DB or has scripts).
+  // Display logic: Admin (Red) always wins. 
+  // Then Modder (Purple) if they have the role or have published scripts.
   // Member as fallback.
-  const displayRole: "admin" | "modder" | "member" | "modder-elite" = 
+  const displayRole: "admin" | "modder" | "member" = 
     userRoles?.includes("admin") ? "admin" : 
-    (userRoles?.includes("modder") || (scripts && scripts.length > 0)) 
-      ? (isElite ? "modder-elite" : "modder") 
-      : (isElite ? "modder-elite" : "member");
+    (userRoles?.includes("modder") || (scripts && scripts.length > 0)) ? "modder" : "member";
 
   const totalDownloads = scripts?.reduce((sum, s: any) => sum + (s.download_count || 0), 0) ?? 0;
   const avgRating = scripts && scripts.length > 0
