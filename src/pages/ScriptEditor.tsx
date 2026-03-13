@@ -520,7 +520,7 @@ export default function ScriptEditor() {
                     const f = e.target.files?.[0] ?? null;
                     setFile(f);
                     // Auto-extract lua code from .lua files for preview
-                    if (f && f.name.endsWith(".lua")) {
+                    if (f && f.name.toLowerCase().endsWith(".lua")) {
                       const reader = new FileReader();
                       reader.onload = (ev) => {
                         const content = ev.target?.result as string;
@@ -528,10 +528,11 @@ export default function ScriptEditor() {
                       };
                       reader.readAsText(f);
                     }
-                  }} accept=".lua,.zip,.rar,.apk" />
+                  }} accept=".lua" />
                   {existingScript?.file_url && !file && (
-                    <p className="text-[10px] text-muted-foreground mt-1">Arquivo atual mantido. Selecione novo para substituir.</p>
+                    <p className="text-[10px] text-muted-foreground mt-1">Arquivo atual mantido. Selecione novo .lua para substituir.</p>
                   )}
+                  <p className="text-[10px] text-primary/80 mt-1 font-medium">⚠️ Apenas arquivos .lua são permitidos por segurança.</p>
                 </div>
                 <div>
                   <Label>Link externo (opcional)</Label>

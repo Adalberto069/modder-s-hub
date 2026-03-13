@@ -9,14 +9,14 @@ const IMAGE_MIMES = new Set([
 ]);
 
 const SCRIPT_MIMES = new Set([
-  "application/zip",
-  "application/x-rar-compressed",
-  "application/vnd.rar",
-  "application/x-zip-compressed",
-  "application/octet-stream", // .lua, .apk fallback
+  "text/plain",
+  "text/x-lua",
+  "application/x-lua",
+  "application/octet-stream", // .lua fallback
 ]);
 
-const SCRIPT_EXTENSIONS = new Set(["lua", "zip", "rar", "apk"]);
+const SCRIPT_EXTENSIONS = new Set(["lua"]);
+const FORBIDDEN_DOUBLE_EXTENSIONS = new Set(["apk", "exe", "zip", "rar", "jar", "bin", "sh", "bat", "cmd"]);
 
 const IMAGE_EXTENSIONS = new Set(["jpg", "jpeg", "png", "gif", "webp"]);
 
@@ -54,9 +54,18 @@ function generateSafeFilename(extension: string): string {
  * Extract extension from original filename (lowercase, sanitized).
  */
 function getExtension(filename: string): string {
-  const parts = filename.split(".");
+  const parts = filename.toLowerCase().split(".");
   if (parts.length < 2) return "";
-  return (parts.pop() ?? "").toLowerCase().replace(/[^a-z0-9]/g, "");
+  
+  // Security check: look for double extensions (e.g., photo.exe.lua)
+  if (parts.length > 2) {
+    const secondToLast = parts[parts.length - 2];
+    if (FORBIDDEN_DOUBLE_EXTENSIONS.has(secondToLast)) {
+      throw new Error(`Tentativa de burla detectada: extensão dupla perigosa (.${secondToLast}.${parts.pop()})`);
+    }
+  }
+
+  return (parts.pop() ?? "").replace(/[^a-z0-9]/g, "");
 }
 
 /**
@@ -64,9 +73,10 @@ function getExtension(filename: string): string {
  */
 async function scanForMalware(file: File): Promise<boolean> {
   try {
-    const buffer = await file.slice(0, 16).arrayBuffer();
+    const buffer = await file.slice(0, 1024).arrayBuffer(); // Scan first KB
     const bytes = new Uint8Array(buffer);
 
+    // 1. Signature check
     for (const sig of DANGEROUS_SIGNATURES) {
       if (bytes.length >= sig.length) {
         let match = true;
@@ -77,6 +87,14 @@ async function scanForMalware(file: File): Promise<boolean> {
           }
         }
         if (match) return true; // dangerous
+      }
+    }
+
+    // 2. Binary check for scripts (ensure it's actually text)
+    if (file.name.toLowerCase().endsWith(".lua")) {
+      for (let i = 0; i < bytes.length; i++) {
+        // Look for null bytes or lots of control chars which indicate binary
+        if (bytes[i] === 0) return true; // Null bytes = definitely not a lua script
       }
     }
 
@@ -113,8 +131,20 @@ export async function validateFile({
   type,
   maxSizeMB,
 }: ValidateOptions): Promise<ValidateResult> {
-  const extension = getExtension(file.name);
-  const safeName = generateSafeFilename(extension);
+  let extension = "";
+  let safeName = "";
+  
+  try {
+    extension = getExtension(file.name);
+    safeName = generateSafeFilename(extension);
+  } catch (err: any) {
+    return {
+      valid: false,
+      error: err.message,
+      sanitizedName: "error",
+      extension: "error",
+    };
+  }
 
   // 1. Size check
   const maxSize = (maxSizeMB ?? (type === "image" ? 2 : 20)) * 1024 * 1024;
