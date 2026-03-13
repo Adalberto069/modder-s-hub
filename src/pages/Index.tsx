@@ -297,7 +297,7 @@ export default function Index() {
             viewport={{ once: true }}
           >
             <Badge variant="outline" className="neon-border mb-4 font-mono">
-              <Trophy className="h-3.5 w-3.5 mr-1.5 text-yellow-500" /> Hall da Fama
+              <Trophy className="h-3.5 w-3.5 mr-1.5 text-accent" /> Hall da Fama
             </Badge>
             <h2 className="text-3xl sm:text-4xl font-bold tracking-tight">
               A Elite dos <span className="text-neon-purple">Criadores</span>
@@ -308,39 +308,43 @@ export default function Index() {
           </motion.div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {hallOfFameModders.slice(0, 4).map((profile: any, i: number) => (
-              <motion.div
-                key={profile.id}
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                className="flex flex-col items-center p-6 rounded-xl border border-border/50 bg-background/50 hover:neon-border transition-all group cursor-pointer"
-                onClick={() => navigate(`/modder/${profile.id}`)}
-              >
-                <div className="relative mb-4">
-                  <Avatar className="h-20 w-20 border-2 border-primary/20 group-hover:border-primary transition-colors">
-                    <AvatarImage src={profile.avatar_url} />
-                    <AvatarFallback className="bg-primary/10 text-xl font-bold">
-                      {(profile.display_name || profile.username || "?")[0].toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="absolute -bottom-1 -right-1 bg-background border border-border rounded-full p-1">
-                    <ShieldCheck className="h-4 w-4 text-neon-green" />
+            {hallOfFameModders.slice(0, 4).map((profile: any, i: number) => {
+              const roleKey = hallRolesMap[profile.user_id];
+              const displayRole: "admin" | "modder" | "member" = roleKey === "admin" ? "admin" : roleKey === "modder" ? "modder" : "member";
+              return (
+                <motion.div
+                  key={profile.id}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.1 }}
+                  className="flex flex-col items-center p-6 rounded-xl border border-border/50 bg-background/50 hover:neon-border transition-all group cursor-pointer"
+                  onClick={() => setSelectedModder(profile)}
+                >
+                  <div className="relative mb-4">
+                    <Avatar className="h-20 w-20 border-2 border-primary/20 group-hover:border-primary transition-colors">
+                      <AvatarImage src={profile.avatar_url} />
+                      <AvatarFallback className="bg-primary/10 text-xl font-bold">
+                        {(profile.display_name || profile.username || "?")[0].toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="absolute -bottom-1 -right-1 bg-background border border-border rounded-full p-1">
+                      <ShieldCheck className="h-4 w-4 text-neon-green" />
+                    </div>
                   </div>
-                </div>
-                <h3 className="font-bold text-lg text-center line-clamp-1">
-                  {profile.display_name || profile.username || "Modder"}
-                </h3>
-                <p className="text-xs text-muted-foreground font-mono mt-1">
-                  @{profile.username || "user"}
-                </p>
-                <div className="flex items-center gap-1 mt-3">
-                  <Star className="h-3 w-3 text-accent fill-accent" />
-                  <span className="text-xs font-bold">VIP CREATOR</span>
-                </div>
-              </motion.div>
-            ))}
+                  <h3 className="font-bold text-lg text-center line-clamp-1">
+                    {profile.display_name || profile.username || "Modder"}
+                  </h3>
+                  <p className="text-xs text-muted-foreground font-mono mt-1">
+                    @{profile.username || "user"}
+                  </p>
+                  <div className="mt-2">
+                    <RoleBadge role={displayRole} />
+                  </div>
+                  <UserBadges userId={profile.user_id} compact />
+                </motion.div>
+              );
+            })}
             {hallOfFameModders.length === 0 && (
               <div className="col-span-full text-center py-10 opacity-50">
                 <Users className="h-10 w-10 mx-auto mb-2" />
@@ -350,6 +354,67 @@ export default function Index() {
           </div>
         </div>
       </section>
+
+      {/* ══════════════ MODDER PROFILE DIALOG ══════════════ */}
+      <Dialog open={!!selectedModder} onOpenChange={(open) => !open && setSelectedModder(null)}>
+        <DialogContent className="sm:max-w-md">
+          {selectedModder && (() => {
+            const roleKey = hallRolesMap[selectedModder.user_id];
+            const displayRole: "admin" | "modder" | "member" = roleKey === "admin" ? "admin" : roleKey === "modder" ? "modder" : "member";
+            return (
+              <>
+                <DialogHeader>
+                  <DialogTitle className="sr-only">Perfil do Criador</DialogTitle>
+                </DialogHeader>
+                <div className="flex flex-col items-center text-center space-y-4">
+                  <Avatar className="h-24 w-24 border-2 border-primary/30">
+                    <AvatarImage src={selectedModder.avatar_url} />
+                    <AvatarFallback className="bg-primary/10 text-2xl font-bold">
+                      {(selectedModder.display_name || selectedModder.username || "?")[0].toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <h3 className="text-xl font-bold">{selectedModder.display_name || selectedModder.username}</h3>
+                    <p className="text-sm text-muted-foreground font-mono">@{selectedModder.username}</p>
+                  </div>
+                  <RoleBadge role={displayRole} />
+                  <UserBadges userId={selectedModder.user_id} />
+                  {selectedModder.bio && (
+                    <p className="text-sm text-muted-foreground leading-relaxed max-w-xs">{selectedModder.bio}</p>
+                  )}
+                  <div className="grid grid-cols-3 gap-4 w-full pt-2 border-t border-border">
+                    <div className="text-center">
+                      <p className="text-lg font-bold font-mono">{selectedModder.reputation_score ?? 0}</p>
+                      <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Reputação</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-lg font-bold font-mono">{selectedModder.total_downloads ?? 0}</p>
+                      <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Downloads</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-lg font-bold font-mono">{selectedModder.total_positive_reviews ?? 0}</p>
+                      <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Avaliações</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <CalendarDays className="h-3 w-3" />
+                    Membro desde {new Date(selectedModder.created_at).toLocaleDateString("pt-BR", { month: "long", year: "numeric" })}
+                  </div>
+                  <Button
+                    className="w-full mt-2"
+                    onClick={() => {
+                      setSelectedModder(null);
+                      navigate(`/modder/${selectedModder.user_id}`);
+                    }}
+                  >
+                    <Eye className="mr-2 h-4 w-4" /> Ver Perfil Completo
+                  </Button>
+                </div>
+              </>
+            );
+          })()}
+        </DialogContent>
+      </Dialog>
 
       {/* ══════════════ COMMUNITY SOCIALS ══════════════ */}
       <section className="relative py-14 sm:py-24 overflow-hidden border-y border-border/30">
