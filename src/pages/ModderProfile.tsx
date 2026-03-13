@@ -141,7 +141,7 @@ export default function ModderProfile() {
                   <RoleBadge role={displayRole} />
                 </div>
                 <p className="text-sm text-muted-foreground font-mono">@{profile.username}</p>
-                <UserBadges userId={userId!} />
+                <UserBadges userId={profile.user_id} />
                 {profile.bio && (
                   <p className="text-sm text-muted-foreground mt-2 max-w-lg">{profile.bio}</p>
                 )}
