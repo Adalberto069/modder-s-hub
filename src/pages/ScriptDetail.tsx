@@ -332,7 +332,7 @@ export default function ScriptDetail() {
 
     const loaderCode = `-- ========================================
 -- ${script.title} - Loader
--- Powered by ModHub License System
+-- Powered by Nexus Society License System
 -- ========================================
 
 local license = "${(license as any).license_key}"

@@ -163,7 +163,7 @@ export default function Dashboard() {
 
     const loaderCode = `-- ========================================
 -- ${script.title} - Loader
--- Powered by ModHub License System
+-- Powered by Nexus Society License System
 -- ========================================
 
 local license = "${license.license_key}"

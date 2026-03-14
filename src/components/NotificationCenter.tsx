@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Bell, Check, ShoppingCart, MessageSquare, Info, ShieldCheck, X } from "lucide-react";
+import { Bell, Check, ShoppingCart, MessageSquare, Info, ShieldCheck } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";

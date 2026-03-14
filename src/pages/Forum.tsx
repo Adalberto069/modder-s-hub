@@ -21,7 +21,7 @@ import { LoginPromptDialog } from "@/components/LoginPromptDialog";
 import { UserRoleBadge } from "@/components/UserRoleBadge";
 import { UserBadges } from "@/components/UserBadges";
 import LuaCodeEditor from "@/components/LuaCodeEditor";
-import { Copy, Terminal as TerminalIcon, Code as CodeIcon } from "lucide-react";
+import { Terminal as TerminalIcon, Code as CodeIcon } from "lucide-react";
 import { CodeTerminal } from "@/components/forum/CodeTerminal";
 
 const CATEGORIES = [
@@ -418,11 +418,13 @@ export default function Forum() {
                 <Plus className="h-5 w-5" /> Nova Discussão
               </Button>
             </DialogTrigger>
-              <DialogContent className="max-w-lg bg-[#0a0a0c]/95 backdrop-blur-xl border-white/10 shadow-2xl">
-                <DialogHeader>
-                  <DialogTitle className="text-2xl font-black tracking-tighter uppercase italic">Iniciar Discussão Elite</DialogTitle>
-                </DialogHeader>
-                <div className="space-y-4 mt-4">
+              <DialogContent className="max-w-lg bg-[#0a0a0c]/95 backdrop-blur-xl border-white/10 shadow-2xl p-0 gap-0 overflow-hidden">
+                <div className="p-6 border-b border-white/10">
+                  <DialogHeader>
+                    <DialogTitle className="text-2xl font-black tracking-tighter uppercase italic">Iniciar Discussão Elite</DialogTitle>
+                  </DialogHeader>
+                </div>
+                <div className="p-6 max-h-[70vh] overflow-y-auto space-y-6 custom-scrollbar">
                   <div className="space-y-2">
                     <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/70">O que está na sua mente?</Label>
                     <Input 
@@ -430,13 +432,13 @@ export default function Forum() {
                       value={newTitle} 
                       onChange={(e) => setNewTitle(e.target.value)} 
                       maxLength={120} 
-                      className="bg-white/5 border-white/10 focus:border-neon-purple/50 h-12"
+                      className="bg-white/5 border-white/10 focus:border-neon-purple/50 h-11 text-sm"
                     />
                   </div>
                   <div className="space-y-2">
                     <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/70">Classificação</Label>
                     <Select value={newCategory} onValueChange={setNewCategory}>
-                      <SelectTrigger className="bg-white/5 border-white/10 h-12"><SelectValue /></SelectTrigger>
+                      <SelectTrigger className="bg-white/5 border-white/10 h-11 text-sm"><SelectValue /></SelectTrigger>
                       <SelectContent className="bg-[#0a0a0c] border-white/10">
                         {CATEGORIES.map((c) => (
                           <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>
@@ -450,40 +452,50 @@ export default function Forum() {
                       placeholder="Descreva em detalhes sua dúvida ou sugestão..." 
                       value={newContent} 
                       onChange={(e) => setNewContent(e.target.value)} 
-                      className="min-h-[160px] bg-white/5 border-white/10 focus:border-neon-purple/50 resize-none" 
+                      className="min-h-[120px] bg-white/5 border-white/10 focus:border-neon-purple/50 resize-none text-sm" 
                     />
                   </div>
                   
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/70">Anexar Código (Opcional)</Label>
+                      <div className="flex flex-col">
+                        <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/70">Anexar Código</Label>
+                        <span className="text-[8px] text-muted-foreground/40 uppercase font-mono tracking-tighter">Opcional · Lua Language</span>
+                      </div>
                       <Button 
                         variant="ghost" 
                         size="sm" 
-                        className={`text-[9px] font-black uppercase tracking-widest h-7 ${showCodeInput ? "text-neon-purple" : ""}`}
+                        className={`text-[9px] font-black uppercase tracking-widest h-7 gap-2 px-3 ${showCodeInput ? "bg-neon-purple/10 text-neon-purple border border-neon-purple/20" : "bg-white/5"}`}
                         onClick={() => setShowCodeInput(!showCodeInput)}
                       >
-                        {showCodeInput ? "Remover Editor" : "Abrir Editor"}
+                        <TerminalIcon className="h-3 w-3" />
+                        {showCodeInput ? "Remover" : "Abrir Editor"}
                       </Button>
                     </div>
                     {showCodeInput && (
-                      <div className="rounded-xl border border-white/10 overflow-hidden bg-black/20">
+                      <motion.div 
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="rounded-xl border border-white/10 overflow-hidden bg-black/40"
+                      >
                         <LuaCodeEditor 
                           value={newCode} 
                           onChange={setNewCode} 
-                          minHeight="200px" 
+                          minHeight="180px" 
                           placeholder="-- Insira seu código Lua aqui..."
                         />
-                      </div>
+                      </motion.div>
                     )}
                   </div>
+                </div>
 
+                <div className="p-6 bg-white/5 border-t border-white/10">
                   <Button
-                    className="w-full h-12 bg-neon-purple hover:bg-neon-purple/90 text-white font-bold uppercase tracking-widest text-xs"
+                    className="w-full h-12 bg-neon-purple hover:bg-neon-purple/90 text-white font-black uppercase tracking-[0.2em] text-[10px] shadow-lg shadow-neon-purple/40 transition-all hover:scale-[1.02] active:scale-[0.98]"
                     disabled={!newTitle.trim() || !newContent.trim() || createPost.isPending}
                     onClick={() => createPost.mutate()}
                   >
-                    {createPost.isPending ? "Transmitindo..." : "PUBLICAR NA SOCIEDADE"}
+                    {createPost.isPending ? "Transmitindo Dados..." : "Publicar na Nexus Society"}
                   </Button>
                 </div>
               </DialogContent>

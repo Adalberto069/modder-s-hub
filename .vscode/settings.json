@@ -7,5 +7,6 @@
   "deno.unstable": [],
   "deno.suggest.imports.hosts": {
     "https://esm.sh/": true
-  }
+  },
+  "css.lint.unknownAtRules": "ignore"
 }
