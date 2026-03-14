@@ -468,90 +468,139 @@ end
 
   return (
     <Layout>
-      <div className="container py-8 max-w-5xl">
-        <Link to="/marketplace" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6">
-          <ArrowLeft className="h-4 w-4" /> Voltar ao Marketplace
+      <div className="container py-8 max-w-6xl">
+        <Link to="/marketplace" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-neon-purple transition-colors mb-8 group">
+          <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" /> 
+          <span className="font-medium">Voltar ao Marketplace</span>
         </Link>
 
-        <div className="grid md:grid-cols-3 gap-6">
-          {/* Main content */}
-          <div className="md:col-span-2 space-y-6">
-            {/* Header */}
-            <div className="space-y-3">
-              <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
-                <h1 className="text-xl sm:text-2xl font-bold leading-tight">{script.title}</h1>
-                <div className="flex flex-wrap gap-1.5 shrink-0">
+        {/* Hero Header Section */}
+        <div className="relative mb-10 p-6 sm:p-8 rounded-2xl border border-white/5 bg-card/30 backdrop-blur-xl overflow-hidden">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-neon-purple/5 blur-[100px] -z-10" />
+          <div className="absolute bottom-0 left-0 w-48 h-48 bg-neon-green/5 blur-[80px] -z-10" />
+          
+          <div className="flex flex-col md:flex-row md:items-start gap-8">
+            {/* Gallery / Image Preview */}
+            <div className="w-full md:w-2/5 space-y-4">
+              {allMedia.length > 0 ? (
+                <div className="relative rounded-xl overflow-hidden border border-white/10 group shadow-2xl aspect-[4/3] bg-secondary/20">
+                  <AnimatePresence mode="wait">
+                    <motion.img
+                      key={galleryIndex}
+                      src={allMedia[galleryIndex]?.url}
+                      alt={script.title}
+                      className="w-full h-full object-cover"
+                      initial={{ opacity: 0, scale: 1.1 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.95 }}
+                      transition={{ duration: 0.4, ease: [0, 0, 0.2, 1] }}
+                    />
+                  </AnimatePresence>
+                  
+                  {allMedia.length > 1 && (
+                    <>
+                      <button 
+                        onClick={() => setGalleryIndex((p) => (p === 0 ? allMedia.length - 1 : p - 1))} 
+                        className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/50 backdrop-blur-md rounded-full p-2 border border-white/10 opacity-0 group-hover:opacity-100 transition-all hover:bg-neon-purple/50"
+                      >
+                        <ChevronLeft className="h-5 w-5" />
+                      </button>
+                      <button 
+                        onClick={() => setGalleryIndex((p) => (p === allMedia.length - 1 ? 0 : p + 1))} 
+                        className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/50 backdrop-blur-md rounded-full p-2 border border-white/10 opacity-0 group-hover:opacity-100 transition-all hover:bg-neon-purple/50"
+                      >
+                        <ChevronRight className="h-5 w-5" />
+                      </button>
+                    </>
+                  )}
+                  
+                  <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-1.5 px-4">
+                    {allMedia.map((_, i) => (
+                      <button 
+                        key={i} 
+                        onClick={() => setGalleryIndex(i)} 
+                        className={`transition-all duration-300 rounded-full ${
+                          i === galleryIndex ? "w-6 h-1.5 bg-neon-purple" : "w-1.5 h-1.5 bg-white/30 hover:bg-white/50"
+                        }`} 
+                      />
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div className="w-full aspect-square rounded-xl bg-secondary/30 flex items-center justify-center border border-dashed border-white/10">
+                  <FileCode className="h-16 w-16 text-muted-foreground/20" />
+                </div>
+              )}
+            </div>
+
+            {/* Info Section */}
+            <div className="flex-1 space-y-6">
+              <div className="space-y-4">
+                <div className="flex flex-wrap items-center gap-2">
+                  <Badge variant="outline" className="border-neon-purple/30 text-neon-purple bg-neon-purple/5 text-[10px] uppercase font-bold tracking-widest px-2.5">
+                    {script.categories && (script.categories as any).name}
+                  </Badge>
+                  <Badge variant="outline" className={`${st.className} text-[10px] uppercase font-bold tracking-widest px-2.5`}>
+                    {st.label}
+                  </Badge>
                   {!scriptIsActive && (
-                    <Badge className="bg-destructive/20 text-destructive border-destructive/30 gap-1 text-[10px]">
-                      Inativo
+                    <Badge variant="destructive" className="text-[10px] uppercase font-bold px-2.5">Inativo</Badge>
+                  )}
+                  {script.is_paid && (
+                    <Badge variant="secondary" className="bg-neon-pink/10 text-neon-pink border-neon-pink/20 text-[10px] font-bold">
+                       <ShoppingCart className="h-3 w-3 mr-1" /> Premium
                     </Badge>
                   )}
-                  {(script as any).security_status === "verified" && (
-                    <Badge className="bg-accent/20 text-accent border-accent/30 gap-1 text-[10px]">
-                      <ShieldCheck className="h-3 w-3" /> Verificado
-                    </Badge>
-                  )}
-                  {(script as any).security_status === "under_review" && (
-                    <Badge className="bg-primary/20 text-primary border-primary/30 gap-1 text-[10px]">
-                      <Clock className="h-3 w-3" /> Revisão
-                    </Badge>
-                  )}
-                  {(script as any).security_status === "flagged" && (
-                    <Badge className="bg-destructive/20 text-destructive border-destructive/30 gap-1 text-[10px]">
-                      <ShieldX className="h-3 w-3" /> Flag
-                    </Badge>
-                  )}
-                  <Badge variant="outline" className={`${st.className} text-[10px]`}>{st.label}</Badge>
+                </div>
+
+                <div className="space-y-2">
+                  <h1 className="text-3xl sm:text-4xl font-black tracking-tight leading-tight">
+                    {script.title}
+                  </h1>
+                  
+                  <div className="flex flex-wrap items-center gap-4 text-xs">
+                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/5 hover:bg-white/10 transition-colors">
+                      <Star className="h-3 w-3 text-amber-400 fill-amber-400" />
+                      <span className="font-bold">{script.average_rating ? Number(script.average_rating).toFixed(1) : "N/A"}</span>
+                      <span className="text-muted-foreground">({script.total_ratings || 0} reviews)</span>
+                    </div>
+                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/5">
+                      <Download className="h-3 w-3 text-neon-cyan" />
+                      <span className="font-bold">{script.download_count}</span>
+                      <span className="text-muted-foreground">downloads</span>
+                    </div>
+                    {scriptVersion && (
+                      <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/5 font-mono">
+                        <Badge variant="outline" className="border-none p-0 text-[10px]">VER: {scriptVersion}</Badge>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
 
-              <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                {gameName && (
-                  <Badge variant="secondary" className="gap-1 text-[10px]">
-                    <Gamepad2 className="h-3 w-3" /> {gameName}
-                  </Badge>
-                )}
-                {script.categories && (
-                  <Badge variant="secondary" className="text-[10px]">{(script.categories as any).name}</Badge>
-                )}
-                {scriptVersion && (
-                  <Badge variant="outline" className="text-[10px]">v{scriptVersion}</Badge>
-                )}
+              <div className="flex items-center gap-3 p-3 rounded-xl bg-white/5 border border-white/5 w-fit">
+                <Link to={`/modder/${script.modder_id}`} className="flex items-center gap-3 group">
+                  <Avatar className="h-10 w-10 border-2 border-white/10 group-hover:border-neon-purple transition-all duration-300">
+                    <AvatarImage src={modderProfile?.avatar_url} />
+                    <AvatarFallback className="bg-primary/10">
+                      {modderProfile?.username?.[0].toUpperCase() || "M"}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest">Desenvolvido por</p>
+                    <div className="flex items-center gap-1.5">
+                      <p className="font-bold text-sm">@{modderProfile?.display_name || modderProfile?.username || "Modder"}</p>
+                      <ShieldCheck className="h-3.5 w-3.5 text-neon-cyan" />
+                    </div>
+                  </div>
+                </Link>
               </div>
             </div>
+          </div>
+        </div>
 
-            {/* Image Gallery */}
-            {allMedia.length > 0 && (
-              <div className="relative rounded-lg overflow-hidden neon-border group">
-                <AnimatePresence mode="wait">
-                  <motion.img
-                    key={galleryIndex}
-                    src={allMedia[galleryIndex]?.url}
-                    alt={script.title}
-                    className="w-full aspect-video object-cover"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.2 }}
-                  />
-                </AnimatePresence>
-                {allMedia.length > 1 && (
-                  <>
-                    <button onClick={() => setGalleryIndex((p) => (p === 0 ? allMedia.length - 1 : p - 1))} className="absolute left-2 top-1/2 -translate-y-1/2 bg-background/70 rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <ChevronLeft className="h-5 w-5" />
-                    </button>
-                    <button onClick={() => setGalleryIndex((p) => (p === allMedia.length - 1 ? 0 : p + 1))} className="absolute right-2 top-1/2 -translate-y-1/2 bg-background/70 rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <ChevronRight className="h-5 w-5" />
-                    </button>
-                    <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
-                      {allMedia.map((_, i) => (
-                        <button key={i} onClick={() => setGalleryIndex(i)} className={`w-2 h-2 rounded-full transition-colors ${i === galleryIndex ? "bg-primary" : "bg-muted-foreground/40"}`} />
-                      ))}
-                    </div>
-                  </>
-                )}
-              </div>
-            )}
+        <div className="grid lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2 space-y-8">
 
             {script.video_url && (
               <div>
@@ -563,56 +612,66 @@ end
             )}
 
             {/* Description */}
-            <div>
-              <h3 className="text-sm font-semibold mb-2 flex items-center gap-2">
-                <FileCode className="h-4 w-4 text-primary" /> Descrição
+            <div className="space-y-4">
+              <h3 className="text-lg font-bold flex items-center gap-2">
+                <FileCode className="h-5 w-5 text-neon-purple" /> Sobre o Script
               </h3>
-              <p className="text-muted-foreground whitespace-pre-wrap text-sm">{script.description ?? "Sem descrição."}</p>
+              <div className="p-6 rounded-2xl border border-white/5 bg-white/5 backdrop-blur-sm text-muted-foreground leading-relaxed">
+                {script.description ?? "Sem descrição relevante fornecida pelo autor."}
+              </div>
             </div>
 
-            {/* Features */}
-            {scriptFeatures.length > 0 && (
-              <Card className="neon-border bg-card/80">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-base flex items-center gap-2">
-                    <List className="h-4 w-4 text-accent" /> Features
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-2">
-                    {scriptFeatures.map((f: string, i: number) => (
-                      <li key={i} className="flex items-start gap-2 text-sm">
-                        <CheckCircle className="h-4 w-4 text-accent shrink-0 mt-0.5" />
-                        <span className="text-foreground">{f}</span>
-                      </li>
+            {/* Features & Tags */}
+            <div className="grid sm:grid-cols-2 gap-6">
+              {scriptFeatures.length > 0 && (
+                <Card className="border-white/5 bg-white/5 backdrop-blur-sm overflow-hidden">
+                  <CardHeader className="pb-3 border-b border-white/5 bg-white/5">
+                    <CardTitle className="text-sm font-bold flex items-center gap-2">
+                      <List className="h-4 w-4 text-neon-green" /> Funcionalidades
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="pt-4">
+                    <ul className="space-y-2.5">
+                      {scriptFeatures.map((f: string, i: number) => (
+                        <li key={i} className="flex items-start gap-2.5 text-xs text-muted-foreground">
+                          <CheckCircle className="h-3.5 w-3.5 text-neon-green shrink-0 mt-0.5" />
+                          <span>{f}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </CardContent>
+                </Card>
+              )}
+
+              {scriptTags.length > 0 && (
+                <Card className="border-white/5 bg-white/5 backdrop-blur-sm overflow-hidden">
+                  <CardHeader className="pb-3 border-b border-white/5 bg-white/5">
+                    <CardTitle className="text-sm font-bold flex items-center gap-2">
+                      <Tag className="h-4 w-4 text-neon-cyan" /> Tags de Busca
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="pt-4 flex flex-wrap gap-2">
+                    {scriptTags.map((t: string, i: number) => (
+                      <Badge key={i} variant="outline" className="text-[10px] text-neon-cyan border-neon-cyan/20 bg-neon-cyan/5">
+                        #{t}
+                      </Badge>
                     ))}
-                  </ul>
-                </CardContent>
-              </Card>
-            )}
+                  </CardContent>
+                </Card>
+              )}
+            </div>
 
             {/* Code Preview */}
             {luaCode && (
               <div className="space-y-4">
-                <h3 className="text-sm font-semibold mb-2 flex items-center gap-2">
-                  <FileCode className="h-4 w-4 text-neon-green" /> Preview do Código
-                </h3>
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg font-bold flex items-center gap-2">
+                    <FileCode className="h-5 w-5 text-neon-green" /> Estrutura do Código
+                  </h3>
+                  <Badge variant="outline" className="border-neon-green/30 text-neon-green bg-neon-green/5">Preview Seguro</Badge>
+                </div>
                 <CodeBlock code={luaCode.split("\n").slice(0, 20).join("\n") + (luaCode.split("\n").length > 20 ? "\n-- ..." : "")} />
                 <ScriptAnalysis code={luaCode} scriptId={id} />
-              </div>
-            )}
-
-            {/* Moderation Messages (visible to script owner) */}
-            {isOwner && <ModerationMessages scriptId={script.id} />}
-
-            {/* Tags */}
-            {scriptTags.length > 0 && (
-              <div className="flex flex-wrap gap-2">
-                {scriptTags.map((t: string, i: number) => (
-                  <Badge key={i} variant="outline" className="text-[10px] text-neon-cyan border-neon-cyan/30">
-                    <Tag className="h-3 w-3 mr-1" /> #{t}
-                  </Badge>
-                ))}
               </div>
             )}
 
@@ -673,7 +732,7 @@ end
                   {reviews?.map((review: any) => {
                     const rProfile = profileMap[review.user_id];
                     return (
-                      <div key={review.id} className="flex gap-3 p-3 rounded-lg border border-border/30">
+                      <div key={review.id} className="flex gap-3 p-3 rounded-lg border border-border/30 text-card-foreground">
                         <Avatar className="h-8 w-8 shrink-0">
                           {rProfile?.avatar_url && <AvatarImage src={rProfile.avatar_url} />}
                           <AvatarFallback className="bg-secondary text-[10px]">
@@ -698,169 +757,139 @@ end
             </Card>
           </div>
 
-          {/* Sidebar */}
-          <div className="space-y-4">
-            <Card className="neon-border bg-card/80">
-              <CardContent className="p-4 space-y-4">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="flex items-center gap-1 text-muted-foreground"><Download className="h-4 w-4" /> Downloads</span>
-                  <span className="font-mono font-bold">{script.download_count}</span>
-                </div>
-                <div className="flex items-center justify-between text-sm">
-                  <span className="flex items-center gap-1 text-muted-foreground"><Star className="h-4 w-4" /> Avaliação</span>
-                  <div className="flex items-center gap-1">
-                    <StarRating rating={Math.round(Number(script.average_rating))} />
-                    <span className="font-mono font-bold text-xs">({script.total_ratings})</span>
-                  </div>
+          {/* Sidebar / Purchase Experience */}
+          <div className="space-y-6">
+            <Card className="relative overflow-hidden border-neon-purple/20 bg-card/40 backdrop-blur-xl shadow-2xl">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-neon-purple/10 blur-[40px] -z-10" />
+              
+              <CardHeader className="pb-3 border-b border-white/5">
+                <CardTitle className="text-sm font-bold uppercase tracking-widest text-muted-foreground">Checkout Elite</CardTitle>
+              </CardHeader>
+              
+              <CardContent className="p-6 space-y-6">
+                <div className="flex flex-col items-center gap-2 py-4">
+                  {script.is_paid ? (
+                    <>
+                      <div className="flex items-baseline gap-1">
+                        <span className="text-sm font-bold text-muted-foreground">R$</span>
+                        <span className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-br from-white to-white/50">{Number(script.price).toFixed(2)}</span>
+                      </div>
+                      <Badge variant="outline" className="border-neon-pink/30 text-neon-pink bg-neon-pink/5 px-4 py-1">
+                        <Key className="h-3 w-3 mr-2" /> {(script as any).license_duration_days ? `${(script as any).license_duration_days} dias de acesso` : "Acesso Vitalício"}
+                      </Badge>
+                    </>
+                  ) : (
+                    <>
+                      <span className="text-4xl font-black text-neon-green">Grátis</span>
+                      <Badge variant="outline" className="border-neon-green/30 text-neon-green bg-neon-green/5 px-4 py-1">Acesso Livre</Badge>
+                    </>
+                  )}
                 </div>
 
-                {script.is_paid ? (
-                  <div className="space-y-3">
-                    <p className="text-2xl font-bold font-mono text-primary text-center">R$ {Number(script.price).toFixed(2)}</p>
-                    <div className="text-center">
-                      {(script as any).license_duration_days ? (
-                        <Badge variant="outline" className="text-[10px] border-yellow-500/30 text-yellow-400">
-                          <Clock className="h-3 w-3 mr-1" /> 
-                          {(script as any).license_duration_days === 7 ? "Licença Semanal (7 dias)" : `Licença Mensal (${(script as any).license_duration_days} dias)`}
-                        </Badge>
-                      ) : (
-                        <Badge variant="outline" className="text-[10px] border-accent/30 text-accent">
-                          🔑 Licença Permanente
-                        </Badge>
-                      )}
-                    </div>
-
-                    {/* Purchase success state */}
-                    {purchaseSuccess && (
-                      <Card className="border-accent/30 bg-accent/5">
-                        <CardContent className="p-4 space-y-3">
-                          <div className="flex items-center gap-2 text-accent text-sm font-semibold">
-                            <CheckCircle className="h-4 w-4" /> Compra Realizada!
-                          </div>
-                          <div>
-                            <p className="text-[10px] text-muted-foreground mb-1">Sua Licença:</p>
-                            <div className="flex items-center gap-2 bg-secondary/50 rounded p-2">
-                              <Key className="h-4 w-4 text-primary shrink-0" />
-                              <code className="text-sm font-mono text-primary flex-1">{purchaseSuccess}</code>
-                              <Button variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={() => { navigator.clipboard.writeText(purchaseSuccess); toast.success("Licença copiada!"); }}>
-                                <Copy className="h-3 w-3" />
+                <div className="space-y-3">
+                  {script.is_paid ? (
+                    <>
+                      {purchaseSuccess || (existingLicense && !isLicenseExpired) ? (
+                        <div className="space-y-4">
+                          <div className="bg-neon-green/5 border border-neon-green/20 rounded-xl p-4 space-y-3">
+                            <div className="flex items-center gap-2 text-neon-green text-sm font-bold">
+                              <CheckCircle className="h-4 w-4" /> Licença Ativa
+                            </div>
+                            <div className="bg-black/40 rounded-lg p-3 border border-white/5 flex items-center justify-between group">
+                              <code className="text-xs font-mono text-neon-purple truncate flex-1 mr-2">
+                                {purchaseSuccess || (existingLicense as any).license_key}
+                              </code>
+                              <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                className="h-8 w-8 p-0 hover:bg-neon-purple/20"
+                                onClick={() => {
+                                  navigator.clipboard.writeText(purchaseSuccess || (existingLicense as any).license_key);
+                                  toast.success("Chave copiada!");
+                                }}
+                              >
+                                <Copy className="h-3.5 w-3.5" />
                               </Button>
                             </div>
-                          </div>
-                          <Button className="w-full neon-glow-green" onClick={handleDownloadLoader}>
-                            <Download className="mr-2 h-4 w-4" /> Baixar Loader (.lua)
-                          </Button>
-                          <p className="text-[10px] text-muted-foreground text-center">
-                            Sua licença também está disponível no Dashboard
-                          </p>
-                        </CardContent>
-                      </Card>
-                    )}
-
-
-                    {!purchaseSuccess && existingLicense ? (
-                      isLicenseExpired ? (
-                        <div className="space-y-2">
-                          <div className="p-3 rounded-lg bg-destructive/10 border border-destructive/20 text-center">
-                            <p className="text-sm font-semibold text-destructive">❌ Licença Expirada</p>
-                            <p className="text-[10px] text-muted-foreground mt-1">
-                              Expirou em {new Date(existingLicense.expires_at!).toLocaleDateString("pt-BR")}
-                            </p>
-                          </div>
-                          <div className="bg-secondary/50 rounded p-2">
-                            <p className="text-[10px] text-muted-foreground mb-1">Sua Licença:</p>
-                            <div className="flex items-center gap-2">
-                              <Key className="h-3 w-3 text-muted-foreground shrink-0" />
-                              <code className="text-xs font-mono text-muted-foreground flex-1">{(existingLicense as any).license_key}</code>
-                            </div>
-                          </div>
-                          {scriptIsActive && (
-                            <Button className="w-full neon-glow-purple" onClick={handleRenew} disabled={purchasing}>
-                              <Clock className="mr-2 h-4 w-4" />
-                              {purchasing ? "Processando..." : `Renovar por R$ ${Number(script.price).toFixed(2)}`}
+                            <Button className="w-full bg-neon-purple hover:bg-neon-purple/90 text-white font-bold h-12 rounded-xl shadow-neon-purple/20" onClick={handleDownloadLoader}>
+                              <Download className="mr-2 h-4 w-4" /> Baixar Loader
                             </Button>
-                          )}
-                          <p className="text-[10px] text-muted-foreground text-center">
-                            +{(script as any).license_duration_days} dias adicionais
-                          </p>
-                        </div>
-                      ) : (
-                        <div className="space-y-2">
-                          <div className="flex items-center gap-2 justify-center text-accent text-sm">
-                            <CheckCircle className="h-4 w-4" /><span>Já adquirido</span>
                           </div>
-                          <div className="bg-secondary/50 rounded p-2">
-                            <p className="text-[10px] text-muted-foreground mb-1">Sua Licença:</p>
-                            <div className="flex items-center gap-2">
-                              <Key className="h-3 w-3 text-primary shrink-0" />
-                              <code className="text-xs font-mono text-primary flex-1">{(existingLicense as any).license_key}</code>
-                              <Button variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={() => { navigator.clipboard.writeText((existingLicense as any).license_key); toast.success("Licença copiada!"); }}>
-                                <Copy className="h-3 w-3" />
-                              </Button>
-                            </div>
-                          </div>
-                          {existingLicense.expires_at && (
-                            <div className="text-center space-y-2">
-                              <Badge variant="outline" className="text-[10px] border-yellow-500/30 text-yellow-400">
-                                ⏳ Expira: {new Date(existingLicense.expires_at).toLocaleDateString("pt-BR")}
+                          
+                          {existingLicense?.expires_at && (
+                            <div className="text-center">
+                              <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest mb-2">Expira em</p>
+                              <Badge variant="outline" className="font-mono text-[11px] border-white/10 px-3">
+                                {new Date(existingLicense.expires_at).toLocaleDateString("pt-BR", { day: '2-digit', month: 'long', year: 'numeric' })}
                               </Badge>
-                              {scriptIsActive && (script as any).license_duration_days && (
-                                <Button variant="outline" size="sm" className="w-full" onClick={handleRenew} disabled={purchasing}>
-                                  <Clock className="mr-2 h-3 w-3" />
-                                  {purchasing ? "..." : `Estender (+${(script as any).license_duration_days} dias)`}
-                                </Button>
-                              )}
                             </div>
                           )}
-                          <Button className="w-full neon-glow-green" onClick={handleDownloadLoader}>
-                            <Download className="mr-2 h-4 w-4" /> Baixar Loader (.lua)
+                        </div >
+                      ) : isLicenseExpired ? (
+                        <div className="space-y-4">
+                          <div className="bg-destructive/5 border border-destructive/20 rounded-xl p-4 text-center">
+                            <p className="text-sm font-bold text-destructive mb-1">Licença Expirada</p>
+                            <p className="text-[11px] text-muted-foreground leading-tight">Renove seu acesso para continuar utilizando este script elite.</p>
+                          </div>
+                          <Button className="w-full bg-neon-purple hover:bg-neon-purple/90 text-white font-bold h-12 rounded-xl overflow-hidden relative group" onClick={handleRenew} disabled={purchasing}>
+                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+                            <Clock className="mr-2 h-4 w-4" /> {purchasing ? "Iniciando..." : "Renovar Acesso"}
                           </Button>
                         </div>
-                      )
-                    ) : !purchaseSuccess ? (
-                      scriptIsActive ? (
-                        <Button className="w-full neon-glow-purple" onClick={openPaymentMethodModal} disabled={purchasing}>
-                          <ShoppingCart className="mr-2 h-4 w-4" />
-                          {purchasing ? "Processando..." : "Comprar Script"}
-                        </Button>
                       ) : (
-                        <div className="text-center p-3 rounded-lg bg-destructive/10 border border-destructive/20">
-                          <p className="text-sm text-destructive font-semibold">Script Indisponível</p>
-                          <p className="text-[10px] text-muted-foreground mt-1">Este script foi desativado pelo criador.</p>
-                        </div>
-                      )
-                    ) : null}
-                  </div>
-                ) : (
-                  <Button className="w-full neon-glow-green" onClick={handleDownloadFree}>
-                    <Download className="mr-2 h-4 w-4" /> Download Grátis
-                  </Button>
-                )}
+                        <Button className="w-full bg-neon-purple hover:bg-neon-purple/90 text-white font-bold h-12 rounded-xl overflow-hidden relative group" onClick={openPaymentMethodModal} disabled={purchasing}>
+                          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+                          <CreditCard className="mr-2 h-4 w-4" /> {purchasing ? "Processando..." : "Comprar Agora"}
+                        </Button>
+                      )}
+                    </>
+                  ) : (
+                    <Button className="w-full bg-neon-green hover:bg-neon-green/90 text-black font-bold h-12 rounded-xl group" onClick={handleDownloadFree}>
+                      <Download className="mr-2 h-4 w-4 group-hover:translate-y-0.5 transition-transform" /> Baixar Agora
+                    </Button>
+                  )}
 
-                {script.external_link && !script.is_paid && (
-                  <Button variant="outline" className="w-full" onClick={() => {
-                    if (!user) { setShowLoginPrompt(true); return; }
-                    window.open(script.external_link!, "_blank");
-                  }}>
-                    <ExternalLink className="mr-2 h-4 w-4" /> Link Externo
-                  </Button>
-                )}
+                  {!hasAccess && (
+                    <p className="text-[10px] text-center text-muted-foreground px-4">
+                      Ao adquirir, você concorda com nossos termos de uso e política de modders.
+                    </p>
+                  )}
+                </div>
+
+                <div className="grid grid-cols-2 gap-4 pt-4 border-t border-white/5">
+                  <div className="space-y-1">
+                    <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest text-center">Reviews</p>
+                    <p className="text-lg font-black text-center">{script.total_ratings || 0}</p>
+                  </div>
+                  <div className="space-y-1 border-l border-white/5">
+                    <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest text-center">Status</p>
+                    <p className={`text-xs font-black text-center uppercase ${st.className.split(' ')[1]}`}>{st.label}</p>
+                  </div>
+                </div>
               </CardContent>
             </Card>
 
-            {/* Modder info */}
-            <Card className="neon-border bg-card/80">
-              <CardContent className="p-4">
-                <Link to={`/modder/${script.modder_id}`} className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-                  <Avatar className="h-10 w-10">
-                    {modderProfile?.avatar_url && <AvatarImage src={modderProfile.avatar_url} />}
-                    <AvatarFallback className="bg-secondary"><User className="h-5 w-5 text-muted-foreground" /></AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <p className="font-semibold text-sm">{modderProfile?.display_name ?? modderProfile?.username}</p>
-                    <p className="text-xs text-muted-foreground font-mono">{modderProfile?.reputation_score ?? 0} pts</p>
+            {/* Support / Quick Info */}
+            <Card className="border-white/5 bg-white/5 backdrop-blur-sm">
+              <CardContent className="p-4 space-y-4">
+                <div className="flex items-start gap-3">
+                  <div className="p-2 rounded-lg bg-neon-cyan/10 border border-neon-cyan/20">
+                    <ShieldCheck className="h-4 w-4 text-neon-cyan" />
                   </div>
-                </Link>
+                  <div className="flex-1">
+                    <p className="text-xs font-bold mb-0.5">Sistema de Ofuscação</p>
+                    <p className="text-[10px] text-muted-foreground leading-relaxed">Código protegido anti-reverso com marca d'água de comprador única.</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="p-2 rounded-lg bg-neon-purple/10 border border-neon-purple/20">
+                    <CheckCircle className="h-4 w-4 text-neon-purple" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-xs font-bold mb-0.5">Verificado Elite</p>
+                    <p className="text-[10px] text-muted-foreground leading-relaxed">Script testado manualmente pela equipe de segurança Nexus Marketplace.</p>
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </div>

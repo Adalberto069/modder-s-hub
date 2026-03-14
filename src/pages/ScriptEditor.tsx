@@ -317,89 +317,126 @@ export default function ScriptEditor() {
           <ArrowLeft className="h-4 w-4 mr-1" /> Voltar
         </Button>
 
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold font-mono">
-            {isEditing ? "Editar Script" : "Novo Script"}
-          </h1>
+        <div className="flex items-center justify-between mb-8">
+          <div className="space-y-1">
+            <h1 className="text-4xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-br from-white to-white/60 uppercase">
+              {isEditing ? "Editar Script Elite" : "Novo Script Elite"}
+            </h1>
+            <p className="text-xs text-muted-foreground font-mono tracking-widest uppercase">Nexus Marketplace / Forge</p>
+          </div>
           {publishStatus !== "published" && (
-            <Badge variant="outline" className="text-xs">
-              {publishStatus === "draft" ? "Rascunho" : publishStatus === "pending_review" ? "Em Revisão" : publishStatus === "archived" ? "Arquivado" : publishStatus}
+            <Badge className="bg-neon-purple/20 text-neon-purple border-neon-purple/30 backdrop-blur-md px-4 py-1.5 animate-pulse">
+              {publishStatus === "draft" ? "RASCUNHO" : publishStatus === "pending_review" ? "EM REVISÃO" : publishStatus === "archived" ? "ARQUIVADO" : publishStatus.toUpperCase()}
             </Badge>
           )}
         </div>
 
         <div className="space-y-6">
           {/* Basic Information */}
-          <Card className="neon-border bg-card/80">
-            <CardHeader>
-              <CardTitle className="text-base flex items-center gap-2">
-                <FileCode className="h-4 w-4 text-primary" /> Informações Básicas
+          <Card className="relative overflow-hidden border-neon-purple/20 bg-card/40 backdrop-blur-xl shadow-xl">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-neon-purple/5 blur-[40px] -z-10" />
+            <CardHeader className="pb-4 border-b border-white/5">
+              <CardTitle className="text-sm font-black uppercase tracking-[0.2em] flex items-center gap-2 text-muted-foreground">
+                <FileCode className="h-4 w-4 text-neon-purple" /> Informações Básicas
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <Label className="mb-2 block">Tipo de conteúdo</Label>
-                <Tabs value={scriptType} onValueChange={setScriptType}>
-                  <TabsList className="grid w-full max-w-xs grid-cols-2">
-                    <TabsTrigger value="script" className="gap-2"><Code className="h-4 w-4" /> Script</TabsTrigger>
-                    <TabsTrigger value="apk" className="gap-2"><Package className="h-4 w-4" /> APK / Mod</TabsTrigger>
+            <CardContent className="p-6 space-y-6">
+              <div className="space-y-3">
+                <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/70">Tipo de projeto</Label>
+                <Tabs value={scriptType} onValueChange={setScriptType} className="w-full">
+                  <TabsList className="grid w-full max-w-sm grid-cols-2 bg-white/5 border border-white/5 p-1">
+                    <TabsTrigger value="script" className="gap-2 data-[state=active]:bg-neon-purple data-[state=active]:text-white">
+                      <Code className="h-4 w-4" /> LUA SCRIPT
+                    </TabsTrigger>
+                    <TabsTrigger value="apk" className="gap-2 data-[state=active]:bg-neon-cyan data-[state=active]:text-white">
+                      <Package className="h-4 w-4" /> APK MOD
+                    </TabsTrigger>
                   </TabsList>
                 </Tabs>
               </div>
 
-              <div className="grid md:grid-cols-2 gap-4">
-                <div>
-                  <Label>Título *</Label>
-                  <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Ex: Auto Farm Script" required />
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/70">Título do Script *</Label>
+                  <Input 
+                    value={title} 
+                    onChange={(e) => setTitle(e.target.value)} 
+                    placeholder="Ex: Nexus Auto Kill v2" 
+                    className="bg-white/5 border-white/10 focus:border-neon-purple/50 focus:ring-neon-purple/20 h-12"
+                    required 
+                  />
                 </div>
-                <div>
-                  <Label className="flex items-center gap-1"><Gamepad2 className="h-3.5 w-3.5" /> Jogo</Label>
-                  <Input value={gameName} onChange={(e) => setGameName(e.target.value)} placeholder="Ex: Roblox, Free Fire" />
+                <div className="space-y-2">
+                  <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/70 flex items-center gap-1">
+                    <Gamepad2 className="h-3.5 w-3.5" /> Jogo Alvo
+                  </Label>
+                  <Input 
+                    value={gameName} 
+                    onChange={(e) => setGameName(e.target.value)} 
+                    placeholder="Ex: Free Fire, Roblox" 
+                    className="bg-white/5 border-white/10 focus:border-neon-purple/50 focus:ring-neon-purple/20 h-12"
+                  />
                 </div>
               </div>
 
-              <div className="grid md:grid-cols-3 gap-4">
-                <div>
-                  <Label>Versão</Label>
-                  <Input value={version} onChange={(e) => setVersion(e.target.value)} placeholder="1.0" />
+              <div className="grid md:grid-cols-3 gap-6">
+                <div className="space-y-2">
+                  <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/70">Versão</Label>
+                  <Input 
+                    value={version} 
+                    onChange={(e) => setVersion(e.target.value)} 
+                    placeholder="1.0.0" 
+                    className="bg-white/5 border-white/10 focus:border-neon-purple/50 focus:ring-neon-purple/20 h-12 font-mono"
+                  />
                 </div>
-                <div>
-                  <Label>Categoria</Label>
+                <div className="space-y-2">
+                  <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/70">Categoria</Label>
                   <Select value={categoryId} onValueChange={setCategoryId}>
-                    <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
-                    <SelectContent>
+                    <SelectTrigger className="bg-white/5 border-white/10 h-12"><SelectValue placeholder="Selecione" /></SelectTrigger>
+                    <SelectContent className="bg-[#0a0a0c] border-white/10">
                       {categories?.map((c: any) => (
                         <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </div>
-                <div>
-                  <Label>Status Operacional</Label>
+                <div className="space-y-2">
+                  <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/70">Status Operacional</Label>
                   <Select value={status} onValueChange={setStatus}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="working">Working</SelectItem>
-                      <SelectItem value="detected">Detected</SelectItem>
-                      <SelectItem value="updating">Updating</SelectItem>
+                    <SelectTrigger className="bg-white/5 border-white/10 h-12"><SelectValue /></SelectTrigger>
+                    <SelectContent className="bg-[#0a0a0c] border-white/10">
+                      <SelectItem value="working" className="text-neon-green">WORKING</SelectItem>
+                      <SelectItem value="detected" className="text-neon-pink">DETECTED</SelectItem>
+                      <SelectItem value="updating" className="text-neon-cyan">UPDATING</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
               </div>
 
-              <div>
-                <Label>Descrição</Label>
-                <Textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={3} placeholder="Descreva o que este script faz..." />
+              <div className="space-y-2">
+                <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/70">Descrição Detalhada</Label>
+                <Textarea 
+                  value={description} 
+                  onChange={(e) => setDescription(e.target.value)} 
+                  rows={4} 
+                  placeholder="Explique as funcionalidades e como usar seu script..." 
+                  className="bg-white/5 border-white/10 focus:border-neon-purple/50 focus:ring-neon-purple/20 resize-none"
+                />
               </div>
 
-              <div className="grid md:grid-cols-2 gap-4">
-                <div>
-                  <Label>Thumbnail URL (opcional)</Label>
-                  <Input value={thumbnailUrl} onChange={(e) => setThumbnailUrl(e.target.value)} placeholder="https://..." />
+              <div className="grid md:grid-cols-2 gap-6 pt-2">
+                <div className="space-y-2">
+                  <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/70">Thumbnail URL</Label>
+                  <Input 
+                    value={thumbnailUrl} 
+                    onChange={(e) => setThumbnailUrl(e.target.value)} 
+                    placeholder="https://sua-imagem.com/preview.jpg" 
+                    className="bg-white/5 border-white/10 h-10"
+                  />
                 </div>
-                <div>
-                  <Label>Ou Enviar Imagem (Recomendado)</Label>
-                  <div className="flex gap-2">
+                <div className="space-y-2">
+                  <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/70">Upload Direto</Label>
+                  <div className="relative group">
                     <Input 
                       type="file" 
                       accept=".jpg,.jpeg,.png,.webp" 
@@ -407,57 +444,48 @@ export default function ScriptEditor() {
                         const f = e.target.files?.[0];
                         if (!f) return;
                         const safeName = await validateFileWithToast({ file: f, type: "image", maxSizeMB: 1 });
-                        if (!safeName) {
-                          e.target.value = "";
-                          return;
-                        }
-
+                        if (!safeName) { e.target.value = ""; return; }
                         toast.info("Enviando miniatura...");
                         const path = `thumbnails/${user!.id}/${safeName}`;
                         const { error: uploadError } = await supabase.storage.from("scripts").upload(path, f);
-                        
-                        if (uploadError) {
-                          toast.error("Erro no upload: " + uploadError.message);
-                          return;
-                        }
-
+                        if (uploadError) { toast.error("Erro no upload: " + uploadError.message); return; }
                         const { data: { publicUrl } } = supabase.storage.from("scripts").getPublicUrl(path);
                         setThumbnailUrl(publicUrl);
                         toast.success("Miniatura enviada!");
                       }}
-                      className="text-xs"
+                      className="bg-white/5 border-white/10 h-10 file:bg-neon-purple/20 file:text-neon-purple file:border-none file:px-3 file:mr-3 file:text-xs file:font-bold hover:file:bg-neon-purple/30 transition-all cursor-pointer"
                     />
                   </div>
-                  <p className="text-[10px] text-muted-foreground mt-1">Máx: 1MB. Apenas JPG, PNG ou WebP (Sem GIFs).</p>
+                  <p className="text-[10px] text-muted-foreground italic">Máx: 1MB. JPG, PNG ou WebP.</p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
           {/* Features */}
-          <Card className="neon-border bg-card/80">
-            <CardHeader>
-              <CardTitle className="text-base flex items-center gap-2">
-                <List className="h-4 w-4 text-accent" /> Features
+          <Card className="relative overflow-hidden border-white/5 bg-card/40 backdrop-blur-xl shadow-lg">
+            <CardHeader className="pb-4 border-b border-white/5">
+              <CardTitle className="text-sm font-black uppercase tracking-[0.2em] flex items-center gap-2 text-muted-foreground">
+                <List className="h-4 w-4 text-neon-cyan" /> Funcionalidades (Features)
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3">
+            <CardContent className="p-6 space-y-4">
               <div className="flex gap-2">
                 <Input
                   value={newFeature}
                   onChange={(e) => setNewFeature(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addFeature())}
-                  placeholder="Ex: Auto Farm, Anti-Ban..."
-                  className="flex-1"
+                  placeholder="Ex: Anti-Ban Bypass, Speed Hack..."
+                  className="bg-white/5 border-white/10 h-11"
                 />
-                <Button type="button" variant="outline" size="icon" onClick={addFeature}><Plus className="h-4 w-4" /></Button>
+                <Button type="button" variant="outline" size="icon" onClick={addFeature} className="h-11 w-11 hover:bg-neon-cyan/20 border-white/10"><Plus className="h-4 w-4 text-neon-cyan" /></Button>
               </div>
               {features.length > 0 && (
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-2 pt-2">
                   {features.map((f, i) => (
-                    <Badge key={i} variant="secondary" className="gap-1 pr-1">
+                    <Badge key={i} className="bg-neon-cyan/10 text-neon-cyan border-neon-cyan/20 px-3 py-1 gap-1 group">
                       {f}
-                      <button onClick={() => setFeatures(features.filter((_, j) => j !== i))} className="ml-1 hover:text-destructive">
+                      <button onClick={() => setFeatures(features.filter((_, j) => j !== i))} className="ml-1 opacity-50 group-hover:opacity-100 transition-opacity">
                         <X className="h-3 w-3" />
                       </button>
                     </Badge>
@@ -468,29 +496,29 @@ export default function ScriptEditor() {
           </Card>
 
           {/* Tags */}
-          <Card className="neon-border bg-card/80">
-            <CardHeader>
-              <CardTitle className="text-base flex items-center gap-2">
-                <Tag className="h-4 w-4 text-neon-cyan" /> Tags
+          <Card className="relative overflow-hidden border-white/5 bg-card/40 backdrop-blur-xl shadow-lg">
+            <CardHeader className="pb-4 border-b border-white/5">
+              <CardTitle className="text-sm font-black uppercase tracking-[0.2em] flex items-center gap-2 text-muted-foreground">
+                <Tag className="h-4 w-4 text-neon-pink" /> Tags de Descoberta
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3">
+            <CardContent className="p-6 space-y-4">
               <div className="flex gap-2">
                 <Input
                   value={newTag}
                   onChange={(e) => setNewTag(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addTag())}
-                  placeholder="Ex: roblox, farm, lua..."
-                  className="flex-1"
+                  placeholder="Ex: roblox, farm, injector..."
+                  className="bg-white/5 border-white/10 h-11"
                 />
-                <Button type="button" variant="outline" size="icon" onClick={addTag}><Plus className="h-4 w-4" /></Button>
+                <Button type="button" variant="outline" size="icon" onClick={addTag} className="h-11 w-11 hover:bg-neon-pink/20 border-white/10"><Plus className="h-4 w-4 text-neon-pink" /></Button>
               </div>
               {tags.length > 0 && (
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-2 pt-2">
                   {tags.map((t, i) => (
-                    <Badge key={i} variant="outline" className="gap-1 pr-1 text-neon-cyan border-neon-cyan/30">
+                    <Badge key={i} className="bg-neon-pink/10 text-neon-pink border-neon-pink/20 px-3 py-1 gap-1 group">
                       #{t}
-                      <button onClick={() => setTags(tags.filter((_, j) => j !== i))} className="ml-1 hover:text-destructive">
+                      <button onClick={() => setTags(tags.filter((_, j) => j !== i))} className="ml-1 opacity-50 group-hover:opacity-100 transition-opacity">
                         <X className="h-3 w-3" />
                       </button>
                     </Badge>
@@ -500,35 +528,38 @@ export default function ScriptEditor() {
             </CardContent>
           </Card>
 
-          {/* Code Preview (auto-extracted from file) */}
+          {/* Code Preview */}
           {luaCode && (
-            <Card className="neon-border bg-card/80">
-              <CardHeader>
-                <CardTitle className="text-base flex items-center gap-2">
-                  <Code className="h-4 w-4 text-neon-green" /> Preview do Código
+            <Card className="relative overflow-hidden border-neon-green/20 bg-[#060608]/90 backdrop-blur-xl shadow-2xl">
+              <CardHeader className="pb-4 border-b border-white/5">
+                <CardTitle className="text-sm font-black uppercase tracking-[0.2em] flex items-center gap-2 text-neon-green">
+                  <Code className="h-4 w-4" /> Nexus Forge Editor
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="relative rounded-lg overflow-hidden border border-border bg-[hsl(240,15%,3%)]">
-                  <div className="flex items-center gap-2 px-3 py-2 bg-secondary/50 border-b border-border">
-                    <div className="flex gap-1.5">
-                      <span className="w-3 h-3 rounded-full bg-destructive/60" />
-                      <span className="w-3 h-3 rounded-full bg-primary/60" />
-                      <span className="w-3 h-3 rounded-full bg-accent/60" />
+              <CardContent className="p-6">
+                <div className="relative rounded-xl overflow-hidden border border-white/10 bg-[hsl(240,15%,2%)] shadow-inner">
+                  <div className="flex items-center justify-between px-4 py-3 bg-white/5 border-b border-white/5">
+                    <div className="flex gap-2">
+                      <span className="w-2.5 h-2.5 rounded-full bg-red-500/40" />
+                      <span className="w-2.5 h-2.5 rounded-full bg-yellow-500/40" />
+                      <span className="w-2.5 h-2.5 rounded-full bg-green-500/40" />
                     </div>
-                    <span className="text-[10px] text-muted-foreground font-mono ml-2">preview (primeiras 20 linhas)</span>
+                    <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/50">RO/Preview Mode</span>
                   </div>
                   <LuaCodeEditor
-                    value={luaCode.split("\n").slice(0, 20).join("\n") + (luaCode.split("\n").length > 20 ? "\n-- ..." : "")}
+                    value={luaCode.split("\n").slice(0, 25).join("\n") + (luaCode.split("\n").length > 25 ? "\n\n-- [CONTEÚDO ADICIONAL OCULTO NO PREVIEW]" : "")}
                     readOnly
-                    minHeight="200px"
+                    minHeight="300px"
                   />
                 </div>
-                <p className="text-[10px] text-muted-foreground mt-2">Preview automático das primeiras 20 linhas do arquivo enviado.</p>
-
-                {/* Script Analysis */}
+                
+                {/* Script Analysis Integration */}
                 {luaCode.trim().length > 10 && (
-                  <div className="mt-4">
+                  <div className="mt-8 pt-8 border-t border-white/5">
+                    <div className="mb-4 space-y-1">
+                      <h4 className="text-xs font-black uppercase tracking-widest text-neon-green">Análise de Segurança Automática</h4>
+                      <p className="text-[10px] text-muted-foreground">O Nexus Marketplace analisa seu código em tempo real para garantir padrões de segurança.</p>
+                    </div>
                     <ScriptAnalysis code={luaCode} scriptId={id} onAnalysisComplete={setLastAnalysis} />
                   </div>
                 )}
@@ -537,71 +568,72 @@ export default function ScriptEditor() {
           )}
 
           {/* Video & Files */}
-          <Card className="neon-border bg-card/80">
-            <CardHeader>
-              <CardTitle className="text-base flex items-center gap-2">
-                <Upload className="h-4 w-4 text-primary" /> Mídia & Arquivos
+          <Card className="relative overflow-hidden border-white/5 bg-card/40 backdrop-blur-xl shadow-lg">
+            <CardHeader className="pb-4 border-b border-white/5">
+              <CardTitle className="text-sm font-black uppercase tracking-[0.2em] flex items-center gap-2 text-muted-foreground">
+                <Upload className="h-4 w-4 text-neon-cyan" /> Mídia & Arquivos
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <Label>URL do Vídeo (YouTube)</Label>
-                <Input value={videoUrl} onChange={(e) => setVideoUrl(e.target.value)} placeholder="https://youtube.com/watch?v=..." />
+            <CardContent className="p-6 space-y-6">
+              <div className="space-y-2">
+                <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/70">URL Vídeo Demonstração (YouTube/Vimeo)</Label>
+                <Input 
+                  value={videoUrl} 
+                  onChange={(e) => setVideoUrl(e.target.value)} 
+                  placeholder="https://youtube.com/watch?v=..." 
+                  className="bg-white/5 border-white/10 h-11"
+                />
               </div>
-              <div className="grid md:grid-cols-2 gap-4">
-                <div>
-                  <Label>Arquivo para download</Label>
-                  <Input type="file" onChange={async (e) => {
-                    const f = e.target.files?.[0] ?? null;
-                    if (!f) {
-                      setFile(null);
-                      return;
-                    }
-
-                    // Immediate validation
-                    const safeName = await validateFileWithToast({ file: f, type: "script", maxSizeMB: 20 });
-                    if (!safeName) {
-                      e.target.value = ""; // Clear input
-                      setFile(null);
-                      return;
-                    }
-
-                    setFile(f);
-                    // Auto-extract lua code from .lua files for preview
-                    if (f.name.toLowerCase().endsWith(".lua")) {
-                      const reader = new FileReader();
-                      reader.onload = (ev) => {
-                        const content = ev.target?.result as string;
-                        if (content) setLuaCode(content);
-                      };
-                      reader.readAsText(f);
-                    }
-                  }} accept=".lua" />
-                  {existingScript?.file_url && !file && (
-                    <p className="text-[10px] text-muted-foreground mt-1">Arquivo atual mantido. Selecione novo .lua para substituir.</p>
-                  )}
-                  <p className="text-[10px] text-primary/80 mt-1 font-medium">⚠️ Apenas arquivos .lua são permitidos por segurança.</p>
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/70">Script Principal (.lua)</Label>
+                  <Input 
+                    type="file" 
+                    onChange={async (e) => {
+                      const f = e.target.files?.[0] ?? null;
+                      if (!f) { setFile(null); return; }
+                      const safeName = await validateFileWithToast({ file: f, type: "script", maxSizeMB: 20 });
+                      if (!safeName) { e.target.value = ""; setFile(null); return; }
+                      setFile(f);
+                      if (f.name.toLowerCase().endsWith(".lua")) {
+                        const reader = new FileReader();
+                        reader.onload = (ev) => {
+                          const content = ev.target?.result as string;
+                          if (content) setLuaCode(content);
+                        };
+                        reader.readAsText(f);
+                      }
+                    }} 
+                    accept=".lua" 
+                    className="bg-white/5 border-white/10 h-11 file:bg-neon-cyan/20 file:text-neon-cyan file:border-none file:px-3 file:mr-3 file:text-xs file:font-bold hover:file:bg-neon-cyan/30 transition-all cursor-pointer"
+                  />
+                  <p className="text-[10px] text-neon-cyan/80 font-bold uppercase tracking-widest pt-1">⚠️ Apenas .lua permitido.</p>
                 </div>
-                <div>
-                  <Label>Link externo (opcional)</Label>
-                  <Input value={externalLink} onChange={(e) => setExternalLink(e.target.value)} placeholder="https://..." />
+                <div className="space-y-2">
+                  <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/70">Link Externo Adicional</Label>
+                  <Input 
+                    value={externalLink} 
+                    onChange={(e) => setExternalLink(e.target.value)} 
+                    placeholder="Discord, GitHub, etc." 
+                    className="bg-white/5 border-white/10 h-11"
+                  />
                 </div>
               </div>
             </CardContent>
           </Card>
 
           {/* Related Tutorial */}
-          <Card className="neon-border bg-card/80">
-            <CardHeader>
-              <CardTitle className="text-base flex items-center gap-2">
-                <BookOpen className="h-4 w-4 text-neon-pink" /> Tutorial Relacionado
+          <Card className="relative overflow-hidden border-white/5 bg-card/40 backdrop-blur-xl shadow-lg">
+            <CardHeader className="pb-4 border-b border-white/5">
+              <CardTitle className="text-sm font-black uppercase tracking-[0.2em] flex items-center gap-2 text-muted-foreground">
+                <BookOpen className="h-4 w-4 text-neon-pink" /> Tutorial de Apoio
               </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-6">
               <Select value={relatedTutorialId} onValueChange={setRelatedTutorialId}>
-                <SelectTrigger><SelectValue placeholder="Selecione um tutorial (opcional)" /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">Nenhum</SelectItem>
+                <SelectTrigger className="bg-white/5 border-white/10 h-11"><SelectValue placeholder="Selecione um tutorial de suporte" /></SelectTrigger>
+                <SelectContent className="bg-[#0a0a0c] border-white/10">
+                  <SelectItem value="none">Nenhum tutorial vinculado</SelectItem>
                   {tutorials?.map((t: any) => (
                     <SelectItem key={t.id} value={t.id}>{t.title}</SelectItem>
                   ))}
@@ -610,47 +642,66 @@ export default function ScriptEditor() {
             </CardContent>
           </Card>
 
-          {/* Pricing & Password */}
-          <Card className="neon-border bg-card/80">
-            <CardHeader>
-              <CardTitle className="text-base flex items-center gap-2">
-                <Lock className="h-4 w-4 text-primary" /> Preço & Proteção
+          {/* Pricing & Protection */}
+          <Card className="relative overflow-hidden border-orange-500/20 bg-card/40 backdrop-blur-xl shadow-lg">
+             <CardHeader className="pb-4 border-b border-white/5">
+              <CardTitle className="text-sm font-black uppercase tracking-[0.2em] flex items-center gap-2 text-orange-500">
+                <Lock className="h-4 w-4" /> Monetização & Segurança
               </CardTitle>
             </CardHeader>
-           <CardContent className="space-y-4">
-              <div className="flex items-center gap-4">
-                <Switch checked={isPaid} onCheckedChange={setIsPaid} disabled={!!licenseFieldsLocked} />
-                <Label className="text-sm">{isPaid ? "Script Pago" : "Script Gratuito"}</Label>
+            <CardContent className="p-6 space-y-6">
+              <div className="flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/5">
+                <div className="flex items-center gap-4">
+                  <Switch checked={isPaid} onCheckedChange={setIsPaid} disabled={!!licenseFieldsLocked} className="data-[state=checked]:bg-orange-500" />
+                  <div className="space-y-0.5">
+                    <Label className="text-sm font-bold">{isPaid ? "PROJETO COMERCIAL" : "PROJETO GRATUITO"}</Label>
+                    <p className="text-[10px] text-muted-foreground">Defina se seu script será vendido ou livre.</p>
+                  </div>
+                </div>
+                {!isPaid && <Badge variant="outline" className="text-neon-green border-neon-green/30">LIVRE</Badge>}
               </div>
 
               {licenseFieldsLocked && (
-                <div className="p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
-                  <p className="text-xs text-yellow-400">🔒 Este script já possui compras. As configurações de preço e licença não podem ser alteradas. Apenas administradores podem modificar esses campos.</p>
+                <div className="p-4 rounded-xl bg-orange-500/10 border border-orange-500/20 flex gap-3">
+                  <Lock className="h-4 w-4 text-orange-500 shrink-0 mt-0.5" />
+                  <p className="text-[11px] text-orange-200/80 leading-relaxed font-medium">Configurações de licença bloqueadas. Este script já possui proprietários. Alterações de preço requerem autorização administrativa.</p>
                 </div>
               )}
 
               {isPaid && (
-                <div className="space-y-4">
-                  <div>
-                    <Label>Preço (R$)</Label>
-                    <Input type="number" value={price} onChange={(e) => setPrice(e.target.value)} placeholder="0.00" min="0" step="0.01" disabled={!!licenseFieldsLocked} />
+                <div className="grid md:grid-cols-2 gap-8 animate-in fade-in slide-in-from-top-2 duration-300">
+                  <div className="space-y-2">
+                    <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/70">Preço de Venda (R$)</Label>
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground font-bold">R$</span>
+                      <Input 
+                        type="number" 
+                        value={price} 
+                        onChange={(e) => setPrice(e.target.value)} 
+                        placeholder="0.00" 
+                        min="0" 
+                        step="0.01" 
+                        disabled={!!licenseFieldsLocked} 
+                        className="bg-white/5 border-white/10 pl-10 h-12 font-bold text-lg"
+                      />
+                    </div>
                   </div>
-                  <div>
-                    <Label>Tipo de Licença</Label>
+                  <div className="space-y-2">
+                    <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/70">Modelo de Licença</Label>
                     <Select value={licenseType} onValueChange={setLicenseType} disabled={!!licenseFieldsLocked}>
-                      <SelectTrigger>
+                      <SelectTrigger className="bg-white/5 border-white/10 h-12">
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="permanent">🔑 Permanente</SelectItem>
-                        <SelectItem value="monthly">📅 Mensal (30 dias)</SelectItem>
-                        <SelectItem value="weekly">⏳ Semanal (7 dias)</SelectItem>
+                      <SelectContent className="bg-[#0a0a0c] border-white/10">
+                        <SelectItem value="permanent">💎 Permanente (Vitalício)</SelectItem>
+                        <SelectItem value="monthly">📅 Mensal (Subscrição)</SelectItem>
+                        <SelectItem value="weekly">⏳ Semanal (Trial/Plus)</SelectItem>
                       </SelectContent>
                     </Select>
-                    <p className="text-[10px] text-muted-foreground mt-1">
-                      {licenseType === "permanent" && "O comprador terá acesso vitalício ao script."}
-                      {licenseType === "monthly" && "A licença expira após 30 dias. O comprador pode renovar."}
-                      {licenseType === "weekly" && "A licença expira após 7 dias. O comprador pode renovar."}
+                    <p className="text-[10px] text-muted-foreground italic pt-1">
+                      {licenseType === "permanent" && "O comprador terá acesso vitalício a todas as atualizações."}
+                      {licenseType === "monthly" && "Assinatura recorrente disponível por 30 dias."}
+                      {licenseType === "weekly" && "Acesso rápido por 7 dias."}
                     </p>
                   </div>
                 </div>
@@ -659,15 +710,15 @@ export default function ScriptEditor() {
           </Card>
 
           {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-3 pb-8">
+          <div className="flex flex-col sm:flex-row gap-4 pb-12">
             <Button
               variant="outline"
               onClick={() => handleSave("draft")}
               disabled={submitting}
-              className="flex-1"
+              className="flex-1 h-14 rounded-xl border-white/10 bg-white/5 hover:bg-white/10 font-bold uppercase tracking-widest text-xs transition-all"
             >
               {submitting ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
-              Salvar Rascunho
+              Salvar como Rascunho
             </Button>
 
             {!isAdmin && (
@@ -675,10 +726,10 @@ export default function ScriptEditor() {
                 variant="outline"
                 onClick={() => handleSave("pending_review")}
                 disabled={submitting}
-                className="flex-1 border-primary/30 text-primary hover:bg-primary/10"
+                className="flex-1 h-14 rounded-xl border-neon-purple/20 bg-neon-purple/5 text-neon-purple hover:bg-neon-purple/10 font-bold uppercase tracking-widest text-xs shadow-lg shadow-neon-purple/5 transition-all"
               >
                 {submitting ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Send className="h-4 w-4 mr-2" />}
-                Enviar para Revisão
+                Enviar para Aprovação
               </Button>
             )}
 
@@ -686,10 +737,10 @@ export default function ScriptEditor() {
               <Button
                 onClick={() => handleSave("published")}
                 disabled={submitting || lastAnalysis?.classification === "malicious"}
-                className={`flex-1 ${
+                className={`flex-1 h-14 rounded-xl font-bold uppercase tracking-widest text-xs transition-all shadow-xl ${
                   lastAnalysis?.classification === "malicious"
                     ? "bg-destructive/20 text-destructive border-destructive/30 cursor-not-allowed"
-                    : "neon-glow-green bg-accent text-accent-foreground hover:bg-accent/90"
+                    : "bg-neon-green hover:bg-neon-green/90 text-black shadow-neon-green/20"
                 }`}
                 title={lastAnalysis?.classification === "malicious" ? "Bloqueado: script malicioso detectado" : undefined}
               >
@@ -700,7 +751,7 @@ export default function ScriptEditor() {
                 ) : (
                   <Eye className="h-4 w-4 mr-2" />
                 )}
-                {lastAnalysis?.classification === "malicious" ? "Publicação Bloqueada" : "Publicar"}
+                {lastAnalysis?.classification === "malicious" ? "Publicação Bloqueada" : "Lançar no Marketplace"}
               </Button>
             )}
 
@@ -709,7 +760,7 @@ export default function ScriptEditor() {
                 variant="outline"
                 onClick={() => handleSave("archived")}
                 disabled={submitting}
-                className="border-destructive/30 text-destructive hover:bg-destructive/10"
+                className="h-14 px-8 rounded-xl border-destructive/20 text-destructive hover:bg-destructive/5 font-bold uppercase tracking-widest text-xs transition-all"
               >
                 Arquivar
               </Button>

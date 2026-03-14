@@ -13,10 +13,13 @@ const Toaster = ({ ...props }: ToasterProps) => {
       toastOptions={{
         classNames: {
           toast:
-            "group toast group-[.toaster]:bg-background group-[.toaster]:text-foreground group-[.toaster]:border-border group-[.toaster]:shadow-lg",
-          description: "group-[.toast]:text-muted-foreground",
-          actionButton: "group-[.toast]:bg-primary group-[.toast]:text-primary-foreground",
-          cancelButton: "group-[.toast]:bg-muted group-[.toast]:text-muted-foreground",
+            "group toast group-[.toaster]:bg-[#0a0a0c]/90 group-[.toaster]:backdrop-blur-xl group-[.toaster]:text-foreground group-[.toaster]:border-white/10 group-[.toaster]:shadow-2xl group-[.toaster]:rounded-xl font-sans",
+          description: "group-[.toast]:text-muted-foreground group-[.toast]:text-xs",
+          actionButton: "group-[.toast]:bg-neon-purple group-[.toast]:text-white group-[.toast]:font-black group-[.toast]:uppercase group-[.toast]:tracking-widest group-[.toast]:text-[10px]",
+          cancelButton: "group-[.toast]:bg-white/5 group-[.toast]:text-muted-foreground",
+          success: "group-[.toaster]:border-neon-green/30 group-[.toaster]:shadow-neon-green/10",
+          error: "group-[.toaster]:border-destructive/30 group-[.toaster]:shadow-destructive/10",
+          info: "group-[.toaster]:border-neon-purple/30 group-[.toaster]:shadow-neon-purple/10",
         },
       }}
       {...props}

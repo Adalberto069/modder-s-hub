@@ -3,14 +3,21 @@ import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { Navigate, useNavigate } from "react-router-dom";
 import {
   Users, Code, CheckCircle, XCircle, Trash2, Plus, Pencil, Eye, EyeOff, Clock, FileX, Send, Shield,
-  UserCheck, ShieldCheck, ShieldOff, Key, Ban, ShoppingCart, Copy, DollarSign, Percent, Search, AlertTriangle, Landmark
+  UserCheck, ShieldCheck, ShieldOff, Key, Ban, ShoppingCart, Copy, DollarSign, Percent, Search, 
+  AlertTriangle, Landmark, TrendingUp, Calendar, BarChart3, Activity
 } from "lucide-react";
+import { 
+  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
+  BarChart, Bar, Cell
+} from 'recharts';
+import { format, subDays, isSameDay, parseISO } from "date-fns";
+import { ptBR } from "date-fns/locale";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { AdminBadges } from "@/components/admin/AdminBadges";
@@ -122,6 +129,25 @@ export default function Admin() {
       return data ?? [];
     },
     enabled: isAdmin,
+  });
+
+  // Prepare data for the sales chart
+  const last30DaysData = Array.from({ length: 30 }, (_, i) => {
+    const date = subDays(new Date(), 29 - i);
+    const dayPurchases = allPurchases?.filter((p: any) => 
+      isSameDay(parseISO(p.created_at), date)
+    ) ?? [];
+    
+    const count = dayPurchases.length;
+    const volume = dayPurchases.reduce((sum: number, p: any) => sum + Number(p.amount), 0);
+    const commission = dayPurchases.reduce((sum: number, p: any) => sum + Number(p.platform_commission || 0), 0);
+
+    return {
+      name: format(date, "dd/MM"),
+      count,
+      volume,
+      commission,
+    };
   });
 
   if (loading) return <Layout><div className="container py-16 text-center">Carregando...</div></Layout>;
@@ -337,59 +363,177 @@ export default function Admin() {
           </Button>
         </div>
 
-        {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-          <Card className="neon-border bg-card/80">
-            <CardContent className="p-4 text-center">
-              <Users className="h-5 w-5 mx-auto text-neon-purple mb-1" />
-              <p className="text-2xl font-bold font-mono">{stats?.users}</p>
-              <p className="text-xs text-muted-foreground">Usuários</p>
+        {/* Stats Grid */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <Card className="bg-card/40 backdrop-blur-md border-neon-purple/20 shadow-lg shadow-neon-purple/5 hover:border-neon-purple/40 transition-all group">
+            <CardContent className="p-5">
+              <div className="flex justify-between items-start mb-2">
+                <div className="bg-neon-purple/10 p-2 rounded-lg group-hover:bg-neon-purple/20 transition-colors">
+                  <Users className="h-4 w-4 text-neon-purple" />
+                </div>
+                <Badge variant="outline" className="text-[10px] opacity-60">Base</Badge>
+              </div>
+              <p className="text-2xl font-bold font-mono text-foreground leading-none">{stats?.users}</p>
+              <p className="text-xs text-muted-foreground mt-1 uppercase tracking-wider font-medium">Usuários</p>
             </CardContent>
           </Card>
-          <Card className="neon-border bg-card/80">
-            <CardContent className="p-4 text-center">
-              <Code className="h-5 w-5 mx-auto text-neon-green mb-1" />
-              <p className="text-2xl font-bold font-mono">{stats?.scripts}</p>
-              <p className="text-xs text-muted-foreground">Scripts</p>
+
+          <Card className="bg-card/40 backdrop-blur-md border-neon-green/20 shadow-lg shadow-neon-green/5 hover:border-neon-green/40 transition-all group">
+            <CardContent className="p-5">
+              <div className="flex justify-between items-start mb-2">
+                <div className="bg-neon-green/10 p-2 rounded-lg group-hover:bg-neon-green/20 transition-colors">
+                  <Code className="h-4 w-4 text-neon-green" />
+                </div>
+                <Badge variant="outline" className="text-[10px] text-neon-green/70 border-neon-green/20">Ativos</Badge>
+              </div>
+              <p className="text-2xl font-bold font-mono text-foreground leading-none">{stats?.scripts}</p>
+              <p className="text-xs text-muted-foreground mt-1 uppercase tracking-wider font-medium">Scripts</p>
             </CardContent>
           </Card>
-          <Card className="neon-border bg-card/80">
-            <CardContent className="p-4 text-center">
-              <ShoppingCart className="h-5 w-5 mx-auto text-primary mb-1" />
-              <p className="text-2xl font-bold font-mono">{stats?.purchases}</p>
-              <p className="text-xs text-muted-foreground">Compras</p>
+
+          <Card className="bg-card/40 backdrop-blur-md border-primary/20 shadow-lg shadow-primary/5 hover:border-primary/40 transition-all group">
+            <CardContent className="p-5">
+              <div className="flex justify-between items-start mb-2">
+                <div className="bg-primary/10 p-2 rounded-lg group-hover:bg-primary/20 transition-colors">
+                  <ShoppingCart className="h-4 w-4 text-primary" />
+                </div>
+                <Badge variant="outline" className="text-[10px] text-primary/70 border-primary/20">Sucesso</Badge>
+              </div>
+              <p className="text-2xl font-bold font-mono text-foreground leading-none">{stats?.purchases}</p>
+              <p className="text-xs text-muted-foreground mt-1 uppercase tracking-wider font-medium">Compras</p>
             </CardContent>
           </Card>
-          <Card className="neon-border bg-card/80">
-            <CardContent className="p-4 text-center">
-              <Shield className="h-5 w-5 mx-auto text-primary mb-1" />
-              <p className="text-2xl font-bold font-mono">{pendingModders?.length}</p>
-              <p className="text-xs text-muted-foreground">Pendentes</p>
+
+          <Card className="bg-card/40 backdrop-blur-md border-accent/20 shadow-lg shadow-accent/5 hover:border-accent/40 transition-all group">
+            <CardContent className="p-5">
+              <div className="flex justify-between items-start mb-2">
+                <div className="bg-accent/10 p-2 rounded-lg group-hover:bg-accent/20 transition-colors">
+                  <Activity className="h-4 w-4 text-accent" />
+                </div>
+                <Badge variant="outline" className="text-[10px] text-accent/70 border-accent/20">Crescimento</Badge>
+              </div>
+              <p className="text-2xl font-bold font-mono text-foreground leading-none">R$ {(stats?.totalSales ?? 0).toFixed(0)}</p>
+              <p className="text-xs text-muted-foreground mt-1 uppercase tracking-wider font-medium">Volume Total</p>
             </CardContent>
           </Card>
         </div>
 
-        {/* Financial Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-          <Card className="neon-border bg-card/80 border-accent/30">
-            <CardContent className="p-4 text-center">
-              <DollarSign className="h-5 w-5 mx-auto text-accent mb-1" />
-              <p className="text-2xl font-bold font-mono text-accent">R$ {(stats?.totalSales ?? 0).toFixed(2)}</p>
-              <p className="text-xs text-muted-foreground">Total de Vendas</p>
+        {/* Financial Overview & Chart */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+          <Card className="lg:col-span-2 bg-card/40 backdrop-blur-md border-border/50 shadow-xl overflow-hidden">
+            <CardHeader className="pb-2 border-b border-border/10 flex flex-row items-center justify-between">
+              <div>
+                <CardTitle className="text-sm font-bold flex items-center gap-2">
+                  <TrendingUp className="h-4 w-4 text-accent" />
+                  Visão Geral da Plataforma
+                </CardTitle>
+                <CardDescription className="text-[10px]">Volume de vendas nos últimos 30 dias</CardDescription>
+              </div>
+              <Activity className="h-3 w-3 text-muted-foreground/30" />
+            </CardHeader>
+            <CardContent className="pt-6">
+              <div className="h-[280px] w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={last30DaysData}>
+                    <defs>
+                      <linearGradient id="adminChart" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="hsl(var(--accent))" stopOpacity={0.2}/>
+                        <stop offset="95%" stopColor="hsl(var(--accent))" stopOpacity={0}/>
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.03)" vertical={false} />
+                    <XAxis 
+                      dataKey="name" 
+                      axisLine={false} 
+                      tickLine={false} 
+                      tick={{ fontSize: 9, fill: '#666' }}
+                      interval={4}
+                    />
+                    <YAxis 
+                      axisLine={false} 
+                      tickLine={false} 
+                      tick={{ fontSize: 9, fill: '#666' }}
+                    />
+                    <Tooltip 
+                      contentStyle={{ 
+                        backgroundColor: 'rgba(15, 15, 20, 0.95)', 
+                        border: '1px solid rgba(255,255,255,0.1)',
+                        borderRadius: '8px',
+                        fontSize: '11px'
+                      }}
+                      formatter={(v: any) => [`R$ ${v.toFixed(2)}`, 'Volume']}
+                    />
+                    <Area 
+                      type="monotone" 
+                      dataKey="volume" 
+                      stroke="hsl(var(--accent))" 
+                      strokeWidth={2}
+                      fillOpacity={1} 
+                      fill="url(#adminChart)" 
+                      animationDuration={2000}
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
             </CardContent>
           </Card>
-          <Card className="neon-border bg-card/80 border-primary/30">
-            <CardContent className="p-4 text-center">
-              <Percent className="h-5 w-5 mx-auto text-primary mb-1" />
-              <p className="text-2xl font-bold font-mono text-primary">R$ {(stats?.totalCommission ?? 0).toFixed(2)}</p>
-              <p className="text-xs text-muted-foreground">Comissão Plataforma (20%)</p>
-            </CardContent>
-          </Card>
-          <Card className="neon-border bg-card/80 border-neon-green/30">
-            <CardContent className="p-4 text-center">
-              <Key className="h-5 w-5 mx-auto text-neon-green mb-1" />
-              <p className="text-2xl font-bold font-mono text-neon-green">R$ {(stats?.totalModderEarnings ?? 0).toFixed(2)}</p>
-              <p className="text-xs text-muted-foreground">Ganhos dos Modders</p>
+
+          <Card className="bg-card/40 backdrop-blur-md border-border/50 shadow-xl overflow-hidden">
+            <CardHeader className="pb-2 border-b border-border/10">
+              <CardTitle className="text-sm font-bold flex items-center gap-2">
+                <BarChart3 className="h-4 w-4 text-neon-green" />
+                Divisão de Ganhos
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-8">
+              <div className="space-y-6">
+                <div className="relative pt-1">
+                  <div className="flex mb-2 items-center justify-between">
+                    <div>
+                      <span className="text-[10px] font-semibold inline-block py-1 px-2 uppercase rounded-full text-primary bg-primary/10">
+                        Comissão Plataforma (20%)
+                      </span>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-xs font-mono font-bold text-primary">
+                        R$ {(stats?.totalCommission ?? 0).toFixed(2)}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="overflow-hidden h-2 mb-4 text-xs flex rounded bg-primary/10">
+                    <div style={{ width: "20%" }} className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-primary"></div>
+                  </div>
+                </div>
+
+                <div className="relative pt-1">
+                  <div className="flex mb-2 items-center justify-between">
+                    <div>
+                      <span className="text-[10px] font-semibold inline-block py-1 px-2 uppercase rounded-full text-neon-green bg-neon-green/10">
+                        Ganhos Modders (80%)
+                      </span>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-xs font-mono font-bold text-neon-green">
+                        R$ {(stats?.totalModderEarnings ?? 0).toFixed(2)}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="overflow-hidden h-2 mb-4 text-xs flex rounded bg-neon-green/10">
+                    <div style={{ width: "80%" }} className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-neon-green"></div>
+                  </div>
+                </div>
+
+                <div className="bg-secondary/20 p-4 rounded-lg border border-border/50 mt-4">
+                  <div className="flex items-center justify-between text-xs mb-1">
+                    <span className="text-muted-foreground">Lucro Bruto:</span>
+                    <span className="font-bold">R$ {(stats?.totalSales ?? 0).toFixed(2)}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-muted-foreground">Licenças Ativas:</span>
+                    <span className="font-bold">{stats?.licenses}</span>
+                  </div>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </div>

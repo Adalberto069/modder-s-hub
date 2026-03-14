@@ -133,49 +133,73 @@ export default function ModderProfile() {
     <Layout>
       <div className="container py-8 max-w-5xl space-y-6">
         {/* Hero Header */}
-        <div className="relative rounded-xl overflow-hidden border border-border bg-card/60">
-          {/* Gradient backdrop */}
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-accent/10 pointer-events-none" />
+        <div className="relative rounded-2xl overflow-hidden border border-white/5 bg-card/40 backdrop-blur-xl shadow-2xl">
+          {/* Gradient backdrop with neon glow */}
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-neon-purple via-neon-cyan to-neon-pink opacity-50" />
+          <div className="absolute -top-24 -right-24 w-64 h-64 bg-neon-purple/20 blur-[80px] rounded-full" />
+          <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-neon-cyan/10 blur-[80px] rounded-full" />
 
-          <div className="relative p-8">
-            <div className="flex flex-col sm:flex-row items-center gap-6">
-              {/* Avatar */}
-              <div className="h-24 w-24 rounded-full bg-secondary border-2 border-primary/30 flex items-center justify-center shrink-0 shadow-lg shadow-primary/10">
-                {profile.avatar_url ? (
-                  <img src={profile.avatar_url} alt={profile.username} className="h-full w-full rounded-full object-cover" />
-                ) : (
-                  <User className="h-12 w-12 text-muted-foreground" />
-                )}
+          <div className="relative p-8 sm:p-10">
+            <div className="flex flex-col sm:flex-row items-center gap-8 text-center sm:text-left">
+              {/* Avatar with luxury border */}
+              <div className="relative group">
+                <div className="absolute -inset-0.5 bg-gradient-to-tr from-neon-purple to-neon-cyan rounded-full opacity-60 group-hover:opacity-100 transition duration-500 blur" />
+                <div className="relative h-32 w-32 rounded-full bg-[#0a0a0c] border border-white/10 flex items-center justify-center shrink-0 shadow-2xl overflow-hidden">
+                  {profile.avatar_url ? (
+                    <img src={profile.avatar_url} alt={profile.username} className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                  ) : (
+                    <User className="h-16 w-16 text-muted-foreground/50" />
+                  )}
+                </div>
               </div>
 
-              {/* Info */}
-              <div className="text-center sm:text-left flex-1 space-y-1">
-                <div className="flex items-center gap-2 justify-center sm:justify-start flex-wrap">
-                  <h1 className="text-3xl font-bold tracking-tight">
-                    {profile.display_name ?? profile.username}
-                  </h1>
-                  <RoleBadge role={displayRole} />
+              {/* Info section */}
+              <div className="flex-1 space-y-4">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-3 justify-center sm:justify-start flex-wrap">
+                    <h1 className="text-4xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-br from-white to-white/60">
+                      {profile.display_name ?? profile.username}
+                    </h1>
+                    <RoleBadge role={displayRole} />
+                    {isElite && (
+                      <Badge className="bg-neon-purple text-white border-none shadow-neon-purple/50 animate-pulse">ELITE</Badge>
+                    )}
+                  </div>
+                  <p className="text-sm font-mono text-neon-purple/80">@{profile.username}</p>
                 </div>
-                <p className="text-sm text-muted-foreground font-mono">@{profile.username}</p>
-                <UserBadges userId={userId!} authId={profile.user_id} />
+
+                <div className="flex flex-wrap items-center gap-2 justify-center sm:justify-start">
+                  <UserBadges userId={userId!} authId={profile.user_id} />
+                </div>
+
                 {profile.bio && (
-                  <p className="text-sm text-muted-foreground mt-2 max-w-lg">{profile.bio}</p>
+                  <p className="text-base text-muted-foreground leading-relaxed max-w-2xl border-l-2 border-white/5 pl-4 py-1 italic">
+                    "{profile.bio}"
+                  </p>
                 )}
-                <div className="flex items-center gap-2 justify-center sm:justify-start mt-2">
-                  <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
-                  <span className="text-xs text-muted-foreground">Membro desde {memberSince}</span>
+
+                <div className="flex items-center gap-4 justify-center sm:justify-start pt-2">
+                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground bg-white/5 px-3 py-1.5 rounded-full border border-white/5">
+                    <Calendar className="h-3.5 w-3.5 text-neon-purple" />
+                    Membro desde {memberSince}
+                  </div>
+                  {profile.reputation_score > 100 && (
+                    <div className="flex items-center gap-1.5 text-xs text-neon-green bg-neon-green/5 px-3 py-1.5 rounded-full border border-neon-green/10">
+                      <Trophy className="h-3.5 w-3.5" />
+                      Modder Referência
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Stats bar */}
-          <Separator />
-          <div className="grid grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-border">
-            <StatItem icon={<Code className="h-4 w-4" />} value={scripts?.length ?? 0} label="Scripts" color="text-primary" />
-            <StatItem icon={<Download className="h-4 w-4" />} value={totalDownloads} label="Downloads" color="text-accent" />
-            <StatItem icon={<Star className="h-4 w-4" />} value={avgRating.toFixed(1)} label="Média" color="text-[hsl(var(--neon-cyan))]" />
-            <StatItem icon={<Trophy className="h-4 w-4" />} value={profile.reputation_score} label="Reputação" color="text-[hsl(var(--neon-pink))]" />
+          {/* Luxury Stats bar */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 border-t border-white/5 bg-white/5 backdrop-blur-md">
+            <StatItem icon={<Code className="h-5 w-5" />} value={scripts?.length ?? 0} label="Scripts Publicados" color="text-neon-purple" />
+            <StatItem icon={<Download className="h-5 w-5" />} value={totalDownloads.toLocaleString()} label="Downloads Totais" color="text-neon-pink" />
+            <StatItem icon={<Star className="h-5 w-5" />} value={avgRating.toFixed(1)} label="Avaliação Média" color="text-neon-cyan" />
+            <StatItem icon={<Trophy className="h-5 w-5" />} value={profile.reputation_score} label="Score de Reputação" color="text-neon-green" />
           </div>
         </div>
 
@@ -234,23 +258,36 @@ export default function ModderProfile() {
           {/* Tutorials Tab */}
           <TabsContent value="tutorials">
             {tutorials && tutorials.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 {tutorials.map((t: any) => (
-                  <Card key={t.id} className="hover:border-primary/40 transition-colors">
-                    <CardContent className="p-4 space-y-2">
+                  <Card key={t.id} className="group relative overflow-hidden border-neon-purple/20 bg-card/40 backdrop-blur-md hover:border-neon-purple/40 transition-all duration-500 shadow-lg hover:shadow-neon-purple/10">
+                    <CardContent className="p-0">
                       <a href={`/tutorial/${t.id}`} className="block">
-                        {t.thumbnail_url && (
-                          <img src={t.thumbnail_url} alt={t.title} className="w-full h-32 object-cover rounded-md mb-3" />
-                        )}
-                        <h3 className="font-semibold line-clamp-1">{t.title}</h3>
-                        {t.description && (
-                          <p className="text-sm text-muted-foreground line-clamp-2">{t.description}</p>
-                        )}
-                        <div className="flex items-center gap-2 mt-2">
-                          <Badge variant="secondary" className="text-xs">{t.category}</Badge>
-                          <span className="text-xs text-muted-foreground">
-                            {new Date(t.created_at).toLocaleDateString("pt-BR")}
-                          </span>
+                        <div className="relative h-44 w-full overflow-hidden">
+                          {t.thumbnail_url ? (
+                            <img src={t.thumbnail_url} alt={t.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                          ) : (
+                            <div className="w-full h-full bg-secondary/50 flex items-center justify-center">
+                              <BookOpen className="h-10 w-10 text-muted-foreground/20" />
+                            </div>
+                          )}
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-60" />
+                          <Badge className="absolute top-3 left-3 bg-neon-purple/80 text-white border-none backdrop-blur-md">{t.category}</Badge>
+                        </div>
+                        <div className="p-5 space-y-3">
+                          <h3 className="font-bold text-lg line-clamp-1 group-hover:text-neon-purple transition-colors uppercase tracking-tight">{t.title}</h3>
+                          {t.description && (
+                            <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">{t.description}</p>
+                          )}
+                          <div className="flex items-center justify-between pt-2 border-t border-white/5">
+                            <span className="text-[10px] uppercase font-black tracking-widest text-muted-foreground/60">
+                              Publicado em {new Date(t.created_at).toLocaleDateString("pt-BR")}
+                            </span>
+                            <div className="flex items-center gap-1 text-neon-purple group-hover:gap-2 transition-all">
+                              <span className="text-[10px] font-bold">VER TUTORIAL</span>
+                              <BookOpen className="h-3 w-3" />
+                            </div>
+                          </div>
                         </div>
                       </a>
                     </CardContent>
@@ -258,9 +295,10 @@ export default function ModderProfile() {
                 ))}
               </div>
             ) : (
-              <Card className="border-dashed">
-                <CardContent className="py-12 text-center text-muted-foreground">
-                  Nenhum tutorial publicado ainda.
+              <Card className="border-dashed border-white/10 bg-white/5">
+                <CardContent className="py-20 text-center space-y-3">
+                  <BookOpen className="h-10 w-10 text-muted-foreground/20 mx-auto" />
+                  <p className="text-muted-foreground font-medium">Nenhum tutorial publicado ainda.</p>
                 </CardContent>
               </Card>
             )}
@@ -268,33 +306,43 @@ export default function ModderProfile() {
 
           {/* About Tab */}
           <TabsContent value="about">
-            <Card>
-              <CardContent className="p-6 space-y-4">
-                <div>
-                  <h3 className="text-sm font-medium text-muted-foreground mb-1">Bio</h3>
-                  <p className="text-foreground">
-                    {profile.bio || "Esse criador ainda não adicionou uma bio."}
+            <Card className="border-white/5 bg-card/40 backdrop-blur-md overflow-hidden relative">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-neon-purple/5 blur-[40px] -z-10" />
+              <CardContent className="p-8 space-y-8">
+                <div className="space-y-3">
+                  <h3 className="text-xs font-black uppercase tracking-[0.2em] text-neon-purple">Trajetória e Bio</h3>
+                  <p className="text-lg text-foreground/80 leading-relaxed font-medium">
+                    {profile.bio || "Esse criador de elite preferiu manter sua biografia um mistério por enquanto."}
                   </p>
                 </div>
-                <Separator />
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <h3 className="text-sm font-medium text-muted-foreground mb-1">Membro desde</h3>
-                    <p className="text-foreground">{memberSince}</p>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 pt-6 border-t border-white/5">
+                  <div className="space-y-1">
+                    <h3 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Membro da Comunidade</h3>
+                    <div className="flex items-center gap-2">
+                      <Calendar className="h-4 w-4 text-neon-purple" />
+                      <p className="font-bold">{memberSince}</p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="text-sm font-medium text-muted-foreground mb-1">Total de publicações</h3>
-                    <p className="text-foreground">{(scripts?.length ?? 0) + (tutorials?.length ?? 0)}</p>
+                  <div className="space-y-1">
+                    <h3 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Arsenal de Conteúdo</h3>
+                    <div className="flex items-center gap-2">
+                      <Code className="h-4 w-4 text-neon-pink" />
+                      <p className="font-bold">{(scripts?.length ?? 0) + (tutorials?.length ?? 0)} Publicações</p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="text-sm font-medium text-muted-foreground mb-1">Downloads totais</h3>
-                    <p className="text-foreground">{totalDownloads.toLocaleString("pt-BR")}</p>
+                  <div className="space-y-1">
+                    <h3 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Impacto no Mercado</h3>
+                    <div className="flex items-center gap-2">
+                      <Download className="h-4 w-4 text-neon-green" />
+                      <p className="font-bold">{totalDownloads.toLocaleString("pt-BR")} Downloads</p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="text-sm font-medium text-muted-foreground mb-1">Avaliação média</h3>
-                    <div className="flex items-center gap-1">
-                      <Star className="h-4 w-4 text-[hsl(var(--neon-cyan))] fill-[hsl(var(--neon-cyan))]" />
-                      <span className="text-foreground">{avgRating.toFixed(1)}</span>
+                  <div className="space-y-1">
+                    <h3 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Selo de Qualidade</h3>
+                    <div className="flex items-center gap-2">
+                      <Star className="h-4 w-4 text-neon-cyan" />
+                      <p className="font-bold">{avgRating.toFixed(1)} / 5.0 (Média)</p>
                     </div>
                   </div>
                 </div>
@@ -309,10 +357,10 @@ export default function ModderProfile() {
 
 function StatItem({ icon, value, label, color }: { icon: React.ReactNode; value: string | number; label: string; color: string }) {
   return (
-    <div className="flex flex-col items-center py-4 gap-1">
-      <div className={color}>{icon}</div>
-      <p className="text-lg font-bold font-mono">{value}</p>
-      <p className="text-xs text-muted-foreground">{label}</p>
+    <div className="flex flex-col items-center py-6 gap-2 group hover:bg-white/5 transition-colors">
+      <div className={`${color} p-2 rounded-lg bg-white/5 border border-white/5 group-hover:scale-110 transition-transform`}>{icon}</div>
+      <p className="text-2xl font-black font-mono tracking-tighter">{value}</p>
+      <p className="text-[10px] uppercase font-black tracking-widest text-muted-foreground/70">{label}</p>
     </div>
   );
 }

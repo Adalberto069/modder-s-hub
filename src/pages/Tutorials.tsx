@@ -208,7 +208,7 @@ export default function Tutorials() {
                   transition={{ delay: i * 0.04, duration: 0.3 }}
                 >
                   <Link to={`/tutorial/${tutorial.id}`} className="block h-full">
-                    <Card className="group overflow-hidden neon-border hover:neon-glow-purple transition-all duration-300 bg-card/80 backdrop-blur-sm h-full flex flex-col">
+                    <Card className="group overflow-hidden border-neon-purple/20 hover:border-neon-purple/40 hover:shadow-neon-purple/10 transition-all duration-500 bg-card/40 backdrop-blur-md h-full flex flex-col shadow-lg">
                       {/* Thumbnail */}
                       <div className="aspect-video bg-secondary/40 flex items-center justify-center overflow-hidden relative">
                         {tutorial.thumbnail_url ? (
@@ -241,25 +241,27 @@ export default function Tutorials() {
                         )}
                       </div>
 
-                      <CardContent className="p-4 space-y-2.5 flex-1 flex flex-col">
-                        <div className="flex items-center gap-2">
-                          <Badge variant="secondary" className="text-[10px]">
+                      <CardContent className="p-5 space-y-3 flex-1 flex flex-col">
+                        <div className="flex items-center justify-between">
+                          <Badge variant="secondary" className="text-[10px] bg-neon-purple/10 text-neon-purple border-neon-purple/20">
                             {categoryLabels[tutorial.category] ?? tutorial.category}
                           </Badge>
                           {rating && (
-                            <span className="flex items-center gap-0.5 text-[10px] text-amber-400">
-                              <Star className="h-3 w-3 fill-amber-400" />
-                              {rating.avg.toFixed(1)}
-                            </span>
+                            <div className="flex items-center gap-1 bg-amber-400/10 px-1.5 py-0.5 rounded-full">
+                              <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
+                              <span className="text-[10px] font-bold text-amber-400">
+                                {rating.avg.toFixed(1)}
+                              </span>
+                            </div>
                           )}
                         </div>
-                        <h3 className="font-semibold text-sm line-clamp-2 group-hover:text-primary transition-colors leading-snug">
+                        <h3 className="font-bold text-sm line-clamp-2 group-hover:text-neon-purple transition-colors leading-snug">
                           {tutorial.title}
                         </h3>
                         {tutorial.description && (
-                          <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">{tutorial.description}</p>
+                          <p className="text-xs text-muted-foreground/80 line-clamp-2 leading-relaxed">{tutorial.description}</p>
                         )}
-                        <div className="flex items-center gap-1 text-[10px] text-muted-foreground pt-1 mt-auto">
+                        <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground/60 pt-2 mt-auto border-t border-border/10">
                           <Clock className="h-3 w-3" />
                           {new Date(tutorial.created_at).toLocaleDateString("pt-BR")}
                         </div>

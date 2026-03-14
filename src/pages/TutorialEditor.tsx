@@ -17,9 +17,10 @@ import { toast } from "sonner";
 import {
   ArrowLeft, Save, Eye, Send, Plus, Trash2, Loader2,
   FileText, Video, BookOpen, Lightbulb, AlertTriangle,
-  Image, Code, Link2, GripVertical, ChevronRight,
+  Image, Code, Link2, GripVertical, ChevronRight, Sparkles, Wand2,
 } from "lucide-react";
 import { motion } from "framer-motion";
+import { validateFileWithToast } from "@/lib/secure-upload";
 
 const CATEGORIES = [
   { value: "geral", label: "Geral", icon: "📖" },
@@ -222,22 +223,37 @@ function parseTroubleshooting(content: string): { problem: string; solution: str
 }
 
 // ─── Section Card wrapper ───
-function SectionCard({ title, description, icon: Icon, children, delay = 0 }: {
+function SectionCard({ title, description, icon: Icon, children, delay = 0, variant = "purple" }: {
   title: string;
   description?: string;
   icon: any;
   children: React.ReactNode;
   delay?: number;
+  variant?: "purple" | "green" | "cyan";
 }) {
+  const variantStyles = {
+    purple: "border-neon-purple/20 shadow-neon-purple/5 hover:border-neon-purple/40",
+    green: "border-neon-green/20 shadow-neon-green/5 hover:border-neon-green/40",
+    cyan: "border-neon-cyan/20 shadow-neon-cyan/5 hover:border-neon-cyan/40",
+  }[variant];
+
+  const iconStyles = {
+    purple: "text-neon-purple",
+    green: "text-neon-green",
+    cyan: "text-neon-cyan",
+  }[variant];
+
   return (
     <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay, duration: 0.3 }}>
-      <Card className="bg-card/80 backdrop-blur-sm neon-border">
+      <Card className={`bg-card/40 backdrop-blur-md transition-all duration-300 shadow-lg ${variantStyles}`}>
         <CardHeader className="pb-4">
-          <CardTitle className="text-base font-mono flex items-center gap-2">
-            <Icon className="h-4 w-4 text-primary" />
+          <CardTitle className="text-base font-bold font-mono flex items-center gap-2">
+            <div className={`p-1.5 rounded-lg bg-background/50 border border-border/20 ${iconStyles}`}>
+              <Icon className="h-4 w-4" />
+            </div>
             {title}
           </CardTitle>
-          {description && <CardDescription className="text-xs">{description}</CardDescription>}
+          {description && <CardDescription className="text-xs text-muted-foreground/70">{description}</CardDescription>}
         </CardHeader>
         <CardContent className="space-y-4">{children}</CardContent>
       </Card>
@@ -251,73 +267,96 @@ function BlockEditor({ block, onChange, onRemove }: {
   onChange: (b: ContentBlock) => void;
   onRemove: () => void;
 }) {
-  const typeLabel: Record<string, { label: string; icon: any; color: string }> = {
-    text: { label: "Texto", icon: FileText, color: "text-foreground" },
-    step: { label: "Passo", icon: ChevronRight, color: "text-primary" },
-    code: { label: "Código", icon: Code, color: "text-neon-green" },
-    image: { label: "Imagem", icon: Image, color: "text-neon-pink" },
-    tip: { label: "Dica", icon: Lightbulb, color: "text-neon-cyan" },
-    warning: { label: "Aviso", icon: AlertTriangle, color: "text-destructive" },
+  const typeLabel: Record<string, { label: string; icon: any; color: string; bgColor: string }> = {
+    text: { label: "Texto", icon: FileText, color: "text-foreground", bgColor: "bg-foreground/5" },
+    step: { label: "Passo", icon: ChevronRight, color: "text-neon-purple", bgColor: "bg-neon-purple/10" },
+    code: { label: "Código", icon: Code, color: "text-neon-green", bgColor: "bg-neon-green/10" },
+    image: { label: "Imagem", icon: Image, color: "text-neon-pink", bgColor: "bg-neon-pink/10" },
+    tip: { label: "Dica", icon: Lightbulb, color: "text-neon-cyan", bgColor: "bg-neon-cyan/10" },
+    warning: { label: "Aviso", icon: AlertTriangle, color: "text-destructive", bgColor: "bg-destructive/10" },
   };
 
   const info = typeLabel[block.type];
   const IconComp = info.icon;
 
   return (
-    <div className="group relative border border-border/50 rounded-lg p-3 bg-secondary/20 hover:bg-secondary/30 transition-colors">
-      <div className="flex items-center justify-between mb-2">
-        <div className="flex items-center gap-2">
-          <GripVertical className="h-3.5 w-3.5 text-muted-foreground/40" />
-          <IconComp className={`h-3.5 w-3.5 ${info.color}`} />
-          <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider">{info.label}</span>
+    <div className="group relative border border-border/30 rounded-xl p-4 bg-background/30 backdrop-blur-sm hover:border-primary/30 transition-all duration-300">
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-2.5">
+          <GripVertical className="h-4 w-4 text-muted-foreground/30 cursor-grab active:cursor-grabbing" />
+          <div className={`p-1.5 rounded-md ${info.bgColor} ${info.color}`}>
+            <IconComp className="h-3.5 w-3.5" />
+          </div>
+          <span className="text-[10px] font-bold font-mono text-muted-foreground uppercase tracking-widest">{info.label}</span>
         </div>
-        <Button variant="ghost" size="icon" className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity" onClick={onRemove}>
-          <Trash2 className="h-3 w-3 text-destructive" />
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          className="h-7 w-7 rounded-full bg-background/50 opacity-0 group-hover:opacity-100 transition-all hover:bg-destructive/10 hover:text-destructive" 
+          onClick={onRemove}
+        >
+          <Trash2 className="h-3.5 w-3.5" />
         </Button>
       </div>
 
-      {block.type === "code" && (
-        <Input
-          placeholder="Linguagem (ex: lua, javascript)"
-          value={block.language || ""}
-          onChange={(e) => onChange({ ...block, language: e.target.value })}
-          className="mb-2 h-7 text-xs"
-        />
-      )}
+      <div className="space-y-3">
+        {block.type === "code" && (
+          <div className="relative">
+            <Input
+              placeholder="Linguagem (ex: lua, js)"
+              value={block.language || ""}
+              onChange={(e) => onChange({ ...block, language: e.target.value })}
+              className="h-8 text-xs bg-background/50 border-border/20 font-mono w-48"
+            />
+          </div>
+        )}
 
-      {block.type === "image" ? (
-        <div className="space-y-2">
-          <Input
-            placeholder="URL da imagem"
-            value={block.imageUrl || ""}
-            onChange={(e) => onChange({ ...block, imageUrl: e.target.value })}
-            className="h-8 text-xs"
-          />
-          <Input
-            placeholder="Texto alternativo (alt)"
+        {block.type === "image" ? (
+          <div className="space-y-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="space-y-1">
+                <Label className="text-[10px] uppercase font-bold text-muted-foreground/70">URL da Imagem</Label>
+                <Input
+                  placeholder="https://..."
+                  value={block.imageUrl || ""}
+                  onChange={(e) => onChange({ ...block, imageUrl: e.target.value })}
+                  className="h-9 text-sm bg-background/50 border-border/20"
+                />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-[10px] uppercase font-bold text-muted-foreground/70">Legenda / Alt</Label>
+                <Input
+                  placeholder="Descrição da imagem"
+                  value={block.content}
+                  onChange={(e) => onChange({ ...block, content: e.target.value })}
+                  className="h-9 text-sm bg-background/50 border-border/20"
+                />
+              </div>
+            </div>
+            {block.imageUrl && (
+              <div className="relative rounded-lg overflow-hidden border border-border/20 aspect-video bg-black/20">
+                <img src={block.imageUrl} alt={block.content} className="w-full h-full object-contain" />
+              </div>
+            )}
+          </div>
+        ) : (
+          <Textarea
+            placeholder={
+              block.type === "step" ? "Descreva este passo..."
+                : block.type === "tip" ? "Escreva uma dica valiosa..."
+                : block.type === "warning" ? "Escreva um aviso importante..."
+                : block.type === "code" ? "-- Cole seu código aqui..."
+                : "Escreva o conteúdo do bloco..."
+            }
             value={block.content}
             onChange={(e) => onChange({ ...block, content: e.target.value })}
-            className="h-8 text-xs"
+            rows={block.type === "code" ? 8 : 4}
+            className={`text-sm bg-background/50 border-border/20 focus:border-primary/40 resize-none transition-all ${
+              block.type === "code" ? "font-mono text-xs bg-slate-950/50" : ""
+            }`}
           />
-          {block.imageUrl && (
-            <img src={block.imageUrl} alt={block.content} className="max-h-32 rounded-md object-contain" />
-          )}
-        </div>
-      ) : (
-        <Textarea
-          placeholder={
-            block.type === "step" ? "Descreva este passo..."
-              : block.type === "tip" ? "Escreva uma dica..."
-              : block.type === "warning" ? "Escreva um aviso..."
-              : block.type === "code" ? "Cole o código aqui..."
-              : "Escreva o conteúdo..."
-          }
-          value={block.content}
-          onChange={(e) => onChange({ ...block, content: e.target.value })}
-          rows={block.type === "code" ? 6 : 3}
-          className={`text-sm ${block.type === "code" ? "font-mono text-xs" : ""}`}
-        />
-      )}
+        )}
+      </div>
     </div>
   );
 }
@@ -371,6 +410,7 @@ export default function TutorialEditor() {
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState("edit");
   const [tagInput, setTagInput] = useState("");
+  const [isGenerating, setIsGenerating] = useState(false);
 
   const [form, setForm] = useState<TutorialFormData>(emptyForm);
 
@@ -412,6 +452,47 @@ export default function TutorialEditor() {
   }, [existing]);
 
   if (!isAdmin) return <Navigate to="/tutorials" />;
+
+  const handleGenerateWithAI = async () => {
+    if (!form.title.trim()) {
+      toast.error("Digite um título primeiro para a IA saber o que gerar!");
+      return;
+    }
+
+    setIsGenerating(true);
+    toast.info("A IA está escrevendo seu tutorial... Isso pode levar alguns segundos.");
+    
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-tutorial', {
+        body: { title: form.title }
+      });
+
+      if (error) throw error;
+
+      if (data) {
+        setForm(f => ({
+          ...f,
+          description: data.description || f.description,
+          contentBlocks: data.blocks.map((b: any) => ({
+            id: crypto.randomUUID(),
+            type: b.type,
+            content: b.content,
+            language: b.language || (b.type === "code" ? "lua" : undefined)
+          })),
+          tips: data.tips && data.tips.length > 0 ? data.tips : f.tips,
+          troubleshooting: data.troubleshooting && data.troubleshooting.length > 0 
+            ? data.troubleshooting 
+            : f.troubleshooting
+        }));
+        toast.success("Tutorial gerado com sucesso! Agora é só revisar.");
+      }
+    } catch (e: any) {
+      console.error(e);
+      toast.error("Erro ao gerar com IA: " + (e.message || "Verifique se a GEMINI_API_KEY está configurada."));
+    } finally {
+      setIsGenerating(false);
+    }
+  };
 
   const handleSave = async () => {
     if (!form.title.trim()) {
@@ -536,10 +617,26 @@ export default function TutorialEditor() {
         ) : (
           <div className="space-y-5">
             {/* 1. Basic Information */}
-            <SectionCard title="Informações Básicas" description="Título, descrição e categorização do tutorial" icon={FileText} delay={0}>
+            <SectionCard title="Informações Básicas" description="Título, descrição e categorização do tutorial" icon={FileText} delay={0} variant="purple">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="sm:col-span-2 space-y-1.5">
-                  <Label className="text-xs">Título *</Label>
+                  <div className="flex items-center justify-between">
+                    <Label className="text-xs">Título *</Label>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="h-7 text-[10px] gap-1.5 text-neon-purple hover:text-neon-purple hover:bg-neon-purple/10"
+                      onClick={handleGenerateWithAI}
+                      disabled={isGenerating || !form.title.trim()}
+                    >
+                      {isGenerating ? (
+                        <Loader2 className="h-3 w-3 animate-spin" />
+                      ) : (
+                        <Sparkles className="h-3 w-3" />
+                      )}
+                      Gerar com IA
+                    </Button>
+                  </div>
                   <Input
                     value={form.title}
                     onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
@@ -655,7 +752,7 @@ export default function TutorialEditor() {
             </SectionCard>
 
             {/* 2. Video Section */}
-            <SectionCard title="Vídeo" description="Embed de vídeo do YouTube (opcional)" icon={Video} delay={0.05}>
+            <SectionCard title="Vídeo" description="Embed de vídeo do YouTube (opcional)" icon={Video} delay={0.05} variant="cyan">
               <div className="space-y-1.5">
                 <Label className="text-xs">URL do YouTube</Label>
                 <Input
@@ -682,7 +779,7 @@ export default function TutorialEditor() {
             </SectionCard>
 
             {/* 3. Tutorial Content */}
-            <SectionCard title="Conteúdo do Tutorial" description="Adicione blocos de conteúdo: texto, passos, código, imagens, dicas e avisos" icon={BookOpen} delay={0.1}>
+            <SectionCard title="Conteúdo do Tutorial" description="Adicione blocos de conteúdo: texto, passos, código, imagens, dicas e avisos" icon={BookOpen} delay={0.1} variant="purple">
               <div className="space-y-3">
                 {form.contentBlocks.map((block, idx) => (
                   <BlockEditor
@@ -714,7 +811,7 @@ export default function TutorialEditor() {
             </SectionCard>
 
             {/* 4. Tips */}
-            <SectionCard title="Dicas" description="Dicas úteis que serão destacadas no tutorial" icon={Lightbulb} delay={0.15}>
+            <SectionCard title="Dicas" description="Dicas úteis que serão destacadas no tutorial" icon={Lightbulb} delay={0.15} variant="green">
               {form.tips.map((tip, idx) => (
                 <div key={idx} className="flex gap-2">
                   <Input

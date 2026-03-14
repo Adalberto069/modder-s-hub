@@ -113,44 +113,44 @@ export function ModderFinanceTab({ totalEarnings }: ModderFinanceTabProps) {
   return (
     <div className="space-y-6">
       {/* Resumo Financeiro */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <Card className="neon-border bg-card/80">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Card className="bg-card/40 backdrop-blur-md border-primary/20 shadow-lg shadow-primary/5 hover:border-primary/40 transition-all group">
           <CardContent className="p-6">
             <div className="flex items-center gap-4">
-              <div className="bg-primary/20 p-3 rounded-full">
+              <div className="bg-primary/10 p-3 rounded-full group-hover:bg-primary/20 transition-colors">
                 <DollarSign className="h-6 w-6 text-primary" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Ganhos Totais (80%)</p>
-                <p className="text-2xl font-bold">R$ {totalEarnings.toFixed(2)}</p>
+                <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium">Ganhos Totais (80%)</p>
+                <p className="text-2xl font-bold font-mono">R$ {totalEarnings.toFixed(2)}</p>
               </div>
             </div>
           </CardContent>
         </Card>
         
-        <Card className="neon-border bg-card/80">
+        <Card className="bg-card/40 backdrop-blur-md border-accent/20 shadow-lg shadow-accent/5 hover:border-accent/40 transition-all group">
           <CardContent className="p-6">
             <div className="flex items-center gap-4">
-              <div className="bg-accent/20 p-3 rounded-full">
+              <div className="bg-accent/10 p-3 rounded-full group-hover:bg-accent/20 transition-colors">
                 <Wallet className="h-6 w-6 text-accent" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Saldo Disponível</p>
-                <p className="text-2xl font-bold">R$ {Math.max(0, availableBalance).toFixed(2)}</p>
+                <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium">Saldo Disponível</p>
+                <p className="text-2xl font-bold font-mono text-accent">R$ {Math.max(0, availableBalance).toFixed(2)}</p>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="neon-border bg-card/80">
+        <Card className="bg-card/40 backdrop-blur-md border-muted/20 shadow-lg shadow-black/5 hover:border-muted/40 transition-all group">
           <CardContent className="p-6">
             <div className="flex items-center gap-4">
-              <div className="bg-muted p-3 rounded-full">
+              <div className="bg-muted/10 p-3 rounded-full group-hover:bg-muted/20 transition-colors">
                 <Landmark className="h-6 w-6 text-muted-foreground" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Saques Pendentes/Aprovados</p>
-                <p className="text-2xl font-bold">R$ {totalWithdrawnOrPending.toFixed(2)}</p>
+                <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium">Saques Processados</p>
+                <p className="text-2xl font-bold font-mono">R$ {totalWithdrawnOrPending.toFixed(2)}</p>
               </div>
             </div>
           </CardContent>

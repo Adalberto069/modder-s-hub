@@ -9,14 +9,23 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { Upload, Download, Star, DollarSign, Plus, Trash2, Code, Package, Pencil, Key, Copy, ShoppingBag, EyeOff, Eye, Clock, RefreshCw } from "lucide-react";
+import {
+  Upload, Download, Star, DollarSign, Plus, Trash2, Code, Package, Pencil, Key, 
+  Copy, ShoppingBag, EyeOff, Eye, Clock, RefreshCw, TrendingUp, Calendar, ArrowUpRight
+} from "lucide-react";
 import { Navigate, useNavigate } from "react-router-dom";
+import { 
+  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
+  AreaChart, Area
+} from 'recharts';
+import { format, subDays, isSameDay, parseISO } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
 export default function Dashboard() {
   const { user, isModder, loading, profile } = useAuth();
@@ -220,8 +229,27 @@ end
   });
 
   const totalEarnings = modderPurchases?.reduce((sum: number, p: any) => sum + Number(p.modder_earnings || 0), 0) ?? 0;
-  const totalCommission = modderPurchases?.reduce((sum: number, p: any) => sum + Number(p.platform_commission || 0), 0) ?? 0;
   const totalSales = modderPurchases?.length ?? 0;
+
+  // Prepare chart data for last 7 days
+  const chartData = Array.from({ length: 7 }, (_, i) => {
+    const date = subDays(new Date(), 6 - i);
+    const dayPurchases = modderPurchases?.filter((p: any) => 
+      isSameDay(parseISO(p.created_at), date)
+    ) ?? [];
+    
+    const earnings = dayPurchases.reduce((sum: number, p: any) => 
+      sum + Number(p.modder_earnings || 0), 0
+    );
+
+    return {
+      name: format(date, "EEE", { locale: ptBR }),
+      date: format(date, "dd/MM"),
+      earnings,
+    };
+  });
+
+  const dailyGrowth = chartData[6].earnings > chartData[5].earnings;
 
   return (
     <Layout>
@@ -237,35 +265,143 @@ end
 
         {/* Stats - only for modders */}
         {isModder && (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-            <Card className="neon-border bg-card/80">
-              <CardContent className="p-4 text-center">
-                <Upload className="h-5 w-5 mx-auto text-primary mb-1" />
-                <p className="text-2xl font-bold font-mono">{myScripts?.length ?? 0}</p>
-                <p className="text-xs text-muted-foreground">Publicações</p>
-              </CardContent>
-            </Card>
-            <Card className="neon-border bg-card/80">
-              <CardContent className="p-4 text-center">
-                <Download className="h-5 w-5 mx-auto text-accent mb-1" />
-                <p className="text-2xl font-bold font-mono">{totalDownloads}</p>
-                <p className="text-xs text-muted-foreground">Downloads</p>
-              </CardContent>
-            </Card>
-            <Card className="neon-border bg-card/80">
-              <CardContent className="p-4 text-center">
-                <ShoppingBag className="h-5 w-5 mx-auto text-primary mb-1" />
-                <p className="text-2xl font-bold font-mono">{totalSales}</p>
-                <p className="text-xs text-muted-foreground">Vendas</p>
-              </CardContent>
-            </Card>
-            <Card className="neon-border bg-card/80">
-              <CardContent className="p-4 text-center">
-                <DollarSign className="h-5 w-5 mx-auto text-accent mb-1" />
-                <p className="text-2xl font-bold font-mono text-accent">R$ {totalEarnings.toFixed(2)}</p>
-                <p className="text-xs text-muted-foreground">Ganhos (80%)</p>
-              </CardContent>
-            </Card>
+          <div className="space-y-6 mb-8">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              <Card className="bg-card/40 backdrop-blur-md border-primary/20 shadow-lg shadow-primary/5 hover:border-primary/40 transition-all group">
+                <CardContent className="p-5">
+                  <div className="flex justify-between items-start mb-2">
+                    <div className="bg-primary/10 p-2 rounded-lg group-hover:bg-primary/20 transition-colors">
+                      <Code className="h-4 w-4 text-primary" />
+                    </div>
+                    <Badge variant="outline" className="text-[10px] opacity-60">Total</Badge>
+                  </div>
+                  <p className="text-2xl font-bold font-mono text-foreground leading-none">
+                    {myScripts?.length ?? 0}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1 uppercase tracking-wider font-medium">Publicações</p>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-card/40 backdrop-blur-md border-accent/20 shadow-lg shadow-accent/5 hover:border-accent/40 transition-all group">
+                <CardContent className="p-5">
+                  <div className="flex justify-between items-start mb-2">
+                    <div className="bg-accent/10 p-2 rounded-lg group-hover:bg-accent/20 transition-colors">
+                      <Download className="h-4 w-4 text-accent" />
+                    </div>
+                    <Badge variant="outline" className="text-[10px] text-accent/70 border-accent/20">Popularidade</Badge>
+                  </div>
+                  <p className="text-2xl font-bold font-mono text-foreground leading-none">
+                    {totalDownloads}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1 uppercase tracking-wider font-medium">Downloads</p>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-card/40 backdrop-blur-md border-neon-purple/20 shadow-lg shadow-neon-purple/5 hover:border-neon-purple/40 transition-all group">
+                <CardContent className="p-5">
+                  <div className="flex justify-between items-start mb-2">
+                    <div className="bg-neon-purple/10 p-2 rounded-lg group-hover:bg-neon-purple/20 transition-colors">
+                      <ShoppingBag className="h-4 w-4 text-neon-purple" />
+                    </div>
+                    <Badge variant="outline" className="text-[10px] text-neon-purple/70 border-neon-purple/20">Volume</Badge>
+                  </div>
+                  <p className="text-2xl font-bold font-mono text-foreground leading-none">
+                    {totalSales}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1 uppercase tracking-wider font-medium">Vendas</p>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-card/40 backdrop-blur-md border-neon-green/20 shadow-lg shadow-neon-green/5 hover:border-neon-green/40 transition-all group">
+                <CardContent className="p-5">
+                  <div className="flex justify-between items-start mb-2">
+                    <div className="bg-neon-green/10 p-2 rounded-lg group-hover:bg-neon-green/20 transition-colors">
+                      <DollarSign className="h-4 w-4 text-neon-green" />
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <ArrowUpRight className={`h-3 w-3 ${dailyGrowth ? 'text-neon-green' : 'text-muted-foreground'}`} />
+                      <span className="text-[10px] font-medium text-neon-green">Lucro</span>
+                    </div>
+                  </div>
+                  <p className="text-2xl font-bold font-mono text-neon-green leading-none">
+                    R$ {totalEarnings.toFixed(2)}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1 uppercase tracking-wider font-medium">Ganhos (80%)</p>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Charts Section */}
+            <div className="grid grid-cols-1 gap-6">
+              <Card className="bg-card/40 backdrop-blur-md border-border/50 shadow-xl overflow-hidden">
+                <CardHeader className="pb-2 border-b border-border/10">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <CardTitle className="text-sm font-bold flex items-center gap-2">
+                        <TrendingUp className="h-4 w-4 text-primary" />
+                        Desempenho de Vendas
+                      </CardTitle>
+                      <CardDescription className="text-[10px]">Ganhos líquidos nos últimos 7 dias</CardDescription>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-1.5 px-2 py-1 rounded bg-secondary/50 text-[10px] font-mono">
+                        <Calendar className="h-3 w-3" /> 
+                        Última semana
+                      </div>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="pt-6">
+                  <div className="h-[250px] w-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <AreaChart data={chartData}>
+                        <defs>
+                          <linearGradient id="colorEarnings" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="hsl(var(--neon-purple))" stopOpacity={0.3}/>
+                            <stop offset="95%" stopColor="hsl(var(--neon-purple))" stopOpacity={0}/>
+                          </linearGradient>
+                        </defs>
+                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+                        <XAxis 
+                          dataKey="name" 
+                          axisLine={false} 
+                          tickLine={false} 
+                          tick={{ fontSize: 10, fill: '#888' }}
+                          dy={10}
+                        />
+                        <YAxis 
+                          axisLine={false} 
+                          tickLine={false} 
+                          tick={{ fontSize: 10, fill: '#888' }}
+                          tickFormatter={(value) => `R$${value}`}
+                        />
+                        <Tooltip 
+                          contentStyle={{ 
+                            backgroundColor: 'rgba(20, 20, 25, 0.95)', 
+                            border: '1px solid rgba(255,255,255,0.1)',
+                            borderRadius: '8px',
+                            fontSize: '12px',
+                            color: '#fff'
+                          }}
+                          itemStyle={{ color: 'hsl(var(--neon-purple))' }}
+                          formatter={(value: any) => [`R$ ${value.toFixed(2)}`, 'Ganhos']}
+                          labelStyle={{ marginBottom: '4px', fontWeight: 'bold' }}
+                        />
+                        <Area 
+                          type="monotone" 
+                          dataKey="earnings" 
+                          stroke="hsl(var(--neon-purple))" 
+                          strokeWidth={3}
+                          fillOpacity={1} 
+                          fill="url(#colorEarnings)" 
+                          animationDuration={1500}
+                        />
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </div>
         )}
 

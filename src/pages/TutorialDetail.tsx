@@ -13,7 +13,7 @@ import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
 import {
   ArrowLeft, BookOpen, Clock, Star, Play, MessageSquare, Send,
-  Loader2, Lightbulb, AlertTriangle, ChevronRight, Lock,
+  Loader2, Lightbulb, AlertTriangle, ChevronRight, Lock, Copy, Check
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { formatDistanceToNow } from "date-fns";
@@ -67,25 +67,30 @@ function StarRating({ rating, onRate, interactive = false, size = "md" }: {
   );
 }
 
-/** Renders content with basic formatting support */
+/** Renders content with premium formatting support */
 function ContentRenderer({ content }: { content: string }) {
   const sections = content.split(/\n(?=##\s)/).filter(Boolean);
 
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    toast.success("Código copiado!");
+  };
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {sections.map((section, i) => {
         const lines = section.split("\n");
         const isHeading = lines[0]?.startsWith("## ");
 
         return (
-          <div key={i}>
+          <div key={i} className="animate-in fade-in slide-in-from-bottom-2 duration-500 fill-mode-both" style={{ animationDelay: `${i * 100}ms` }}>
             {isHeading && (
-              <h2 className="text-lg font-bold font-mono text-foreground mb-3 flex items-center gap-2">
-                <ChevronRight className="h-4 w-4 text-primary shrink-0" />
+              <h2 className="text-xl font-bold font-mono text-foreground mb-5 flex items-center gap-3">
+                <div className="h-6 w-1.5 bg-primary rounded-full shadow-[0_0_10px_rgba(216,180,254,0.5)]" />
                 {lines[0].replace(/^##\s*/, "")}
               </h2>
             )}
-            <div className="space-y-2">
+            <div className="space-y-4">
               {lines.slice(isHeading ? 1 : 0).map((line, j) => {
                 const trimmed = line.trim();
                 if (!trimmed) return null;
@@ -93,30 +98,71 @@ function ContentRenderer({ content }: { content: string }) {
                 // Tip callout
                 if (trimmed.startsWith("💡") || trimmed.toLowerCase().startsWith("dica:")) {
                   return (
-                    <div key={j} className="flex gap-2.5 p-3 rounded-lg bg-neon-cyan/5 border border-neon-cyan/20">
-                      <Lightbulb className="h-4 w-4 text-neon-cyan shrink-0 mt-0.5" />
-                      <p className="text-sm text-foreground/90">{trimmed.replace(/^💡\s*|^dica:\s*/i, "")}</p>
-                    </div>
+                    <motion.div 
+                      key={j} 
+                      whileHover={{ scale: 1.01 }}
+                      className="flex gap-4 p-4 rounded-xl bg-neon-cyan/5 border border-neon-cyan/20 backdrop-blur-sm shadow-lg shadow-neon-cyan/5"
+                    >
+                      <div className="p-2 rounded-lg bg-neon-cyan/10 text-neon-cyan shrink-0 h-fit">
+                        <Lightbulb className="h-5 w-5" />
+                      </div>
+                      <div className="space-y-1">
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-neon-cyan/70">Dica Útil</span>
+                        <p className="text-sm text-foreground/90 leading-relaxed font-medium">
+                          {trimmed.replace(/^💡\s*|^dica:\s*/i, "")}
+                        </p>
+                      </div>
+                    </motion.div>
                   );
                 }
 
                 // Warning callout
                 if (trimmed.startsWith("⚠️") || trimmed.toLowerCase().startsWith("atenção:")) {
                   return (
-                    <div key={j} className="flex gap-2.5 p-3 rounded-lg bg-destructive/5 border border-destructive/20">
-                      <AlertTriangle className="h-4 w-4 text-destructive shrink-0 mt-0.5" />
-                      <p className="text-sm text-foreground/90">{trimmed.replace(/^⚠️\s*|^atenção:\s*/i, "")}</p>
-                    </div>
+                    <motion.div 
+                      key={j}
+                      whileHover={{ scale: 1.01 }}
+                      className="flex gap-4 p-4 rounded-xl bg-destructive/5 border border-destructive/20 backdrop-blur-sm shadow-lg shadow-destructive/5"
+                    >
+                      <div className="p-2 rounded-lg bg-destructive/10 text-destructive shrink-0 h-fit">
+                        <AlertTriangle className="h-5 w-5" />
+                      </div>
+                      <div className="space-y-1">
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-destructive/70">Atenção</span>
+                        <p className="text-sm text-foreground/90 leading-relaxed font-medium">
+                          {trimmed.replace(/^⚠️\s*|^atenção:\s*/i, "")}
+                        </p>
+                      </div>
+                    </motion.div>
                   );
                 }
 
                 // Code block
                 if (trimmed.startsWith("```") || trimmed.startsWith("`")) {
-                  const code = trimmed.replace(/^```\w*\s*|```$/g, "").replace(/^`|`$/g, "");
+                  const isLarge = trimmed.startsWith("```");
+                  const content = trimmed.replace(/^```\w*\s*|```$/g, "").replace(/^`|`$/g, "");
+                  const langMatch = trimmed.match(/^```(\w+)/);
+                  const lang = langMatch ? langMatch[1] : "code";
+
                   return (
-                    <pre key={j} className="bg-secondary/60 rounded-lg p-3 text-xs font-mono overflow-x-auto border border-border max-w-full">
-                      <code className="block min-w-full">{code}</code>
-                    </pre>
+                    <div key={j} className="relative group">
+                      <div className="absolute top-0 right-0 p-2 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                        <span className="text-[10px] font-mono text-muted-foreground bg-background/50 px-2 py-0.5 rounded border border-border/20 uppercase">
+                          {lang}
+                        </span>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-7 w-7 bg-background/50 hover:bg-background/80" 
+                          onClick={() => copyToClipboard(content)}
+                        >
+                          <Copy className="h-3.5 w-3.5" />
+                        </Button>
+                      </div>
+                      <pre className={`bg-slate-950/80 rounded-xl p-5 text-[13px] font-mono overflow-x-auto border border-white/5 shadow-2xl ${isLarge ? "min-h-[100px]" : ""}`}>
+                        <code className="block text-neon-green/90 leading-relaxed">{content}</code>
+                      </pre>
+                    </div>
                   );
                 }
 
@@ -125,11 +171,16 @@ function ContentRenderer({ content }: { content: string }) {
                   const num = trimmed.match(/^(\d+)\./)?.[1];
                   const text = trimmed.replace(/^\d+\.\s*/, "");
                   return (
-                    <div key={j} className="flex gap-3 items-start">
-                      <span className="flex items-center justify-center h-6 w-6 rounded-full bg-primary/20 text-primary text-xs font-bold shrink-0 mt-0.5">
-                        {num}
-                      </span>
-                      <p className="text-sm text-foreground/85 leading-relaxed">{renderInline(text)}</p>
+                    <div key={j} className="flex gap-4 items-start group">
+                      <div className="relative shrink-0 mt-0.5">
+                        <div className="absolute inset-0 bg-primary/40 blur-md rounded-full group-hover:bg-primary/60 transition-colors" />
+                        <span className="relative flex items-center justify-center h-8 w-8 rounded-full bg-primary text-primary-foreground text-sm font-black shadow-lg">
+                          {num}
+                        </span>
+                      </div>
+                      <p className="text-[15px] text-foreground/80 leading-relaxed font-medium pt-1">
+                        {renderInline(text)}
+                      </p>
                     </div>
                   );
                 }
@@ -137,15 +188,30 @@ function ContentRenderer({ content }: { content: string }) {
                 // Bullet
                 if (trimmed.startsWith("- ") || trimmed.startsWith("* ")) {
                   return (
-                    <div key={j} className="flex gap-2.5 items-start pl-1">
-                      <span className="h-1.5 w-1.5 rounded-full bg-accent shrink-0 mt-2" />
-                      <p className="text-sm text-foreground/85 leading-relaxed">{renderInline(trimmed.slice(2))}</p>
+                    <div key={j} className="flex gap-3 items-start pl-2">
+                      <div className="h-2 w-2 rounded-full bg-accent mt-2.5 shadow-[0_0_8px_hsl(var(--accent))]" />
+                      <p className="text-[15px] text-foreground/85 leading-relaxed">{renderInline(trimmed.slice(2))}</p>
+                    </div>
+                  );
+                }
+
+                // Image in markdown format
+                const imgMatch = trimmed.match(/!\[(.*?)\]\((.*?)\)/);
+                if (imgMatch) {
+                  return (
+                    <div key={j} className="my-6 rounded-2xl overflow-hidden border border-border/20 shadow-2xl aspect-video bg-black/20 group">
+                      <img src={imgMatch[2]} alt={imgMatch[1]} className="w-full h-full object-contain group-hover:scale-[1.02] transition-transform duration-700" loading="lazy" />
+                      {imgMatch[1] && (
+                        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-background/80 backdrop-blur-md px-4 py-1.5 rounded-full border border-border/20 shadow-xl opacity-0 group-hover:opacity-100 transition-opacity">
+                          <p className="text-[10px] font-bold uppercase tracking-widest text-foreground/70">{imgMatch[1]}</p>
+                        </div>
+                      )}
                     </div>
                   );
                 }
 
                 // Normal text
-                return <p key={j} className="text-sm text-foreground/85 leading-relaxed">{renderInline(trimmed)}</p>;
+                return <p key={j} className="text-[15px] text-foreground/85 leading-relaxed font-medium">{renderInline(trimmed)}</p>;
               })}
             </div>
           </div>
@@ -365,7 +431,7 @@ export default function TutorialDetail() {
             transition={{ delay: 0.1 }}
             className="mb-8"
           >
-            <div className="aspect-video rounded-xl overflow-hidden neon-border">
+            <div className="aspect-video rounded-xl overflow-hidden shadow-2xl border border-white/10">
               <iframe
                 src={embedUrl}
                 title={tutorial.title}
@@ -408,22 +474,24 @@ export default function TutorialDetail() {
           )}
         </motion.div>
 
-        {/* Rating section */}
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
+           <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.2 }}
           className="mb-10"
         >
-          <Card className="bg-card/60 neon-border">
-            <CardContent className="p-6 text-center space-y-3">
-              <h3 className="font-semibold font-mono">Avalie este tutorial</h3>
-              <StarRating
-                rating={userRating || (existingRating?.rating ?? 0)}
-                onRate={handleRate}
-                interactive
-              />
-              <p className="text-xs text-muted-foreground">
+          <Card className="bg-card/40 backdrop-blur-md border-neon-purple/20 shadow-lg shadow-neon-purple/5 overflow-hidden group">
+            <div className="absolute inset-0 bg-gradient-to-br from-neon-purple/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+            <CardContent className="p-8 text-center space-y-4 relative">
+              <h3 className="font-bold font-mono text-lg tracking-wider">Avalie este Tutorial</h3>
+              <div className="flex justify-center">
+                <StarRating
+                  rating={userRating || (existingRating?.rating ?? 0)}
+                  onRate={handleRate}
+                  interactive
+                />
+              </div>
+              <p className="text-xs text-muted-foreground/70 uppercase tracking-widest font-bold">
                 {allRatings.length > 0
                   ? `${allRatings.length} avaliação(ões) · Média: ${avgRating.toFixed(1)}`
                   : "Seja o primeiro a avaliar!"}
@@ -439,10 +507,12 @@ export default function TutorialDetail() {
           transition={{ delay: 0.25 }}
           className="mb-10"
         >
-          <h3 className="text-lg font-bold font-mono mb-4 flex items-center gap-2">
-            <MessageSquare className="h-5 w-5 text-neon-cyan" />
-            Comentários ({comments.length})
-          </h3>
+            <h3 className="text-xl font-bold font-mono mb-6 flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-neon-cyan/10 text-neon-cyan">
+                <MessageSquare className="h-5 w-5" />
+              </div>
+              Feed de Comentários ({comments.length})
+            </h3>
 
           {/* Comment input */}
           <div className="flex gap-2 mb-6">
@@ -477,10 +547,10 @@ export default function TutorialDetail() {
                     <div className="flex items-start gap-3">
                       <Avatar className="h-8 w-8 shrink-0">
                         {author?.avatar_url ? <AvatarImage src={author.avatar_url} /> : null}
-                        <AvatarFallback className="bg-secondary text-[10px]">
-                          {(author?.username ?? "U").charAt(0).toUpperCase()}
-                        </AvatarFallback>
-                      </Avatar>
+                          <AvatarFallback className="bg-background border border-border/20 text-[10px] font-bold">
+                            {(author?.username ?? "U").charAt(0).toUpperCase()}
+                          </AvatarFallback>
+                     </Avatar>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
                           <span className="text-xs font-medium">{author?.display_name ?? author?.username ?? "Usuário"}</span>
