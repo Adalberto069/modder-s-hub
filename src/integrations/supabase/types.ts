@@ -80,6 +80,7 @@ export type Database = {
       forum_posts: {
         Row: {
           category: string
+          code_content: string | null
           content: string
           created_at: string
           id: string
@@ -89,6 +90,7 @@ export type Database = {
         }
         Insert: {
           category?: string
+          code_content?: string | null
           content: string
           created_at?: string
           id?: string
@@ -98,6 +100,7 @@ export type Database = {
         }
         Update: {
           category?: string
+          code_content?: string | null
           content?: string
           created_at?: string
           id?: string
@@ -109,6 +112,7 @@ export type Database = {
       }
       forum_replies: {
         Row: {
+          code_content: string | null
           content: string
           created_at: string
           id: string
@@ -116,6 +120,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          code_content?: string | null
           content: string
           created_at?: string
           id?: string
@@ -123,6 +128,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          code_content?: string | null
           content?: string
           created_at?: string
           id?: string
