@@ -2,7 +2,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
 }
 
 serve(async (req) => {
@@ -12,76 +12,130 @@ serve(async (req) => {
 
   try {
     const { title } = await req.json()
-    const apiKey = Deno.env.get('GEMINI_API_KEY')
+    const apiKey = Deno.env.get('LOVABLE_API_KEY')
 
     if (!apiKey) {
       return new Response(
-        JSON.stringify({ error: 'GEMINI_API_KEY não configurada no Supabase' }),
+        JSON.stringify({ error: 'LOVABLE_API_KEY não configurada' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
 
-    const prompt = `Você é um especialista em modding mobile, engenharia reversa e Scripting para Game Guardian no Android.
-Seu objetivo é gerar um tutorial técnico e profissional baseado no seguinte título: "${title}".
-
-O tutorial deve ser retornado EXCLUSIVAMENTE em formato JSON com esta estrutura exata:
-{
-  "description": "Uma breve descrição atraente do que será aprendido",
-  "blocks": [
-    { "type": "text", "content": "Introdução teórica focada em conceitos de memória, offsets ou lógica de jogo." },
-    { "type": "step", "content": "Primeiro passo prático detalhado." },
-    { "type": "code", "content": "-- código lua completo e funcional para Game Guardian\\ngg.clearResults()\\ngg.searchNumber('1234', gg.TYPE_DWORD)\\n...", "language": "lua" },
-    { "type": "tip", "content": "Uma dica avançada sobre busca de valores ou proteção contra bans." },
-    { "type": "warning", "content": "Um aviso sobre riscos de detecção ou erros de script." }
-  ],
-  "tips": ["Dica extra curta 1", "Dica extra curta 2"],
-  "troubleshooting": [
-    { "problem": "Script não encontra valores", "solution": "Verifique se o jogo foi selecionado corretamente e o intervalo de memória está em Anonymous." }
-  ]
-}
+    const systemPrompt = `Você é um especialista em modding mobile, engenharia reversa e Scripting para Game Guardian no Android.
+Seu objetivo é gerar um tutorial técnico e profissional.
 
 Regras Cruciais:
 1. Use termos técnicos precisos: libs, offsets, hex, memory ranges (CodeApp, Anonymous), XOR key.
 2. O código Lua DEVE ser funcional e usar a API do Game Guardian (gg.*).
 3. Escreva em Português do Brasil de forma clara e profissional.
-4. Retorne APENAS o JSON puro, sem explicações fora do JSON.
-5. Se o título for irrelevante ao tema de modding, tente criar algo relacionado ou retorne um tutorial básico de scripting.`
+4. Se o título for irrelevante ao tema de modding, tente criar algo relacionado ou retorne um tutorial básico de scripting.`
 
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+    const userPrompt = `Gere um tutorial técnico completo baseado no título: "${title}"`
+
+    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
       body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: {
-          temperature: 0.7,
-          maxOutputTokens: 2048,
-          response_mime_type: "application/json",
-        },
+        model: 'google/gemini-3-flash-preview',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt },
+        ],
+        tools: [
+          {
+            type: 'function',
+            function: {
+              name: 'generate_tutorial',
+              description: 'Gera um tutorial técnico estruturado sobre modding mobile e Game Guardian.',
+              parameters: {
+                type: 'object',
+                properties: {
+                  description: {
+                    type: 'string',
+                    description: 'Uma breve descrição atraente do que será aprendido'
+                  },
+                  blocks: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      properties: {
+                        type: {
+                          type: 'string',
+                          enum: ['text', 'step', 'code', 'tip', 'warning'],
+                          description: 'Tipo do bloco de conteúdo'
+                        },
+                        content: {
+                          type: 'string',
+                          description: 'Conteúdo do bloco'
+                        },
+                        language: {
+                          type: 'string',
+                          description: 'Linguagem do código (apenas para blocos do tipo code)'
+                        }
+                      },
+                      required: ['type', 'content'],
+                      additionalProperties: false
+                    }
+                  },
+                  tips: {
+                    type: 'array',
+                    items: { type: 'string' },
+                    description: 'Dicas extras curtas'
+                  },
+                  troubleshooting: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      properties: {
+                        problem: { type: 'string' },
+                        solution: { type: 'string' }
+                      },
+                      required: ['problem', 'solution'],
+                      additionalProperties: false
+                    },
+                    description: 'Problemas comuns e soluções'
+                  }
+                },
+                required: ['description', 'blocks', 'tips', 'troubleshooting'],
+                additionalProperties: false
+              }
+            }
+          }
+        ],
+        tool_choice: { type: 'function', function: { name: 'generate_tutorial' } },
       }),
     })
 
     if (!response.ok) {
-      const errorData = await response.json()
-      throw new Error(`Erro na API Gemini: ${JSON.stringify(errorData)}`)
+      if (response.status === 429) {
+        return new Response(
+          JSON.stringify({ error: 'Limite de requisições excedido. Tente novamente em alguns segundos.' }),
+          { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
+      if (response.status === 402) {
+        return new Response(
+          JSON.stringify({ error: 'Créditos insuficientes. Adicione créditos ao workspace.' }),
+          { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
+      const errorText = await response.text()
+      console.error('AI gateway error:', response.status, errorText)
+      throw new Error(`Erro na IA: ${response.status}`)
     }
 
     const data = await response.json()
-    const textResponse = data.candidates?.[0]?.content?.parts?.[0]?.text || ''
     
-    if (!textResponse) {
-      throw new Error('A IA retornou uma resposta vazia.')
+    const toolCall = data.choices?.[0]?.message?.tool_calls?.[0]
+    if (!toolCall?.function?.arguments) {
+      throw new Error('A IA não retornou dados estruturados.')
     }
 
-    // Tentar extrair o JSON mesmo que a IA coloque blocos de código markdown
-    let jsonString = textResponse
-    const jsonMatch = textResponse.match(/\{[\s\S]*\}/)
-    if (jsonMatch) {
-      jsonString = jsonMatch[0]
-    }
+    const tutorialData = JSON.parse(toolCall.function.arguments)
 
-    const tutorialData = JSON.parse(jsonString)
-
-    // Validação básica da estrutura
     if (!tutorialData.blocks || !Array.isArray(tutorialData.blocks)) {
       throw new Error('A estrutura do tutorial gerada é inválida.')
     }
@@ -92,6 +146,7 @@ Regras Cruciais:
     )
 
   } catch (error) {
+    console.error('generate-tutorial error:', error)
     return new Response(
       JSON.stringify({ error: (error as Error).message }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
