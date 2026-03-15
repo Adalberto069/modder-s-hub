@@ -275,6 +275,7 @@ function BlockEditor({ block, onChange, onRemove }: {
     step: { label: "Passo", icon: ChevronRight, color: "text-neon-purple", bgColor: "bg-neon-purple/10" },
     code: { label: "Código", icon: Code, color: "text-neon-green", bgColor: "bg-neon-green/10" },
     image: { label: "Imagem", icon: Image, color: "text-neon-pink", bgColor: "bg-neon-pink/10" },
+    video: { label: "Vídeo", icon: Video, color: "text-neon-pink", bgColor: "bg-neon-pink/10" },
     tip: { label: "Dica", icon: Lightbulb, color: "text-neon-cyan", bgColor: "bg-neon-cyan/10" },
     warning: { label: "Aviso", icon: AlertTriangle, color: "text-destructive", bgColor: "bg-destructive/10" },
   };
