@@ -37,7 +37,7 @@ const TAG_SUGGESTIONS = [
 
 interface ContentBlock {
   id: string;
-  type: "text" | "step" | "code" | "image" | "tip" | "warning";
+  type: "text" | "step" | "code" | "image" | "tip" | "warning" | "video";
   content: string;
   language?: string;
   imageUrl?: string;
@@ -83,7 +83,7 @@ function serializeContent(form: TutorialFormData): string {
   // Content blocks
   let stepCounter = 0;
   form.contentBlocks.forEach((block) => {
-    if (!block.content.trim() && block.type !== "image") return;
+    if (!block.content.trim() && block.type !== "image" && block.type !== "video") return;
     switch (block.type) {
       case "text":
         parts.push(block.content);
@@ -97,6 +97,9 @@ function serializeContent(form: TutorialFormData): string {
         break;
       case "image":
         if (block.imageUrl) parts.push(`![${block.content || "imagem"}](${block.imageUrl})`);
+        break;
+      case "video":
+        if (block.content.trim()) parts.push(`[video](${block.content.trim()})`);
         break;
       case "tip":
         parts.push(`💡 ${block.content}`);
@@ -178,6 +181,15 @@ function parseContentToBlocks(content: string): ContentBlock[] {
     if (trimmed.startsWith("⚠️")) {
       flushText();
       blocks.push({ id: crypto.randomUUID(), type: "warning", content: trimmed.replace(/^⚠️\s*/, "") });
+      i++;
+      continue;
+    }
+
+    // Video embed
+    const videoMatch = trimmed.match(/^\[video\]\((.*?)\)$/);
+    if (videoMatch) {
+      flushText();
+      blocks.push({ id: crypto.randomUUID(), type: "video", content: videoMatch[1] });
       i++;
       continue;
     }
@@ -272,6 +284,7 @@ function BlockEditor({ block, onChange, onRemove }: {
     step: { label: "Passo", icon: ChevronRight, color: "text-neon-purple", bgColor: "bg-neon-purple/10" },
     code: { label: "Código", icon: Code, color: "text-neon-green", bgColor: "bg-neon-green/10" },
     image: { label: "Imagem", icon: Image, color: "text-neon-pink", bgColor: "bg-neon-pink/10" },
+    video: { label: "Vídeo", icon: Video, color: "text-neon-pink", bgColor: "bg-neon-pink/10" },
     tip: { label: "Dica", icon: Lightbulb, color: "text-neon-cyan", bgColor: "bg-neon-cyan/10" },
     warning: { label: "Aviso", icon: AlertTriangle, color: "text-destructive", bgColor: "bg-destructive/10" },
   };
@@ -338,6 +351,33 @@ function BlockEditor({ block, onChange, onRemove }: {
                 <img src={block.imageUrl} alt={block.content} className="w-full h-full object-contain" />
               </div>
             )}
+          </div>
+        ) : block.type === "video" ? (
+          <div className="space-y-3">
+            <div className="space-y-1">
+              <Label className="text-[10px] uppercase font-bold text-muted-foreground/70">URL do YouTube</Label>
+              <Input
+                placeholder="https://www.youtube.com/watch?v=... ou https://youtu.be/..."
+                value={block.content}
+                onChange={(e) => onChange({ ...block, content: e.target.value })}
+                className="h-9 text-sm bg-background/50 border-border/20"
+              />
+            </div>
+            {block.content && (() => {
+              const match = block.content.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/);
+              return match ? (
+                <div className="aspect-video rounded-lg overflow-hidden border border-border/20">
+                  <iframe
+                    src={`https://www.youtube.com/embed/${match[1]}`}
+                    className="w-full h-full"
+                    allowFullScreen
+                    loading="lazy"
+                  />
+                </div>
+              ) : (
+                <p className="text-xs text-destructive">URL do YouTube inválida</p>
+              );
+            })()}
           </div>
         ) : (
           <Textarea
@@ -800,6 +840,7 @@ export default function TutorialEditor() {
                   { type: "step" as const, label: "Passo", icon: ChevronRight },
                   { type: "code" as const, label: "Código", icon: Code },
                   { type: "image" as const, label: "Imagem", icon: Image },
+                  { type: "video" as const, label: "Vídeo", icon: Video },
                   { type: "tip" as const, label: "Dica", icon: Lightbulb },
                   { type: "warning" as const, label: "Aviso", icon: AlertTriangle },
                 ].map(({ type, label, icon: I }) => (
