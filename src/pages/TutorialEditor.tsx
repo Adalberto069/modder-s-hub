@@ -343,6 +343,33 @@ function BlockEditor({ block, onChange, onRemove }: {
               </div>
             )}
           </div>
+        ) : block.type === "video" ? (
+          <div className="space-y-3">
+            <div className="space-y-1">
+              <Label className="text-[10px] uppercase font-bold text-muted-foreground/70">URL do YouTube</Label>
+              <Input
+                placeholder="https://www.youtube.com/watch?v=... ou https://youtu.be/..."
+                value={block.content}
+                onChange={(e) => onChange({ ...block, content: e.target.value })}
+                className="h-9 text-sm bg-background/50 border-border/20"
+              />
+            </div>
+            {block.content && (() => {
+              const match = block.content.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/);
+              return match ? (
+                <div className="aspect-video rounded-lg overflow-hidden border border-border/20">
+                  <iframe
+                    src={`https://www.youtube.com/embed/${match[1]}`}
+                    className="w-full h-full"
+                    allowFullScreen
+                    loading="lazy"
+                  />
+                </div>
+              ) : (
+                <p className="text-xs text-destructive">URL do YouTube inválida</p>
+              );
+            })()}
+          </div>
         ) : (
           <Textarea
             placeholder={
