@@ -83,7 +83,7 @@ function serializeContent(form: TutorialFormData): string {
   // Content blocks
   let stepCounter = 0;
   form.contentBlocks.forEach((block) => {
-    if (!block.content.trim() && block.type !== "image") return;
+    if (!block.content.trim() && block.type !== "image" && block.type !== "video") return;
     switch (block.type) {
       case "text":
         parts.push(block.content);
@@ -97,6 +97,9 @@ function serializeContent(form: TutorialFormData): string {
         break;
       case "image":
         if (block.imageUrl) parts.push(`![${block.content || "imagem"}](${block.imageUrl})`);
+        break;
+      case "video":
+        if (block.content.trim()) parts.push(`[video](${block.content.trim()})`);
         break;
       case "tip":
         parts.push(`💡 ${block.content}`);
