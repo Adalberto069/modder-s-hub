@@ -185,6 +185,15 @@ function parseContentToBlocks(content: string): ContentBlock[] {
       continue;
     }
 
+    // Video embed
+    const videoMatch = trimmed.match(/^\[video\]\((.*?)\)$/);
+    if (videoMatch) {
+      flushText();
+      blocks.push({ id: crypto.randomUUID(), type: "video", content: videoMatch[1] });
+      i++;
+      continue;
+    }
+
     if (/^\d+\.\s/.test(trimmed)) {
       flushText();
       blocks.push({ id: crypto.randomUUID(), type: "step", content: trimmed.replace(/^\d+\.\s*/, "") });
