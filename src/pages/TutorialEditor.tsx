@@ -37,7 +37,7 @@ const TAG_SUGGESTIONS = [
 
 interface ContentBlock {
   id: string;
-  type: "text" | "step" | "code" | "image" | "tip" | "warning";
+  type: "text" | "step" | "code" | "image" | "tip" | "warning" | "video";
   content: string;
   language?: string;
   imageUrl?: string;
