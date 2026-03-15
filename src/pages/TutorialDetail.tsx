@@ -69,153 +69,207 @@ function StarRating({ rating, onRate, interactive = false, size = "md" }: {
 
 /** Renders content with premium formatting support */
 function ContentRenderer({ content }: { content: string }) {
-  const sections = content.split(/\n(?=##\s)/).filter(Boolean);
-
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
     toast.success("Código copiado!");
   };
 
+  // Parse content into structured blocks first, handling multi-line code blocks properly
+  interface ParsedBlock {
+    type: 'heading' | 'tip' | 'warning' | 'code' | 'step' | 'bullet' | 'image' | 'video' | 'text';
+    content: string;
+    lang?: string;
+    alt?: string;
+    url?: string;
+  }
+
+  const blocks: ParsedBlock[] = [];
+  const lines = content.split("\n");
+  let i = 0;
+
+  while (i < lines.length) {
+    const line = lines[i];
+    const trimmed = line.trim();
+
+    if (!trimmed) { i++; continue; }
+
+    // Section heading
+    if (trimmed.startsWith("## ")) {
+      blocks.push({ type: 'heading', content: trimmed.replace(/^##\s*/, "") });
+      i++; continue;
+    }
+
+    // Multi-line code block
+    if (trimmed.startsWith("```")) {
+      const lang = trimmed.slice(3).trim() || "code";
+      const codeLines: string[] = [];
+      i++;
+      while (i < lines.length && !lines[i].trim().startsWith("```")) {
+        codeLines.push(lines[i]);
+        i++;
+      }
+      if (i < lines.length) i++; // skip closing ```
+      blocks.push({ type: 'code', content: codeLines.join("\n"), lang });
+      continue;
+    }
+
+    // Tip
+    if (trimmed.startsWith("💡") || trimmed.toLowerCase().startsWith("dica:")) {
+      blocks.push({ type: 'tip', content: trimmed.replace(/^💡\s*|^dica:\s*/i, "") });
+      i++; continue;
+    }
+
+    // Warning
+    if (trimmed.startsWith("⚠️") || trimmed.toLowerCase().startsWith("atenção:")) {
+      blocks.push({ type: 'warning', content: trimmed.replace(/^⚠️\s*|^atenção:\s*/i, "").replace(/^\*\*|\*\*$/g, "") });
+      i++; continue;
+    }
+
+    // Numbered step
+    if (/^\d+\.\s/.test(trimmed)) {
+      const num = trimmed.match(/^(\d+)\./)?.[1] || "1";
+      blocks.push({ type: 'step', content: trimmed.replace(/^\d+\.\s*/, ""), lang: num });
+      i++; continue;
+    }
+
+    // Bullet
+    if (trimmed.startsWith("- ") || trimmed.startsWith("* ")) {
+      blocks.push({ type: 'bullet', content: trimmed.slice(2) });
+      i++; continue;
+    }
+
+    // Image
+    const imgMatch = trimmed.match(/!\[(.*?)\]\((.*?)\)/);
+    if (imgMatch) {
+      blocks.push({ type: 'image', content: imgMatch[1], url: imgMatch[2] });
+      i++; continue;
+    }
+
+    // Video embed (YouTube URL on its own line or [video](url))
+    const videoMatch = trimmed.match(/\[video\]\((.*?)\)/) || trimmed.match(/^(https?:\/\/(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)[a-zA-Z0-9_-]{11}.*)$/);
+    if (videoMatch) {
+      const videoUrl = videoMatch[1] || videoMatch[0];
+      const embedUrl = getYouTubeEmbedUrl(videoUrl);
+      if (embedUrl) {
+        blocks.push({ type: 'video', content: videoUrl, url: embedUrl });
+        i++; continue;
+      }
+    }
+
+    // Normal text
+    blocks.push({ type: 'text', content: trimmed });
+    i++;
+  }
+
   return (
-    <div className="space-y-8">
-      {sections.map((section, i) => {
-        const lines = section.split("\n");
-        const isHeading = lines[0]?.startsWith("## ");
+    <div className="space-y-6">
+      {blocks.map((block, idx) => {
+        const delay = `${Math.min(idx * 50, 500)}ms`;
 
-        return (
-          <div key={i} className="animate-in fade-in slide-in-from-bottom-2 duration-500 fill-mode-both" style={{ animationDelay: `${i * 100}ms` }}>
-            {isHeading && (
-              <h2 className="text-xl font-bold font-mono text-foreground mb-5 flex items-center gap-3">
+        switch (block.type) {
+          case 'heading':
+            return (
+              <h2 key={idx} className="text-xl font-bold font-mono text-foreground mt-8 mb-4 flex items-center gap-3 animate-in fade-in slide-in-from-bottom-2 duration-500" style={{ animationDelay: delay }}>
                 <div className="h-6 w-1.5 bg-primary rounded-full shadow-[0_0_10px_rgba(216,180,254,0.5)]" />
-                {lines[0].replace(/^##\s*/, "")}
+                {block.content}
               </h2>
-            )}
-            <div className="space-y-4">
-              {lines.slice(isHeading ? 1 : 0).map((line, j) => {
-                const trimmed = line.trim();
-                if (!trimmed) return null;
+            );
 
-                // Tip callout
-                if (trimmed.startsWith("💡") || trimmed.toLowerCase().startsWith("dica:")) {
-                  return (
-                    <motion.div 
-                      key={j} 
-                      whileHover={{ scale: 1.01 }}
-                      className="flex gap-4 p-4 rounded-xl bg-neon-cyan/5 border border-neon-cyan/20 backdrop-blur-sm shadow-lg shadow-neon-cyan/5"
-                    >
-                      <div className="p-2 rounded-lg bg-neon-cyan/10 text-neon-cyan shrink-0 h-fit">
-                        <Lightbulb className="h-5 w-5" />
-                      </div>
-                      <div className="space-y-1">
-                        <span className="text-[10px] font-bold uppercase tracking-widest text-neon-cyan/70">Dica Útil</span>
-                        <p className="text-sm text-foreground/90 leading-relaxed font-medium">
-                          {trimmed.replace(/^💡\s*|^dica:\s*/i, "")}
-                        </p>
-                      </div>
-                    </motion.div>
-                  );
-                }
+          case 'tip':
+            return (
+              <motion.div key={idx} whileHover={{ scale: 1.01 }}
+                className="flex gap-4 p-4 rounded-xl bg-neon-cyan/5 border border-neon-cyan/20 backdrop-blur-sm shadow-lg shadow-neon-cyan/5">
+                <div className="p-2 rounded-lg bg-neon-cyan/10 text-neon-cyan shrink-0 h-fit">
+                  <Lightbulb className="h-5 w-5" />
+                </div>
+                <div className="space-y-1">
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-neon-cyan/70">Dica Útil</span>
+                  <p className="text-sm text-foreground/90 leading-relaxed font-medium">{renderInline(block.content)}</p>
+                </div>
+              </motion.div>
+            );
 
-                // Warning callout
-                if (trimmed.startsWith("⚠️") || trimmed.toLowerCase().startsWith("atenção:")) {
-                  return (
-                    <motion.div 
-                      key={j}
-                      whileHover={{ scale: 1.01 }}
-                      className="flex gap-4 p-4 rounded-xl bg-destructive/5 border border-destructive/20 backdrop-blur-sm shadow-lg shadow-destructive/5"
-                    >
-                      <div className="p-2 rounded-lg bg-destructive/10 text-destructive shrink-0 h-fit">
-                        <AlertTriangle className="h-5 w-5" />
-                      </div>
-                      <div className="space-y-1">
-                        <span className="text-[10px] font-bold uppercase tracking-widest text-destructive/70">Atenção</span>
-                        <p className="text-sm text-foreground/90 leading-relaxed font-medium">
-                          {trimmed.replace(/^⚠️\s*|^atenção:\s*/i, "")}
-                        </p>
-                      </div>
-                    </motion.div>
-                  );
-                }
+          case 'warning':
+            return (
+              <motion.div key={idx} whileHover={{ scale: 1.01 }}
+                className="flex gap-4 p-4 rounded-xl bg-destructive/5 border border-destructive/20 backdrop-blur-sm shadow-lg shadow-destructive/5">
+                <div className="p-2 rounded-lg bg-destructive/10 text-destructive shrink-0 h-fit">
+                  <AlertTriangle className="h-5 w-5" />
+                </div>
+                <div className="space-y-1">
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-destructive/70">Atenção</span>
+                  <p className="text-sm text-foreground/90 leading-relaxed font-medium">{renderInline(block.content)}</p>
+                </div>
+              </motion.div>
+            );
 
-                // Code block
-                if (trimmed.startsWith("```") || trimmed.startsWith("`")) {
-                  const isLarge = trimmed.startsWith("```");
-                  const content = trimmed.replace(/^```\w*\s*|```$/g, "").replace(/^`|`$/g, "");
-                  const langMatch = trimmed.match(/^```(\w+)/);
-                  const lang = langMatch ? langMatch[1] : "code";
+          case 'code':
+            return (
+              <div key={idx} className="relative group">
+                <div className="absolute top-0 right-0 p-2 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                  <span className="text-[10px] font-mono text-muted-foreground bg-background/50 px-2 py-0.5 rounded border border-border/20 uppercase">
+                    {block.lang}
+                  </span>
+                  <Button variant="ghost" size="icon" className="h-7 w-7 bg-background/50 hover:bg-background/80" onClick={() => copyToClipboard(block.content)}>
+                    <Copy className="h-3.5 w-3.5" />
+                  </Button>
+                </div>
+                <pre className="bg-slate-950/80 rounded-xl p-5 text-[13px] font-mono overflow-x-auto border border-white/5 shadow-2xl min-h-[60px]">
+                  <code className="block text-neon-green/90 leading-relaxed whitespace-pre">{block.content}</code>
+                </pre>
+              </div>
+            );
 
-                  return (
-                    <div key={j} className="relative group">
-                      <div className="absolute top-0 right-0 p-2 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
-                        <span className="text-[10px] font-mono text-muted-foreground bg-background/50 px-2 py-0.5 rounded border border-border/20 uppercase">
-                          {lang}
-                        </span>
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          className="h-7 w-7 bg-background/50 hover:bg-background/80" 
-                          onClick={() => copyToClipboard(content)}
-                        >
-                          <Copy className="h-3.5 w-3.5" />
-                        </Button>
-                      </div>
-                      <pre className={`bg-slate-950/80 rounded-xl p-5 text-[13px] font-mono overflow-x-auto border border-white/5 shadow-2xl ${isLarge ? "min-h-[100px]" : ""}`}>
-                        <code className="block text-neon-green/90 leading-relaxed">{content}</code>
-                      </pre>
-                    </div>
-                  );
-                }
+          case 'step':
+            return (
+              <div key={idx} className="flex gap-4 items-start group">
+                <div className="relative shrink-0 mt-0.5">
+                  <div className="absolute inset-0 bg-primary/40 blur-md rounded-full group-hover:bg-primary/60 transition-colors" />
+                  <span className="relative flex items-center justify-center h-8 w-8 rounded-full bg-primary text-primary-foreground text-sm font-black shadow-lg">
+                    {block.lang}
+                  </span>
+                </div>
+                <p className="text-[15px] text-foreground/80 leading-relaxed font-medium pt-1">{renderInline(block.content)}</p>
+              </div>
+            );
 
-                // Numbered step
-                if (/^\d+\.\s/.test(trimmed)) {
-                  const num = trimmed.match(/^(\d+)\./)?.[1];
-                  const text = trimmed.replace(/^\d+\.\s*/, "");
-                  return (
-                    <div key={j} className="flex gap-4 items-start group">
-                      <div className="relative shrink-0 mt-0.5">
-                        <div className="absolute inset-0 bg-primary/40 blur-md rounded-full group-hover:bg-primary/60 transition-colors" />
-                        <span className="relative flex items-center justify-center h-8 w-8 rounded-full bg-primary text-primary-foreground text-sm font-black shadow-lg">
-                          {num}
-                        </span>
-                      </div>
-                      <p className="text-[15px] text-foreground/80 leading-relaxed font-medium pt-1">
-                        {renderInline(text)}
-                      </p>
-                    </div>
-                  );
-                }
+          case 'bullet':
+            return (
+              <div key={idx} className="flex gap-3 items-start pl-2">
+                <div className="h-2 w-2 rounded-full bg-accent mt-2.5 shadow-[0_0_8px_hsl(var(--accent))]" />
+                <p className="text-[15px] text-foreground/85 leading-relaxed">{renderInline(block.content)}</p>
+              </div>
+            );
 
-                // Bullet
-                if (trimmed.startsWith("- ") || trimmed.startsWith("* ")) {
-                  return (
-                    <div key={j} className="flex gap-3 items-start pl-2">
-                      <div className="h-2 w-2 rounded-full bg-accent mt-2.5 shadow-[0_0_8px_hsl(var(--accent))]" />
-                      <p className="text-[15px] text-foreground/85 leading-relaxed">{renderInline(trimmed.slice(2))}</p>
-                    </div>
-                  );
-                }
+          case 'image':
+            return (
+              <div key={idx} className="my-4 rounded-2xl overflow-hidden border border-border/20 shadow-2xl bg-black/20 group relative">
+                <img src={block.url} alt={block.content} className="w-full object-contain max-h-[500px] group-hover:scale-[1.02] transition-transform duration-700" loading="lazy" />
+                {block.content && (
+                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-background/80 backdrop-blur-md px-4 py-1.5 rounded-full border border-border/20 shadow-xl opacity-0 group-hover:opacity-100 transition-opacity">
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-foreground/70">{block.content}</p>
+                  </div>
+                )}
+              </div>
+            );
 
-                // Image in markdown format
-                const imgMatch = trimmed.match(/!\[(.*?)\]\((.*?)\)/);
-                if (imgMatch) {
-                  return (
-                    <div key={j} className="my-6 rounded-2xl overflow-hidden border border-border/20 shadow-2xl aspect-video bg-black/20 group">
-                      <img src={imgMatch[2]} alt={imgMatch[1]} className="w-full h-full object-contain group-hover:scale-[1.02] transition-transform duration-700" loading="lazy" />
-                      {imgMatch[1] && (
-                        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-background/80 backdrop-blur-md px-4 py-1.5 rounded-full border border-border/20 shadow-xl opacity-0 group-hover:opacity-100 transition-opacity">
-                          <p className="text-[10px] font-bold uppercase tracking-widest text-foreground/70">{imgMatch[1]}</p>
-                        </div>
-                      )}
-                    </div>
-                  );
-                }
+          case 'video':
+            return (
+              <div key={idx} className="my-4 aspect-video rounded-xl overflow-hidden shadow-2xl border border-white/10">
+                <iframe
+                  src={block.url}
+                  title="Vídeo do tutorial"
+                  className="w-full h-full"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  loading="lazy"
+                />
+              </div>
+            );
 
-                // Normal text
-                return <p key={j} className="text-[15px] text-foreground/85 leading-relaxed font-medium">{renderInline(trimmed)}</p>;
-              })}
-            </div>
-          </div>
-        );
+          default:
+            return <p key={idx} className="text-[15px] text-foreground/85 leading-relaxed font-medium">{renderInline(block.content)}</p>;
+        }
       })}
     </div>
   );
