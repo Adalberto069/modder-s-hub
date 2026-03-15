@@ -831,6 +831,7 @@ export default function TutorialEditor() {
                   { type: "step" as const, label: "Passo", icon: ChevronRight },
                   { type: "code" as const, label: "Código", icon: Code },
                   { type: "image" as const, label: "Imagem", icon: Image },
+                  { type: "video" as const, label: "Vídeo", icon: Video },
                   { type: "tip" as const, label: "Dica", icon: Lightbulb },
                   { type: "warning" as const, label: "Aviso", icon: AlertTriangle },
                 ].map(({ type, label, icon: I }) => (
