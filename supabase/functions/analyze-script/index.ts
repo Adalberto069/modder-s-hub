@@ -27,55 +27,146 @@ serve(async (req) => {
       });
     }
 
-    const prompt = `You are a Lua script security analyzer for a game modding platform. Analyze the following Lua script and return a JSON response with exactly this structure (no markdown, no code blocks, just raw JSON):
+    const apiKey = Deno.env.get('LOVABLE_API_KEY');
 
-{
-  "classification": "safe" | "suspicious" | "malicious",
-  "securityScore": number (0-100, where 100 is completely safe),
-  "threats": [
-    {
-      "type": "system_command" | "network_abuse" | "filesystem" | "obfuscation" | "encoded_payload" | "reverse_shell" | "persistence",
-      "severity": "low" | "medium" | "high" | "critical",
-      "description": "Brief description in Portuguese",
-      "line": "relevant code snippet"
+    if (!apiKey) {
+      console.warn("LOVABLE_API_KEY não configurada, usando análise estática.");
+      const result = performStaticAnalysis(code);
+      return new Response(JSON.stringify(result), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
-  ],
-  "summary": "Short description in Portuguese of what the script does (max 3 sentences)",
-  "functionality": "Brief explanation in Portuguese of the main functionality and possible use cases (max 3 sentences)"
-}
 
-Check for:
-1. Dangerous system commands (os.execute, io.popen, os.remove, loadstring with external input)
-2. Network abuse (hidden HTTP requests, socket connections, data exfiltration)
-3. File system manipulation (reading/deleting files, writing to system paths)
-4. Obfuscation (string.char chains, loadstring of concatenated strings, byte manipulation)
-5. Embedded binaries or encoded payloads (base64 blobs, hex payloads, long encoded strings)
-6. Reverse shells, remote command execution, persistence mechanisms
-7. Excessive use of pcall/xpcall to hide errors from malicious operations
+    const systemPrompt = `Você é um analista de segurança especialista em scripts Lua para Game Guardian (Android modding).
 
-If no threats are found, return an empty threats array.
+Seu conhecimento profundo inclui:
+- API Game Guardian: gg.searchNumber, gg.getResults, gg.editAll, gg.setRanges, gg.getRangesList, gg.clearResults, gg.toast, gg.alert, gg.prompt, gg.choice, gg.sleep, gg.getListItems, gg.addListItems, gg.removeListItems, gg.processResume, gg.processPause, gg.getTargetInfo, gg.setVisible, gg.getValues, gg.setValues
+- Tipos de busca: gg.TYPE_DWORD, gg.TYPE_FLOAT, gg.TYPE_DOUBLE, gg.TYPE_WORD, gg.TYPE_BYTE, gg.TYPE_QWORD, gg.TYPE_XOR, gg.TYPE_AUTO
+- Memory ranges: gg.REGION_CODE_APP, gg.REGION_C_ALLOC, gg.REGION_ANONYMOUS, gg.REGION_JAVA_HEAP, gg.REGION_C_DATA, gg.REGION_C_BSS, gg.REGION_STACK, gg.REGION_OTHER
+- Técnicas comuns: Group Search (busca agrupada por offsets), pointer scanning, lib dumping, offset calculation, XOR encryption/decryption, fuzzy search, refined search
+- Padrões legítimos: menus interativos com gg.choice, loops de main com gg.sleep, funções de hack organizadas, multi-game support
 
-Script to analyze:
-\`\`\`lua
-${code.substring(0, 50000)}
-\`\`\``;
+Você DEVE distinguir entre:
+1. Uso legítimo da API do GG (busca em memória, edição de valores, menus) → SEGURO
+2. Operações potencialmente perigosas mas comuns em modding (loadstring para atualização remota, HTTP requests para verificar versão) → SUSPEITO
+3. Código genuinamente malicioso (roubo de dados, reverse shells, mineradores, ransomware, keyloggers) → MALICIOSO
 
-    // Try AI analysis first, fallback to static
-    let parsed;
-    try {
-      const session = new (globalThis as any).Supabase.ai.Session('google/gemini-2.5-flash');
-      const aiOutput = await session.run(prompt, { stream: false });
-      const content = typeof aiOutput === 'string' ? aiOutput : (aiOutput as any)?.content ?? JSON.stringify(aiOutput);
-      const jsonMatch = content.match(/\{[\s\S]*\}/);
-      parsed = JSON.parse(jsonMatch ? jsonMatch[0] : content);
-    } catch (aiError) {
-      console.error("AI analysis failed, using static fallback:", aiError);
-      parsed = performStaticAnalysis(code);
+IMPORTANTE: Scripts de Game Guardian normalmente acessam memória, editam valores e usam loops — isso é o comportamento ESPERADO e não deve ser classificado como ameaça.`;
+
+    const userPrompt = `Analise este script Lua de Game Guardian quanto à segurança:\n\n\`\`\`lua\n${code.substring(0, 50000)}\n\`\`\``;
+
+    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'google/gemini-3-flash-preview',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt },
+        ],
+        tools: [
+          {
+            type: 'function',
+            function: {
+              name: 'analyze_script',
+              description: 'Retorna a análise de segurança de um script Lua de Game Guardian.',
+              parameters: {
+                type: 'object',
+                properties: {
+                  classification: {
+                    type: 'string',
+                    enum: ['safe', 'suspicious', 'malicious'],
+                    description: 'Classificação geral de segurança do script'
+                  },
+                  securityScore: {
+                    type: 'number',
+                    description: 'Pontuação de 0 a 100 (100 = totalmente seguro)'
+                  },
+                  threats: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      properties: {
+                        type: {
+                          type: 'string',
+                          enum: ['system_command', 'network_abuse', 'filesystem', 'obfuscation', 'encoded_payload', 'reverse_shell', 'persistence', 'data_theft'],
+                          description: 'Tipo da ameaça'
+                        },
+                        severity: {
+                          type: 'string',
+                          enum: ['low', 'medium', 'high', 'critical'],
+                          description: 'Gravidade da ameaça'
+                        },
+                        description: {
+                          type: 'string',
+                          description: 'Descrição breve em português da ameaça encontrada'
+                        },
+                        line: {
+                          type: 'string',
+                          description: 'Trecho relevante do código'
+                        }
+                      },
+                      required: ['type', 'severity', 'description', 'line'],
+                      additionalProperties: false
+                    }
+                  },
+                  summary: {
+                    type: 'string',
+                    description: 'Resumo em português do que o script faz (máx 3 frases)'
+                  },
+                  functionality: {
+                    type: 'string',
+                    description: 'Descrição da funcionalidade principal e casos de uso do script em português (máx 3 frases)'
+                  }
+                },
+                required: ['classification', 'securityScore', 'threats', 'summary', 'functionality'],
+                additionalProperties: false
+              }
+            }
+          }
+        ],
+        tool_choice: { type: 'function', function: { name: 'analyze_script' } },
+      }),
+    });
+
+    if (!response.ok) {
+      if (response.status === 429) {
+        return new Response(JSON.stringify({ error: 'Limite de requisições excedido. Tente novamente em alguns segundos.' }), {
+          status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+      if (response.status === 402) {
+        return new Response(JSON.stringify({ error: 'Créditos insuficientes.' }), {
+          status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+      console.error('AI gateway error:', response.status, await response.text());
+      const result = performStaticAnalysis(code);
+      return new Response(JSON.stringify(result), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
+
+    const data = await response.json();
+    const toolCall = data.choices?.[0]?.message?.tool_calls?.[0];
+
+    if (!toolCall?.function?.arguments) {
+      console.error('AI não retornou tool call, usando fallback estático.');
+      const result = performStaticAnalysis(code);
+      return new Response(JSON.stringify(result), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    const parsed = JSON.parse(toolCall.function.arguments);
 
     return new Response(JSON.stringify(parsed), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
+
   } catch (error) {
     console.error("Analysis error:", error);
     return new Response(JSON.stringify({ error: 'Erro interno na análise' }), {
@@ -95,7 +186,6 @@ function performStaticAnalysis(code: string) {
     { regex: /os\.rename\s*\(/g, type: "filesystem", severity: "medium", desc: "Renomeação de arquivo do sistema detectada" },
     { regex: /io\.open\s*\([^)]*['"]\s*\/(?:etc|tmp|var|usr)/g, type: "filesystem", severity: "critical", desc: "Acesso a diretório sensível do sistema" },
     { regex: /loadstring\s*\(/g, type: "obfuscation", severity: "high", desc: "Execução dinâmica de código (loadstring)" },
-    { regex: /load\s*\(/g, type: "obfuscation", severity: "medium", desc: "Carregamento dinâmico de código" },
     { regex: /string\.char\s*\([^)]{50,}\)/g, type: "obfuscation", severity: "high", desc: "Ofuscação via string.char extensa" },
     { regex: /\\x[0-9a-fA-F]{2}(?:\\x[0-9a-fA-F]{2}){20,}/g, type: "encoded_payload", severity: "high", desc: "Payload hexadecimal embutido" },
     { regex: /[A-Za-z0-9+\/=]{100,}/g, type: "encoded_payload", severity: "medium", desc: "Possível payload base64 detectado" },

@@ -21,16 +21,56 @@ serve(async (req) => {
       )
     }
 
-    const systemPrompt = `Você é um especialista em modding mobile, engenharia reversa e Scripting para Game Guardian no Android.
-Seu objetivo é gerar um tutorial técnico e profissional.
+    const systemPrompt = `Você é um MESTRE absoluto em modding mobile, engenharia reversa Android e scripting Lua para Game Guardian. Você tem 10+ anos de experiência prática.
 
-Regras Cruciais:
-1. Use termos técnicos precisos: libs, offsets, hex, memory ranges (CodeApp, Anonymous), XOR key.
-2. O código Lua DEVE ser funcional e usar a API do Game Guardian (gg.*).
-3. Escreva em Português do Brasil de forma clara e profissional.
-4. Se o título for irrelevante ao tema de modding, tente criar algo relacionado ou retorne um tutorial básico de scripting.`
+## Seu Conhecimento Técnico Profundo
 
-    const userPrompt = `Gere um tutorial técnico completo baseado no título: "${title}"`
+### Game Guardian API
+- Busca: gg.searchNumber, gg.searchAddress, gg.searchFuzzy, gg.refineNumber, gg.refineAddress
+- Resultados: gg.getResults, gg.getResultsCount, gg.clearResults, gg.getListItems, gg.addListItems, gg.removeListItems
+- Edição: gg.editAll, gg.setValues, gg.getValues
+- Tipos: gg.TYPE_DWORD, gg.TYPE_FLOAT, gg.TYPE_DOUBLE, gg.TYPE_WORD, gg.TYPE_BYTE, gg.TYPE_QWORD, gg.TYPE_XOR, gg.TYPE_AUTO
+- Regiões: gg.REGION_CODE_APP, gg.REGION_C_ALLOC, gg.REGION_ANONYMOUS, gg.REGION_JAVA_HEAP, gg.REGION_C_DATA, gg.REGION_C_BSS, gg.REGION_STACK, gg.REGION_OTHER
+- Interface: gg.alert, gg.toast, gg.prompt, gg.choice, gg.multiChoice, gg.setVisible
+- Processo: gg.getTargetInfo, gg.processResume, gg.processPause, gg.getTargetPackage, gg.isVisible
+- Memória: gg.getRangesList, gg.allocatePage, gg.bytes, gg.dump
+- Utilidades: gg.sleep, gg.getFile, gg.makeRequest, gg.copyText, gg.getLocale
+
+### Técnicas Avançadas de Modding
+- **Group Search**: Busca agrupada por offsets entre valores para encontrar estruturas na memória
+- **Pointer Scanning**: Rastreamento de ponteiros para encontrar endereços base estáveis
+- **Lib Dumping**: Extração de bibliotecas .so da memória do processo
+- **Offset Calculation**: Cálculo de offsets relativos entre endereços de memória
+- **XOR Encryption**: Valores cifrados com XOR que precisam de chave para decodificar
+- **Fuzzy Search**: Busca incremental para valores desconhecidos (aumentou/diminuiu/não mudou)
+- **Refined Search**: Refinamento progressivo de resultados
+- **Memory Patching**: Alteração de instruções ARM/ARM64 na memória (NOP, branch, MOV)
+- **Hook Functions**: Interceptação de funções nativas via modificação de GOT/PLT
+- **Anti-detection bypass**: Técnicas para contornar verificações de integridade
+
+### Ferramentas do Ecossistema
+- Game Guardian (Android), GameGuardian (iOS via checkra1n/unc0ver)
+- APK Editor / APKTool / MT Manager para edição de APK
+- IDA Pro / Ghidra / Binary Ninja para análise de binários
+- Frida para hooking dinâmico
+- Logcat / ADB para debugging
+
+## Regras para Geração de Tutoriais
+
+1. TODO código Lua DEVE ser funcional, testado e usar a API correta do GG
+2. Inclua exemplos REAIS com valores e offsets plausíveis
+3. Explique o PORQUÊ de cada passo, não apenas o quê
+4. Inclua tratamento de erros (verificação de resultados, fallbacks)
+5. Use menus interativos (gg.choice/gg.multiChoice) quando aplicável
+6. Escreva em Português do Brasil, claro e profissional
+7. Gere conteúdo EXTENSO e DETALHADO com pelo menos 8-12 blocos
+8. Inclua blocos de código com exemplos práticos sempre que possível
+9. Se o título não for relacionado a modding, adapte criativamente para o contexto de Game Guardian
+10. Inclua dicas de performance e boas práticas`
+
+    const userPrompt = `Gere um tutorial técnico COMPLETO e DETALHADO sobre: "${title}"
+
+O tutorial deve ser extenso, com múltiplos exemplos de código funcional, explicações detalhadas de cada conceito, e dicas práticas baseadas em experiência real.`
 
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
@@ -49,31 +89,32 @@ Regras Cruciais:
             type: 'function',
             function: {
               name: 'generate_tutorial',
-              description: 'Gera um tutorial técnico estruturado sobre modding mobile e Game Guardian.',
+              description: 'Gera um tutorial técnico estruturado e completo sobre modding mobile e Game Guardian.',
               parameters: {
                 type: 'object',
                 properties: {
                   description: {
                     type: 'string',
-                    description: 'Uma breve descrição atraente do que será aprendido'
+                    description: 'Descrição atraente do tutorial (2-3 frases)'
                   },
                   blocks: {
                     type: 'array',
+                    description: 'Blocos de conteúdo do tutorial. Gere pelo menos 8-12 blocos variados.',
                     items: {
                       type: 'object',
                       properties: {
                         type: {
                           type: 'string',
-                          enum: ['text', 'step', 'code', 'tip', 'warning'],
-                          description: 'Tipo do bloco de conteúdo'
+                          enum: ['text', 'step', 'code', 'tip', 'warning', 'video'],
+                          description: 'Tipo do bloco: text (explicação), step (passo numerado), code (código Lua funcional), tip (dica útil), warning (aviso importante), video (referência a vídeo)'
                         },
                         content: {
                           type: 'string',
-                          description: 'Conteúdo do bloco'
+                          description: 'Conteúdo do bloco. Para code, deve ser código Lua funcional e comentado.'
                         },
                         language: {
                           type: 'string',
-                          description: 'Linguagem do código (apenas para blocos do tipo code)'
+                          description: 'Linguagem do código (apenas para type=code). Geralmente "lua".'
                         }
                       },
                       required: ['type', 'content'],
@@ -83,7 +124,7 @@ Regras Cruciais:
                   tips: {
                     type: 'array',
                     items: { type: 'string' },
-                    description: 'Dicas extras curtas'
+                    description: 'Pelo menos 3-5 dicas extras baseadas em experiência real'
                   },
                   troubleshooting: {
                     type: 'array',
@@ -96,7 +137,7 @@ Regras Cruciais:
                       required: ['problem', 'solution'],
                       additionalProperties: false
                     },
-                    description: 'Problemas comuns e soluções'
+                    description: 'Pelo menos 3-5 problemas comuns com soluções detalhadas'
                   }
                 },
                 required: ['description', 'blocks', 'tips', 'troubleshooting'],
