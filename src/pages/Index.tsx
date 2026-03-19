@@ -325,8 +325,8 @@ export default function Index() {
                       </Avatar>
                     </div>
 
-                    <div className="space-y-1 mb-6">
-                      <h3 className="font-black text-xl italic uppercase tracking-tighter">
+                    <div className="space-y-1 mb-3 sm:mb-6">
+                      <h3 className="font-black text-sm sm:text-xl italic uppercase tracking-tighter">
                         {profile.display_name || profile.username || "Anonymous"}
                       </h3>
                       <p className="text-[10px] font-mono text-muted-foreground/60 tracking-widest">
