@@ -110,8 +110,8 @@ export default function Index() {
           <img src={heroBg} alt="" className="w-full h-full object-cover opacity-30 grayscale" />
           <div className="absolute inset-0 bg-gradient-to-b from-[#050507] via-background/90 to-background" />
           {/* Neon Particles / Elements */}
-          <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-neon-purple/10 blur-[120px] rounded-full animate-pulse-neon" />
-          <div className="absolute bottom-1/4 right-1/4 w-[600px] h-[600px] bg-neon-cyan/5 blur-[150px] rounded-full animate-pulse-neon" style={{ animationDelay: "2s" }} />
+          <div className="absolute top-1/4 left-1/4 w-[250px] sm:w-[500px] h-[250px] sm:h-[500px] bg-neon-purple/10 blur-[80px] sm:blur-[120px] rounded-full animate-pulse-neon" />
+          <div className="absolute bottom-1/4 right-1/4 w-[300px] sm:w-[600px] h-[300px] sm:h-[600px] bg-neon-cyan/5 blur-[100px] sm:blur-[150px] rounded-full animate-pulse-neon" style={{ animationDelay: "2s" }} />
           <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]" />
         </div>
 
