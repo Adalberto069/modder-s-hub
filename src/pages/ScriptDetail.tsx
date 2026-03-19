@@ -479,9 +479,9 @@ end
           <div className="absolute top-0 right-0 w-64 h-64 bg-neon-purple/5 blur-[100px] -z-10" />
           <div className="absolute bottom-0 left-0 w-48 h-48 bg-neon-green/5 blur-[80px] -z-10" />
           
-          <div className="flex flex-col md:flex-row md:items-start gap-8">
+          <div className="flex flex-col md:flex-row md:items-start gap-4 sm:gap-8">
             {/* Gallery / Image Preview */}
-            <div className="w-full md:w-2/5 space-y-4">
+            <div className="w-full md:w-2/5 space-y-3 sm:space-y-4">
               {allMedia.length > 0 ? (
                 <div className="relative rounded-xl overflow-hidden border border-white/10 group shadow-2xl aspect-[4/3] bg-secondary/20">
                   <AnimatePresence mode="wait">
