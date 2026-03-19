@@ -354,9 +354,9 @@ export default function Index() {
       </section>
 
       {/* ══════════════ MARKETPLACE PREVIEW ══════════════ */}
-      <section className="py-32 bg-[#0a0a0c]/80 backdrop-blur-sm border-y border-white/5">
-        <div className="container px-6">
-          <div className="flex flex-col md:flex-row items-center justify-between mb-16 gap-6 text-center md:text-left">
+      <section className="py-16 sm:py-32 bg-[#0a0a0c]/80 backdrop-blur-sm border-y border-white/5">
+        <div className="container px-4 sm:px-6">
+          <div className="flex flex-col md:flex-row items-center justify-between mb-8 sm:mb-16 gap-4 sm:gap-6 text-center md:text-left">
             <div className="space-y-2">
               <h2 className="text-5xl font-black italic uppercase tracking-tighter">
                 Últimas <span className="text-neon-cyan text-glow-cyan">Injeções</span>
