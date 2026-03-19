@@ -426,7 +426,7 @@ export default function Index() {
               <div className="flex flex-col sm:flex-row gap-6 justify-center pt-8">
                 <Button
                   size="lg"
-                  className="h-16 px-16 bg-white text-black hover:bg-white/90 font-black uppercase tracking-widest text-sm rounded-2xl group transition-all"
+                  className="h-12 sm:h-16 px-8 sm:px-16 bg-white text-black hover:bg-white/90 font-black uppercase tracking-widest text-xs sm:text-sm rounded-2xl group transition-all"
                   onClick={() => navigate("/auth?tab=signup")}
                 >
                   Criar Credenciais
