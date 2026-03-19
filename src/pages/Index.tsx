@@ -310,7 +310,7 @@ export default function Index() {
                   className="relative group cursor-pointer"
                   onClick={() => setSelectedModder(profile)}
                 >
-                  <Card className="bg-[#0a0a0c]/60 backdrop-blur-2xl border-white/5 hover:border-neon-purple/40 transition-all duration-500 p-8 rounded-3xl overflow-hidden text-center h-full flex flex-col items-center">
+                  <Card className="bg-[#0a0a0c]/60 backdrop-blur-2xl border-white/5 hover:border-neon-purple/40 transition-all duration-500 p-4 sm:p-8 rounded-2xl sm:rounded-3xl overflow-hidden text-center h-full flex flex-col items-center">
                     <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-30 transition-opacity">
                       <Hexagon className="h-12 w-12 text-neon-purple" />
                     </div>
