@@ -418,7 +418,7 @@ export default function Index() {
                  </h2>
               </div>
               
-              <p className="text-xl text-muted-foreground leading-relaxed font-medium">
+              <p className="text-sm sm:text-xl text-muted-foreground leading-relaxed font-medium">
                 Não somos apenas uma plataforma, somos o futuro do modding.
                 O portal da elite está aberto para novos membros de alto nível.
               </p>
