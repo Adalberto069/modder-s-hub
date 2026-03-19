@@ -220,7 +220,7 @@ export default function Index() {
               <Badge className="bg-neon-green/10 text-neon-green border border-neon-green/20 text-[10px] font-black tracking-widest px-4 py-1 uppercase">
                 System Capabilities
               </Badge>
-              <h2 className="text-5xl font-black italic uppercase tracking-tighter">
+              <h2 className="text-3xl sm:text-5xl font-black italic uppercase tracking-tighter">
                 Tecnologia que <span className="text-neon-green">domina</span> o cenário
               </h2>
             </div>
