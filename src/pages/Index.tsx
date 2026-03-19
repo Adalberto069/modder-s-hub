@@ -175,7 +175,7 @@ export default function Index() {
               <Button
                 size="lg"
                 variant="outline"
-                className="h-16 px-12 border-white/10 bg-white/5 hover:bg-white/10 text-white font-black uppercase tracking-widest text-sm rounded-2xl transition-all"
+                className="h-12 sm:h-16 px-6 sm:px-12 border-white/10 bg-white/5 hover:bg-white/10 text-white font-black uppercase tracking-widest text-xs sm:text-sm rounded-2xl transition-all"
                 onClick={() => navigate("/auth")}
               >
                 Fazer Parte do Clã
