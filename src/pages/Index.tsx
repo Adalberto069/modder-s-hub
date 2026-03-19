@@ -358,7 +358,7 @@ export default function Index() {
         <div className="container px-4 sm:px-6">
           <div className="flex flex-col md:flex-row items-center justify-between mb-8 sm:mb-16 gap-4 sm:gap-6 text-center md:text-left">
             <div className="space-y-2">
-              <h2 className="text-5xl font-black italic uppercase tracking-tighter">
+              <h2 className="text-3xl sm:text-5xl font-black italic uppercase tracking-tighter">
                 Últimas <span className="text-neon-cyan text-glow-cyan">Injeções</span>
               </h2>
               <p className="text-sm font-mono text-muted-foreground uppercase tracking-widest">Acesso liberado aos novos sistemas de elite</p>
