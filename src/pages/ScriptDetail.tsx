@@ -554,7 +554,7 @@ end
                 </div>
 
                 <div className="space-y-2">
-                  <h1 className="text-3xl sm:text-4xl font-black tracking-tight leading-tight">
+                  <h1 className="text-xl sm:text-4xl font-black tracking-tight leading-tight">
                     {script.title}
                   </h1>
                   
