@@ -286,7 +286,7 @@ export default function Index() {
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[400px] sm:w-[800px] h-1 bg-gradient-to-r from-transparent via-neon-purple/30 to-transparent" />
         <div className="container px-4 sm:px-6">
           <div className="text-center mb-10 sm:mb-20 space-y-4">
-            <h2 className="text-6xl font-black italic uppercase tracking-tighter">
+            <h2 className="text-3xl sm:text-6xl font-black italic uppercase tracking-tighter">
               Nexus <span className="text-neon-purple">Commanders</span>
             </h2>
             <p className="text-muted-foreground uppercase font-black tracking-[0.4em] text-[10px] italic">
