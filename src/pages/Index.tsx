@@ -402,9 +402,9 @@ export default function Index() {
       </section>
 
       {/* ══════════════ CTA FINAL (THE MOVEMENT) ══════════════ */}
-      <section className="py-40 relative">
-        <div className="container px-6">
-          <div className="relative rounded-[40px] overflow-hidden border border-white/10 p-12 sm:p-24 text-center">
+      <section className="py-16 sm:py-40 relative">
+        <div className="container px-4 sm:px-6">
+          <div className="relative rounded-2xl sm:rounded-[40px] overflow-hidden border border-white/10 p-6 sm:p-24 text-center">
             {/* Background elements */}
             <div className="absolute inset-0 bg-[#0a0a0c]/80 backdrop-blur-2xl z-0" />
             <div className="absolute top-0 right-0 w-full h-full bg-gradient-to-br from-neon-purple/10 via-transparent to-neon-cyan/5 z-0" />
