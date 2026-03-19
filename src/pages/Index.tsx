@@ -224,7 +224,7 @@ export default function Index() {
                 Tecnologia que <span className="text-neon-green">domina</span> o cenário
               </h2>
             </div>
-            <p className="text-muted-foreground font-medium max-w-sm text-right italic border-r-2 border-neon-green pr-6">
+            <p className="text-muted-foreground font-medium max-w-sm text-left sm:text-right italic border-l-2 sm:border-l-0 sm:border-r-2 border-neon-green pl-4 sm:pl-0 sm:pr-6 text-sm">
               Desenvolvido por modders, para modders. Segurança máxima e performance extrema em cada linha de código.
             </p>
           </div>
