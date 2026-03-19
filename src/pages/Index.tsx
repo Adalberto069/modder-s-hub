@@ -128,7 +128,7 @@ export default function Index() {
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.2 }}
               >
-                <Badge variant="outline" className="bg-neon-purple/5 border-neon-purple/20 text-neon-purple font-black tracking-[0.3em] uppercase py-2 px-6 italic backdrop-blur-md">
+                <Badge variant="outline" className="bg-neon-purple/5 border-neon-purple/20 text-neon-purple font-black tracking-[0.15em] sm:tracking-[0.3em] uppercase py-1.5 px-3 sm:py-2 sm:px-6 italic backdrop-blur-md text-[9px] sm:text-xs">
                   <Sparkles className="h-3.5 w-3.5 mr-2 animate-spin-slow" />
                   Nexus Intelligence protocol v4.0
                 </Badge>
