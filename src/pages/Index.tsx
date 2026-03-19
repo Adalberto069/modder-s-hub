@@ -115,7 +115,7 @@ export default function Index() {
           <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]" />
         </div>
 
-        <div className="container relative z-10 px-6 sm:px-12 text-center">
+        <div className="container relative z-10 px-4 sm:px-12 text-center">
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
