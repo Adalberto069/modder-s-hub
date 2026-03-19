@@ -64,14 +64,10 @@ export default function Forum() {
     action();
   };
 
-  // Fetch posts
   const { data: posts = [], isLoading } = useQuery({
     queryKey: ["forum-posts", filterCat, search],
     queryFn: async () => {
-      let q = supabase
-        .from("forum_posts")
-        .select("*")
-        .order("created_at", { ascending: false });
+      let q = supabase.from("forum_posts").select("*").order("created_at", { ascending: false });
       if (filterCat !== "all") q = q.eq("category", filterCat);
       if (search.trim()) q = q.ilike("title", `%${search.trim()}%`);
       const { data, error } = await q;
@@ -80,7 +76,6 @@ export default function Forum() {
     },
   });
 
-  // Fetch profiles for posts
   const userIds = [...new Set(posts.map((p: any) => p.user_id))];
   const { data: profiles = [] } = useQuery({
     queryKey: ["forum-profiles", userIds],
@@ -93,23 +88,17 @@ export default function Forum() {
   });
   const profileMap = Object.fromEntries((profiles as any[]).map((p) => [p.user_id, p]));
 
-  // Fetch selected post replies
   const { data: replies = [] } = useQuery({
     queryKey: ["forum-replies", selectedPost],
     queryFn: async () => {
       if (!selectedPost) return [];
-      const { data, error } = await supabase
-        .from("forum_replies")
-        .select("*")
-        .eq("post_id", selectedPost)
-        .order("created_at", { ascending: true });
+      const { data, error } = await supabase.from("forum_replies").select("*").eq("post_id", selectedPost).order("created_at", { ascending: true });
       if (error) throw error;
       return data;
     },
     enabled: !!selectedPost,
   });
 
-  // Fetch reply profiles
   const replyUserIds = [...new Set(replies.map((r: any) => r.user_id))];
   const { data: replyProfiles = [] } = useQuery({
     queryKey: ["forum-reply-profiles", replyUserIds],
@@ -122,7 +111,6 @@ export default function Forum() {
   });
   const replyProfileMap = Object.fromEntries((replyProfiles as any[]).map((p) => [p.user_id, p]));
 
-  // Reply count per post
   const { data: replyCounts = [] } = useQuery({
     queryKey: ["forum-reply-counts"],
     queryFn: async () => {
@@ -135,7 +123,6 @@ export default function Forum() {
     replyCountMap[r.post_id] = (replyCountMap[r.post_id] || 0) + 1;
   });
 
-  // Fetch likes for replies
   const replyIds = replies.map((r: any) => r.id);
   const { data: allLikes = [] } = useQuery({
     queryKey: ["forum-reply-likes", replyIds],
@@ -154,7 +141,6 @@ export default function Forum() {
     if (user && l.user_id === user.id) userLikedReply[l.reply_id] = true;
   });
 
-  // Toggle like
   const toggleLike = useMutation({
     mutationFn: async (replyId: string) => {
       if (!user) throw new Error("Login necessário");
@@ -164,46 +150,32 @@ export default function Forum() {
         await supabase.from("forum_reply_likes").insert({ reply_id: replyId, user_id: user.id });
       }
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["forum-reply-likes"] });
-    },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["forum-reply-likes"] }); },
     onError: (e: any) => toast.error(e.message),
   });
 
-  // Create post
   const createPost = useMutation({
     mutationFn: async () => {
       if (!user) throw new Error("Login necessário");
       const { error } = await supabase.from("forum_posts").insert({
-        user_id: user.id,
-        title: newTitle.trim(),
-        content: newContent.trim(),
-        code_content: newCode.trim() || null,
-        category: newCategory,
+        user_id: user.id, title: newTitle.trim(), content: newContent.trim(),
+        code_content: newCode.trim() || null, category: newCategory,
       });
       if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["forum-posts"] });
-      setNewPostOpen(false);
-      setNewTitle("");
-      setNewContent("");
-      setNewCode("");
-      setShowCodeInput(false);
-      setNewCategory("geral");
+      setNewPostOpen(false); setNewTitle(""); setNewContent(""); setNewCode(""); setShowCodeInput(false); setNewCategory("geral");
       toast.success("Post criado!");
     },
     onError: (e: any) => toast.error(e.message),
   });
 
-  // Create reply
   const createReply = useMutation({
     mutationFn: async () => {
       if (!user || !selectedPost) throw new Error("Login necessário");
       const { error } = await supabase.from("forum_replies").insert({
-        post_id: selectedPost,
-        user_id: user.id,
-        content: replyContent.trim(),
+        post_id: selectedPost, user_id: user.id, content: replyContent.trim(),
         code_content: replyCode.trim() || null,
       });
       if (error) throw error;
@@ -211,9 +183,7 @@ export default function Forum() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["forum-replies", selectedPost] });
       queryClient.invalidateQueries({ queryKey: ["forum-reply-counts"] });
-      setReplyContent("");
-      setReplyCode("");
-      setShowReplyCode(false);
+      setReplyContent(""); setReplyCode(""); setShowReplyCode(false);
       toast.success("Resposta enviada!");
     },
     onError: (e: any) => toast.error(e.message),
@@ -226,55 +196,55 @@ export default function Forum() {
     const author = profileMap[activePost.user_id] || replyProfileMap[activePost.user_id];
     return (
       <Layout>
-        <div className="container py-8 max-w-4xl space-y-8 animate-in fade-in duration-500">
+        <div className="container py-4 sm:py-8 px-3 sm:px-4 max-w-4xl space-y-4 sm:space-y-8 animate-in fade-in duration-500">
           <Button 
-            variant="ghost" 
-            size="sm" 
-            className="group gap-2 hover:bg-white/5 transition-all text-muted-foreground hover:text-white" 
+            variant="ghost" size="sm" 
+            className="group gap-1.5 sm:gap-2 hover:bg-white/5 transition-all text-muted-foreground hover:text-white text-xs sm:text-sm" 
             onClick={() => setSelectedPost(null)}
           >
-            <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" /> 
-            Voltar para a Sociedade
+            <ArrowLeft className="h-3.5 w-3.5 sm:h-4 sm:w-4 group-hover:-translate-x-1 transition-transform" /> 
+            Voltar
           </Button>
 
           {/* Hero Post */}
           <Card className="relative overflow-hidden border-orange-500/20 bg-card/40 backdrop-blur-2xl shadow-2xl">
             <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-orange-500 via-neon-purple to-neon-cyan opacity-40" />
-            <div className="absolute -top-24 -right-24 w-64 h-64 bg-orange-500/10 blur-[100px] rounded-full" />
             
-            <CardContent className="p-8 sm:p-10">
-              <div className="flex flex-col md:flex-row items-start gap-8">
-                <div className="flex md:flex-col items-center gap-4 shrink-0">
+            <CardContent className="p-4 sm:p-8 md:p-10">
+              <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-8">
+                <div className="flex sm:flex-col items-center gap-3 sm:gap-4 shrink-0">
                   <div className="relative group">
                     <div className="absolute -inset-0.5 bg-gradient-to-tr from-orange-500 to-neon-purple rounded-full opacity-40 blur group-hover:opacity-70 transition duration-500" />
-                    <Avatar className="h-16 w-16 border border-white/10 shadow-xl relative bg-[#0a0a0c]">
+                    <Avatar className="h-10 w-10 sm:h-16 sm:w-16 border border-white/10 shadow-xl relative bg-[#0a0a0c]">
                       {author?.avatar_url ? <AvatarImage src={author.avatar_url} /> : null}
-                      <AvatarFallback className="text-xl">{(author?.username ?? "U").charAt(0).toUpperCase()}</AvatarFallback>
+                      <AvatarFallback className="text-sm sm:text-xl">{(author?.username ?? "U").charAt(0).toUpperCase()}</AvatarFallback>
                     </Avatar>
                   </div>
-                  <div className="flex flex-col items-center gap-1">
+                  <div className="flex sm:flex-col items-center gap-1">
                     <UserRoleBadge userId={activePost.user_id} />
                     <UserBadges userId={activePost.user_id} compact />
                   </div>
                 </div>
 
-                <div className="flex-1 space-y-6">
-                  <div className="space-y-4">
-                    <div className="flex flex-wrap items-center gap-3">
-                      <Badge className={`text-[10px] font-black uppercase tracking-widest px-3 py-1 border-none shadow-sm ${categoryColor(activePost.category)}`}>
+                <div className="flex-1 space-y-3 sm:space-y-6 min-w-0">
+                  <div className="space-y-2 sm:space-y-4">
+                    <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                      <Badge className={`text-[9px] sm:text-[10px] font-black uppercase tracking-widest px-2 sm:px-3 py-0.5 sm:py-1 border-none shadow-sm ${categoryColor(activePost.category)}`}>
                         {CATEGORIES.find((c) => c.value === activePost.category)?.label ?? activePost.category}
                       </Badge>
-                      <span className="text-xs font-mono text-muted-foreground/80 tracking-tight">
-                        Transmitido por <span className="text-white font-bold">@{author?.username}</span> · {formatDistanceToNow(new Date(activePost.created_at), { addSuffix: true, locale: ptBR })}
+                      <span className="text-[10px] sm:text-xs font-mono text-muted-foreground/80 tracking-tight">
+                        <span className="text-white font-bold">@{author?.username}</span> · {formatDistanceToNow(new Date(activePost.created_at), { addSuffix: true, locale: ptBR })}
                       </span>
                     </div>
                     
-                    <h2 className="text-3xl font-black tracking-tighter text-white leading-tight uppercase italic">{activePost.title}</h2>
-                    <div className="text-lg text-muted-foreground leading-relaxed whitespace-pre-wrap font-medium">
+                    <h2 className="text-xl sm:text-3xl font-black tracking-tighter text-white leading-tight uppercase italic break-words">{activePost.title}</h2>
+                    <div className="text-sm sm:text-lg text-muted-foreground leading-relaxed whitespace-pre-wrap font-medium">
                       {activePost.content}
                     </div>
                     {activePost.code_content && (
-                      <CodeTerminal code={activePost.code_content} title={`${activePost.title.toLowerCase().replace(/\s+/g, '_')}.lua`} />
+                      <div className="overflow-x-auto">
+                        <CodeTerminal code={activePost.code_content} title={`${activePost.title.toLowerCase().replace(/\s+/g, '_')}.lua`} />
+                      </div>
                     )}
                   </div>
                 </div>
@@ -283,51 +253,52 @@ export default function Forum() {
           </Card>
 
           {/* Replies Section */}
-          <div className="space-y-6 pt-4">
+          <div className="space-y-4 sm:space-y-6 pt-2 sm:pt-4">
             <div className="flex items-center gap-3">
               <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-              <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-neon-purple drop-shadow-neon-purple">
-                {replies.length} Transmissões de Inteligência
+              <h3 className="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] sm:tracking-[0.3em] text-neon-purple drop-shadow-neon-purple whitespace-nowrap">
+                {replies.length} Respostas
               </h3>
               <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/10 to-transparent" />
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               <AnimatePresence>
                 {replies.map((reply: any) => {
                   const rAuthor = replyProfileMap[reply.user_id] || profileMap[reply.user_id];
                   return (
                     <motion.div key={reply.id} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0 }}>
                       <Card className="border-white/5 bg-white/5 backdrop-blur-md hover:bg-white/10 transition-colors duration-300">
-                        <CardContent className="p-6">
-                          <div className="flex items-start gap-4">
-                            <Avatar className="h-10 w-10 border border-white/5 shadow-md">
+                        <CardContent className="p-3 sm:p-6">
+                          <div className="flex items-start gap-2.5 sm:gap-4">
+                            <Avatar className="h-8 w-8 sm:h-10 sm:w-10 border border-white/5 shadow-md shrink-0">
                               {rAuthor?.avatar_url ? <AvatarImage src={rAuthor.avatar_url} /> : null}
-                              <AvatarFallback className="bg-secondary/50 text-xs">{(rAuthor?.username ?? "U").charAt(0).toUpperCase()}</AvatarFallback>
+                              <AvatarFallback className="bg-secondary/50 text-[10px] sm:text-xs">{(rAuthor?.username ?? "U").charAt(0).toUpperCase()}</AvatarFallback>
                             </Avatar>
-                            <div className="flex-1 min-w-0 space-y-2">
-                              <div className="flex items-center gap-3">
-                                <span className="text-xs font-black uppercase tracking-wide text-white/90">{rAuthor?.display_name ?? rAuthor?.username ?? "Membro Nexus"}</span>
+                            <div className="flex-1 min-w-0 space-y-1.5 sm:space-y-2">
+                              <div className="flex flex-wrap items-center gap-1.5 sm:gap-3">
+                                <span className="text-[10px] sm:text-xs font-black uppercase tracking-wide text-white/90 truncate max-w-[120px] sm:max-w-none">{rAuthor?.display_name ?? rAuthor?.username ?? "Membro Nexus"}</span>
                                 <UserRoleBadge userId={reply.user_id} />
-                                <span className="text-[10px] font-mono text-muted-foreground/60">
+                                <span className="text-[9px] sm:text-[10px] font-mono text-muted-foreground/60">
                                   {formatDistanceToNow(new Date(reply.created_at), { addSuffix: true, locale: ptBR })}
                                 </span>
                               </div>
-                              <p className="text-sm text-foreground/80 leading-relaxed whitespace-pre-wrap">{reply.content}</p>
+                              <p className="text-xs sm:text-sm text-foreground/80 leading-relaxed whitespace-pre-wrap">{reply.content}</p>
                               
                               {reply.code_content && (
-                                <CodeTerminal code={reply.code_content} title="reply_snippet.lua" />
+                                <div className="overflow-x-auto">
+                                  <CodeTerminal code={reply.code_content} title="reply_snippet.lua" />
+                                </div>
                               )}
 
-                              <div className="pt-2 flex items-center gap-4">
+                              <div className="pt-1.5 sm:pt-2 flex items-center gap-3 sm:gap-4">
                                 <button
-                                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-black transition-all ${userLikedReply[reply.id] ? "bg-neon-green/10 text-neon-green border border-neon-green/20" : "bg-white/5 text-muted-foreground hover:text-white border border-transparent hover:border-white/5"}`}
+                                  className={`flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-[9px] sm:text-[10px] font-black transition-all ${userLikedReply[reply.id] ? "bg-neon-green/10 text-neon-green border border-neon-green/20" : "bg-white/5 text-muted-foreground hover:text-white border border-transparent hover:border-white/5"}`}
                                   onClick={() => requireAuth(() => toggleLike.mutate(reply.id))}
                                 >
-                                  <ThumbsUp className={`h-3 w-3 ${userLikedReply[reply.id] ? "fill-current" : ""}`} />
+                                  <ThumbsUp className={`h-2.5 w-2.5 sm:h-3 sm:w-3 ${userLikedReply[reply.id] ? "fill-current" : ""}`} />
                                   <span className="font-mono">{likesPerReply[reply.id] || 0}</span>
                                 </button>
-                                <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">Resposta Útil</span>
                               </div>
                             </div>
                           </div>
@@ -339,34 +310,36 @@ export default function Forum() {
               </AnimatePresence>
             </div>
 
-            {/* Elite Reply input */}
-            <div className="relative group transition-all mt-8">
+            {/* Reply input */}
+            <div className="relative group transition-all mt-4 sm:mt-8">
               <div className="absolute -inset-1 bg-gradient-to-r from-neon-purple via-transparent to-neon-cyan opacity-10 group-focus-within:opacity-30 blur rounded-2xl transition-opacity" />
-              <div className="relative flex gap-3 p-2 bg-[#0a0a0c]/80 backdrop-blur-xl border border-white/10 rounded-2xl">
+              <div className="relative flex gap-2 sm:gap-3 p-1.5 sm:p-2 bg-[#0a0a0c]/80 backdrop-blur-xl border border-white/10 rounded-xl sm:rounded-2xl">
                 <Textarea
                   placeholder="Contribua para a inteligência coletiva..."
                   value={replyContent}
                   onChange={(e) => setReplyContent(e.target.value)}
                   onClick={() => { if (!user) setShowLoginPrompt(true); }}
                   readOnly={!user}
-                  className="min-h-[60px] flex-1 bg-transparent border-none focus-visible:ring-0 placeholder:text-muted-foreground/40 text-sm resize-none"
+                  className="min-h-[50px] sm:min-h-[60px] flex-1 bg-transparent border-none focus-visible:ring-0 placeholder:text-muted-foreground/40 text-xs sm:text-sm resize-none"
                 />
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className={`h-12 w-12 rounded-xl transition-all ${showReplyCode ? "text-neon-purple bg-neon-purple/10" : "text-muted-foreground hover:text-white"}`}
-                  onClick={() => setShowReplyCode(!showReplyCode)}
-                >
-                  <CodeIcon className="h-5 w-5" />
-                </Button>
-                <Button
-                  size="icon"
-                  className="h-12 w-12 bg-neon-purple hover:bg-neon-purple/90 text-white shadow-lg shadow-neon-purple/40 rounded-xl shrink-0 self-end transition-transform hover:scale-105 active:scale-95"
-                  disabled={!replyContent.trim() || createReply.isPending}
-                  onClick={() => requireAuth(() => createReply.mutate())}
-                >
-                  <Send className="h-5 w-5" />
-                </Button>
+                <div className="flex flex-col gap-1.5 sm:gap-2">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className={`h-9 w-9 sm:h-12 sm:w-12 rounded-lg sm:rounded-xl transition-all ${showReplyCode ? "text-neon-purple bg-neon-purple/10" : "text-muted-foreground hover:text-white"}`}
+                    onClick={() => setShowReplyCode(!showReplyCode)}
+                  >
+                    <CodeIcon className="h-4 w-4 sm:h-5 sm:w-5" />
+                  </Button>
+                  <Button
+                    size="icon"
+                    className="h-9 w-9 sm:h-12 sm:w-12 bg-neon-purple hover:bg-neon-purple/90 text-white shadow-lg shadow-neon-purple/40 rounded-lg sm:rounded-xl shrink-0 transition-transform hover:scale-105 active:scale-95"
+                    disabled={!replyContent.trim() || createReply.isPending}
+                    onClick={() => requireAuth(() => createReply.mutate())}
+                  >
+                    <Send className="h-4 w-4 sm:h-5 sm:w-5" />
+                  </Button>
+                </div>
               </div>
               <AnimatePresence>
                 {showReplyCode && (
@@ -376,9 +349,9 @@ export default function Forum() {
                     exit={{ height: 0, opacity: 0 }}
                     className="mt-3 overflow-hidden"
                   >
-                    <div className="p-1 rounded-2xl border border-neon-purple/20 bg-black/40">
+                    <div className="p-1 rounded-xl sm:rounded-2xl border border-neon-purple/20 bg-black/40">
                       <div className="flex items-center justify-between px-3 py-1.5 border-b border-white/5">
-                        <span className="text-[10px] font-black uppercase tracking-widest text-neon-purple/60">Nexus Forge Editor Lite</span>
+                        <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-neon-purple/60">Editor</span>
                         <Button variant="ghost" size="sm" className="h-6 text-[9px] uppercase font-black" onClick={() => setReplyCode("")}>Limpar</Button>
                       </div>
                       <LuaCodeEditor 
@@ -402,43 +375,43 @@ export default function Forum() {
   // List view
   return (
     <Layout>
-      <div className="container py-6 max-w-3xl">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 mb-10">
+      <div className="container py-4 sm:py-6 px-3 sm:px-4 max-w-3xl">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-6 mb-6 sm:mb-10">
           <div className="space-y-1">
-            <h1 className="text-4xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-br from-white to-white/60 uppercase">
+            <h1 className="text-2xl sm:text-4xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-br from-white to-white/60 uppercase">
               Nexus <span className="text-neon-purple">Society</span>
             </h1>
-            <p className="text-sm text-muted-foreground font-mono tracking-widest uppercase flex items-center gap-2">
-              <MessageSquare className="h-3 w-3 text-neon-purple" /> Inteligência Coletiva & Elite Modding
+            <p className="text-[10px] sm:text-sm text-muted-foreground font-mono tracking-widest uppercase flex items-center gap-1.5 sm:gap-2">
+              <MessageSquare className="h-3 w-3 text-neon-purple" /> Inteligência Coletiva
             </p>
           </div>
           <Dialog open={newPostOpen} onOpenChange={setNewPostOpen}>
             <DialogTrigger asChild>
-              <Button size="lg" className="bg-neon-purple hover:bg-neon-purple/90 text-white shadow-lg shadow-neon-purple/20 gap-2 rounded-xl transition-all hover:scale-105" onClick={(e) => { if (!user) { e.preventDefault(); setShowLoginPrompt(true); } }}>
-                <Plus className="h-5 w-5" /> Nova Discussão
+              <Button size="default" className="bg-neon-purple hover:bg-neon-purple/90 text-white shadow-lg shadow-neon-purple/20 gap-1.5 sm:gap-2 rounded-xl transition-all hover:scale-105 w-full sm:w-auto text-xs sm:text-sm h-10 sm:h-11" onClick={(e) => { if (!user) { e.preventDefault(); setShowLoginPrompt(true); } }}>
+                <Plus className="h-4 w-4 sm:h-5 sm:w-5" /> Nova Discussão
               </Button>
             </DialogTrigger>
-              <DialogContent className="max-w-lg bg-[#0a0a0c]/95 backdrop-blur-xl border-white/10 shadow-2xl p-0 gap-0 overflow-hidden">
-                <div className="p-6 border-b border-white/10">
+              <DialogContent className="max-w-[95vw] sm:max-w-lg bg-[#0a0a0c]/95 backdrop-blur-xl border-white/10 shadow-2xl p-0 gap-0 overflow-hidden">
+                <div className="p-4 sm:p-6 border-b border-white/10">
                   <DialogHeader>
-                    <DialogTitle className="text-2xl font-black tracking-tighter uppercase italic">Iniciar Discussão Elite</DialogTitle>
+                    <DialogTitle className="text-lg sm:text-2xl font-black tracking-tighter uppercase italic">Iniciar Discussão</DialogTitle>
                   </DialogHeader>
                 </div>
-                <div className="p-6 max-h-[70vh] overflow-y-auto space-y-6 custom-scrollbar">
+                <div className="p-4 sm:p-6 max-h-[60vh] sm:max-h-[70vh] overflow-y-auto space-y-4 sm:space-y-6 custom-scrollbar">
                   <div className="space-y-2">
-                    <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/70">O que está na sua mente?</Label>
+                    <Label className="text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-muted-foreground/70">Título</Label>
                     <Input 
                       placeholder="Título da discussão..." 
                       value={newTitle} 
                       onChange={(e) => setNewTitle(e.target.value)} 
                       maxLength={120} 
-                      className="bg-white/5 border-white/10 focus:border-neon-purple/50 h-11 text-sm"
+                      className="bg-white/5 border-white/10 focus:border-neon-purple/50 h-10 sm:h-11 text-sm"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/70">Classificação</Label>
+                    <Label className="text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-muted-foreground/70">Classificação</Label>
                     <Select value={newCategory} onValueChange={setNewCategory}>
-                      <SelectTrigger className="bg-white/5 border-white/10 h-11 text-sm"><SelectValue /></SelectTrigger>
+                      <SelectTrigger className="bg-white/5 border-white/10 h-10 sm:h-11 text-sm"><SelectValue /></SelectTrigger>
                       <SelectContent className="bg-[#0a0a0c] border-white/10">
                         {CATEGORIES.map((c) => (
                           <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>
@@ -447,55 +420,42 @@ export default function Forum() {
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/70">Conteúdo Detalhado</Label>
+                    <Label className="text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-muted-foreground/70">Conteúdo</Label>
                     <Textarea 
-                      placeholder="Descreva em detalhes sua dúvida ou sugestão..." 
+                      placeholder="Descreva em detalhes..." 
                       value={newContent} 
                       onChange={(e) => setNewContent(e.target.value)} 
-                      className="min-h-[120px] bg-white/5 border-white/10 focus:border-neon-purple/50 resize-none text-sm" 
+                      className="min-h-[100px] sm:min-h-[120px] bg-white/5 border-white/10 focus:border-neon-purple/50 resize-none text-sm" 
                     />
                   </div>
                   
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <div className="flex flex-col">
-                        <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/70">Anexar Código</Label>
-                        <span className="text-[8px] text-muted-foreground/40 uppercase font-mono tracking-tighter">Opcional · Lua Language</span>
-                      </div>
+                      <Label className="text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-muted-foreground/70">Código (opcional)</Label>
                       <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className={`text-[9px] font-black uppercase tracking-widest h-7 gap-2 px-3 ${showCodeInput ? "bg-neon-purple/10 text-neon-purple border border-neon-purple/20" : "bg-white/5"}`}
+                        variant="ghost" size="sm" 
+                        className={`text-[9px] font-black uppercase tracking-widest h-7 gap-1.5 px-2.5 ${showCodeInput ? "bg-neon-purple/10 text-neon-purple border border-neon-purple/20" : "bg-white/5"}`}
                         onClick={() => setShowCodeInput(!showCodeInput)}
                       >
                         <TerminalIcon className="h-3 w-3" />
-                        {showCodeInput ? "Remover" : "Abrir Editor"}
+                        {showCodeInput ? "Remover" : "Abrir"}
                       </Button>
                     </div>
                     {showCodeInput && (
-                      <motion.div 
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        className="rounded-xl border border-white/10 overflow-hidden bg-black/40"
-                      >
-                        <LuaCodeEditor 
-                          value={newCode} 
-                          onChange={setNewCode} 
-                          minHeight="180px" 
-                          placeholder="-- Insira seu código Lua aqui..."
-                        />
+                      <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="rounded-xl border border-white/10 overflow-hidden bg-black/40">
+                        <LuaCodeEditor value={newCode} onChange={setNewCode} minHeight="150px" placeholder="-- Código Lua aqui..." />
                       </motion.div>
                     )}
                   </div>
                 </div>
 
-                <div className="p-6 bg-white/5 border-t border-white/10">
+                <div className="p-4 sm:p-6 bg-white/5 border-t border-white/10">
                   <Button
-                    className="w-full h-12 bg-neon-purple hover:bg-neon-purple/90 text-white font-black uppercase tracking-[0.2em] text-[10px] shadow-lg shadow-neon-purple/40 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                    className="w-full h-10 sm:h-12 bg-neon-purple hover:bg-neon-purple/90 text-white font-black uppercase tracking-[0.15em] sm:tracking-[0.2em] text-[10px] shadow-lg shadow-neon-purple/40 transition-all hover:scale-[1.02] active:scale-[0.98]"
                     disabled={!newTitle.trim() || !newContent.trim() || createPost.isPending}
                     onClick={() => createPost.mutate()}
                   >
-                    {createPost.isPending ? "Transmitindo Dados..." : "Publicar na Nexus Society"}
+                    {createPost.isPending ? "Publicando..." : "Publicar"}
                   </Button>
                 </div>
               </DialogContent>
@@ -503,22 +463,22 @@ export default function Forum() {
         </div>
 
         {/* Filters Bar */}
-        <div className="flex flex-col sm:flex-row gap-4 mb-8 p-4 rounded-xl bg-card/30 backdrop-blur-md border border-white/5 shadow-xl">
+        <div className="flex flex-col gap-3 sm:flex-row sm:gap-4 mb-6 sm:mb-8 p-3 sm:p-4 rounded-xl bg-card/30 backdrop-blur-md border border-white/5 shadow-xl">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input 
-              placeholder="Buscar discussões na Nexus Society..." 
+              placeholder="Buscar discussões..." 
               value={search} 
               onChange={(e) => setSearch(e.target.value)} 
-              className="pl-10 bg-white/5 border-white/5 focus:border-neon-purple/50 focus:ring-neon-purple/20 h-12" 
+              className="pl-10 bg-white/5 border-white/5 focus:border-neon-purple/50 focus:ring-neon-purple/20 h-10 sm:h-12 text-sm" 
             />
           </div>
           <Select value={filterCat} onValueChange={setFilterCat}>
-            <SelectTrigger className="w-full sm:w-[180px] bg-white/5 border-white/5 h-12">
+            <SelectTrigger className="w-full sm:w-[180px] bg-white/5 border-white/5 h-10 sm:h-12 text-sm">
               <SelectValue placeholder="Filtrar por" />
             </SelectTrigger>
             <SelectContent className="bg-[#0a0a0c] border-white/10">
-              <SelectItem value="all">Todas Categorias</SelectItem>
+              <SelectItem value="all">Todas</SelectItem>
               {CATEGORIES.map((c) => (
                 <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>
               ))}
@@ -530,12 +490,12 @@ export default function Forum() {
         {isLoading ? (
           <p className="text-sm text-muted-foreground text-center py-12">Carregando...</p>
         ) : posts.length === 0 ? (
-          <div className="text-center py-16 space-y-2">
-            <MessageSquare className="h-10 w-10 mx-auto text-muted-foreground/40" />
-            <p className="text-sm text-muted-foreground">Nenhum post encontrado. Seja o primeiro a perguntar!</p>
+          <div className="text-center py-12 sm:py-16 space-y-2">
+            <MessageSquare className="h-8 w-8 sm:h-10 sm:w-10 mx-auto text-muted-foreground/40" />
+            <p className="text-xs sm:text-sm text-muted-foreground">Nenhum post encontrado.</p>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
             {posts.map((post: any) => {
               const author = profileMap[post.user_id];
               const count = replyCountMap[post.id] || 0;
@@ -546,37 +506,36 @@ export default function Forum() {
                     onClick={() => setSelectedPost(post.id)}
                   >
                     <div className="absolute left-0 top-0 w-1 h-full bg-neon-purple opacity-0 group-hover:opacity-100 transition-opacity" />
-                    <CardContent className="p-6">
-                      <div className="flex items-start gap-5">
-                        <div className="relative hidden sm:block">
-                          <Avatar className="h-12 w-12 border border-white/10 shadow-lg group-hover:border-neon-purple/40 transition-colors">
+                    <CardContent className="p-3 sm:p-6">
+                      <div className="flex items-start gap-3 sm:gap-5">
+                        <div className="relative hidden sm:block shrink-0">
+                          <Avatar className="h-10 w-10 sm:h-12 sm:w-12 border border-white/10 shadow-lg group-hover:border-neon-purple/40 transition-colors">
                             {author?.avatar_url ? <AvatarImage src={author.avatar_url} /> : null}
-                            <AvatarFallback className="bg-secondary text-lg">{(author?.username ?? "U").charAt(0).toUpperCase()}</AvatarFallback>
+                            <AvatarFallback className="bg-secondary text-sm sm:text-lg">{(author?.username ?? "U").charAt(0).toUpperCase()}</AvatarFallback>
                           </Avatar>
                           <div className="absolute -bottom-1 -right-1">
                             <UserRoleBadge userId={post.user_id} />
                           </div>
                         </div>
                         
-                        <div className="flex-1 min-w-0 space-y-2">
-                          <div className="flex flex-wrap items-center gap-3">
-                            <Badge className={`text-[9px] font-black uppercase tracking-widest px-2 py-0.5 border-none shadow-sm ${categoryColor(post.category)}`}>
+                        <div className="flex-1 min-w-0 space-y-1 sm:space-y-2">
+                          <div className="flex flex-wrap items-center gap-1.5 sm:gap-3">
+                            <Badge className={`text-[8px] sm:text-[9px] font-black uppercase tracking-widest px-1.5 sm:px-2 py-0.5 border-none shadow-sm ${categoryColor(post.category)}`}>
                               {CATEGORIES.find((c) => c.value === post.category)?.label ?? post.category}
                             </Badge>
-                            <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">
+                            <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 truncate">
                               {author?.display_name ?? author?.username ?? "Membro"} · {formatDistanceToNow(new Date(post.created_at), { addSuffix: true, locale: ptBR })}
                             </span>
-                            <UserBadges userId={post.user_id} compact />
                           </div>
                           
-                          <h3 className="text-lg font-bold group-hover:text-neon-purple transition-colors truncate tracking-tight">{post.title}</h3>
-                          <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">{post.content}</p>
+                          <h3 className="text-sm sm:text-lg font-bold group-hover:text-neon-purple transition-colors truncate tracking-tight">{post.title}</h3>
+                          <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2 leading-relaxed">{post.content}</p>
                         </div>
                         
-                        <div className="flex flex-col items-center justify-center gap-1 min-w-[60px] p-2 rounded-lg bg-white/5 border border-white/5 group-hover:bg-neon-purple/5 transition-colors">
-                          <MessageSquare className="h-5 w-5 text-neon-purple" />
-                          <span className="text-sm font-black font-mono">{count}</span>
-                          <span className="text-[8px] font-black uppercase tracking-wider text-muted-foreground/50">RESPOSTAS</span>
+                        <div className="flex flex-col items-center justify-center gap-0.5 sm:gap-1 min-w-[44px] sm:min-w-[60px] p-1.5 sm:p-2 rounded-lg bg-white/5 border border-white/5 group-hover:bg-neon-purple/5 transition-colors shrink-0">
+                          <MessageSquare className="h-4 w-4 sm:h-5 sm:w-5 text-neon-purple" />
+                          <span className="text-xs sm:text-sm font-black font-mono">{count}</span>
+                          <span className="text-[7px] sm:text-[8px] font-black uppercase tracking-wider text-muted-foreground/50 hidden sm:block">RESPOSTAS</span>
                         </div>
                       </div>
                     </CardContent>
