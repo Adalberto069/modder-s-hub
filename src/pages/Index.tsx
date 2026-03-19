@@ -196,7 +196,7 @@ export default function Index() {
                   { icon: Users, value: stats?.users ?? 0, label: "Active Operatives", color: "text-neon-green" },
                   { icon: Activity, value: stats?.downloads ?? 0, label: "Data Transmissions", color: "text-neon-cyan" },
                 ].map((stat, i) => (
-                  <div key={stat.label} className="bg-[#0a0a0c]/60 p-6 flex flex-col items-center justify-center gap-2 group hover:bg-white/5 transition-colors">
+                  <div key={stat.label} className="bg-[#0a0a0c]/60 p-3 sm:p-6 flex flex-col items-center justify-center gap-1 sm:gap-2 group hover:bg-white/5 transition-colors">
                     <stat.icon className={`h-5 w-5 ${stat.color} mb-1`} />
                     <p className="text-3xl font-black font-mono tracking-tighter text-white">
                       {stat.value.toLocaleString("pt-BR")}
