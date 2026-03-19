@@ -104,7 +104,7 @@ export default function Index() {
   return (
     <Layout>
       {/* ══════════════ MONUMENTAL HERO ══════════════ */}
-      <section className="relative min-h-[92vh] flex items-center justify-center overflow-hidden">
+      <section className="relative min-h-[80vh] sm:min-h-[92vh] flex items-center justify-center overflow-hidden">
         {/* Futuristic Background */}
         <div className="absolute inset-0 z-0">
           <img src={heroBg} alt="" className="w-full h-full object-cover opacity-30 grayscale" />
