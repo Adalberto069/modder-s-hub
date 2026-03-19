@@ -198,7 +198,7 @@ export default function Index() {
                 ].map((stat, i) => (
                   <div key={stat.label} className="bg-[#0a0a0c]/60 p-3 sm:p-6 flex flex-col items-center justify-center gap-1 sm:gap-2 group hover:bg-white/5 transition-colors">
                     <stat.icon className={`h-5 w-5 ${stat.color} mb-1`} />
-                    <p className="text-3xl font-black font-mono tracking-tighter text-white">
+                    <p className="text-xl sm:text-3xl font-black font-mono tracking-tighter text-white">
                       {stat.value.toLocaleString("pt-BR")}
                     </p>
                     <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/50 italic">
