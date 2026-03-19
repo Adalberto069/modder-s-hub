@@ -166,7 +166,7 @@ export default function Index() {
             >
               <Button
                 size="lg"
-                className="h-16 px-12 bg-neon-purple hover:bg-neon-purple/90 text-white font-black uppercase tracking-widest text-sm rounded-2xl shadow-2xl shadow-neon-purple/20 transition-all hover:scale-105 active:scale-95 group"
+                className="h-12 sm:h-16 px-6 sm:px-12 bg-neon-purple hover:bg-neon-purple/90 text-white font-black uppercase tracking-widest text-xs sm:text-sm rounded-2xl shadow-2xl shadow-neon-purple/20 transition-all hover:scale-105 active:scale-95 group"
                 onClick={() => navigate("/marketplace")}
               >
                 <Store className="mr-3 h-5 w-5 group-hover:rotate-12 transition-transform" />
