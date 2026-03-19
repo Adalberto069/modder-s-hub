@@ -188,7 +188,7 @@ export default function Index() {
               initial={{ opacity: 0, y: 40 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 1, duration: 1 }}
-              className="pt-16 max-w-4xl mx-auto"
+              className="pt-8 sm:pt-16 max-w-4xl mx-auto"
             >
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-1 bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl overflow-hidden p-1 shadow-2xl shadow-black/50">
                 {[
