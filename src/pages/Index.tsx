@@ -140,7 +140,7 @@ export default function Index() {
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.4 }}
-                className="text-6xl sm:text-7xl lg:text-9xl font-black tracking-tighter uppercase italic leading-[0.85] text-white drop-shadow-2xl"
+                className="text-4xl sm:text-7xl lg:text-9xl font-black tracking-tighter uppercase italic leading-[0.85] text-white drop-shadow-2xl"
               >
                 Forge your <br />
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-neon-purple via-white to-neon-cyan drop-shadow-[0_0_30px_rgba(168,85,247,0.5)]">
