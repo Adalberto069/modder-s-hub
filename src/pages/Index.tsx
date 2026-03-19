@@ -315,9 +315,9 @@ export default function Index() {
                       <Hexagon className="h-12 w-12 text-neon-purple" />
                     </div>
                     
-                    <div className="relative mb-6">
+                    <div className="relative mb-3 sm:mb-6">
                        <div className="absolute inset-0 bg-neon-purple/20 blur-2xl rounded-full scale-0 group-hover:scale-100 transition-transform duration-500" />
-                       <Avatar className="h-28 w-28 border-2 border-white/5 relative z-10 grayscale group-hover:grayscale-0 transition-all duration-500">
+                       <Avatar className="h-16 w-16 sm:h-28 sm:w-28 border-2 border-white/5 relative z-10 grayscale group-hover:grayscale-0 transition-all duration-500">
                         <AvatarImage src={profile.avatar_url} />
                         <AvatarFallback className="bg-primary/5 text-3xl font-black italic">
                           {(profile.display_name || profile.username || "?")[0].toUpperCase()}
