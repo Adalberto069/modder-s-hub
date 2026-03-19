@@ -270,7 +270,7 @@ export default function Index() {
                       <cap.icon className={`h-8 w-8 ${cap.color}`} />
                     </div>
                     <div className="space-y-3">
-                      <h3 className="text-2xl font-black italic uppercase tracking-tighter text-white">{cap.title}</h3>
+                      <h3 className="text-lg sm:text-2xl font-black italic uppercase tracking-tighter text-white">{cap.title}</h3>
                       <p className="text-sm text-muted-foreground font-medium leading-relaxed">{cap.description}</p>
                     </div>
                   </div>
