@@ -263,7 +263,7 @@ export default function Index() {
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1, duration: 0.6 }}
               >
-                <div className={`p-8 rounded-3xl border border-white/5 bg-[#0a0a0c]/40 backdrop-blur-xl hover:border-white/20 transition-all duration-500 group relative overflow-hidden`}>
+                <div className={`p-5 sm:p-8 rounded-2xl sm:rounded-3xl border border-white/5 bg-[#0a0a0c]/40 backdrop-blur-xl hover:border-white/20 transition-all duration-500 group relative overflow-hidden`}>
                   <div className={`absolute -top-24 -right-24 w-48 h-48 ${cap.color} opacity-5 blur-[80px] rounded-full group-hover:opacity-10 transition-opacity`} />
                   <div className="relative z-10 space-y-6">
                     <div className={`h-16 w-16 rounded-2xl ${cap.bg} border border-white/10 flex items-center justify-center group-hover:scale-110 transition-all duration-500 shadow-xl ${cap.glow}`}>
