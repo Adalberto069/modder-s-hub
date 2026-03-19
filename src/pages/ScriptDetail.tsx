@@ -468,7 +468,7 @@ end
 
   return (
     <Layout>
-      <div className="container py-8 max-w-6xl">
+      <div className="container py-4 sm:py-8 px-3 sm:px-4 max-w-6xl">
         <Link to="/marketplace" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-neon-purple transition-colors mb-8 group">
           <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" /> 
           <span className="font-medium">Voltar ao Marketplace</span>
