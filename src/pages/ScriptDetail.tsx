@@ -475,7 +475,7 @@ end
         </Link>
 
         {/* Hero Header Section */}
-        <div className="relative mb-10 p-6 sm:p-8 rounded-2xl border border-white/5 bg-card/30 backdrop-blur-xl overflow-hidden">
+        <div className="relative mb-6 sm:mb-10 p-4 sm:p-8 rounded-xl sm:rounded-2xl border border-white/5 bg-card/30 backdrop-blur-xl overflow-hidden">
           <div className="absolute top-0 right-0 w-64 h-64 bg-neon-purple/5 blur-[100px] -z-10" />
           <div className="absolute bottom-0 left-0 w-48 h-48 bg-neon-green/5 blur-[80px] -z-10" />
           
