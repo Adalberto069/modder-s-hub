@@ -213,8 +213,8 @@ export default function Index() {
       </section>
 
       {/* ══════════════ CORE CAPABILITIES (REPLACING BENEFITS) ══════════════ */}
-      <section className="relative py-32 border-y border-white/5 bg-[#050507]">
-        <div className="container px-6">
+      <section className="relative py-16 sm:py-32 border-y border-white/5 bg-[#050507]">
+        <div className="container px-4 sm:px-6">
           <div className="flex flex-col md:flex-row items-end justify-between mb-20 gap-8">
             <div className="space-y-4 max-w-2xl">
               <Badge className="bg-neon-green/10 text-neon-green border border-neon-green/20 text-[10px] font-black tracking-widest px-4 py-1 uppercase">
