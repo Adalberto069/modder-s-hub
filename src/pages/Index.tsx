@@ -282,10 +282,10 @@ export default function Index() {
       </section>
 
       {/* ══════════════ HALL OF FAME ══════════════ */}
-      <section className="py-32 relative overflow-hidden">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-1 bg-gradient-to-r from-transparent via-neon-purple/30 to-transparent" />
-        <div className="container px-6">
-          <div className="text-center mb-20 space-y-4">
+      <section className="py-16 sm:py-32 relative overflow-hidden">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[400px] sm:w-[800px] h-1 bg-gradient-to-r from-transparent via-neon-purple/30 to-transparent" />
+        <div className="container px-4 sm:px-6">
+          <div className="text-center mb-10 sm:mb-20 space-y-4">
             <h2 className="text-6xl font-black italic uppercase tracking-tighter">
               Nexus <span className="text-neon-purple">Commanders</span>
             </h2>
