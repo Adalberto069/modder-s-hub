@@ -435,7 +435,7 @@ export default function Index() {
                 <Button
                   size="lg"
                   variant="ghost"
-                  className="h-16 px-12 text-white hover:bg-white/5 font-black uppercase tracking-widest text-sm rounded-2xl border border-white/5"
+                  className="h-12 sm:h-16 px-6 sm:px-12 text-white hover:bg-white/5 font-black uppercase tracking-widest text-xs sm:text-sm rounded-2xl border border-white/5"
                   onClick={() => navigate("/tutorials")}
                 >
                   <BookOpen className="mr-3 h-5 w-5" />

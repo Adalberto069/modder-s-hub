@@ -599,7 +599,7 @@ end
           </div>
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-8">
+        <div className="grid lg:grid-cols-3 gap-4 sm:gap-8">
           <div className="lg:col-span-2 space-y-8">
 
             {script.video_url && (
