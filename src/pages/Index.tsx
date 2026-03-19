@@ -104,18 +104,18 @@ export default function Index() {
   return (
     <Layout>
       {/* ══════════════ MONUMENTAL HERO ══════════════ */}
-      <section className="relative min-h-[92vh] flex items-center justify-center overflow-hidden">
+      <section className="relative min-h-[80vh] sm:min-h-[92vh] flex items-center justify-center overflow-hidden">
         {/* Futuristic Background */}
         <div className="absolute inset-0 z-0">
           <img src={heroBg} alt="" className="w-full h-full object-cover opacity-30 grayscale" />
           <div className="absolute inset-0 bg-gradient-to-b from-[#050507] via-background/90 to-background" />
           {/* Neon Particles / Elements */}
-          <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-neon-purple/10 blur-[120px] rounded-full animate-pulse-neon" />
-          <div className="absolute bottom-1/4 right-1/4 w-[600px] h-[600px] bg-neon-cyan/5 blur-[150px] rounded-full animate-pulse-neon" style={{ animationDelay: "2s" }} />
+          <div className="absolute top-1/4 left-1/4 w-[250px] sm:w-[500px] h-[250px] sm:h-[500px] bg-neon-purple/10 blur-[80px] sm:blur-[120px] rounded-full animate-pulse-neon" />
+          <div className="absolute bottom-1/4 right-1/4 w-[300px] sm:w-[600px] h-[300px] sm:h-[600px] bg-neon-cyan/5 blur-[100px] sm:blur-[150px] rounded-full animate-pulse-neon" style={{ animationDelay: "2s" }} />
           <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]" />
         </div>
 
-        <div className="container relative z-10 px-6 sm:px-12 text-center">
+        <div className="container relative z-10 px-4 sm:px-12 text-center">
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -128,7 +128,7 @@ export default function Index() {
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.2 }}
               >
-                <Badge variant="outline" className="bg-neon-purple/5 border-neon-purple/20 text-neon-purple font-black tracking-[0.3em] uppercase py-2 px-6 italic backdrop-blur-md">
+                <Badge variant="outline" className="bg-neon-purple/5 border-neon-purple/20 text-neon-purple font-black tracking-[0.15em] sm:tracking-[0.3em] uppercase py-1.5 px-3 sm:py-2 sm:px-6 italic backdrop-blur-md text-[9px] sm:text-xs">
                   <Sparkles className="h-3.5 w-3.5 mr-2 animate-spin-slow" />
                   Nexus Intelligence protocol v4.0
                 </Badge>
@@ -140,7 +140,7 @@ export default function Index() {
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.4 }}
-                className="text-6xl sm:text-7xl lg:text-9xl font-black tracking-tighter uppercase italic leading-[0.85] text-white drop-shadow-2xl"
+                className="text-4xl sm:text-7xl lg:text-9xl font-black tracking-tighter uppercase italic leading-[0.85] text-white drop-shadow-2xl"
               >
                 Forge your <br />
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-neon-purple via-white to-neon-cyan drop-shadow-[0_0_30px_rgba(168,85,247,0.5)]">
@@ -151,7 +151,7 @@ export default function Index() {
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.6 }}
-                className="text-lg sm:text-2xl text-muted-foreground font-mono max-w-2xl mx-auto uppercase tracking-wider leading-relaxed"
+                className="text-sm sm:text-2xl text-muted-foreground font-mono max-w-2xl mx-auto uppercase tracking-wider leading-relaxed"
               >
                 A elite do modding mobile se encontra aqui. Scripts ofuscados, 
                 proteção avançada e o marketplace supremo.
@@ -166,7 +166,7 @@ export default function Index() {
             >
               <Button
                 size="lg"
-                className="h-16 px-12 bg-neon-purple hover:bg-neon-purple/90 text-white font-black uppercase tracking-widest text-sm rounded-2xl shadow-2xl shadow-neon-purple/20 transition-all hover:scale-105 active:scale-95 group"
+                className="h-12 sm:h-16 px-6 sm:px-12 bg-neon-purple hover:bg-neon-purple/90 text-white font-black uppercase tracking-widest text-xs sm:text-sm rounded-2xl shadow-2xl shadow-neon-purple/20 transition-all hover:scale-105 active:scale-95 group"
                 onClick={() => navigate("/marketplace")}
               >
                 <Store className="mr-3 h-5 w-5 group-hover:rotate-12 transition-transform" />
@@ -175,7 +175,7 @@ export default function Index() {
               <Button
                 size="lg"
                 variant="outline"
-                className="h-16 px-12 border-white/10 bg-white/5 hover:bg-white/10 text-white font-black uppercase tracking-widest text-sm rounded-2xl transition-all"
+                className="h-12 sm:h-16 px-6 sm:px-12 border-white/10 bg-white/5 hover:bg-white/10 text-white font-black uppercase tracking-widest text-xs sm:text-sm rounded-2xl transition-all"
                 onClick={() => navigate("/auth")}
               >
                 Fazer Parte do Clã
@@ -188,7 +188,7 @@ export default function Index() {
               initial={{ opacity: 0, y: 40 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 1, duration: 1 }}
-              className="pt-16 max-w-4xl mx-auto"
+              className="pt-8 sm:pt-16 max-w-4xl mx-auto"
             >
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-1 bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl overflow-hidden p-1 shadow-2xl shadow-black/50">
                 {[
@@ -196,9 +196,9 @@ export default function Index() {
                   { icon: Users, value: stats?.users ?? 0, label: "Active Operatives", color: "text-neon-green" },
                   { icon: Activity, value: stats?.downloads ?? 0, label: "Data Transmissions", color: "text-neon-cyan" },
                 ].map((stat, i) => (
-                  <div key={stat.label} className="bg-[#0a0a0c]/60 p-6 flex flex-col items-center justify-center gap-2 group hover:bg-white/5 transition-colors">
+                  <div key={stat.label} className="bg-[#0a0a0c]/60 p-3 sm:p-6 flex flex-col items-center justify-center gap-1 sm:gap-2 group hover:bg-white/5 transition-colors">
                     <stat.icon className={`h-5 w-5 ${stat.color} mb-1`} />
-                    <p className="text-3xl font-black font-mono tracking-tighter text-white">
+                    <p className="text-xl sm:text-3xl font-black font-mono tracking-tighter text-white">
                       {stat.value.toLocaleString("pt-BR")}
                     </p>
                     <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/50 italic">
@@ -213,23 +213,23 @@ export default function Index() {
       </section>
 
       {/* ══════════════ CORE CAPABILITIES (REPLACING BENEFITS) ══════════════ */}
-      <section className="relative py-32 border-y border-white/5 bg-[#050507]">
-        <div className="container px-6">
-          <div className="flex flex-col md:flex-row items-end justify-between mb-20 gap-8">
+      <section className="relative py-16 sm:py-32 border-y border-white/5 bg-[#050507]">
+        <div className="container px-4 sm:px-6">
+          <div className="flex flex-col md:flex-row items-end justify-between mb-10 sm:mb-20 gap-6 sm:gap-8">
             <div className="space-y-4 max-w-2xl">
               <Badge className="bg-neon-green/10 text-neon-green border border-neon-green/20 text-[10px] font-black tracking-widest px-4 py-1 uppercase">
                 System Capabilities
               </Badge>
-              <h2 className="text-5xl font-black italic uppercase tracking-tighter">
+              <h2 className="text-3xl sm:text-5xl font-black italic uppercase tracking-tighter">
                 Tecnologia que <span className="text-neon-green">domina</span> o cenário
               </h2>
             </div>
-            <p className="text-muted-foreground font-medium max-w-sm text-right italic border-r-2 border-neon-green pr-6">
+            <p className="text-muted-foreground font-medium max-w-sm text-left sm:text-right italic border-l-2 sm:border-l-0 sm:border-r-2 border-neon-green pl-4 sm:pl-0 sm:pr-6 text-sm">
               Desenvolvido por modders, para modders. Segurança máxima e performance extrema em cada linha de código.
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-8">
             {[
               {
                 icon: ShieldCheck,
@@ -263,14 +263,14 @@ export default function Index() {
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1, duration: 0.6 }}
               >
-                <div className={`p-8 rounded-3xl border border-white/5 bg-[#0a0a0c]/40 backdrop-blur-xl hover:border-white/20 transition-all duration-500 group relative overflow-hidden`}>
+                <div className={`p-5 sm:p-8 rounded-2xl sm:rounded-3xl border border-white/5 bg-[#0a0a0c]/40 backdrop-blur-xl hover:border-white/20 transition-all duration-500 group relative overflow-hidden`}>
                   <div className={`absolute -top-24 -right-24 w-48 h-48 ${cap.color} opacity-5 blur-[80px] rounded-full group-hover:opacity-10 transition-opacity`} />
                   <div className="relative z-10 space-y-6">
                     <div className={`h-16 w-16 rounded-2xl ${cap.bg} border border-white/10 flex items-center justify-center group-hover:scale-110 transition-all duration-500 shadow-xl ${cap.glow}`}>
                       <cap.icon className={`h-8 w-8 ${cap.color}`} />
                     </div>
                     <div className="space-y-3">
-                      <h3 className="text-2xl font-black italic uppercase tracking-tighter text-white">{cap.title}</h3>
+                      <h3 className="text-lg sm:text-2xl font-black italic uppercase tracking-tighter text-white">{cap.title}</h3>
                       <p className="text-sm text-muted-foreground font-medium leading-relaxed">{cap.description}</p>
                     </div>
                   </div>
@@ -282,11 +282,11 @@ export default function Index() {
       </section>
 
       {/* ══════════════ HALL OF FAME ══════════════ */}
-      <section className="py-32 relative overflow-hidden">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-1 bg-gradient-to-r from-transparent via-neon-purple/30 to-transparent" />
-        <div className="container px-6">
-          <div className="text-center mb-20 space-y-4">
-            <h2 className="text-6xl font-black italic uppercase tracking-tighter">
+      <section className="py-16 sm:py-32 relative overflow-hidden">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[400px] sm:w-[800px] h-1 bg-gradient-to-r from-transparent via-neon-purple/30 to-transparent" />
+        <div className="container px-4 sm:px-6">
+          <div className="text-center mb-10 sm:mb-20 space-y-4">
+            <h2 className="text-3xl sm:text-6xl font-black italic uppercase tracking-tighter">
               Nexus <span className="text-neon-purple">Commanders</span>
             </h2>
             <p className="text-muted-foreground uppercase font-black tracking-[0.4em] text-[10px] italic">
@@ -294,7 +294,7 @@ export default function Index() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-8">
             {hallOfFameModders.slice(0, 4).map((profile: any, i: number) => {
               const roleKey = hallRolesMap[profile.user_id] || hallRolesMap[profile.id];
               const displayRole: "admin" | "modder" | "member" = 
@@ -310,14 +310,14 @@ export default function Index() {
                   className="relative group cursor-pointer"
                   onClick={() => setSelectedModder(profile)}
                 >
-                  <Card className="bg-[#0a0a0c]/60 backdrop-blur-2xl border-white/5 hover:border-neon-purple/40 transition-all duration-500 p-8 rounded-3xl overflow-hidden text-center h-full flex flex-col items-center">
+                  <Card className="bg-[#0a0a0c]/60 backdrop-blur-2xl border-white/5 hover:border-neon-purple/40 transition-all duration-500 p-4 sm:p-8 rounded-2xl sm:rounded-3xl overflow-hidden text-center h-full flex flex-col items-center">
                     <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-30 transition-opacity">
                       <Hexagon className="h-12 w-12 text-neon-purple" />
                     </div>
                     
-                    <div className="relative mb-6">
+                    <div className="relative mb-3 sm:mb-6">
                        <div className="absolute inset-0 bg-neon-purple/20 blur-2xl rounded-full scale-0 group-hover:scale-100 transition-transform duration-500" />
-                       <Avatar className="h-28 w-28 border-2 border-white/5 relative z-10 grayscale group-hover:grayscale-0 transition-all duration-500">
+                       <Avatar className="h-16 w-16 sm:h-28 sm:w-28 border-2 border-white/5 relative z-10 grayscale group-hover:grayscale-0 transition-all duration-500">
                         <AvatarImage src={profile.avatar_url} />
                         <AvatarFallback className="bg-primary/5 text-3xl font-black italic">
                           {(profile.display_name || profile.username || "?")[0].toUpperCase()}
@@ -325,8 +325,8 @@ export default function Index() {
                       </Avatar>
                     </div>
 
-                    <div className="space-y-1 mb-6">
-                      <h3 className="font-black text-xl italic uppercase tracking-tighter">
+                    <div className="space-y-1 mb-3 sm:mb-6">
+                      <h3 className="font-black text-sm sm:text-xl italic uppercase tracking-tighter">
                         {profile.display_name || profile.username || "Anonymous"}
                       </h3>
                       <p className="text-[10px] font-mono text-muted-foreground/60 tracking-widest">
@@ -354,11 +354,11 @@ export default function Index() {
       </section>
 
       {/* ══════════════ MARKETPLACE PREVIEW ══════════════ */}
-      <section className="py-32 bg-[#0a0a0c]/80 backdrop-blur-sm border-y border-white/5">
-        <div className="container px-6">
-          <div className="flex flex-col md:flex-row items-center justify-between mb-16 gap-6 text-center md:text-left">
+      <section className="py-16 sm:py-32 bg-[#0a0a0c]/80 backdrop-blur-sm border-y border-white/5">
+        <div className="container px-4 sm:px-6">
+          <div className="flex flex-col md:flex-row items-center justify-between mb-8 sm:mb-16 gap-4 sm:gap-6 text-center md:text-left">
             <div className="space-y-2">
-              <h2 className="text-5xl font-black italic uppercase tracking-tighter">
+              <h2 className="text-3xl sm:text-5xl font-black italic uppercase tracking-tighter">
                 Últimas <span className="text-neon-cyan text-glow-cyan">Injeções</span>
               </h2>
               <p className="text-sm font-mono text-muted-foreground uppercase tracking-widest">Acesso liberado aos novos sistemas de elite</p>
@@ -373,7 +373,7 @@ export default function Index() {
             </Button>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-8">
             {scripts?.map((script: any, i: number) => (
               <motion.div
                 key={script.id}
@@ -402,9 +402,9 @@ export default function Index() {
       </section>
 
       {/* ══════════════ CTA FINAL (THE MOVEMENT) ══════════════ */}
-      <section className="py-40 relative">
-        <div className="container px-6">
-          <div className="relative rounded-[40px] overflow-hidden border border-white/10 p-12 sm:p-24 text-center">
+      <section className="py-16 sm:py-40 relative">
+        <div className="container px-4 sm:px-6">
+          <div className="relative rounded-2xl sm:rounded-[40px] overflow-hidden border border-white/10 p-6 sm:p-24 text-center">
             {/* Background elements */}
             <div className="absolute inset-0 bg-[#0a0a0c]/80 backdrop-blur-2xl z-0" />
             <div className="absolute top-0 right-0 w-full h-full bg-gradient-to-br from-neon-purple/10 via-transparent to-neon-cyan/5 z-0" />
@@ -412,13 +412,13 @@ export default function Index() {
             <div className="relative z-10 space-y-10 max-w-3xl mx-auto">
               <div className="flex justify-center flex-col items-center gap-4">
                  <div className="w-2.5 h-2.5 rounded-full bg-neon-purple animate-ping" />
-                 <h2 className="text-5xl sm:text-7xl font-black italic uppercase tracking-tighter leading-tight drop-shadow-2xl">
+                 <h2 className="text-3xl sm:text-7xl font-black italic uppercase tracking-tighter leading-tight drop-shadow-2xl">
                    Join the <br />
                    <span className="text-neon-purple">Nexus Generation</span>
                  </h2>
               </div>
               
-              <p className="text-xl text-muted-foreground leading-relaxed font-medium">
+              <p className="text-sm sm:text-xl text-muted-foreground leading-relaxed font-medium">
                 Não somos apenas uma plataforma, somos o futuro do modding.
                 O portal da elite está aberto para novos membros de alto nível.
               </p>
@@ -426,7 +426,7 @@ export default function Index() {
               <div className="flex flex-col sm:flex-row gap-6 justify-center pt-8">
                 <Button
                   size="lg"
-                  className="h-16 px-16 bg-white text-black hover:bg-white/90 font-black uppercase tracking-widest text-sm rounded-2xl group transition-all"
+                  className="h-12 sm:h-16 px-8 sm:px-16 bg-white text-black hover:bg-white/90 font-black uppercase tracking-widest text-xs sm:text-sm rounded-2xl group transition-all"
                   onClick={() => navigate("/auth?tab=signup")}
                 >
                   Criar Credenciais
@@ -435,7 +435,7 @@ export default function Index() {
                 <Button
                   size="lg"
                   variant="ghost"
-                  className="h-16 px-12 text-white hover:bg-white/5 font-black uppercase tracking-widest text-sm rounded-2xl border border-white/5"
+                  className="h-12 sm:h-16 px-6 sm:px-12 text-white hover:bg-white/5 font-black uppercase tracking-widest text-xs sm:text-sm rounded-2xl border border-white/5"
                   onClick={() => navigate("/tutorials")}
                 >
                   <BookOpen className="mr-3 h-5 w-5" />

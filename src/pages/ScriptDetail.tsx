@@ -468,20 +468,20 @@ end
 
   return (
     <Layout>
-      <div className="container py-8 max-w-6xl">
+      <div className="container py-4 sm:py-8 px-3 sm:px-4 max-w-6xl">
         <Link to="/marketplace" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-neon-purple transition-colors mb-8 group">
           <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" /> 
           <span className="font-medium">Voltar ao Marketplace</span>
         </Link>
 
         {/* Hero Header Section */}
-        <div className="relative mb-10 p-6 sm:p-8 rounded-2xl border border-white/5 bg-card/30 backdrop-blur-xl overflow-hidden">
+        <div className="relative mb-6 sm:mb-10 p-4 sm:p-8 rounded-xl sm:rounded-2xl border border-white/5 bg-card/30 backdrop-blur-xl overflow-hidden">
           <div className="absolute top-0 right-0 w-64 h-64 bg-neon-purple/5 blur-[100px] -z-10" />
           <div className="absolute bottom-0 left-0 w-48 h-48 bg-neon-green/5 blur-[80px] -z-10" />
           
-          <div className="flex flex-col md:flex-row md:items-start gap-8">
+          <div className="flex flex-col md:flex-row md:items-start gap-4 sm:gap-8">
             {/* Gallery / Image Preview */}
-            <div className="w-full md:w-2/5 space-y-4">
+            <div className="w-full md:w-2/5 space-y-3 sm:space-y-4">
               {allMedia.length > 0 ? (
                 <div className="relative rounded-xl overflow-hidden border border-white/10 group shadow-2xl aspect-[4/3] bg-secondary/20">
                   <AnimatePresence mode="wait">
@@ -554,7 +554,7 @@ end
                 </div>
 
                 <div className="space-y-2">
-                  <h1 className="text-3xl sm:text-4xl font-black tracking-tight leading-tight">
+                  <h1 className="text-xl sm:text-4xl font-black tracking-tight leading-tight">
                     {script.title}
                   </h1>
                   
@@ -599,7 +599,7 @@ end
           </div>
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-8">
+        <div className="grid lg:grid-cols-3 gap-4 sm:gap-8">
           <div className="lg:col-span-2 space-y-8">
 
             {script.video_url && (
