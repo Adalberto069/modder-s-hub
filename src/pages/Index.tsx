@@ -412,7 +412,7 @@ export default function Index() {
             <div className="relative z-10 space-y-10 max-w-3xl mx-auto">
               <div className="flex justify-center flex-col items-center gap-4">
                  <div className="w-2.5 h-2.5 rounded-full bg-neon-purple animate-ping" />
-                 <h2 className="text-5xl sm:text-7xl font-black italic uppercase tracking-tighter leading-tight drop-shadow-2xl">
+                 <h2 className="text-3xl sm:text-7xl font-black italic uppercase tracking-tighter leading-tight drop-shadow-2xl">
                    Join the <br />
                    <span className="text-neon-purple">Nexus Generation</span>
                  </h2>
