@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { Download, Star, Code, Package } from "lucide-react";
+import { Download, Star, Code, ArrowRight } from "lucide-react";
 import { UserRoleBadge } from "@/components/UserRoleBadge";
 import { UserBadges } from "@/components/UserBadges";
 
@@ -20,9 +20,9 @@ interface ScriptCardProps {
 }
 
 const statusConfig = {
-  working: { label: "Working", className: "bg-neon-green/20 text-neon-green border-neon-green/30" },
+  working: { label: "Working", className: "bg-accent/20 text-accent border-accent/30" },
   detected: { label: "Detected", className: "bg-destructive/20 text-destructive border-destructive/30" },
-  updating: { label: "Updating", className: "bg-neon-cyan/20 text-neon-cyan border-neon-cyan/30" },
+  updating: { label: "Updating", className: "bg-[hsl(var(--neon-cyan)/0.2)] text-[hsl(var(--neon-cyan))] border-[hsl(var(--neon-cyan)/0.3)]" },
 };
 
 export function ScriptCard({
@@ -31,67 +31,77 @@ export function ScriptCard({
   const st = statusConfig[status];
 
   return (
-    <Link to={`/script/${id}`}>
-      <Card className="group overflow-hidden border-neon-purple/20 hover:border-neon-purple/40 hover:shadow-neon-purple/10 transition-all duration-500 bg-card/40 backdrop-blur-md h-full flex flex-col shadow-lg">
-        <div className="aspect-video bg-secondary/30 flex items-center justify-center overflow-hidden relative">
+    <Link to={`/script/${id}`} className="block h-full">
+      <Card className="group overflow-hidden border-white/[0.06] hover:border-primary/30 transition-all duration-500 bg-card/50 backdrop-blur-md h-full flex flex-col shadow-lg hover:shadow-primary/5 hover:shadow-xl">
+        {/* Thumbnail */}
+        <div className="aspect-video bg-secondary/20 flex items-center justify-center overflow-hidden relative">
           {thumbnailUrl ? (
-            <img 
-              src={thumbnailUrl} 
-              alt={title} 
-              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
+            <img
+              src={thumbnailUrl}
+              alt={title}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
               loading="lazy"
             />
           ) : (
-            <Code className="h-6 w-6 sm:h-10 sm:w-10 text-muted-foreground/20 group-hover:scale-110 transition-transform duration-700" />
+            <Code className="h-6 w-6 sm:h-10 sm:w-10 text-muted-foreground/15 group-hover:scale-110 transition-transform duration-700" />
           )}
-          
-          <div className="absolute top-1.5 right-1.5 sm:top-2 sm:right-2 z-10">
+
+          {/* Price badge */}
+          <div className="absolute top-1.5 right-1.5 sm:top-2.5 sm:right-2.5 z-10">
             {isPaid ? (
-              <span className="bg-background/80 backdrop-blur-md px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full text-[9px] sm:text-[10px] font-bold text-neon-pink border border-neon-pink/30 shadow-neon-pink/20 shadow-lg">
+              <span className="bg-background/80 backdrop-blur-md px-2 py-0.5 sm:py-1 rounded-full text-[9px] sm:text-[11px] font-bold text-[hsl(var(--neon-pink))] border border-[hsl(var(--neon-pink)/0.3)] shadow-lg">
                 R$ {price?.toFixed(0)}
               </span>
             ) : (
-              <span className="bg-background/80 backdrop-blur-md px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full text-[9px] sm:text-[10px] font-bold text-neon-green border border-neon-green/30 shadow-neon-green/20 shadow-lg">
+              <span className="bg-background/80 backdrop-blur-md px-2 py-0.5 sm:py-1 rounded-full text-[9px] sm:text-[11px] font-bold text-accent border border-accent/30 shadow-lg">
                 Grátis
               </span>
             )}
           </div>
-          
-          <div className="absolute bottom-1.5 left-1.5 sm:bottom-2 sm:left-2 z-10 flex flex-wrap gap-0.5 sm:gap-1">
-             <Badge variant="outline" className={`${st.className} text-[7px] sm:text-[9px] h-4 sm:h-5 px-1 sm:px-2 backdrop-blur-sm border-white/10 font-bold uppercase tracking-tight`}>
-                {st.label}
-             </Badge>
-             {categorySlug && (
-               <Badge variant="outline" className="bg-background/50 backdrop-blur-sm text-[7px] sm:text-[9px] h-4 sm:h-5 px-1 sm:px-2 border-white/10 text-muted-foreground uppercase hidden sm:inline-flex">
-                 {categorySlug === "scripts-lua" ? "Lua" : categorySlug}
-               </Badge>
-             )}
+
+          {/* Status + Category */}
+          <div className="absolute bottom-1.5 left-1.5 sm:bottom-2.5 sm:left-2.5 z-10 flex flex-wrap gap-1">
+            <Badge variant="outline" className={`${st.className} text-[7px] sm:text-[9px] h-4 sm:h-5 px-1.5 sm:px-2 backdrop-blur-sm border-white/10 font-bold uppercase tracking-tight`}>
+              {st.label}
+            </Badge>
+            {categorySlug && (
+              <Badge variant="outline" className="bg-background/50 backdrop-blur-sm text-[7px] sm:text-[9px] h-4 sm:h-5 px-1.5 sm:px-2 border-white/10 text-muted-foreground uppercase hidden sm:inline-flex">
+                {categorySlug === "scripts-lua" ? "Lua" : categorySlug}
+              </Badge>
+            )}
           </div>
-          
-          <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+          {/* Hover overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-end justify-center pb-3">
+            <span className="text-[10px] sm:text-xs font-bold text-primary flex items-center gap-1 translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
+              Ver detalhes <ArrowRight className="h-3 w-3" />
+            </span>
+          </div>
         </div>
 
-        <CardContent className="p-2.5 sm:p-4 space-y-2 sm:space-y-4 flex-1 flex flex-col">
-          <div className="space-y-1 sm:space-y-2">
-            <h3 className="font-bold text-[11px] sm:text-base line-clamp-1 group-hover:text-neon-purple transition-colors duration-300 leading-tight">
+        {/* Content */}
+        <CardContent className="p-2.5 sm:p-4 space-y-2 sm:space-y-3 flex-1 flex flex-col">
+          <div className="space-y-1.5 sm:space-y-2 flex-1">
+            <h3 className="font-bold text-[11px] sm:text-sm line-clamp-1 group-hover:text-primary transition-colors duration-300 leading-tight">
               {title}
             </h3>
-            
-            <div className="flex flex-wrap items-center gap-1 sm:gap-2" onClick={(e) => e.stopPropagation()}>
-              <Link 
-                to={`/modder/${modderId}`} 
-                className="flex items-center gap-1 text-[9px] sm:text-xs text-muted-foreground/80 hover:text-neon-purple transition-colors duration-300 bg-white/5 py-0.5 px-1.5 sm:px-2 rounded-full border border-white/5"
+
+            <div className="flex flex-wrap items-center gap-1 sm:gap-1.5" onClick={(e) => e.stopPropagation()}>
+              <Link
+                to={`/modder/${modderId}`}
+                className="flex items-center gap-1 text-[9px] sm:text-[11px] text-muted-foreground/70 hover:text-primary transition-colors duration-200 bg-white/[0.03] py-0.5 px-1.5 sm:px-2 rounded-full border border-white/5"
               >
-                <span className="truncate max-w-[60px] sm:max-w-[80px]">@{modderName}</span>
+                <span className="truncate max-w-[55px] sm:max-w-[90px]">@{modderName}</span>
               </Link>
-              <div className="scale-[0.65] sm:scale-90 origin-left flex items-center gap-1">
+              <div className="scale-[0.6] sm:scale-[0.85] origin-left flex items-center gap-0.5">
                 <UserRoleBadge userId={modderId} />
                 <UserBadges userId={modderId} compact />
               </div>
             </div>
           </div>
 
-          <div className="flex items-center justify-between text-[9px] sm:text-xs text-muted-foreground/60 pt-2 sm:pt-3 mt-auto border-t border-white/5">
+          {/* Footer stats */}
+          <div className="flex items-center justify-between text-[9px] sm:text-[11px] text-muted-foreground/50 pt-2 mt-auto border-t border-white/5">
             <div className="flex items-center gap-2 sm:gap-3">
               <span className="flex items-center gap-0.5 sm:gap-1">
                 <Download className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
@@ -101,10 +111,6 @@ export function ScriptCard({
                 <Star className="h-2.5 w-2.5 sm:h-3 sm:w-3 text-amber-400 fill-amber-400" />
                 <span className="font-bold text-amber-400/90">{averageRating.toFixed(1)}</span>
               </span>
-            </div>
-            
-            <div className="hidden sm:flex items-center gap-1 font-mono text-neon-purple/70 font-bold group-hover:translate-x-0.5 transition-transform text-[10px]">
-              DETALHES
             </div>
           </div>
         </CardContent>

@@ -31,7 +31,7 @@ function YouTubeEmbed({ url }: { url: string }) {
   const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/))([a-zA-Z0-9_-]{11})/);
   if (!match) return null;
   return (
-    <div className="aspect-video rounded-lg overflow-hidden neon-border">
+    <div className="aspect-video rounded-xl overflow-hidden border border-white/10">
       <iframe
         src={`https://www.youtube.com/embed/${match[1]}`}
         className="w-full h-full"
@@ -45,15 +45,15 @@ function YouTubeEmbed({ url }: { url: string }) {
 function StarRating({ rating, onRate, interactive = false }: { rating: number; onRate?: (r: number) => void; interactive?: boolean }) {
   const [hover, setHover] = useState(0);
   return (
-    <div className="flex gap-1">
+    <div className="flex gap-0.5">
       {[1, 2, 3, 4, 5].map((i) => (
         <Star
           key={i}
-          className={`h-5 w-5 transition-colors ${
+          className={`h-4 w-4 sm:h-5 sm:w-5 transition-colors ${
             (interactive ? hover || rating : rating) >= i
-              ? "fill-accent text-accent"
-              : "text-muted-foreground/30"
-          } ${interactive ? "cursor-pointer" : ""}`}
+              ? "fill-amber-400 text-amber-400"
+              : "text-muted-foreground/20"
+          } ${interactive ? "cursor-pointer hover:scale-110 transition-transform" : ""}`}
           onClick={() => interactive && onRate?.(i)}
           onMouseEnter={() => interactive && setHover(i)}
           onMouseLeave={() => interactive && setHover(0)}
@@ -74,13 +74,13 @@ function CodeBlock({ code }: { code: string }) {
   };
 
   return (
-    <div className="relative rounded-lg overflow-hidden border border-border bg-[hsl(240,15%,3%)]">
-      <div className="flex items-center justify-between px-3 py-2 bg-secondary/50 border-b border-border">
+    <div className="relative rounded-xl overflow-hidden border border-white/5 bg-[hsl(240,15%,3%)]">
+      <div className="flex items-center justify-between px-3 py-2 bg-secondary/50 border-b border-white/5">
         <div className="flex items-center gap-2">
           <div className="flex gap-1.5">
-            <span className="w-3 h-3 rounded-full bg-destructive/60" />
-            <span className="w-3 h-3 rounded-full bg-primary/60" />
-            <span className="w-3 h-3 rounded-full bg-accent/60" />
+            <span className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-destructive/60" />
+            <span className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-primary/60" />
+            <span className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-accent/60" />
           </div>
           <span className="text-[10px] text-muted-foreground font-mono ml-2">script.lua</span>
         </div>
@@ -99,23 +99,10 @@ function CodeBlock({ code }: { code: string }) {
   );
 }
 
-function generateLicenseKey(): string {
-  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-  const segments: string[] = [];
-  for (let s = 0; s < 3; s++) {
-    let seg = "";
-    for (let i = 0; i < 4; i++) {
-      seg += chars[Math.floor(Math.random() * chars.length)];
-    }
-    segments.push(seg);
-  }
-  return segments.join("-");
-}
-
 export default function ScriptDetail() {
   const { id } = useParams<{ id: string }>();
   const [searchParams, setSearchParams] = useSearchParams();
-  
+
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [galleryIndex, setGalleryIndex] = useState(0);
@@ -135,14 +122,12 @@ export default function ScriptDetail() {
   const [pixPolling, setPixPolling] = useState(false);
   const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Cleanup polling on unmount
   useEffect(() => {
     return () => {
       if (pollingRef.current) clearInterval(pollingRef.current);
     };
   }, []);
 
-  // Handle card payment return via query params
   useEffect(() => {
     const paymentStatus = searchParams.get("payment");
     if (paymentStatus === "success") {
@@ -159,7 +144,6 @@ export default function ScriptDetail() {
     }
   }, [searchParams, setSearchParams, queryClient, id, user?.id]);
 
-  // Poll PIX payment status
   const startPolling = useCallback((purchaseId: string) => {
     if (pollingRef.current) clearInterval(pollingRef.current);
     setPixPolling(true);
@@ -189,7 +173,7 @@ export default function ScriptDetail() {
       } catch {
         // continue polling
       }
-    }, 5000); // Poll every 5 seconds
+    }, 5000);
   }, [id, user?.id, queryClient]);
 
   const { data: script } = useQuery({
@@ -232,7 +216,6 @@ export default function ScriptDetail() {
     enabled: !!id,
   });
 
-  // Check if user already has a license for this script (active or expired)
   const { data: existingLicense } = useQuery({
     queryKey: ["script-license", id, user?.id],
     queryFn: async () => {
@@ -250,7 +233,6 @@ export default function ScriptDetail() {
 
   const isLicenseExpired = existingLicense?.expires_at && new Date(existingLicense.expires_at) < new Date();
 
-  // Related tutorial
   const relatedTutorialId = (script as any)?.related_tutorial_id;
   const { data: relatedTutorial } = useQuery({
     queryKey: ["related-tutorial", relatedTutorialId],
@@ -289,7 +271,6 @@ export default function ScriptDetail() {
       if (error) throw error;
 
       if (paymentMethod === "card" && data?.init_point) {
-        // Redirect to Mercado Pago checkout
         window.location.href = data.init_point;
         return;
       }
@@ -449,7 +430,25 @@ end
   };
 
   if (!script) {
-    return <Layout><div className="container py-16 text-center text-muted-foreground">Carregando...</div></Layout>;
+    return (
+      <Layout>
+        <div className="container py-16 max-w-6xl">
+          <div className="animate-pulse space-y-6">
+            <div className="h-4 bg-secondary/40 rounded w-40" />
+            <div className="rounded-2xl border border-white/5 bg-card/30 p-6 sm:p-8">
+              <div className="flex flex-col md:flex-row gap-6">
+                <div className="w-full md:w-2/5 aspect-[4/3] bg-secondary/30 rounded-xl" />
+                <div className="flex-1 space-y-4">
+                  <div className="h-6 bg-secondary/40 rounded w-3/4" />
+                  <div className="h-4 bg-secondary/30 rounded w-1/2" />
+                  <div className="h-10 bg-secondary/20 rounded w-48" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Layout>
+    );
   }
 
   const scriptIsActive = (script as any).is_active !== false;
@@ -468,223 +467,258 @@ end
 
   return (
     <Layout>
-      <div className="container py-4 sm:py-8 px-3 sm:px-4 max-w-6xl">
-        <Link to="/marketplace" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-neon-purple transition-colors mb-8 group">
-          <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" /> 
-          <span className="font-medium">Voltar ao Marketplace</span>
-        </Link>
+      <div className="container py-4 sm:py-8 px-3 sm:px-6 max-w-6xl">
+        {/* Back link */}
+        <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}>
+          <Link to="/marketplace" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors mb-6 sm:mb-8 group">
+            <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" />
+            <span className="font-medium">Marketplace</span>
+          </Link>
+        </motion.div>
 
-        {/* Hero Header Section */}
-        <div className="relative mb-6 sm:mb-10 p-4 sm:p-8 rounded-xl sm:rounded-2xl border border-white/5 bg-card/30 backdrop-blur-xl overflow-hidden">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-neon-purple/5 blur-[100px] -z-10" />
-          <div className="absolute bottom-0 left-0 w-48 h-48 bg-neon-green/5 blur-[80px] -z-10" />
-          
-          <div className="flex flex-col md:flex-row md:items-start gap-4 sm:gap-8">
-            {/* Gallery / Image Preview */}
-            <div className="w-full md:w-2/5 space-y-3 sm:space-y-4">
+        {/* Hero Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="relative mb-6 sm:mb-10 p-4 sm:p-8 rounded-2xl border border-white/5 bg-card/30 backdrop-blur-xl overflow-hidden"
+        >
+          <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 blur-[100px] -z-10" />
+          <div className="absolute bottom-0 left-0 w-48 h-48 bg-accent/5 blur-[80px] -z-10" />
+
+          <div className="flex flex-col md:flex-row md:items-start gap-5 sm:gap-8">
+            {/* Gallery */}
+            <div className="w-full md:w-2/5 space-y-3">
               {allMedia.length > 0 ? (
-                <div className="relative rounded-xl overflow-hidden border border-white/10 group shadow-2xl aspect-[4/3] bg-secondary/20">
+                <div className="relative rounded-xl overflow-hidden border border-white/10 shadow-2xl aspect-[4/3] bg-secondary/20 group">
                   <AnimatePresence mode="wait">
                     <motion.img
                       key={galleryIndex}
                       src={allMedia[galleryIndex]?.url}
                       alt={script.title}
                       className="w-full h-full object-cover"
-                      initial={{ opacity: 0, scale: 1.1 }}
+                      initial={{ opacity: 0, scale: 1.05 }}
                       animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.95 }}
-                      transition={{ duration: 0.4, ease: [0, 0, 0.2, 1] }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.3 }}
                     />
                   </AnimatePresence>
-                  
+
                   {allMedia.length > 1 && (
                     <>
-                      <button 
-                        onClick={() => setGalleryIndex((p) => (p === 0 ? allMedia.length - 1 : p - 1))} 
-                        className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/50 backdrop-blur-md rounded-full p-2 border border-white/10 opacity-0 group-hover:opacity-100 transition-all hover:bg-neon-purple/50"
+                      <button
+                        onClick={() => setGalleryIndex((p) => (p === 0 ? allMedia.length - 1 : p - 1))}
+                        className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/60 backdrop-blur-md rounded-full p-1.5 sm:p-2 border border-white/10 sm:opacity-0 sm:group-hover:opacity-100 transition-all hover:bg-primary/50"
                       >
-                        <ChevronLeft className="h-5 w-5" />
+                        <ChevronLeft className="h-4 w-4 sm:h-5 sm:w-5" />
                       </button>
-                      <button 
-                        onClick={() => setGalleryIndex((p) => (p === allMedia.length - 1 ? 0 : p + 1))} 
-                        className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/50 backdrop-blur-md rounded-full p-2 border border-white/10 opacity-0 group-hover:opacity-100 transition-all hover:bg-neon-purple/50"
+                      <button
+                        onClick={() => setGalleryIndex((p) => (p === allMedia.length - 1 ? 0 : p + 1))}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/60 backdrop-blur-md rounded-full p-1.5 sm:p-2 border border-white/10 sm:opacity-0 sm:group-hover:opacity-100 transition-all hover:bg-primary/50"
                       >
-                        <ChevronRight className="h-5 w-5" />
+                        <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5" />
                       </button>
                     </>
                   )}
-                  
-                  <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-1.5 px-4">
-                    {allMedia.map((_, i) => (
-                      <button 
-                        key={i} 
-                        onClick={() => setGalleryIndex(i)} 
-                        className={`transition-all duration-300 rounded-full ${
-                          i === galleryIndex ? "w-6 h-1.5 bg-neon-purple" : "w-1.5 h-1.5 bg-white/30 hover:bg-white/50"
-                        }`} 
-                      />
-                    ))}
-                  </div>
+
+                  {allMedia.length > 1 && (
+                    <div className="absolute bottom-2.5 left-0 right-0 flex justify-center gap-1.5 px-4">
+                      {allMedia.map((_, i) => (
+                        <button
+                          key={i}
+                          onClick={() => setGalleryIndex(i)}
+                          className={`transition-all duration-300 rounded-full ${
+                            i === galleryIndex ? "w-5 h-1.5 bg-primary" : "w-1.5 h-1.5 bg-white/30 hover:bg-white/50"
+                          }`}
+                        />
+                      ))}
+                    </div>
+                  )}
                 </div>
               ) : (
-                <div className="w-full aspect-square rounded-xl bg-secondary/30 flex items-center justify-center border border-dashed border-white/10">
-                  <FileCode className="h-16 w-16 text-muted-foreground/20" />
+                <div className="w-full aspect-[4/3] rounded-xl bg-secondary/20 flex items-center justify-center border border-dashed border-white/10">
+                  <FileCode className="h-12 w-12 text-muted-foreground/15" />
+                </div>
+              )}
+
+              {/* Thumbnail strip on desktop */}
+              {allMedia.length > 1 && (
+                <div className="hidden sm:flex gap-2 overflow-x-auto pb-1 scrollbar-none">
+                  {allMedia.map((m, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setGalleryIndex(i)}
+                      className={`w-16 h-12 rounded-lg overflow-hidden border-2 shrink-0 transition-all ${
+                        i === galleryIndex ? "border-primary shadow-md" : "border-white/5 opacity-60 hover:opacity-100"
+                      }`}
+                    >
+                      <img src={m.url} alt="" className="w-full h-full object-cover" />
+                    </button>
+                  ))}
                 </div>
               )}
             </div>
 
-            {/* Info Section */}
-            <div className="flex-1 space-y-6">
-              <div className="space-y-4">
-                <div className="flex flex-wrap items-center gap-2">
-                  <Badge variant="outline" className="border-neon-purple/30 text-neon-purple bg-neon-purple/5 text-[10px] uppercase font-bold tracking-widest px-2.5">
+            {/* Info */}
+            <div className="flex-1 space-y-4 sm:space-y-6">
+              <div className="space-y-3 sm:space-y-4">
+                <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                  <Badge variant="outline" className="border-primary/30 text-primary bg-primary/5 text-[9px] sm:text-[10px] uppercase font-bold tracking-widest px-2">
                     {script.categories && (script.categories as any).name}
                   </Badge>
-                  <Badge variant="outline" className={`${st.className} text-[10px] uppercase font-bold tracking-widest px-2.5`}>
+                  <Badge variant="outline" className={`${st.className} text-[9px] sm:text-[10px] uppercase font-bold tracking-widest px-2`}>
                     {st.label}
                   </Badge>
                   {!scriptIsActive && (
-                    <Badge variant="destructive" className="text-[10px] uppercase font-bold px-2.5">Inativo</Badge>
+                    <Badge variant="destructive" className="text-[9px] sm:text-[10px] uppercase font-bold px-2">Inativo</Badge>
                   )}
                   {script.is_paid && (
-                    <Badge variant="secondary" className="bg-neon-pink/10 text-neon-pink border-neon-pink/20 text-[10px] font-bold">
-                       <ShoppingCart className="h-3 w-3 mr-1" /> Premium
+                    <Badge variant="secondary" className="bg-[hsl(var(--neon-pink)/0.1)] text-[hsl(var(--neon-pink))] border-[hsl(var(--neon-pink)/0.2)] text-[9px] sm:text-[10px] font-bold">
+                      <ShoppingCart className="h-3 w-3 mr-1" /> Premium
                     </Badge>
                   )}
                 </div>
 
                 <div className="space-y-2">
-                  <h1 className="text-xl sm:text-4xl font-black tracking-tight leading-tight">
+                  <h1 className="text-xl sm:text-3xl lg:text-4xl font-black tracking-tight leading-tight">
                     {script.title}
                   </h1>
-                  
-                  <div className="flex flex-wrap items-center gap-4 text-xs">
-                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/5 hover:bg-white/10 transition-colors">
+
+                  <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-[10px] sm:text-xs">
+                    <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/5 border border-white/5">
                       <Star className="h-3 w-3 text-amber-400 fill-amber-400" />
                       <span className="font-bold">{script.average_rating ? Number(script.average_rating).toFixed(1) : "N/A"}</span>
-                      <span className="text-muted-foreground">({script.total_ratings || 0} reviews)</span>
+                      <span className="text-muted-foreground">({script.total_ratings || 0})</span>
                     </div>
-                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/5">
-                      <Download className="h-3 w-3 text-neon-cyan" />
+                    <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/5 border border-white/5">
+                      <Download className="h-3 w-3 text-[hsl(var(--neon-cyan))]" />
                       <span className="font-bold">{script.download_count}</span>
-                      <span className="text-muted-foreground">downloads</span>
                     </div>
                     {scriptVersion && (
-                      <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/5 font-mono">
-                        <Badge variant="outline" className="border-none p-0 text-[10px]">VER: {scriptVersion}</Badge>
+                      <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/5 border border-white/5 font-mono text-[10px]">
+                        v{scriptVersion}
                       </div>
                     )}
                   </div>
                 </div>
               </div>
 
-              <div className="flex items-center gap-3 p-3 rounded-xl bg-white/5 border border-white/5 w-fit">
-                <Link to={`/modder/${script.modder_id}`} className="flex items-center gap-3 group">
-                  <Avatar className="h-10 w-10 border-2 border-white/10 group-hover:border-neon-purple transition-all duration-300">
-                    <AvatarImage src={modderProfile?.avatar_url} />
-                    <AvatarFallback className="bg-primary/10">
-                      {modderProfile?.username?.[0].toUpperCase() || "M"}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest">Desenvolvido por</p>
-                    <div className="flex items-center gap-1.5">
-                      <p className="font-bold text-sm">@{modderProfile?.display_name || modderProfile?.username || "Modder"}</p>
-                      <ShieldCheck className="h-3.5 w-3.5 text-neon-cyan" />
-                    </div>
+              {/* Modder info */}
+              <Link to={`/modder/${script.modder_id}`} className="flex items-center gap-3 p-2.5 sm:p-3 rounded-xl bg-white/[0.03] border border-white/5 w-fit group hover:border-primary/20 transition-all">
+                <Avatar className="h-9 w-9 sm:h-10 sm:w-10 border-2 border-white/10 group-hover:border-primary/40 transition-all">
+                  <AvatarImage src={modderProfile?.avatar_url} />
+                  <AvatarFallback className="bg-primary/10 text-xs">
+                    {modderProfile?.username?.[0].toUpperCase() || "M"}
+                  </AvatarFallback>
+                </Avatar>
+                <div>
+                  <p className="text-[9px] sm:text-[10px] text-muted-foreground uppercase font-bold tracking-widest">Por</p>
+                  <div className="flex items-center gap-1.5">
+                    <p className="font-bold text-xs sm:text-sm">@{modderProfile?.display_name || modderProfile?.username || "Modder"}</p>
+                    <ShieldCheck className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-[hsl(var(--neon-cyan))]" />
                   </div>
-                </Link>
-              </div>
+                </div>
+              </Link>
+
+              {/* Quick description on desktop */}
+              {script.description && (
+                <p className="hidden lg:block text-sm text-muted-foreground/80 leading-relaxed line-clamp-3">
+                  {script.description}
+                </p>
+              )}
             </div>
           </div>
-        </div>
+        </motion.div>
 
-        <div className="grid lg:grid-cols-3 gap-4 sm:gap-8">
-          <div className="lg:col-span-2 space-y-8">
-
+        {/* Main Content + Sidebar */}
+        <div className="grid lg:grid-cols-3 gap-5 sm:gap-8">
+          {/* Main content */}
+          <div className="lg:col-span-2 space-y-6 sm:space-y-8">
             {script.video_url && (
-              <div>
-                <h3 className="text-sm font-semibold mb-2 flex items-center gap-2">
+              <section>
+                <h3 className="text-sm font-bold mb-3 flex items-center gap-2">
                   <Play className="h-4 w-4 text-destructive" /> Demonstração
                 </h3>
                 <YouTubeEmbed url={script.video_url} />
+              </section>
+            )}
+
+            {/* Description (mobile + full) */}
+            <section className="space-y-3">
+              <h3 className="text-base sm:text-lg font-bold flex items-center gap-2">
+                <FileCode className="h-4 w-4 sm:h-5 sm:w-5 text-primary" /> Sobre o Script
+              </h3>
+              <div className="p-4 sm:p-6 rounded-xl border border-white/5 bg-white/[0.03] text-sm text-muted-foreground leading-relaxed">
+                {script.description ?? "Sem descrição fornecida pelo autor."}
+              </div>
+            </section>
+
+            {/* Features & Tags */}
+            {(scriptFeatures.length > 0 || scriptTags.length > 0) && (
+              <div className="grid sm:grid-cols-2 gap-4 sm:gap-6">
+                {scriptFeatures.length > 0 && (
+                  <Card className="border-white/5 bg-white/[0.03] overflow-hidden">
+                    <CardHeader className="pb-3 border-b border-white/5 bg-white/[0.02]">
+                      <CardTitle className="text-sm font-bold flex items-center gap-2">
+                        <List className="h-4 w-4 text-accent" /> Funcionalidades
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="pt-4">
+                      <ul className="space-y-2">
+                        {scriptFeatures.map((f: string, i: number) => (
+                          <li key={i} className="flex items-start gap-2 text-xs text-muted-foreground">
+                            <CheckCircle className="h-3.5 w-3.5 text-accent shrink-0 mt-0.5" />
+                            <span>{f}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {scriptTags.length > 0 && (
+                  <Card className="border-white/5 bg-white/[0.03] overflow-hidden">
+                    <CardHeader className="pb-3 border-b border-white/5 bg-white/[0.02]">
+                      <CardTitle className="text-sm font-bold flex items-center gap-2">
+                        <Tag className="h-4 w-4 text-[hsl(var(--neon-cyan))]" /> Tags
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="pt-4 flex flex-wrap gap-1.5">
+                      {scriptTags.map((t: string, i: number) => (
+                        <Badge key={i} variant="outline" className="text-[10px] text-[hsl(var(--neon-cyan))] border-[hsl(var(--neon-cyan)/0.2)] bg-[hsl(var(--neon-cyan)/0.05)]">
+                          #{t}
+                        </Badge>
+                      ))}
+                    </CardContent>
+                  </Card>
+                )}
               </div>
             )}
 
-            {/* Description */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-bold flex items-center gap-2">
-                <FileCode className="h-5 w-5 text-neon-purple" /> Sobre o Script
-              </h3>
-              <div className="p-6 rounded-2xl border border-white/5 bg-white/5 backdrop-blur-sm text-muted-foreground leading-relaxed">
-                {script.description ?? "Sem descrição relevante fornecida pelo autor."}
-              </div>
-            </div>
-
-            {/* Features & Tags */}
-            <div className="grid sm:grid-cols-2 gap-6">
-              {scriptFeatures.length > 0 && (
-                <Card className="border-white/5 bg-white/5 backdrop-blur-sm overflow-hidden">
-                  <CardHeader className="pb-3 border-b border-white/5 bg-white/5">
-                    <CardTitle className="text-sm font-bold flex items-center gap-2">
-                      <List className="h-4 w-4 text-neon-green" /> Funcionalidades
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="pt-4">
-                    <ul className="space-y-2.5">
-                      {scriptFeatures.map((f: string, i: number) => (
-                        <li key={i} className="flex items-start gap-2.5 text-xs text-muted-foreground">
-                          <CheckCircle className="h-3.5 w-3.5 text-neon-green shrink-0 mt-0.5" />
-                          <span>{f}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </CardContent>
-                </Card>
-              )}
-
-              {scriptTags.length > 0 && (
-                <Card className="border-white/5 bg-white/5 backdrop-blur-sm overflow-hidden">
-                  <CardHeader className="pb-3 border-b border-white/5 bg-white/5">
-                    <CardTitle className="text-sm font-bold flex items-center gap-2">
-                      <Tag className="h-4 w-4 text-neon-cyan" /> Tags de Busca
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="pt-4 flex flex-wrap gap-2">
-                    {scriptTags.map((t: string, i: number) => (
-                      <Badge key={i} variant="outline" className="text-[10px] text-neon-cyan border-neon-cyan/20 bg-neon-cyan/5">
-                        #{t}
-                      </Badge>
-                    ))}
-                  </CardContent>
-                </Card>
-              )}
-            </div>
-
             {/* Code Preview */}
             {luaCode && (
-              <div className="space-y-4">
+              <section className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-bold flex items-center gap-2">
-                    <FileCode className="h-5 w-5 text-neon-green" /> Estrutura do Código
+                  <h3 className="text-base sm:text-lg font-bold flex items-center gap-2">
+                    <FileCode className="h-4 w-4 sm:h-5 sm:w-5 text-accent" /> Estrutura do Código
                   </h3>
-                  <Badge variant="outline" className="border-neon-green/30 text-neon-green bg-neon-green/5">Preview Seguro</Badge>
+                  <Badge variant="outline" className="border-accent/30 text-accent bg-accent/5 text-[10px]">Preview Seguro</Badge>
                 </div>
                 <CodeBlock code={luaCode.split("\n").slice(0, 20).join("\n") + (luaCode.split("\n").length > 20 ? "\n-- ..." : "")} />
                 <ScriptAnalysis code={luaCode} scriptId={id} />
-              </div>
+              </section>
             )}
 
             {/* Related Tutorial */}
             {relatedTutorial && (
-              <Card className="neon-border bg-card/80">
+              <Card className="border-white/5 bg-white/[0.03]">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-base flex items-center gap-2">
-                    <BookOpen className="h-4 w-4 text-neon-pink" /> Tutorial Relacionado
+                  <CardTitle className="text-sm font-bold flex items-center gap-2">
+                    <BookOpen className="h-4 w-4 text-[hsl(var(--neon-pink))]" /> Tutorial Relacionado
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <Link to={`/tutorial/${relatedTutorial.id}`} className="flex items-center gap-3 p-3 rounded-lg bg-secondary/30 hover:bg-secondary/50 transition-colors">
+                  <Link to={`/tutorial/${relatedTutorial.id}`} className="flex items-center gap-3 p-3 rounded-lg bg-secondary/20 hover:bg-secondary/30 transition-colors">
                     {relatedTutorial.thumbnail_url ? (
                       <img src={relatedTutorial.thumbnail_url} alt="" className="w-16 h-10 rounded object-cover" />
                     ) : (
@@ -704,35 +738,35 @@ end
             )}
 
             {/* Reviews */}
-            <Card className="neon-border bg-card/80">
+            <Card className="border-white/5 bg-white/[0.03]">
               <CardHeader>
-                <CardTitle className="text-base flex items-center gap-2">
+                <CardTitle className="text-sm sm:text-base font-bold flex items-center gap-2">
                   <MessageSquare className="h-4 w-4 text-primary" />
                   Avaliações ({reviews?.length ?? 0})
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 {user ? (
-                  <div className="space-y-3 p-3 rounded-lg bg-secondary/30 border border-border/50">
-                    <p className="text-xs text-muted-foreground">Sua avaliação:</p>
+                  <div className="space-y-3 p-3 sm:p-4 rounded-xl bg-secondary/20 border border-white/5">
+                    <p className="text-xs text-muted-foreground font-medium">Sua avaliação:</p>
                     <StarRating rating={newRating} onRate={setNewRating} interactive />
-                    <Textarea placeholder="Comentário (opcional)" value={newComment} onChange={(e) => setNewComment(e.target.value)} rows={2} className="text-sm" />
-                    <Button size="sm" onClick={handleReview} disabled={submitting || newRating === 0} className="neon-glow-purple">
+                    <Textarea placeholder="Comentário (opcional)" value={newComment} onChange={(e) => setNewComment(e.target.value)} rows={2} className="text-sm bg-background/50" />
+                    <Button size="sm" onClick={handleReview} disabled={submitting || newRating === 0} className="bg-primary hover:bg-primary/90 text-primary-foreground">
                       {submitting ? "Enviando..." : "Enviar Avaliação"}
                     </Button>
                   </div>
                 ) : (
-                  <div className="p-3 rounded-lg bg-secondary/20 text-center">
+                  <div className="p-4 rounded-xl bg-secondary/10 text-center border border-white/5">
                     <p className="text-xs text-muted-foreground mb-2">Faça login para avaliar este script.</p>
                     <Button size="sm" variant="outline" onClick={() => setShowLoginPrompt(true)}>Entrar</Button>
                   </div>
                 )}
 
-                <div className="space-y-3">
+                <div className="space-y-2">
                   {reviews?.map((review: any) => {
                     const rProfile = profileMap[review.user_id];
                     return (
-                      <div key={review.id} className="flex gap-3 p-3 rounded-lg border border-border/30 text-card-foreground">
+                      <div key={review.id} className="flex gap-3 p-3 rounded-xl border border-white/5 bg-white/[0.02]">
                         <Avatar className="h-8 w-8 shrink-0">
                           {rProfile?.avatar_url && <AvatarImage src={rProfile.avatar_url} />}
                           <AvatarFallback className="bg-secondary text-[10px]">
@@ -750,38 +784,39 @@ end
                     );
                   })}
                   {(reviews?.length ?? 0) === 0 && (
-                    <p className="text-xs text-muted-foreground text-center py-4">Nenhuma avaliação ainda. Seja o primeiro!</p>
+                    <p className="text-xs text-muted-foreground text-center py-6">Nenhuma avaliação ainda. Seja o primeiro!</p>
                   )}
                 </div>
               </CardContent>
             </Card>
           </div>
 
-          {/* Sidebar / Purchase Experience */}
-          <div className="space-y-6">
-            <Card className="relative overflow-hidden border-neon-purple/20 bg-card/40 backdrop-blur-xl shadow-2xl">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-neon-purple/10 blur-[40px] -z-10" />
-              
+          {/* Sidebar */}
+          <div className="space-y-5 lg:sticky lg:top-24 lg:self-start">
+            {/* Checkout Card */}
+            <Card className="relative overflow-hidden border-primary/15 bg-card/50 backdrop-blur-xl shadow-2xl">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-primary/8 blur-[40px] -z-10" />
+
               <CardHeader className="pb-3 border-b border-white/5">
-                <CardTitle className="text-sm font-bold uppercase tracking-widest text-muted-foreground">Checkout Elite</CardTitle>
+                <CardTitle className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Checkout</CardTitle>
               </CardHeader>
-              
-              <CardContent className="p-6 space-y-6">
-                <div className="flex flex-col items-center gap-2 py-4">
+
+              <CardContent className="p-5 sm:p-6 space-y-5">
+                <div className="flex flex-col items-center gap-2 py-3">
                   {script.is_paid ? (
                     <>
                       <div className="flex items-baseline gap-1">
                         <span className="text-sm font-bold text-muted-foreground">R$</span>
-                        <span className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-br from-white to-white/50">{Number(script.price).toFixed(2)}</span>
+                        <span className="text-4xl sm:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-br from-foreground to-foreground/50">{Number(script.price).toFixed(2)}</span>
                       </div>
-                      <Badge variant="outline" className="border-neon-pink/30 text-neon-pink bg-neon-pink/5 px-4 py-1">
-                        <Key className="h-3 w-3 mr-2" /> {(script as any).license_duration_days ? `${(script as any).license_duration_days} dias de acesso` : "Acesso Vitalício"}
+                      <Badge variant="outline" className="border-[hsl(var(--neon-pink)/0.3)] text-[hsl(var(--neon-pink))] bg-[hsl(var(--neon-pink)/0.05)] px-3 py-1 text-[10px]">
+                        <Key className="h-3 w-3 mr-1.5" /> {(script as any).license_duration_days ? `${(script as any).license_duration_days} dias` : "Vitalício"}
                       </Badge>
                     </>
                   ) : (
                     <>
-                      <span className="text-4xl font-black text-neon-green">Grátis</span>
-                      <Badge variant="outline" className="border-neon-green/30 text-neon-green bg-neon-green/5 px-4 py-1">Acesso Livre</Badge>
+                      <span className="text-3xl sm:text-4xl font-black text-accent">Grátis</span>
+                      <Badge variant="outline" className="border-accent/30 text-accent bg-accent/5 px-3 py-1 text-[10px]">Acesso Livre</Badge>
                     </>
                   )}
                 </div>
@@ -791,103 +826,103 @@ end
                     <>
                       {purchaseSuccess || (existingLicense && !isLicenseExpired) ? (
                         <div className="space-y-4">
-                          <div className="bg-neon-green/5 border border-neon-green/20 rounded-xl p-4 space-y-3">
-                            <div className="flex items-center gap-2 text-neon-green text-sm font-bold">
+                          <div className="bg-accent/5 border border-accent/20 rounded-xl p-4 space-y-3">
+                            <div className="flex items-center gap-2 text-accent text-sm font-bold">
                               <CheckCircle className="h-4 w-4" /> Licença Ativa
                             </div>
-                            <div className="bg-black/40 rounded-lg p-3 border border-white/5 flex items-center justify-between group">
-                              <code className="text-xs font-mono text-neon-purple truncate flex-1 mr-2">
+                            <div className="bg-black/40 rounded-lg p-2.5 border border-white/5 flex items-center justify-between">
+                              <code className="text-[10px] sm:text-xs font-mono text-primary truncate flex-1 mr-2">
                                 {purchaseSuccess || (existingLicense as any).license_key}
                               </code>
-                              <Button 
-                                variant="ghost" 
-                                size="sm" 
-                                className="h-8 w-8 p-0 hover:bg-neon-purple/20"
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-7 w-7 p-0 hover:bg-primary/20 shrink-0"
                                 onClick={() => {
                                   navigator.clipboard.writeText(purchaseSuccess || (existingLicense as any).license_key);
                                   toast.success("Chave copiada!");
                                 }}
                               >
-                                <Copy className="h-3.5 w-3.5" />
+                                <Copy className="h-3 w-3" />
                               </Button>
                             </div>
-                            <Button className="w-full bg-neon-purple hover:bg-neon-purple/90 text-white font-bold h-12 rounded-xl shadow-neon-purple/20" onClick={handleDownloadLoader}>
+                            <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold h-11 rounded-xl" onClick={handleDownloadLoader}>
                               <Download className="mr-2 h-4 w-4" /> Baixar Loader
                             </Button>
                           </div>
-                          
+
                           {existingLicense?.expires_at && (
                             <div className="text-center">
-                              <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest mb-2">Expira em</p>
-                              <Badge variant="outline" className="font-mono text-[11px] border-white/10 px-3">
+                              <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest mb-1">Expira em</p>
+                              <Badge variant="outline" className="font-mono text-[10px] border-white/10 px-3">
                                 {new Date(existingLicense.expires_at).toLocaleDateString("pt-BR", { day: '2-digit', month: 'long', year: 'numeric' })}
                               </Badge>
                             </div>
                           )}
-                        </div >
+                        </div>
                       ) : isLicenseExpired ? (
-                        <div className="space-y-4">
-                          <div className="bg-destructive/5 border border-destructive/20 rounded-xl p-4 text-center">
-                            <p className="text-sm font-bold text-destructive mb-1">Licença Expirada</p>
-                            <p className="text-[11px] text-muted-foreground leading-tight">Renove seu acesso para continuar utilizando este script elite.</p>
+                        <div className="space-y-3">
+                          <div className="bg-destructive/5 border border-destructive/20 rounded-xl p-3 text-center">
+                            <p className="text-sm font-bold text-destructive mb-0.5">Licença Expirada</p>
+                            <p className="text-[10px] text-muted-foreground">Renove para continuar usando.</p>
                           </div>
-                          <Button className="w-full bg-neon-purple hover:bg-neon-purple/90 text-white font-bold h-12 rounded-xl overflow-hidden relative group" onClick={handleRenew} disabled={purchasing}>
+                          <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold h-11 rounded-xl overflow-hidden relative group" onClick={handleRenew} disabled={purchasing}>
                             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
                             <Clock className="mr-2 h-4 w-4" /> {purchasing ? "Iniciando..." : "Renovar Acesso"}
                           </Button>
                         </div>
                       ) : (
-                        <Button className="w-full bg-neon-purple hover:bg-neon-purple/90 text-white font-bold h-12 rounded-xl overflow-hidden relative group" onClick={openPaymentMethodModal} disabled={purchasing}>
+                        <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold h-11 rounded-xl overflow-hidden relative group" onClick={openPaymentMethodModal} disabled={purchasing}>
                           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
                           <CreditCard className="mr-2 h-4 w-4" /> {purchasing ? "Processando..." : "Comprar Agora"}
                         </Button>
                       )}
                     </>
                   ) : (
-                    <Button className="w-full bg-neon-green hover:bg-neon-green/90 text-black font-bold h-12 rounded-xl group" onClick={handleDownloadFree}>
+                    <Button className="w-full bg-accent hover:bg-accent/90 text-accent-foreground font-bold h-11 rounded-xl group" onClick={handleDownloadFree}>
                       <Download className="mr-2 h-4 w-4 group-hover:translate-y-0.5 transition-transform" /> Baixar Agora
                     </Button>
                   )}
 
                   {!hasAccess && (
-                    <p className="text-[10px] text-center text-muted-foreground px-4">
-                      Ao adquirir, você concorda com nossos termos de uso e política de modders.
+                    <p className="text-[9px] text-center text-muted-foreground/60 px-2">
+                      Ao adquirir, você concorda com nossos termos de uso.
                     </p>
                   )}
                 </div>
 
-                <div className="grid grid-cols-2 gap-4 pt-4 border-t border-white/5">
-                  <div className="space-y-1">
-                    <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest text-center">Reviews</p>
-                    <p className="text-lg font-black text-center">{script.total_ratings || 0}</p>
+                <div className="grid grid-cols-2 gap-3 pt-4 border-t border-white/5">
+                  <div className="text-center">
+                    <p className="text-[9px] text-muted-foreground uppercase font-bold tracking-widest">Reviews</p>
+                    <p className="text-lg font-black">{script.total_ratings || 0}</p>
                   </div>
-                  <div className="space-y-1 border-l border-white/5">
-                    <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest text-center">Status</p>
-                    <p className={`text-xs font-black text-center uppercase ${st.className.split(' ')[1]}`}>{st.label}</p>
+                  <div className="text-center border-l border-white/5">
+                    <p className="text-[9px] text-muted-foreground uppercase font-bold tracking-widest">Status</p>
+                    <p className={`text-xs font-black uppercase ${st.className.split(' ')[1]}`}>{st.label}</p>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            {/* Support / Quick Info */}
-            <Card className="border-white/5 bg-white/5 backdrop-blur-sm">
-              <CardContent className="p-4 space-y-4">
+            {/* Trust signals */}
+            <Card className="border-white/5 bg-white/[0.03]">
+              <CardContent className="p-4 space-y-3">
                 <div className="flex items-start gap-3">
-                  <div className="p-2 rounded-lg bg-neon-cyan/10 border border-neon-cyan/20">
-                    <ShieldCheck className="h-4 w-4 text-neon-cyan" />
+                  <div className="p-2 rounded-lg bg-[hsl(var(--neon-cyan)/0.1)] border border-[hsl(var(--neon-cyan)/0.2)]">
+                    <ShieldCheck className="h-4 w-4 text-[hsl(var(--neon-cyan))]" />
                   </div>
                   <div className="flex-1">
-                    <p className="text-xs font-bold mb-0.5">Sistema de Ofuscação</p>
-                    <p className="text-[10px] text-muted-foreground leading-relaxed">Código protegido anti-reverso com marca d'água de comprador única.</p>
+                    <p className="text-xs font-bold mb-0.5">Ofuscação Avançada</p>
+                    <p className="text-[10px] text-muted-foreground leading-relaxed">Código protegido com marca d'água única.</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
-                  <div className="p-2 rounded-lg bg-neon-purple/10 border border-neon-purple/20">
-                    <CheckCircle className="h-4 w-4 text-neon-purple" />
+                  <div className="p-2 rounded-lg bg-primary/10 border border-primary/20">
+                    <CheckCircle className="h-4 w-4 text-primary" />
                   </div>
                   <div className="flex-1">
-                    <p className="text-xs font-bold mb-0.5">Verificado Elite</p>
-                    <p className="text-[10px] text-muted-foreground leading-relaxed">Script testado manualmente pela equipe de segurança Nexus Marketplace.</p>
+                    <p className="text-xs font-bold mb-0.5">Verificado</p>
+                    <p className="text-[10px] text-muted-foreground leading-relaxed">Testado pela equipe Nexus.</p>
                   </div>
                 </div>
               </CardContent>
@@ -895,120 +930,127 @@ end
           </div>
         </div>
       </div>
+
       <LoginPromptDialog open={showLoginPrompt} onOpenChange={setShowLoginPrompt} />
 
-      {/* Payment Method Selection Modal */}
+      {/* Payment Method Modal */}
       {showPaymentMethodModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
-          <Card className="w-full max-w-sm bg-card border-primary/30">
-            <CardHeader className="text-center pb-2">
-              <CardTitle className="text-lg">Escolha o método de pagamento</CardTitle>
-              <p className="text-xs text-muted-foreground">
-                {script?.price ? `R$ ${Number(script.price).toFixed(2)}` : ""}
-                {pendingRenewal ? " (Renovação)" : ""}
-              </p>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <Button
-                className="w-full h-14 justify-start gap-3 bg-accent/10 border border-accent/30 hover:bg-accent/20 text-foreground"
-                variant="outline"
-                onClick={() => handlePurchase(pendingRenewal, "pix")}
-                disabled={purchasing}
-              >
-                <QrCode className="h-6 w-6 text-accent shrink-0" />
-                <div className="text-left">
-                  <p className="font-semibold text-sm">PIX</p>
-                  <p className="text-[10px] text-muted-foreground">Pagamento instantâneo</p>
-                </div>
-              </Button>
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+          <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.2 }}>
+            <Card className="w-full max-w-sm bg-card border-primary/20">
+              <CardHeader className="text-center pb-2">
+                <CardTitle className="text-lg">Método de Pagamento</CardTitle>
+                <p className="text-xs text-muted-foreground">
+                  {script?.price ? `R$ ${Number(script.price).toFixed(2)}` : ""}
+                  {pendingRenewal ? " (Renovação)" : ""}
+                </p>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <Button
+                  className="w-full h-14 justify-start gap-3 bg-accent/10 border border-accent/20 hover:bg-accent/15 text-foreground"
+                  variant="outline"
+                  onClick={() => handlePurchase(pendingRenewal, "pix")}
+                  disabled={purchasing}
+                >
+                  <QrCode className="h-5 w-5 text-accent shrink-0" />
+                  <div className="text-left">
+                    <p className="font-semibold text-sm">PIX</p>
+                    <p className="text-[10px] text-muted-foreground">Pagamento instantâneo</p>
+                  </div>
+                </Button>
 
-              <Button
-                className="w-full h-14 justify-start gap-3 bg-primary/10 border border-primary/30 hover:bg-primary/20 text-foreground"
-                variant="outline"
-                onClick={() => handlePurchase(pendingRenewal, "card")}
-                disabled={purchasing}
-              >
-                <CreditCard className="h-6 w-6 text-primary shrink-0" />
-                <div className="text-left">
-                  <p className="font-semibold text-sm">Cartão de Crédito</p>
-                  <p className="text-[10px] text-muted-foreground">Parcele em até 12x</p>
-                </div>
-              </Button>
+                <Button
+                  className="w-full h-14 justify-start gap-3 bg-primary/10 border border-primary/20 hover:bg-primary/15 text-foreground"
+                  variant="outline"
+                  onClick={() => handlePurchase(pendingRenewal, "card")}
+                  disabled={purchasing}
+                >
+                  <CreditCard className="h-5 w-5 text-primary shrink-0" />
+                  <div className="text-left">
+                    <p className="font-semibold text-sm">Cartão de Crédito</p>
+                    <p className="text-[10px] text-muted-foreground">Parcele em até 12x</p>
+                  </div>
+                </Button>
 
-              <Button
-                variant="ghost"
-                className="w-full text-muted-foreground"
-                onClick={() => { setShowPaymentMethodModal(false); setPendingRenewal(false); }}
-              >
-                Cancelar
-              </Button>
-            </CardContent>
-          </Card>
+                <Button
+                  variant="ghost"
+                  className="w-full text-muted-foreground"
+                  onClick={() => { setShowPaymentMethodModal(false); setPendingRenewal(false); }}
+                >
+                  Cancelar
+                </Button>
+              </CardContent>
+            </Card>
+          </motion.div>
         </div>
       )}
 
       {/* PIX QR Code Modal */}
       {pixData && (
-        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
-          <Card className="w-full max-w-sm bg-card border-primary/30">
-            <CardHeader className="text-center pb-2">
-              <CardTitle className="text-lg">Pagar com PIX</CardTitle>
-              <p className="text-xs text-muted-foreground">Escaneie o QR Code ou copie o código</p>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {pixData.qr_code_base64 && (
-                <div className="flex justify-center">
-                  <img
-                    src={`data:image/png;base64,${pixData.qr_code_base64}`}
-                    alt="QR Code PIX"
-                    className="w-48 h-48 rounded-lg"
-                  />
-                </div>
-              )}
-
-              {pixData.qr_code && (
-                <div className="space-y-2">
-                  <p className="text-[10px] text-muted-foreground text-center">Código PIX (Copia e Cola):</p>
-                  <div className="flex items-center gap-2 bg-secondary/50 rounded p-2">
-                    <code className="text-[10px] font-mono text-foreground flex-1 break-all line-clamp-3">
-                      {pixData.qr_code}
-                    </code>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-7 w-7 p-0 shrink-0"
-                      onClick={() => {
-                        navigator.clipboard.writeText(pixData.qr_code!);
-                        toast.success("Código PIX copiado!");
-                      }}
-                    >
-                      <Copy className="h-3 w-3" />
-                    </Button>
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+          <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.2 }}>
+            <Card className="w-full max-w-sm bg-card border-primary/20">
+              <CardHeader className="text-center pb-2">
+                <CardTitle className="text-lg">Pagar com PIX</CardTitle>
+                <p className="text-xs text-muted-foreground">Escaneie o QR Code ou copie o código</p>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {pixData.qr_code_base64 && (
+                  <div className="flex justify-center">
+                    <div className="p-3 bg-white rounded-xl">
+                      <img
+                        src={`data:image/png;base64,${pixData.qr_code_base64}`}
+                        alt="QR Code PIX"
+                        className="w-44 h-44 sm:w-48 sm:h-48"
+                      />
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
 
-              {pixPolling && (
-                <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
-                  <div className="h-4 w-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-                  Aguardando pagamento...
-                </div>
-              )}
+                {pixData.qr_code && (
+                  <div className="space-y-2">
+                    <p className="text-[10px] text-muted-foreground text-center">Código PIX (Copia e Cola):</p>
+                    <div className="flex items-center gap-2 bg-secondary/30 rounded-lg p-2 border border-white/5">
+                      <code className="text-[10px] font-mono text-foreground flex-1 break-all line-clamp-3">
+                        {pixData.qr_code}
+                      </code>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 w-7 p-0 shrink-0"
+                        onClick={() => {
+                          navigator.clipboard.writeText(pixData.qr_code!);
+                          toast.success("Código PIX copiado!");
+                        }}
+                      >
+                        <Copy className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  </div>
+                )}
 
-              <Button
-                variant="outline"
-                className="w-full"
-                onClick={() => {
-                  if (pollingRef.current) clearInterval(pollingRef.current);
-                  setPixPolling(false);
-                  setPixData(null);
-                  setPurchasing(false);
-                }}
-              >
-                Cancelar
-              </Button>
-            </CardContent>
-          </Card>
+                {pixPolling && (
+                  <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+                    <div className="h-4 w-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                    Aguardando pagamento...
+                  </div>
+                )}
+
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => {
+                    if (pollingRef.current) clearInterval(pollingRef.current);
+                    setPixPolling(false);
+                    setPixData(null);
+                    setPurchasing(false);
+                  }}
+                >
+                  Cancelar
+                </Button>
+              </CardContent>
+            </Card>
+          </motion.div>
         </div>
       )}
     </Layout>
