@@ -5,21 +5,19 @@ import { ScriptCard } from "@/components/ScriptCard";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { useModderProfiles } from "@/hooks/use-modder-profiles";
 import { useAuth } from "@/lib/auth";
 import {
-  Code, Shield, Lock, ArrowRight, Zap, ShieldCheck, Key, Store,
-  Download, Star, Users, ChevronRight, Trophy, Heart,
-  CalendarDays, Eye, Sparkles, Activity, Cpu, Hexagon, BookOpen
+  Code, ShieldCheck, Key, Store, Zap, Users, ChevronRight, Trophy,
+  Eye, Activity, Cpu, Terminal, Fingerprint, Network, SearchCode
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Card, CardContent } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Card } from "@/components/ui/card";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { UserBadges } from "@/components/UserBadges";
 import { RoleBadge } from "@/components/RoleBadge";
 import { useState } from "react";
-import heroBg from "@/assets/hero-bg.jpg";
 
 export default function Index() {
   const navigate = useNavigate();
@@ -53,8 +51,8 @@ export default function Index() {
   });
 
   const { data: profileMap = {} } = useModderProfiles(modderIds);
-  const hallOfFameModders = Object.values(profileMap).length > 0 
-    ? Array.from(new Set(Object.values(profileMap))) 
+  const hallOfFameModders = Object.values(profileMap).length > 0
+    ? Array.from(new Set(Object.values(profileMap)))
     : topModders;
 
   const hallIds = hallOfFameModders.flatMap((p: any) => [p.user_id, p.id].filter(Boolean));
@@ -67,7 +65,7 @@ export default function Index() {
         .select("user_id, role, approved")
         .in("user_id", hallIds)
         .eq("approved", true);
-      
+
       const map: Record<string, string> = {};
       for (const r of data ?? []) {
         const current = map[r.user_id];
@@ -103,282 +101,183 @@ export default function Index() {
 
   return (
     <Layout>
-      {/* ══════════════ MONUMENTAL HERO ══════════════ */}
-      <section className="relative min-h-[80vh] sm:min-h-[92vh] flex items-center justify-center overflow-hidden">
-        {/* Futuristic Background */}
+      {/* ══════════════ TERMINAL HERO ══════════════ */}
+      <section className="relative min-h-[85vh] sm:min-h-[92vh] flex items-center justify-center overflow-hidden bg-[#030304]">
+        {/* Animated Grid & Glows Background */}
         <div className="absolute inset-0 z-0">
-          <img src={heroBg} alt="" className="w-full h-full object-cover opacity-30 grayscale" />
-          <div className="absolute inset-0 bg-gradient-to-b from-[#050507] via-background/90 to-background" />
-          {/* Neon Particles / Elements */}
-          <div className="absolute top-1/4 left-1/4 w-[250px] sm:w-[500px] h-[250px] sm:h-[500px] bg-neon-purple/10 blur-[80px] sm:blur-[120px] rounded-full animate-pulse-neon" />
-          <div className="absolute bottom-1/4 right-1/4 w-[300px] sm:w-[600px] h-[300px] sm:h-[600px] bg-neon-cyan/5 blur-[100px] sm:blur-[150px] rounded-full animate-pulse-neon" style={{ animationDelay: "2s" }} />
-          <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]" />
+          <div className="absolute inset-0 bg-[#030304] z-0" />
+          <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center bg-repeat opacity-[0.15] [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]" />
+          
+          {/* Neon Floating Orbs */}
+          <motion.div 
+            animate={{ y: [0, -20, 0], opacity: [0.3, 0.6, 0.3] }}
+            transition={{ repeat: Infinity, duration: 8, ease: "easeInOut" }}
+            className="absolute top-[10%] left-[20%] w-[300px] h-[300px] bg-neon-green/15 blur-[120px] rounded-full mix-blend-screen"
+          />
+          <motion.div 
+            animate={{ y: [0, 30, 0], x: [0, -30, 0], opacity: [0.2, 0.5, 0.2] }}
+            transition={{ repeat: Infinity, duration: 10, ease: "easeInOut", delay: 1 }}
+            className="absolute bottom-[20%] right-[10%] w-[400px] h-[400px] bg-neon-purple/20 blur-[150px] rounded-full mix-blend-screen"
+          />
         </div>
 
-        <div className="container relative z-10 px-4 sm:px-12 text-center">
+        <div className="container relative z-10 px-4 sm:px-6 w-full flex flex-col items-center">
           <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8 }}
-            className="space-y-8"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            className="flex flex-col items-center w-full max-w-4xl"
           >
-            <div className="flex justify-center">
-              <motion.div
-                initial={{ y: -20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.2 }}
-              >
-                <Badge variant="outline" className="bg-neon-purple/5 border-neon-purple/20 text-neon-purple font-black tracking-[0.15em] sm:tracking-[0.3em] uppercase py-1.5 px-3 sm:py-2 sm:px-6 italic backdrop-blur-md text-[9px] sm:text-xs">
-                  <Sparkles className="h-3.5 w-3.5 mr-2 animate-spin-slow" />
-                  Nexus Intelligence protocol v4.0
-                </Badge>
-              </motion.div>
-            </div>
+            {/* Top Badge */}
+            <Badge variant="outline" className="mb-8 bg-[#0a0f0d] border-neon-green/30 text-neon-green font-mono tracking-widest uppercase py-1.5 px-4 text-[10px] sm:text-xs">
+              <Terminal className="h-3.5 w-3.5 mr-2 animate-pulse" />
+              Hidden Protocol Active
+            </Badge>
 
-            <div className="space-y-4">
-              <motion.h1
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.4 }}
-                className="text-4xl sm:text-7xl lg:text-9xl font-black tracking-tighter uppercase italic leading-[0.85] text-white drop-shadow-2xl"
-              >
-                Forge your <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-neon-purple via-white to-neon-cyan drop-shadow-[0_0_30px_rgba(168,85,247,0.5)]">
-                  Legacy
-                </span>
-              </motion.h1>
-              <motion.p
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.6 }}
-                className="text-sm sm:text-2xl text-muted-foreground font-mono max-w-2xl mx-auto uppercase tracking-wider leading-relaxed"
-              >
-                A elite do modding mobile se encontra aqui. Scripts ofuscados, 
-                proteção avançada e o marketplace supremo.
-              </motion.p>
-            </div>
+            {/* Main Title */}
+            <h1 className="text-center font-black tracking-tighter uppercase leading-[0.85] text-white drop-shadow-2xl mb-6">
+              <span className="block text-4xl sm:text-6xl md:text-8xl">Uncover The</span>
+              <span className="block text-5xl sm:text-7xl md:text-9xl text-transparent bg-clip-text bg-gradient-to-br from-white via-white to-white/40 italic flex items-center justify-center gap-2 sm:gap-4 mt-2">
+                 Hidden
+                 <motion.span
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ delay: 0.5 }}
+                    className="inline-block"
+                 >
+                   <Fingerprint className="w-10 h-10 sm:w-16 sm:h-16 md:w-24 md:h-24 text-neon-green drop-shadow-[0_0_20px_rgba(57,255,20,0.6)]" />
+                 </motion.span>
+              </span>
+            </h1>
 
-            <motion.div
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.8 }}
-              className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-6"
-            >
+            {/* Subtitle */}
+            <p className="text-center text-sm sm:text-lg md:text-xl text-muted-foreground font-mono max-w-2xl lowercase tracking-wider leading-relaxed mb-10 border-l-2 border-white/10 pl-4">
+              [ o cofre underground da elite. scripts lua ofuscados, 
+              APKs modded e o mercado negro seguro que você procurava. ]
+            </p>
+
+            {/* CTA Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
               <Button
                 size="lg"
-                className="h-12 sm:h-16 px-6 sm:px-12 bg-neon-purple hover:bg-neon-purple/90 text-white font-black uppercase tracking-widest text-xs sm:text-sm rounded-2xl shadow-2xl shadow-neon-purple/20 transition-all hover:scale-105 active:scale-95 group"
+                className="h-14 sm:h-16 px-8 sm:px-10 bg-neon-green hover:bg-neon-green/90 text-black font-black uppercase tracking-widest text-xs sm:text-sm rounded-none border border-neon-green shadow-[0_0_20px_rgba(57,255,20,0.2)] hover:shadow-[0_0_30px_rgba(57,255,20,0.4)] transition-all flex group"
                 onClick={() => navigate("/marketplace")}
               >
-                <Store className="mr-3 h-5 w-5 group-hover:rotate-12 transition-transform" />
-                Acessar Hub de Elite
+                <SearchCode className="mr-3 h-5 w-5 group-hover:scale-110 transition-transform" />
+                Acessar o Vault
               </Button>
               <Button
                 size="lg"
                 variant="outline"
-                className="h-12 sm:h-16 px-6 sm:px-12 border-white/10 bg-white/5 hover:bg-white/10 text-white font-black uppercase tracking-widest text-xs sm:text-sm rounded-2xl transition-all"
+                className="h-14 sm:h-16 px-8 sm:px-10 border-white/20 bg-transparent hover:bg-white/5 text-white font-black uppercase tracking-widest text-xs sm:text-sm rounded-none transition-all flex group"
                 onClick={() => navigate("/auth")}
               >
-                Fazer Parte do Clã
-                <ArrowRight className="ml-3 h-5 w-5" />
+                Desbloquear Acesso
+                <ChevronRight className="ml-3 h-5 w-5 opacity-50 group-hover:translate-x-1 group-hover:opacity-100 transition-all" />
               </Button>
-            </motion.div>
+            </div>
 
-            {/* Quick stats floating console */}
-            <motion.div
-              initial={{ opacity: 0, y: 40 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1, duration: 1 }}
-              className="pt-8 sm:pt-16 max-w-4xl mx-auto"
-            >
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-1 bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl overflow-hidden p-1 shadow-2xl shadow-black/50">
-                {[
-                  { icon: Code, value: stats?.scripts ?? 0, label: "Neural Scripts", color: "text-neon-purple" },
-                  { icon: Users, value: stats?.users ?? 0, label: "Active Operatives", color: "text-neon-green" },
-                  { icon: Activity, value: stats?.downloads ?? 0, label: "Data Transmissions", color: "text-neon-cyan" },
-                ].map((stat, i) => (
-                  <div key={stat.label} className="bg-[#0a0a0c]/60 p-3 sm:p-6 flex flex-col items-center justify-center gap-1 sm:gap-2 group hover:bg-white/5 transition-colors">
-                    <stat.icon className={`h-5 w-5 ${stat.color} mb-1`} />
-                    <p className="text-xl sm:text-3xl font-black font-mono tracking-tighter text-white">
-                      {stat.value.toLocaleString("pt-BR")}
-                    </p>
-                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/50 italic">
-                      {stat.label}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
+            {/* Quick Stats Terminal */}
+            <div className="w-full mt-16 sm:mt-24 border border-white/10 bg-[#050505]/80 backdrop-blur-md flex flex-col sm:flex-row divide-y sm:divide-y-0 sm:divide-x divide-white/10 p-1 font-mono">
+              {[
+                { label: "PAYLOADS", val: stats?.scripts ?? 0, color: "text-neon-purple" },
+                { label: "OPERATIVES", val: stats?.users ?? 0, color: "text-neon-cyan" },
+                { label: "EXFILTRATIONS", val: stats?.downloads ?? 0, color: "text-neon-green" }
+              ].map((st) => (
+                <div key={st.label} className="flex-1 flex items-center justify-between sm:justify-center gap-4 px-6 py-4 hover:bg-white/[0.02] transition-colors">
+                   <span className="text-[10px] text-muted-foreground uppercase tracking-widest">{st.label}</span>
+                   <span className={`text-xl sm:text-2xl font-black ${st.color}`}>{st.val.toLocaleString("pt-BR")}</span>
+                </div>
+              ))}
+            </div>
           </motion.div>
         </div>
       </section>
 
-      {/* ══════════════ CORE CAPABILITIES (REPLACING BENEFITS) ══════════════ */}
-      <section className="relative py-16 sm:py-32 border-y border-white/5 bg-[#050507]">
+      {/* ══════════════ CORE CAPABILITIES (BENTO BOX) ══════════════ */}
+      <section className="py-20 sm:py-32 bg-[#050505] relative border-t border-white/5">
         <div className="container px-4 sm:px-6">
-          <div className="flex flex-col md:flex-row items-end justify-between mb-10 sm:mb-20 gap-6 sm:gap-8">
-            <div className="space-y-4 max-w-2xl">
-              <Badge className="bg-neon-green/10 text-neon-green border border-neon-green/20 text-[10px] font-black tracking-widest px-4 py-1 uppercase">
-                System Capabilities
-              </Badge>
-              <h2 className="text-3xl sm:text-5xl font-black italic uppercase tracking-tighter">
-                Tecnologia que <span className="text-neon-green">domina</span> o cenário
-              </h2>
-            </div>
-            <p className="text-muted-foreground font-medium max-w-sm text-left sm:text-right italic border-l-2 sm:border-l-0 sm:border-r-2 border-neon-green pl-4 sm:pl-0 sm:pr-6 text-sm">
-              Desenvolvido por modders, para modders. Segurança máxima e performance extrema em cada linha de código.
-            </p>
-          </div>
-
-          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-8">
-            {[
-              {
-                icon: ShieldCheck,
-                title: "Neural Obfuscation",
-                description: "Proteção de nível militar contra engenharia reversa. Seu código vira uma fortaleza impenetrável.",
-                color: "text-neon-purple",
-                glow: "shadow-neon-purple/20",
-                bg: "bg-neon-purple/5",
-              },
-              {
-                icon: Key,
-                title: "Quantum Licenses",
-                description: "Gerenciamento dinâmico de chaves com verificação em nanossegundos. Controle total do seu software.",
-                color: "text-neon-green",
-                glow: "shadow-neon-green/20",
-                bg: "bg-neon-green/5",
-              },
-              {
-                icon: Cpu,
-                title: "Infinite Engine",
-                description: "Nossa infraestrutura escala com você. Downloads ultra-rápidos e estabilidade garantida 24/7.",
-                color: "text-neon-cyan",
-                glow: "shadow-neon-cyan/20",
-                bg: "bg-neon-cyan/5",
-              },
-            ].map((cap, i) => (
-              <motion.div
-                key={cap.title}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1, duration: 0.6 }}
-              >
-                <div className={`p-5 sm:p-8 rounded-2xl sm:rounded-3xl border border-white/5 bg-[#0a0a0c]/40 backdrop-blur-xl hover:border-white/20 transition-all duration-500 group relative overflow-hidden`}>
-                  <div className={`absolute -top-24 -right-24 w-48 h-48 ${cap.color} opacity-5 blur-[80px] rounded-full group-hover:opacity-10 transition-opacity`} />
-                  <div className="relative z-10 space-y-6">
-                    <div className={`h-16 w-16 rounded-2xl ${cap.bg} border border-white/10 flex items-center justify-center group-hover:scale-110 transition-all duration-500 shadow-xl ${cap.glow}`}>
-                      <cap.icon className={`h-8 w-8 ${cap.color}`} />
-                    </div>
-                    <div className="space-y-3">
-                      <h3 className="text-lg sm:text-2xl font-black italic uppercase tracking-tighter text-white">{cap.title}</h3>
-                      <p className="text-sm text-muted-foreground font-medium leading-relaxed">{cap.description}</p>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ══════════════ HALL OF FAME ══════════════ */}
-      <section className="py-16 sm:py-32 relative overflow-hidden">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[400px] sm:w-[800px] h-1 bg-gradient-to-r from-transparent via-neon-purple/30 to-transparent" />
-        <div className="container px-4 sm:px-6">
-          <div className="text-center mb-10 sm:mb-20 space-y-4">
-            <h2 className="text-3xl sm:text-6xl font-black italic uppercase tracking-tighter">
-              Nexus <span className="text-neon-purple">Commanders</span>
+          <div className="mb-12 sm:mb-20">
+            <h2 className="text-3xl sm:text-5xl font-black uppercase tracking-tighter text-white">
+              System <br className="hidden sm:block" />
+              <span className="text-muted-foreground">Capabilities</span>
             </h2>
-            <p className="text-muted-foreground uppercase font-black tracking-[0.4em] text-[10px] italic">
-              Hall da Fama - Operadores Nível Elite
-            </p>
           </div>
 
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-8">
-            {hallOfFameModders.slice(0, 4).map((profile: any, i: number) => {
-              const roleKey = hallRolesMap[profile.user_id] || hallRolesMap[profile.id];
-              const displayRole: "admin" | "modder" | "member" = 
-                roleKey === "admin" ? "admin" : "modder"; 
-              return (
-                <motion.div
-                  key={profile.id}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.1 }}
-                  whileHover={{ y: -10 }}
-                  className="relative group cursor-pointer"
-                  onClick={() => setSelectedModder(profile)}
-                >
-                  <Card className="bg-[#0a0a0c]/60 backdrop-blur-2xl border-white/5 hover:border-neon-purple/40 transition-all duration-500 p-4 sm:p-8 rounded-2xl sm:rounded-3xl overflow-hidden text-center h-full flex flex-col items-center">
-                    <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-30 transition-opacity">
-                      <Hexagon className="h-12 w-12 text-neon-purple" />
-                    </div>
-                    
-                    <div className="relative mb-3 sm:mb-6">
-                       <div className="absolute inset-0 bg-neon-purple/20 blur-2xl rounded-full scale-0 group-hover:scale-100 transition-transform duration-500" />
-                       <Avatar className="h-16 w-16 sm:h-28 sm:w-28 border-2 border-white/5 relative z-10 grayscale group-hover:grayscale-0 transition-all duration-500">
-                        <AvatarImage src={profile.avatar_url} />
-                        <AvatarFallback className="bg-primary/5 text-3xl font-black italic">
-                          {(profile.display_name || profile.username || "?")[0].toUpperCase()}
-                        </AvatarFallback>
-                      </Avatar>
-                    </div>
+          {/* Bento Box Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 auto-rows-[250px] sm:auto-rows-[300px]">
+             {/* Box 1 (Span 2 cols) */}
+             <div className="md:col-span-2 relative rounded-xl border border-white/10 bg-gradient-to-br from-[#0a0a0c] to-[#050505] p-6 sm:p-10 overflow-hidden group">
+               <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-neon-purple/5 blur-[80px] rounded-full group-hover:bg-neon-purple/10 transition-colors" />
+               <ShieldCheck className="w-10 h-10 text-neon-purple mb-6" />
+               <h3 className="text-2xl sm:text-4xl font-black uppercase tracking-tight text-white mb-2 leading-none">Military Grade<br/>Obfuscation</h3>
+               <p className="text-muted-foreground font-mono text-sm max-w-sm mt-4">
+                 Sistemas impenetráveis. Transformamos código legível em ruído completo para proteger sua propriedade intelectual contra engenharia reversa.
+               </p>
+             </div>
 
-                    <div className="space-y-1 mb-3 sm:mb-6">
-                      <h3 className="font-black text-sm sm:text-xl italic uppercase tracking-tighter">
-                        {profile.display_name || profile.username || "Anonymous"}
-                      </h3>
-                      <p className="text-[10px] font-mono text-muted-foreground/60 tracking-widest">
-                        CODE_SIG: {profile.id.substring(0, 8).toUpperCase()}
-                      </p>
-                    </div>
+             {/* Box 2 (1 col) */}
+             <div className="md:col-span-1 relative rounded-xl border border-white/10 bg-gradient-to-br from-[#0a0a0c] to-[#050505] p-6 overflow-hidden group">
+               <div className="absolute top-0 right-0 w-[200px] h-[200px] bg-neon-green/5 blur-[60px] rounded-full group-hover:bg-neon-green/10 transition-colors" />
+               <Key className="w-8 h-8 text-neon-green mb-4" />
+               <h3 className="text-xl sm:text-2xl font-black uppercase tracking-tight text-white mb-2 leading-none">Quantum Licenses</h3>
+               <p className="text-muted-foreground font-mono text-xs mt-3">
+                 Autenticação em milissegundos. Servidor blindado para gerenciar acessos ativos, banimentos e assinaturas dos seus usuários.
+               </p>
+               <div className="absolute bottom-6 right-6 opacity-20">
+                 <ShieldCheck className="w-24 h-24" />
+               </div>
+             </div>
 
-                    <div className="flex flex-col items-center gap-3">
-                      <RoleBadge role={displayRole} />
-                      <div className="flex gap-1.5 opacity-60 group-hover:opacity-100 transition-opacity">
-                         <UserBadges userId={profile.user_id} compact />
-                      </div>
-                    </div>
+             {/* Box 3 (1 col) */}
+             <div className="md:col-span-1 relative rounded-xl border border-white/10 bg-gradient-to-br from-[#0a0a0c] to-[#050505] p-6 overflow-hidden group">
+               <div className="absolute -bottom-10 -left-10 w-[150px] h-[150px] bg-neon-cyan/5 blur-[50px] rounded-full group-hover:bg-neon-cyan/10 transition-colors" />
+               <Activity className="w-8 h-8 text-neon-cyan mb-4" />
+               <h3 className="text-xl sm:text-2xl font-black uppercase tracking-tight text-white mb-2 leading-none">Zero Downtime</h3>
+               <p className="text-muted-foreground font-mono text-xs mt-3">
+                 Infraestrutura global robusta. Seus scripts e mods sempre disponíveis na velocidade da luz.
+               </p>
+             </div>
 
-                    <div className="mt-auto pt-8 flex items-center gap-2">
-                       <Trophy className="h-3 w-3 text-neon-purple" />
-                       <span className="text-[10px] font-black uppercase tracking-widest text-white/40">Verified Elite</span>
-                    </div>
-                  </Card>
-                </motion.div>
-              );
-            })}
+             {/* Box 4 (Span 2 cols) */}
+             <div className="md:col-span-2 relative rounded-xl border border-white/10 bg-[#101014] p-6 sm:p-10 overflow-hidden group flex flex-col justify-end">
+               <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center opacity-10 mix-blend-overlay" />
+               <div className="relative z-10 flex flex-col sm:flex-row sm:items-end justify-between gap-6">
+                 <div>
+                    <Store className="w-10 h-10 text-white mb-6" />
+                    <h3 className="text-2xl sm:text-3xl font-black uppercase tracking-tight text-white mb-2 leading-none">Underground Marketplace</h3>
+                    <p className="text-muted-foreground font-mono text-sm max-w-sm">Compre e venda seguro. O ponto de encontro oficial para modders sérios monetizarem sua arte.</p>
+                 </div>
+                 <Button onClick={() => navigate("/marketplace")} variant="outline" className="shrink-0 bg-transparent border-white/20 hover:bg-white hover:text-black hover:border-white uppercase font-black text-xs h-12 px-6 rounded-none">
+                   Explorar Loja
+                 </Button>
+               </div>
+             </div>
           </div>
         </div>
       </section>
 
-      {/* ══════════════ MARKETPLACE PREVIEW ══════════════ */}
-      <section className="py-16 sm:py-32 bg-[#0a0a0c]/80 backdrop-blur-sm border-y border-white/5">
+      {/* ══════════════ RECENT BREACHES (MARKETPLACE PREVIEW) ══════════════ */}
+      <section className="py-20 sm:py-32 bg-[#030304] border-t border-white/5">
         <div className="container px-4 sm:px-6">
-          <div className="flex flex-col md:flex-row items-center justify-between mb-8 sm:mb-16 gap-4 sm:gap-6 text-center md:text-left">
-            <div className="space-y-2">
-              <h2 className="text-3xl sm:text-5xl font-black italic uppercase tracking-tighter">
-                Últimas <span className="text-neon-cyan text-glow-cyan">Injeções</span>
+          <div className="flex flex-col md:flex-row items-end justify-between mb-10 sm:mb-16 gap-4">
+            <div>
+              <h2 className="text-3xl sm:text-4xl font-black uppercase tracking-tight text-white">
+                Transmissões <span className="text-neon-cyan/80">Recentes</span>
               </h2>
-              <p className="text-sm font-mono text-muted-foreground uppercase tracking-widest">Acesso liberado aos novos sistemas de elite</p>
+              <p className="text-muted-foreground font-mono text-sm mt-2">Últimos payloads e scripts homologados no cofre.</p>
             </div>
-            <Button
-              variant="outline"
-              className="h-12 px-8 border-white/10 bg-white/5 hover:bg-white/10 font-bold uppercase tracking-widest text-xs group transition-all"
-              onClick={() => navigate("/marketplace")}
-            >
-              Protocolo Marketplace Completo
-              <ChevronRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+            <Button variant="ghost" onClick={() => navigate("/marketplace")} className="text-muted-foreground hover:text-white uppercase font-bold text-xs">
+              Ver todos os logs <ChevronRight className="ml-2 w-4 h-4" />
             </Button>
           </div>
 
-          <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-8">
-            {scripts?.map((script: any, i: number) => (
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
+            {scripts?.slice(0, 4).map((script: any, i: number) => (
               <motion.div
                 key={script.id}
-                initial={{ opacity: 0, scale: 0.95 }}
-                whileInView={{ opacity: 1, scale: 1 }}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
               >
@@ -401,114 +300,140 @@ export default function Index() {
         </div>
       </section>
 
-      {/* ══════════════ CTA FINAL (THE MOVEMENT) ══════════════ */}
-      <section className="py-16 sm:py-40 relative">
-        <div className="container px-4 sm:px-6">
-          <div className="relative rounded-2xl sm:rounded-[40px] overflow-hidden border border-white/10 p-6 sm:p-24 text-center">
-            {/* Background elements */}
-            <div className="absolute inset-0 bg-[#0a0a0c]/80 backdrop-blur-2xl z-0" />
-            <div className="absolute top-0 right-0 w-full h-full bg-gradient-to-br from-neon-purple/10 via-transparent to-neon-cyan/5 z-0" />
+      {/* ══════════════ SYNDICATE OPERATORS (HALL OF FAME) ══════════════ */}
+      <section className="py-20 sm:py-32 bg-[#050505] relative border-t border-white/5 overflow-hidden">
+        <div className="container px-4 sm:px-6 relative z-10">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl sm:text-5xl font-black uppercase tracking-tighter text-white">
+              Syndicate <span className="text-neon-purple/80">Operators</span>
+            </h2>
+            <p className="text-muted-foreground font-mono text-sm mt-2 uppercase tracking-widest">Os cérebros por trás do cofre.</p>
+          </div>
 
-            <div className="relative z-10 space-y-10 max-w-3xl mx-auto">
-              <div className="flex justify-center flex-col items-center gap-4">
-                 <div className="w-2.5 h-2.5 rounded-full bg-neon-purple animate-ping" />
-                 <h2 className="text-3xl sm:text-7xl font-black italic uppercase tracking-tighter leading-tight drop-shadow-2xl">
-                   Join the <br />
-                   <span className="text-neon-purple">Nexus Generation</span>
-                 </h2>
-              </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {hallOfFameModders.slice(0, 4).map((profile: any, i: number) => {
+              const roleKey = hallRolesMap[profile.user_id] || hallRolesMap[profile.id];
+              const displayRole: "admin" | "modder" | "member" = roleKey === "admin" ? "admin" : "modder";
               
-              <p className="text-sm sm:text-xl text-muted-foreground leading-relaxed font-medium">
-                Não somos apenas uma plataforma, somos o futuro do modding.
-                O portal da elite está aberto para novos membros de alto nível.
-              </p>
+              return (
+                <div 
+                  key={profile.id} 
+                  className="bg-[#08080a] border border-white/10 flex flex-col items-center p-6 sm:p-8 cursor-pointer hover:bg-[#0c0c0f] hover:border-white/20 transition-all font-mono group"
+                  onClick={() => setSelectedModder(profile)}
+                >
+                  <div className="w-full flex justify-between items-center mb-6 opacity-50">
+                     <span className="text-[9px] uppercase tracking-widest text-muted-foreground">ID_TAG</span>
+                     <Fingerprint className="w-4 h-4 text-neon-purple" />
+                  </div>
+                  
+                  <Avatar className="h-24 w-24 rounded-none border border-white/20 bg-black mb-6 grayscale group-hover:grayscale-0 transition-all">
+                    <AvatarImage src={profile.avatar_url} />
+                    <AvatarFallback className="bg-transparent text-white text-3xl font-black">
+                      {(profile.display_name || profile.username || "?")[0].toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
 
-              <div className="flex flex-col sm:flex-row gap-6 justify-center pt-8">
-                <Button
-                  size="lg"
-                  className="h-12 sm:h-16 px-8 sm:px-16 bg-white text-black hover:bg-white/90 font-black uppercase tracking-widest text-xs sm:text-sm rounded-2xl group transition-all"
-                  onClick={() => navigate("/auth?tab=signup")}
-                >
-                  Criar Credenciais
-                  <Zap className="ml-3 h-5 w-5 fill-current group-hover:scale-110 transition-transform" />
-                </Button>
-                <Button
-                  size="lg"
-                  variant="ghost"
-                  className="h-12 sm:h-16 px-6 sm:px-12 text-white hover:bg-white/5 font-black uppercase tracking-widest text-xs sm:text-sm rounded-2xl border border-white/5"
-                  onClick={() => navigate("/tutorials")}
-                >
-                  <BookOpen className="mr-3 h-5 w-5" />
-                  Nexus Academy
-                </Button>
-              </div>
-            </div>
+                  <h3 className="font-black text-lg uppercase tracking-wider text-white mb-1">
+                    {profile.display_name || profile.username || "Anonymous"}
+                  </h3>
+                  <p className="text-[10px] text-muted-foreground tracking-widest mb-4">
+                     {profile.id.substring(0, 8).toUpperCase()}
+                  </p>
+                  
+                  <div className="w-full h-[1px] bg-white/10 mb-4" />
+                  
+                  <div className="flex justify-between w-full items-center">
+                    <RoleBadge role={displayRole} />
+                    <div className="flex gap-1">
+                       <UserBadges userId={profile.user_id} compact />
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
 
-      {/* ══════════════ MODDER PROFILE DIALOG (ELITE VERSION) ══════════════ */}
+      {/* ══════════════ FINAL CTA ══════════════ */}
+      <section className="py-24 sm:py-32 bg-[#0a0f0d] border-t border-neon-green/20 relative">
+        <div className="container px-4 text-center max-w-3xl mx-auto relative z-10">
+          <Network className="w-12 h-12 text-neon-green mx-auto mb-6 opacity-50" />
+          <h2 className="text-4xl sm:text-6xl font-black uppercase tracking-tighter text-white mb-6">
+            Initialize <span className="text-neon-green">Connection</span>
+          </h2>
+          <p className="text-muted-foreground font-mono text-sm sm:text-base mb-10 border-l-2 border-r-2 border-neon-green/30 inline-block px-6">
+            Você leu o código. Viu do que somos capazes.
+            Cadastre-se hoje e entre para o lado Hidden da força.
+          </p>
+          <div className="flex justify-center flex-col sm:flex-row gap-4">
+             <Button size="lg" onClick={() => navigate("/auth?tab=signup")} className="h-14 px-10 bg-white text-black hover:bg-white/90 font-black uppercase tracking-widest rounded-none text-xs w-full sm:w-auto">
+               Estabelecer Acesso
+             </Button>
+             <Button size="lg" onClick={() => navigate("/marketplace")} variant="outline" className="h-14 px-10 text-white border-white/20 hover:bg-white/5 font-black uppercase tracking-widest rounded-none text-xs w-full sm:w-auto">
+               Explorar Arquivos
+             </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════════ MODDER DIALOG ══════════════ */}
       <Dialog open={!!selectedModder} onOpenChange={(open) => !open && setSelectedModder(null)}>
-        <DialogContent className="max-w-xl bg-[#0a0a0c]/95 backdrop-blur-3xl border-white/10 p-0 overflow-hidden shadow-3xl">
+        <DialogContent className="max-w-md bg-[#050505] border-white/10 p-0 overflow-hidden font-mono text-white rounded-none">
           {selectedModder && (() => {
             const roleKey = hallRolesMap[selectedModder.user_id] || hallRolesMap[selectedModder.id];
-            const displayRole: "admin" | "modder" | "member" = 
-              roleKey === "admin" ? "admin" : "modder";
+            const displayRole: "admin" | "modder" | "member" = roleKey === "admin" ? "admin" : "modder";
             return (
-              <div className="relative">
-                <div className="h-32 bg-gradient-to-r from-neon-purple/20 to-neon-cyan/10" />
-                <div className="p-10 -mt-20 flex flex-col items-center text-center space-y-6">
-                  <div className="relative group">
-                    <div className="absolute inset-0 bg-neon-purple/30 blur-2xl rounded-full animate-pulse" />
-                    <Avatar className="h-40 w-40 border-4 border-white relative z-10">
+              <div className="flex flex-col">
+                <div className="h-2 w-full bg-neon-purple" />
+                <div className="p-8 pb-4">
+                  <div className="flex justify-between items-start mb-8">
+                     <span className="text-[10px] text-muted-foreground tracking-widest uppercase opacity-50">Authorized Personnel Only</span>
+                     <Fingerprint className="w-5 h-5 text-neon-purple" />
+                  </div>
+                  
+                  <div className="flex gap-6 items-center mb-8">
+                    <Avatar className="h-20 w-20 rounded-none border border-white/20 bg-black">
                       <AvatarImage src={selectedModder.avatar_url} />
-                      <AvatarFallback className="bg-primary/5 text-4xl font-black italic">
+                      <AvatarFallback className="bg-transparent text-white text-2xl font-black">
                         {(selectedModder.display_name || selectedModder.username || "?")[0].toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
-                  </div>
-                  
-                  <div className="space-y-4">
-                    <div className="space-y-1">
-                      <h3 className="text-4xl font-black italic uppercase tracking-tighter">{selectedModder.display_name || selectedModder.username}</h3>
-                      <p className="text-xs font-mono text-muted-foreground/60 tracking-[0.3em] uppercase">Security Level: {displayRole.toUpperCase()}</p>
+                    <div className="flex flex-col">
+                      <h3 className="text-2xl font-black uppercase tracking-tight">{selectedModder.display_name || selectedModder.username}</h3>
+                      <p className="text-xs text-muted-foreground uppercase opacity-70 mt-1 mb-2">ID: {selectedModder.id.substring(0, 12)}</p>
+                      <RoleBadge role={displayRole} />
                     </div>
-                    <RoleBadge role={displayRole} />
                   </div>
 
-                  <div className="flex flex-wrap justify-center gap-2">
-                    <UserBadges userId={selectedModder.user_id} />
+                  <div className="bg-[#0a0a0c] border border-white/5 p-4 mb-8">
+                     <p className="text-xs text-muted-foreground leading-relaxed lowercase">
+                       {selectedModder.bio ? `> ${selectedModder.bio}` : "> no public data available for this operative."}
+                     </p>
                   </div>
-                  
-                  {selectedModder.bio && (
-                    <p className="text-sm text-muted-foreground leading-relaxed font-medium italic max-w-xs pt-4 border-t border-white/5">
-                        "{selectedModder.bio}"
-                    </p>
-                  )}
 
-                  <div className="grid grid-cols-3 gap-6 w-full py-8 border-y border-white/5">
+                  <div className="grid grid-cols-3 divide-x divide-white/10 border-t border-b border-white/10 py-4 mb-8">
                     {[
-                       { value: selectedModder.reputation_score ?? 0, label: "Reputação" },
-                       { value: selectedModder.total_downloads ?? 0, label: "Exports" },
-                       { value: selectedModder.total_positive_reviews ?? 0, label: "Vouches" },
+                       { value: selectedModder.reputation_score ?? 0, label: "REP" },
+                       { value: selectedModder.total_downloads ?? 0, label: "EXFIL" },
+                       { value: selectedModder.total_positive_reviews ?? 0, label: "TRUST" },
                     ].map(st => (
-                      <div key={st.label} className="text-center group">
-                        <p className="text-2xl font-black font-mono group-hover:text-neon-purple transition-colors">{st.value}</p>
-                        <p className="text-[9px] text-muted-foreground uppercase font-black tracking-widest">{st.label}</p>
+                      <div key={st.label} className="text-center">
+                        <p className="text-xl font-black text-white">{st.value}</p>
+                        <p className="text-[9px] text-muted-foreground mt-1">{st.label}</p>
                       </div>
                     ))}
                   </div>
 
                   <Button
                     size="lg"
-                    className="w-full h-14 bg-neon-purple hover:bg-neon-purple/90 text-white font-black uppercase tracking-widest text-xs rounded-2xl group transition-all"
+                    className="w-full h-12 bg-white text-black hover:bg-white/90 font-black uppercase tracking-widest text-xs rounded-none"
                     onClick={() => {
                       setSelectedModder(null);
                       navigate(`/modder/${selectedModder.user_id}`);
                     }}
                   >
-                    Abrir Perfil Completo
-                    <Eye className="ml-3 h-5 w-5 transition-transform group-hover:scale-110" />
+                    Acessar Dossiê Completo
                   </Button>
                 </div>
               </div>
@@ -519,4 +444,3 @@ export default function Index() {
     </Layout>
   );
 }
-
