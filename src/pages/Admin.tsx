@@ -296,10 +296,10 @@ export default function Admin() {
   const ScriptRow = ({ script }: { script: any }) => {
     const ps = publishStatusConfig[(script as any).publish_status ?? "published"] ?? publishStatusConfig.published;
     return (
-      <div className={`flex items-center justify-between p-3 rounded-lg bg-secondary/30 gap-2 ${!script.is_active ? 'opacity-60' : ''}`}>
+      <div className={`flex items-center justify-between p-4 border-b border-white/5 bg-[#050505] hover:bg-[#08080a] transition-colors gap-4 ${!script.is_active ? 'opacity-50 grayscale' : ''}`}>
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 flex-wrap">
-            <p className="font-semibold text-sm truncate">{script.title}</p>
+          <div className="flex items-center gap-2 flex-wrap mb-1">
+            <p className="font-black text-sm uppercase tracking-tight text-white truncate italic">{script.title}</p>
             <Badge variant="outline" className={`text-[10px] ${ps.className}`}>{ps.label}</Badge>
             {script.is_verified && <Badge variant="outline" className="text-[10px] bg-accent/20 text-accent border-accent/30">✅ Verificado</Badge>}
             {!script.is_active && <Badge variant="destructive" className="text-[10px]">Inativo</Badge>}
@@ -356,19 +356,25 @@ export default function Admin() {
   return (
     <Layout>
       <div className="container py-8">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold">Painel Admin</h1>
-          <Button onClick={() => navigate("/script/new")} className="neon-glow-purple">
-            <Plus className="mr-2 h-4 w-4" /> Novo Script
+        <div className="flex items-center justify-between mb-8 border border-white/10 bg-[#030304] p-6 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-neon-purple/10 blur-[80px] pointer-events-none" />
+          <div className="relative z-10 space-y-1">
+            <h1 className="text-3xl font-black uppercase tracking-tighter text-white">Terminal Admin</h1>
+            <p className="text-[10px] text-muted-foreground uppercase font-mono tracking-widest flex items-center gap-2">
+              <Shield className="w-3 h-3 text-neon-purple" /> Acesso Nível Root
+            </p>
+          </div>
+          <Button onClick={() => navigate("/script/new")} className="bg-neon-purple hover:bg-neon-purple/90 text-white shadow-[0_0_15px_rgba(168,85,247,0.3)] rounded-none font-black uppercase tracking-widest text-xs h-12 px-6 relative z-10">
+            <Plus className="mr-2 h-4 w-4" /> Novo Payload
           </Button>
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-          <Card className="bg-card/40 backdrop-blur-md border-neon-purple/20 shadow-lg shadow-neon-purple/5 hover:border-neon-purple/40 transition-all group">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <Card className="bg-[#050505] border-white/10 hover:border-neon-purple/40 rounded-none transition-all group font-mono">
             <CardContent className="p-5">
-              <div className="flex justify-between items-start mb-2">
-                <div className="bg-neon-purple/10 p-2 rounded-lg group-hover:bg-neon-purple/20 transition-colors">
+              <div className="flex justify-between items-start mb-4">
+                <div className="bg-neon-purple/5 border border-neon-purple/20 p-2 group-hover:bg-neon-purple/10 transition-colors">
                   <Users className="h-4 w-4 text-neon-purple" />
                 </div>
                 <Badge variant="outline" className="text-[10px] opacity-60">Base</Badge>
@@ -378,10 +384,10 @@ export default function Admin() {
             </CardContent>
           </Card>
 
-          <Card className="bg-card/40 backdrop-blur-md border-neon-green/20 shadow-lg shadow-neon-green/5 hover:border-neon-green/40 transition-all group">
+          <Card className="bg-[#050505] border-white/10 hover:border-neon-green/40 rounded-none transition-all group font-mono">
             <CardContent className="p-5">
-              <div className="flex justify-between items-start mb-2">
-                <div className="bg-neon-green/10 p-2 rounded-lg group-hover:bg-neon-green/20 transition-colors">
+              <div className="flex justify-between items-start mb-4">
+                <div className="bg-neon-green/5 border border-neon-green/20 p-2 group-hover:bg-neon-green/10 transition-colors">
                   <Code className="h-4 w-4 text-neon-green" />
                 </div>
                 <Badge variant="outline" className="text-[10px] text-neon-green/70 border-neon-green/20">Ativos</Badge>
@@ -391,10 +397,10 @@ export default function Admin() {
             </CardContent>
           </Card>
 
-          <Card className="bg-card/40 backdrop-blur-md border-primary/20 shadow-lg shadow-primary/5 hover:border-primary/40 transition-all group">
+          <Card className="bg-[#050505] border-white/10 hover:border-primary/40 rounded-none transition-all group font-mono">
             <CardContent className="p-5">
-              <div className="flex justify-between items-start mb-2">
-                <div className="bg-primary/10 p-2 rounded-lg group-hover:bg-primary/20 transition-colors">
+              <div className="flex justify-between items-start mb-4">
+                <div className="bg-primary/5 border border-primary/20 p-2 group-hover:bg-primary/10 transition-colors">
                   <ShoppingCart className="h-4 w-4 text-primary" />
                 </div>
                 <Badge variant="outline" className="text-[10px] text-primary/70 border-primary/20">Sucesso</Badge>
@@ -404,10 +410,10 @@ export default function Admin() {
             </CardContent>
           </Card>
 
-          <Card className="bg-card/40 backdrop-blur-md border-accent/20 shadow-lg shadow-accent/5 hover:border-accent/40 transition-all group">
+          <Card className="bg-[#050505] border-white/10 hover:border-accent/40 rounded-none transition-all group font-mono">
             <CardContent className="p-5">
-              <div className="flex justify-between items-start mb-2">
-                <div className="bg-accent/10 p-2 rounded-lg group-hover:bg-accent/20 transition-colors">
+              <div className="flex justify-between items-start mb-4">
+                <div className="bg-accent/5 border border-accent/20 p-2 group-hover:bg-accent/10 transition-colors">
                   <Activity className="h-4 w-4 text-accent" />
                 </div>
                 <Badge variant="outline" className="text-[10px] text-accent/70 border-accent/20">Crescimento</Badge>
@@ -419,15 +425,15 @@ export default function Admin() {
         </div>
 
         {/* Financial Overview & Chart */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-          <Card className="lg:col-span-2 bg-card/40 backdrop-blur-md border-border/50 shadow-xl overflow-hidden">
-            <CardHeader className="pb-2 border-b border-border/10 flex flex-row items-center justify-between">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8 font-mono">
+          <Card className="lg:col-span-2 bg-[#050505] border-white/10 rounded-none shadow-none overflow-hidden">
+            <CardHeader className="pb-4 border-b border-white/5 bg-[#030304] flex flex-row items-center justify-between">
               <div>
-                <CardTitle className="text-sm font-bold flex items-center gap-2">
+                <CardTitle className="text-sm font-black uppercase tracking-widest flex items-center gap-2 text-white">
                   <TrendingUp className="h-4 w-4 text-accent" />
-                  Visão Geral da Plataforma
+                  Plataforma O.S. (Radar)
                 </CardTitle>
-                <CardDescription className="text-[10px]">Volume de vendas nos últimos 30 dias</CardDescription>
+                <CardDescription className="text-[9px] uppercase tracking-widest mt-1">Volume de transações nos últimos 30 dias</CardDescription>
               </div>
               <Activity className="h-3 w-3 text-muted-foreground/30" />
             </CardHeader>
@@ -478,11 +484,11 @@ export default function Admin() {
             </CardContent>
           </Card>
 
-          <Card className="bg-card/40 backdrop-blur-md border-border/50 shadow-xl overflow-hidden">
-            <CardHeader className="pb-2 border-b border-border/10">
-              <CardTitle className="text-sm font-bold flex items-center gap-2">
+          <Card className="bg-[#050505] border-white/10 rounded-none shadow-none overflow-hidden font-mono">
+            <CardHeader className="pb-4 border-b border-white/5 bg-[#030304]">
+              <CardTitle className="text-sm font-black uppercase tracking-widest flex items-center gap-2 text-white">
                 <BarChart3 className="h-4 w-4 text-neon-green" />
-                Divisão de Ganhos
+                Dossiê Financeiro
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-8">
@@ -564,39 +570,42 @@ export default function Admin() {
         )}
 
         {/* Main admin tabs */}
-        <Tabs defaultValue="scripts">
-          <TabsList className="mb-4 grid w-full grid-cols-5">
-            <TabsTrigger value="scripts" className="text-xs gap-1">
-              <Code className="h-3 w-3" /> Scripts
+        <Tabs defaultValue="scripts" className="font-mono">
+          <TabsList className="mb-6 grid w-full grid-cols-5 p-1 bg-[#050505] border border-white/10 rounded-none h-14">
+            <TabsTrigger value="scripts" className="text-[10px] sm:text-xs tracking-widest uppercase font-black gap-2 data-[state=active]:bg-[#030304] data-[state=active]:text-neon-purple rounded-none h-full">
+              <Code className="h-4 w-4" /> <span className="hidden sm:inline">Scripts</span>
             </TabsTrigger>
-            <TabsTrigger value="licenses" className="text-xs gap-1">
-              <Key className="h-3 w-3" /> Licenças
+            <TabsTrigger value="licenses" className="text-[10px] sm:text-xs tracking-widest uppercase font-black gap-2 data-[state=active]:bg-[#030304] data-[state=active]:text-neon-green rounded-none h-full">
+              <Key className="h-4 w-4" /> <span className="hidden sm:inline">Licenças</span>
             </TabsTrigger>
-            <TabsTrigger value="purchases" className="text-xs gap-1">
-              <ShoppingCart className="h-3 w-3" /> Compras
+            <TabsTrigger value="purchases" className="text-[10px] sm:text-xs tracking-widest uppercase font-black gap-2 data-[state=active]:bg-[#030304] data-[state=active]:text-accent rounded-none h-full">
+              <ShoppingCart className="h-4 w-4" /> <span className="hidden sm:inline">Compras</span>
             </TabsTrigger>
-            <TabsTrigger value="withdrawals" className="text-xs gap-1">
-              <Landmark className="h-3 w-3" /> Saques
+            <TabsTrigger value="withdrawals" className="text-[10px] sm:text-xs tracking-widest uppercase font-black gap-2 data-[state=active]:bg-[#030304] data-[state=active]:text-primary rounded-none h-full">
+              <Landmark className="h-4 w-4" /> <span className="hidden sm:inline">Saques</span>
             </TabsTrigger>
-            <TabsTrigger value="leaks" className="text-xs gap-1">
-              <AlertTriangle className="h-3 w-3" /> Vazamentos
+            <TabsTrigger value="leaks" className="text-[10px] sm:text-xs tracking-widest uppercase font-black gap-2 data-[state=active]:bg-[#030304] data-[state=active]:text-destructive rounded-none h-full">
+              <AlertTriangle className="h-4 w-4" /> <span className="hidden sm:inline">Vazamentos</span>
             </TabsTrigger>
           </TabsList>
 
           {/* Scripts Tab */}
           <TabsContent value="scripts">
-            <Card className="neon-border bg-card/80">
-              <CardHeader>
-                <CardTitle>Gerenciar Scripts</CardTitle>
+            <Card className="border-white/10 bg-[#050505] rounded-none">
+              <CardHeader className="border-b border-white/5 bg-[#030304]">
+                <CardTitle className="text-sm font-black uppercase tracking-widest flex items-center gap-2 text-white">
+                  <Code className="w-4 h-4 text-neon-purple" />
+                  Sistema de Inteligência (Scripts)
+                </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="pt-6">
                 <Tabs defaultValue="pending_review">
-                  <TabsList className="mb-4 grid w-full grid-cols-4">
-                    <TabsTrigger value="pending_review" className="text-xs gap-1">
-                      <Send className="h-3 w-3" /> Revisão ({pendingReview.length})
+                  <TabsList className="mb-6 grid w-full grid-cols-4 p-1 bg-[#030304] border border-white/5 rounded-none h-12">
+                    <TabsTrigger value="pending_review" className="text-[9px] sm:text-[10px] tracking-widest uppercase font-black gap-2 data-[state=active]:bg-[#0a0a0c] data-[state=active]:text-white rounded-none h-full">
+                      <Send className="h-3 w-3" /> <span className="hidden sm:inline">Em Análise</span> ({pendingReview.length})
                     </TabsTrigger>
-                    <TabsTrigger value="published" className="text-xs gap-1">
-                      <Eye className="h-3 w-3" /> Publicados ({published.length})
+                    <TabsTrigger value="published" className="text-[9px] sm:text-[10px] tracking-widest uppercase font-black gap-2 data-[state=active]:bg-[#0a0a0c] data-[state=active]:text-neon-cyan rounded-none h-full">
+                      <Eye className="h-3 w-3" /> <span className="hidden sm:inline">Ativos</span> ({published.length})
                     </TabsTrigger>
                     <TabsTrigger value="drafts" className="text-xs gap-1">
                       <Clock className="h-3 w-3" /> Rascunhos ({drafts.length})
@@ -632,10 +641,10 @@ export default function Admin() {
 
           {/* Licenses Tab */}
           <TabsContent value="licenses">
-            <Card className="neon-border bg-card/80">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Key className="h-5 w-5 text-primary" /> Gerenciar Licenças
+            <Card className="border-white/10 bg-[#050505] rounded-none">
+              <CardHeader className="border-b border-white/5 bg-[#030304]">
+                <CardTitle className="flex items-center gap-2 text-sm font-black uppercase tracking-widest text-white">
+                  <Key className="h-4 w-4 text-neon-green" /> Hub de Chaves (Licenças)
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
@@ -685,10 +694,10 @@ export default function Admin() {
 
           {/* Purchases Tab */}
           <TabsContent value="purchases">
-            <Card className="neon-border bg-card/80">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <ShoppingCart className="h-5 w-5 text-primary" /> Histórico de Compras
+            <Card className="border-white/10 bg-[#050505] rounded-none">
+              <CardHeader className="border-b border-white/5 bg-[#030304]">
+                <CardTitle className="flex items-center gap-2 text-sm font-black uppercase tracking-widest text-white">
+                  <ShoppingCart className="h-4 w-4 text-accent" /> Ledger de Transações
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
@@ -723,10 +732,10 @@ export default function Admin() {
 
           {/* Leak Tracker Tab */}
           <TabsContent value="leaks">
-            <Card className="neon-border bg-card/80">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <AlertTriangle className="h-5 w-5 text-destructive" /> Rastrear Vazamentos
+            <Card className="border-white/10 bg-[#050505] rounded-none">
+              <CardHeader className="border-b border-white/5 bg-[#030304]">
+                <CardTitle className="flex items-center gap-2 text-sm font-black uppercase tracking-widest text-destructive">
+                  <AlertTriangle className="h-4 w-4" /> Rastrear Vazamentos (Security Ops)
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -734,15 +743,15 @@ export default function Admin() {
                   Cole o código ofuscado vazado abaixo. O sistema extrairá o watermark embutido e identificará o comprador responsável.
                 </p>
                 <Textarea
-                  placeholder="Cole aqui o código Lua ofuscado encontrado..."
+                  placeholder=">_ insira código lua raw/obfuscado aqui..."
                   value={leakCode}
                   onChange={(e) => setLeakCode(e.target.value)}
                   rows={8}
-                  className="font-mono text-xs"
+                  className="font-mono text-xs bg-[#030304] border-white/10 focus-visible:ring-neon-purple rounded-none"
                 />
-                <Button onClick={extractWatermark} disabled={leakSearching} className="neon-glow-purple">
+                <Button onClick={extractWatermark} disabled={leakSearching} className="bg-neon-purple hover:bg-neon-purple/90 text-white shadow-[0_0_15px_rgba(168,85,247,0.3)] rounded-none font-black uppercase tracking-widest text-[10px] sm:text-xs">
                   <Search className="h-4 w-4 mr-2" />
-                  {leakSearching ? "Buscando..." : "Extrair Watermark"}
+                  {leakSearching ? "Decodificando..." : "Extrair Watermark"}
                 </Button>
 
                 {leakError && (

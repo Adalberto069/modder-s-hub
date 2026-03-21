@@ -113,65 +113,65 @@ export function ModderFinanceTab({ totalEarnings }: ModderFinanceTabProps) {
   return (
     <div className="space-y-6">
       {/* Resumo Financeiro */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="bg-card/40 backdrop-blur-md border-primary/20 shadow-lg shadow-primary/5 hover:border-primary/40 transition-all group">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 font-mono">
+        <Card className="bg-[#050505] border-white/10 hover:border-primary/40 rounded-none transition-all group">
           <CardContent className="p-6">
             <div className="flex items-center gap-4">
-              <div className="bg-primary/10 p-3 rounded-full group-hover:bg-primary/20 transition-colors">
-                <DollarSign className="h-6 w-6 text-primary" />
+              <div className="bg-primary/5 border border-primary/20 p-3 group-hover:bg-primary/10 transition-colors">
+                <DollarSign className="h-5 w-5 text-primary" />
               </div>
               <div>
-                <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium">Ganhos Totais (80%)</p>
-                <p className="text-2xl font-bold font-mono">R$ {totalEarnings.toFixed(2)}</p>
+                <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-black">Ganhos Totais (80%)</p>
+                <p className="text-2xl font-bold text-white mt-1">R$ {totalEarnings.toFixed(2)}</p>
               </div>
             </div>
           </CardContent>
         </Card>
         
-        <Card className="bg-card/40 backdrop-blur-md border-accent/20 shadow-lg shadow-accent/5 hover:border-accent/40 transition-all group">
+        <Card className="bg-[#050505] border-white/10 hover:border-accent/40 rounded-none transition-all group">
           <CardContent className="p-6">
             <div className="flex items-center gap-4">
-              <div className="bg-accent/10 p-3 rounded-full group-hover:bg-accent/20 transition-colors">
-                <Wallet className="h-6 w-6 text-accent" />
+              <div className="bg-accent/5 border border-accent/20 p-3 group-hover:bg-accent/10 transition-colors">
+                <Wallet className="h-5 w-5 text-accent" />
               </div>
               <div>
-                <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium">Saldo Disponível</p>
-                <p className="text-2xl font-bold font-mono text-accent">R$ {Math.max(0, availableBalance).toFixed(2)}</p>
+                <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-black">Saldo Disponível</p>
+                <p className="text-2xl font-bold text-accent mt-1">R$ {Math.max(0, availableBalance).toFixed(2)}</p>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-card/40 backdrop-blur-md border-muted/20 shadow-lg shadow-black/5 hover:border-muted/40 transition-all group">
+        <Card className="bg-[#050505] border-white/10 hover:border-muted/40 rounded-none transition-all group">
           <CardContent className="p-6">
             <div className="flex items-center gap-4">
-              <div className="bg-muted/10 p-3 rounded-full group-hover:bg-muted/20 transition-colors">
-                <Landmark className="h-6 w-6 text-muted-foreground" />
+              <div className="bg-muted/5 border border-muted/20 p-3 group-hover:bg-muted/10 transition-colors">
+                <Landmark className="h-5 w-5 text-muted-foreground" />
               </div>
               <div>
-                <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium">Saques Processados</p>
-                <p className="text-2xl font-bold font-mono">R$ {totalWithdrawnOrPending.toFixed(2)}</p>
+                <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-black">Saques Processados</p>
+                <p className="text-2xl font-bold text-white mt-1">R$ {totalWithdrawnOrPending.toFixed(2)}</p>
               </div>
             </div>
           </CardContent>
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 font-mono">
         {/* Configuração de PIX */}
-        <Card className="neon-border bg-card/80">
-          <CardHeader>
-            <CardTitle className="text-lg">Configurar Chave PIX</CardTitle>
-            <CardDescription>Defina sua chave PIX para receber seus pagamentos.</CardDescription>
+        <Card className="bg-[#050505] border-white/10 rounded-none">
+          <CardHeader className="border-b border-white/5 bg-[#030304]">
+            <CardTitle className="text-sm font-black uppercase tracking-widest text-white">Configurar Chave PIX</CardTitle>
+            <CardDescription className="text-[10px] uppercase font-mono mt-1">Defina sua chave PIX para receber seus pagamentos.</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-4 pt-6">
             <div className="space-y-2">
-              <Label>Tipo de Chave</Label>
+              <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Tipo de Chave</Label>
               <Select value={pixKeyType} onValueChange={setPixKeyType}>
-                <SelectTrigger>
+                <SelectTrigger className="bg-[#030304] border-white/10 focus-visible:ring-neon-purple rounded-none h-12 text-xs">
                   <SelectValue placeholder="Selecione o tipo..." />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-[#050505] border-white/10 rounded-none text-xs">
                   <SelectItem value="cpf">CPF</SelectItem>
                   <SelectItem value="cnpj">CNPJ</SelectItem>
                   <SelectItem value="email">E-mail</SelectItem>
@@ -181,28 +181,29 @@ export function ModderFinanceTab({ totalEarnings }: ModderFinanceTabProps) {
               </Select>
             </div>
             <div className="space-y-2">
-              <Label>Chave PIX</Label>
+              <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Chave PIX</Label>
               <Input 
                 value={pixKey} 
                 onChange={(e) => setPixKey(e.target.value)} 
-                placeholder="Sua chave PIX" 
+                placeholder=">_ insira sua chave PIX" 
+                className="bg-[#030304] border-white/10 focus-visible:ring-neon-purple rounded-none h-12 text-neon-green"
               />
             </div>
-            <Button onClick={handleSavePix} disabled={savingPix} className="neon-glow-purple w-full">
-              {savingPix ? "Salvando..." : "Salvar Chave PIX"}
+            <Button onClick={handleSavePix} disabled={savingPix} className="bg-neon-purple hover:bg-neon-purple/90 text-white shadow-[0_0_15px_rgba(168,85,247,0.3)] rounded-none font-black uppercase tracking-widest text-[10px] w-full h-12 mt-2">
+              {savingPix ? "Processando..." : "Salvar Chave PIX"}
             </Button>
           </CardContent>
         </Card>
 
         {/* Solicitar Saque */}
-        <Card className="neon-border bg-card/80">
-          <CardHeader>
-            <CardTitle className="text-lg">Solicitar Saque</CardTitle>
-            <CardDescription>Os saques podem levar até 48 horas úteis para serem processados pela administração.</CardDescription>
+        <Card className="bg-[#050505] border-white/10 rounded-none">
+          <CardHeader className="border-b border-white/5 bg-[#030304]">
+            <CardTitle className="text-sm font-black uppercase tracking-widest text-white">Solicitar Saque</CardTitle>
+            <CardDescription className="text-[10px] uppercase font-mono mt-1">Processamento em até 48h úteis via ADMIN OPS.</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-4 pt-6">
             <div className="space-y-2">
-              <Label>Valor do Saque (R$)</Label>
+              <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Valor do Saque (R$)</Label>
               <Input 
                 type="number" 
                 step="0.01"
@@ -210,55 +211,57 @@ export function ModderFinanceTab({ totalEarnings }: ModderFinanceTabProps) {
                 max={availableBalance}
                 value={withdrawalAmount} 
                 onChange={(e) => setWithdrawalAmount(e.target.value)} 
-                placeholder="0.00" 
+                placeholder="R$ 0.00" 
+                className="bg-[#030304] border-white/10 focus-visible:ring-neon-green rounded-none h-12 text-neon-green font-black"
               />
             </div>
             
             {!profile?.pix_key ? (
-              <p className="text-sm text-destructive">Configure sua chave PIX primeiro para solicitar um saque.</p>
+              <p className="text-[10px] text-destructive uppercase tracking-widest font-black mt-2">CONFIGURE CHAVE PIX PARA PROSSEGUIR.</p>
             ) : availableBalance <= 0 ? (
-               <p className="text-sm text-muted-foreground">Você não possui saldo disponível para saque.</p>
+               <p className="text-[10px] text-muted-foreground uppercase tracking-widest mt-2">SALDO INSUFICIENTE PARA SAQUE.</p>
             ) : (
-              <Button onClick={handleRequestWithdrawal} disabled={requesting || availableBalance <= 0} className="w-full neon-glow-green">
-                {requesting ? "Solicitando..." : "Confirmar Solicitação"}
+              <Button onClick={handleRequestWithdrawal} disabled={requesting || availableBalance <= 0} className="w-full bg-neon-green hover:bg-neon-green/90 text-[#050505] shadow-[0_0_15px_rgba(57,255,20,0.3)] rounded-none font-black uppercase tracking-widest text-[10px] h-12 mt-2">
+                {requesting ? "Transmitindo Solicitação..." : "Confirmar Solicitação"}
               </Button>
             )}
-            
           </CardContent>
         </Card>
       </div>
 
       {/* Histórico de Saques */}
-      <Card className="neon-border bg-card/80">
-        <CardHeader>
-          <CardTitle className="text-lg">Histórico de Saques</CardTitle>
+      <Card className="bg-[#050505] border-white/10 rounded-none font-mono">
+        <CardHeader className="border-b border-white/5 bg-[#030304]">
+          <CardTitle className="text-sm font-black uppercase tracking-widest text-white">Histórico de Saques</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pt-6">
           <div className="space-y-3">
             {withdrawals?.map((w) => (
-              <div key={w.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 rounded-lg bg-secondary/30 border border-border/50 gap-3">
+              <div key={w.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 bg-[#030304] border border-white/5 rounded-none gap-3 hover:bg-[#08080a] transition-colors">
                 <div>
-                  <p className="font-semibold text-sm">R$ {Number(w.amount).toFixed(2)}</p>
-                  <p className="text-xs text-muted-foreground">Solicitado em: {new Date(w.created_at).toLocaleDateString("pt-BR", { hour: "2-digit", minute: "2-digit" })}</p>
+                  <p className="font-black text-sm text-white">R$ {Number(w.amount).toFixed(2)}</p>
+                  <p className="text-[10px] text-muted-foreground uppercase tracking-widest mt-1">Solicitado: {new Date(w.created_at).toLocaleDateString("pt-BR", { hour: "2-digit", minute: "2-digit" })}</p>
                   {w.completed_at && (
-                    <p className="text-xs text-muted-foreground">Concluído em: {new Date(w.completed_at).toLocaleDateString("pt-BR", { hour: "2-digit", minute: "2-digit" })}</p>
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-widest">Concluído: {new Date(w.completed_at).toLocaleDateString("pt-BR", { hour: "2-digit", minute: "2-digit" })}</p>
                   )}
                   {w.admin_notes && (
-                    <p className="text-[11px] text-muted-foreground mt-1 block px-2 py-1 bg-background rounded">Nota do admin: {w.admin_notes}</p>
+                    <p className="text-[10px] text-neon-purple mt-2 block px-2 py-1 bg-neon-purple/10 border border-neon-purple/20">Nota ADMIN: {w.admin_notes}</p>
                   )}
                 </div>
                 <div className="flex items-center gap-2">
-                  <Badge variant={w.status === 'completed' ? 'default' : w.status === 'rejected' ? 'destructive' : 'outline'} className="text-[10px]">
+                  <Badge variant="outline" className={`text-[9px] uppercase tracking-widest rounded-none border-white/10 bg-[#050505] ${w.status === 'completed' ? 'text-neon-green' : w.status === 'rejected' ? 'text-destructive' : 'text-accent'}`}>
                     {w.status === 'completed' && <CheckCircle2 className="w-3 h-3 mr-1" />}
                     {w.status === 'pending' && <Clock className="w-3 h-3 mr-1" />}
                     {w.status === 'rejected' && <XCircle className="w-3 h-3 mr-1" />}
-                    {w.status === 'completed' ? 'Concluído' : w.status === 'pending' ? 'Pendente' : 'Recusado'}
+                    {w.status === 'completed' ? 'Concluído' : w.status === 'pending' ? 'Em Processamento' : 'Recusado'}
                   </Badge>
                 </div>
               </div>
             ))}
             {withdrawals?.length === 0 && (
-              <p className="text-sm text-muted-foreground text-center py-4">Nenhum saque solicitado ainda.</p>
+              <div className="flex border-t border-white/5 mt-4 pt-4 justify-center">
+                <p className="text-[10px] uppercase tracking-widest text-muted-foreground">Nenhuma solicitação de saque no registro.</p>
+              </div>
             )}
           </div>
         </CardContent>

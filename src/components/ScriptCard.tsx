@@ -20,9 +20,9 @@ interface ScriptCardProps {
 }
 
 const statusConfig = {
-  working: { label: "Working", className: "bg-accent/20 text-accent border-accent/30" },
-  detected: { label: "Detected", className: "bg-destructive/20 text-destructive border-destructive/30" },
-  updating: { label: "Updating", className: "bg-[hsl(var(--neon-cyan)/0.2)] text-[hsl(var(--neon-cyan))] border-[hsl(var(--neon-cyan)/0.3)]" },
+  working: { label: "WORKING_OK", className: "bg-[#030304] text-neon-green border-white/10" },
+  detected: { label: "DETECTED_RISK", className: "bg-[#030304] text-destructive border-white/10" },
+  updating: { label: "UPDATING_NOW", className: "bg-[#030304] text-neon-cyan border-white/10" },
 };
 
 export function ScriptCard({
@@ -32,51 +32,59 @@ export function ScriptCard({
 
   return (
     <Link to={`/script/${id}`} className="block h-full">
-      <Card className="group overflow-hidden border-white/[0.06] hover:border-primary/40 transition-all duration-500 bg-card/50 backdrop-blur-md h-full flex flex-col shadow-lg hover:shadow-primary/10 hover:shadow-xl hover:-translate-y-0.5">
+      <Card className="group overflow-hidden border-white/10 hover:border-neon-purple/50 transition-all duration-300 bg-[#050505] rounded-none h-full flex flex-col shadow-none hover:shadow-[0_0_15px_rgba(168,85,247,0.1)]">
         {/* Thumbnail */}
-        <div className="aspect-video bg-secondary/20 flex items-center justify-center overflow-hidden relative">
+        <div className="aspect-video bg-[#030304] border-b border-white/5 flex items-center justify-center overflow-hidden relative">
           {thumbnailUrl ? (
             <img
               src={thumbnailUrl}
               alt={title}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out opacity-80 group-hover:opacity-100"
               loading="lazy"
             />
           ) : (
-            <Code className="h-6 w-6 sm:h-10 sm:w-10 text-muted-foreground/15 group-hover:scale-110 transition-transform duration-700" />
+            <Code className="h-6 w-6 sm:h-10 sm:w-10 text-white/5 shadow-neon-cyan" />
           )}
 
           {/* Status badge */}
-          <div className="absolute bottom-1.5 left-1.5 sm:bottom-2.5 sm:left-2.5 z-10 flex flex-wrap gap-1">
-            <Badge variant="outline" className={`${st.className} text-[7px] sm:text-[9px] h-4 sm:h-5 px-1.5 sm:px-2 backdrop-blur-sm border-white/10 font-bold uppercase tracking-tight`}>
+          <div className="absolute top-0 right-0 p-1 bg-[#050505] border-b border-l border-white/10 z-10 hidden sm:block">
+             <span className="text-[7px] text-muted-foreground uppercase font-mono tracking-widest">[{id.substring(0,6)}]</span>
+          </div>
+
+          <div className="absolute bottom-2 left-2 z-10 flex flex-wrap gap-1">
+            <Badge variant="outline" className={`${st.className} text-[8px] sm:text-[9px] rounded-none font-mono uppercase tracking-widest`}>
               {st.label}
             </Badge>
             {categorySlug && (
-              <Badge variant="outline" className="bg-background/50 backdrop-blur-sm text-[7px] sm:text-[9px] h-4 sm:h-5 px-1.5 sm:px-2 border-white/10 text-muted-foreground uppercase hidden sm:inline-flex">
-                {categorySlug === "scripts-lua" ? "Lua" : categorySlug}
+              <Badge variant="outline" className="bg-[#030304] text-white/70 border-white/10 text-[8px] sm:text-[9px] rounded-none uppercase tracking-widest font-mono hidden sm:inline-flex">
+                {categorySlug === "scripts-lua" ? "LUA" : categorySlug}
               </Badge>
             )}
           </div>
+
+          {/* Glitch Overlay Effect on Hover */}
+          <div className="absolute inset-0 bg-neon-purple/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 mix-blend-overlay pointer-events-none" />
+        </div>
 
           {/* Hover overlay */}
           <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
         </div>
 
         {/* Content */}
-        <CardContent className="p-2.5 sm:p-4 flex-1 flex flex-col gap-2 sm:gap-3">
+        <CardContent className="p-4 flex-1 flex flex-col gap-3 font-mono">
           {/* Title + Modder */}
-          <div className="flex-1 space-y-1.5">
-            <h3 className="font-bold text-[11px] sm:text-sm line-clamp-2 group-hover:text-primary transition-colors duration-300 leading-tight">
+          <div className="flex-1 space-y-2">
+            <h3 className="font-black text-sm uppercase tracking-tight text-white group-hover:text-neon-purple transition-colors duration-300 leading-tight italic truncate">
               {title}
             </h3>
-            <div className="flex flex-wrap items-center gap-1 sm:gap-1.5" onClick={(e) => e.stopPropagation()}>
+            <div className="flex flex-wrap items-center gap-1 sm:gap-2" onClick={(e) => e.stopPropagation()}>
               <Link
                 to={`/modder/${modderId}`}
-                className="flex items-center gap-1 text-[9px] sm:text-[11px] text-muted-foreground/70 hover:text-primary transition-colors duration-200 bg-white/[0.03] py-0.5 px-1.5 sm:px-2 rounded-full border border-white/5"
+                className="flex items-center gap-1 text-[9px] sm:text-[10px] uppercase font-black tracking-widest text-muted-foreground hover:text-white transition-colors duration-200 border border-white/5 bg-[#030304] px-2 py-0.5"
               >
-                <span className="truncate max-w-[55px] sm:max-w-[90px]">@{modderName}</span>
+                <span className="truncate max-w-[80px] sm:max-w-[100px]">{modderName}</span>
               </Link>
-              <div className="scale-[0.6] sm:scale-[0.85] origin-left flex items-center gap-0.5">
+              <div className="scale-[0.7] sm:scale-[0.8] origin-left flex items-center gap-1">
                 <UserRoleBadge userId={modderId} />
                 <UserBadges userId={modderId} compact />
               </div>
@@ -84,41 +92,41 @@ export function ScriptCard({
           </div>
 
           {/* Stats row */}
-          <div className="flex items-center gap-2 sm:gap-3 text-[9px] sm:text-[11px] text-muted-foreground/50">
-            <span className="flex items-center gap-0.5 sm:gap-1">
-              <Download className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
+          <div className="flex items-center gap-3 sm:gap-4 text-[9px] sm:text-[10px] text-muted-foreground uppercase tracking-widest">
+            <span className="flex items-center gap-1.5 border border-white/5 px-1.5 py-0.5 bg-[#030304]">
+              <Download className="h-3 w-3 text-neon-cyan" />
               {downloadCount}
             </span>
-            <span className="flex items-center gap-0.5 sm:gap-1">
-              <Star className="h-2.5 w-2.5 sm:h-3 sm:w-3 text-amber-400 fill-amber-400" />
-              <span className="font-bold text-amber-400/90">{averageRating.toFixed(1)}</span>
+            <span className="flex items-center gap-1.5 border border-white/5 px-1.5 py-0.5 bg-[#030304]">
+              <Star className="h-3 w-3 text-amber-500 fill-amber-500" />
+              <span className="font-black text-amber-500">{averageRating.toFixed(1)}</span>
             </span>
           </div>
 
           {/* CTA — price + buy button (ALWAYS at bottom) */}
-          <div className={`mt-auto pt-2 sm:pt-3 border-t border-white/5 flex items-center justify-between gap-2`}>
+          <div className={`mt-auto pt-3 border-t border-white/5 flex items-center justify-between gap-2`}>
             {isPaid ? (
               <>
-                <div className="flex flex-col leading-none">
-                  <span className="text-[8px] text-muted-foreground/50 uppercase tracking-widest">Preço</span>
-                  <span className="text-base sm:text-lg font-black text-[hsl(var(--neon-pink))]">
+                <div className="flex flex-col leading-none space-y-1">
+                  <span className="text-[8px] text-muted-foreground uppercase tracking-widest font-black">Transferência</span>
+                  <span className="text-sm sm:text-base font-black text-[#a855f7]">
                     R$ {price?.toFixed(2)}
                   </span>
                 </div>
-                <span className="flex items-center gap-1 bg-[hsl(var(--neon-pink)/0.12)] hover:bg-[hsl(var(--neon-pink)/0.22)] text-[hsl(var(--neon-pink))] border border-[hsl(var(--neon-pink)/0.3)] transition-all duration-300 font-bold text-[9px] sm:text-[11px] px-2.5 sm:px-3 py-1.5 rounded-full group-hover:shadow-[0_0_12px_hsl(var(--neon-pink)/0.3)]">
-                  <ShoppingCart className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
-                  Comprar
+                <span className="flex items-center gap-2 bg-neon-purple hover:bg-neon-purple/90 text-white transition-all duration-300 font-black uppercase tracking-widest text-[9px] sm:text-[10px] px-3 py-1.5 group-hover:shadow-[0_0_15px_rgba(168,85,247,0.3)] border border-neon-purple">
+                  <ShoppingCart className="h-3 w-3" />
+                  Aquisição
                 </span>
               </>
             ) : (
               <>
-                <div className="flex flex-col leading-none">
-                  <span className="text-[8px] text-muted-foreground/50 uppercase tracking-widest">Preço</span>
-                  <span className="text-base sm:text-lg font-black text-accent">Grátis</span>
+                <div className="flex flex-col leading-none space-y-1">
+                  <span className="text-[8px] text-muted-foreground uppercase tracking-widest font-black">Acesso</span>
+                  <span className="text-sm sm:text-base font-black text-neon-green">Livre</span>
                 </div>
-                <span className="flex items-center gap-1 bg-accent/10 hover:bg-accent/20 text-accent border border-accent/30 transition-all duration-300 font-bold text-[9px] sm:text-[11px] px-2.5 sm:px-3 py-1.5 rounded-full group-hover:shadow-[0_0_12px_hsl(var(--neon-green)/0.3)]">
-                  <Unlock className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
-                  Acessar
+                <span className="flex items-center gap-2 bg-transparent hover:bg-neon-green/10 text-neon-green border border-neon-green/50 transition-all duration-300 font-black uppercase tracking-widest text-[9px] sm:text-[10px] px-3 py-1.5 group-hover:shadow-[0_0_15px_rgba(57,255,20,0.1)]">
+                  <Unlock className="h-3 w-3" />
+                  Operar
                 </span>
               </>
             )}

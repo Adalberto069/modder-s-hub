@@ -254,11 +254,17 @@ end
   return (
     <Layout>
       <div className="container py-8">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6">
-          <h1 className="text-xl sm:text-2xl font-bold">Dashboard</h1>
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-8 border border-white/10 bg-[#030304] p-6 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-neon-purple/10 blur-[80px] pointer-events-none" />
+          <div className="relative z-10 space-y-1">
+            <h1 className="text-3xl font-black uppercase tracking-tighter text-white">Terminal Modder</h1>
+            <p className="text-[10px] text-muted-foreground uppercase font-mono tracking-widest flex items-center gap-2">
+              <Code className="w-3 h-3 text-neon-purple" /> Acesso Desenvolvedor
+            </p>
+          </div>
           {isModder && (
-            <Button onClick={() => navigate("/script/new")} className="neon-glow-purple w-full sm:w-auto">
-              <Plus className="mr-2 h-4 w-4" /> Novo Conteúdo
+            <Button onClick={() => navigate("/script/new")} className="bg-neon-purple hover:bg-neon-purple/90 text-white shadow-[0_0_15px_rgba(168,85,247,0.3)] rounded-none font-black uppercase tracking-widest text-[10px] sm:text-xs h-10 sm:h-12 px-6 w-full sm:w-auto relative z-10 transition-transform hover:-translate-y-1">
+              <Plus className="mr-2 h-4 w-4" /> Novo Payload
             </Button>
           )}
         </div>
@@ -266,85 +272,84 @@ end
         {/* Stats - only for modders */}
         {isModder && (
           <div className="space-y-6 mb-8">
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-              <Card className="bg-card/40 backdrop-blur-md border-primary/20 shadow-lg shadow-primary/5 hover:border-primary/40 transition-all group">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 font-mono">
+              <Card className="bg-[#050505] border-white/10 hover:border-primary/40 rounded-none transition-all group">
                 <CardContent className="p-5">
-                  <div className="flex justify-between items-start mb-2">
-                    <div className="bg-primary/10 p-2 rounded-lg group-hover:bg-primary/20 transition-colors">
+                  <div className="flex justify-between items-start mb-4">
+                    <div className="bg-primary/5 border border-primary/20 p-2 group-hover:bg-primary/10 transition-colors">
                       <Code className="h-4 w-4 text-primary" />
                     </div>
                     <Badge variant="outline" className="text-[10px] opacity-60">Total</Badge>
                   </div>
-                  <p className="text-2xl font-bold font-mono text-foreground leading-none">
+                  <p className="text-2xl font-bold text-white leading-none">
                     {myScripts?.length ?? 0}
                   </p>
-                  <p className="text-xs text-muted-foreground mt-1 uppercase tracking-wider font-medium">Publicações</p>
+                  <p className="text-[10px] text-muted-foreground mt-2 uppercase tracking-widest font-black">Publicações</p>
                 </CardContent>
               </Card>
 
-              <Card className="bg-card/40 backdrop-blur-md border-accent/20 shadow-lg shadow-accent/5 hover:border-accent/40 transition-all group">
+              <Card className="bg-[#050505] border-white/10 hover:border-accent/40 rounded-none transition-all group">
                 <CardContent className="p-5">
-                  <div className="flex justify-between items-start mb-2">
-                    <div className="bg-accent/10 p-2 rounded-lg group-hover:bg-accent/20 transition-colors">
+                  <div className="flex justify-between items-start mb-4">
+                    <div className="bg-accent/5 border border-accent/20 p-2 group-hover:bg-accent/10 transition-colors">
                       <Download className="h-4 w-4 text-accent" />
                     </div>
                     <Badge variant="outline" className="text-[10px] text-accent/70 border-accent/20">Popularidade</Badge>
                   </div>
-                  <p className="text-2xl font-bold font-mono text-foreground leading-none">
+                  <p className="text-2xl font-bold text-white leading-none">
                     {totalDownloads}
                   </p>
-                  <p className="text-xs text-muted-foreground mt-1 uppercase tracking-wider font-medium">Downloads</p>
+                  <p className="text-[10px] text-muted-foreground mt-2 uppercase tracking-widest font-black">Downloads</p>
                 </CardContent>
               </Card>
 
-              <Card className="bg-card/40 backdrop-blur-md border-neon-purple/20 shadow-lg shadow-neon-purple/5 hover:border-neon-purple/40 transition-all group">
+              <Card className="bg-[#050505] border-white/10 hover:border-neon-purple/40 rounded-none transition-all group">
                 <CardContent className="p-5">
-                  <div className="flex justify-between items-start mb-2">
-                    <div className="bg-neon-purple/10 p-2 rounded-lg group-hover:bg-neon-purple/20 transition-colors">
+                  <div className="flex justify-between items-start mb-4">
+                    <div className="bg-neon-purple/5 border border-neon-purple/20 p-2 group-hover:bg-neon-purple/10 transition-colors">
                       <ShoppingBag className="h-4 w-4 text-neon-purple" />
                     </div>
                     <Badge variant="outline" className="text-[10px] text-neon-purple/70 border-neon-purple/20">Volume</Badge>
                   </div>
-                  <p className="text-2xl font-bold font-mono text-foreground leading-none">
+                  <p className="text-2xl font-bold text-white leading-none">
                     {totalSales}
                   </p>
-                  <p className="text-xs text-muted-foreground mt-1 uppercase tracking-wider font-medium">Vendas</p>
+                  <p className="text-[10px] text-muted-foreground mt-2 uppercase tracking-widest font-black">Vendas</p>
                 </CardContent>
               </Card>
 
-              <Card className="bg-card/40 backdrop-blur-md border-neon-green/20 shadow-lg shadow-neon-green/5 hover:border-neon-green/40 transition-all group">
+              <Card className="bg-[#050505] border-white/10 hover:border-neon-green/40 rounded-none transition-all group">
                 <CardContent className="p-5">
-                  <div className="flex justify-between items-start mb-2">
-                    <div className="bg-neon-green/10 p-2 rounded-lg group-hover:bg-neon-green/20 transition-colors">
+                  <div className="flex justify-between items-start mb-4">
+                    <div className="bg-neon-green/5 border border-neon-green/20 p-2 group-hover:bg-neon-green/10 transition-colors">
                       <DollarSign className="h-4 w-4 text-neon-green" />
                     </div>
                     <div className="flex items-center gap-1">
-                      <ArrowUpRight className={`h-3 w-3 ${dailyGrowth ? 'text-neon-green' : 'text-muted-foreground'}`} />
-                      <span className="text-[10px] font-medium text-neon-green">Lucro</span>
+                      <ArrowUpRight className={`h-3 w-3 ${dailyGrowth ? 'text-neon-green' : 'text-[#333]'}`} />
+                      <span className="text-[10px] font-black uppercase text-neon-green">Lucro</span>
                     </div>
                   </div>
-                  <p className="text-2xl font-bold font-mono text-neon-green leading-none">
+                  <p className="text-2xl font-bold text-neon-green leading-none">
                     R$ {totalEarnings.toFixed(2)}
                   </p>
-                  <p className="text-xs text-muted-foreground mt-1 uppercase tracking-wider font-medium">Ganhos (80%)</p>
+                  <p className="text-[10px] text-muted-foreground mt-2 uppercase tracking-widest font-black">Ganhos (80%)</p>
                 </CardContent>
               </Card>
             </div>
 
-            {/* Charts Section */}
-            <div className="grid grid-cols-1 gap-6">
-              <Card className="bg-card/40 backdrop-blur-md border-border/50 shadow-xl overflow-hidden">
-                <CardHeader className="pb-2 border-b border-border/10">
+            <div className="grid grid-cols-1 gap-6 font-mono">
+              <Card className="bg-[#050505] border-white/10 rounded-none shadow-none overflow-hidden">
+                <CardHeader className="pb-4 border-b border-white/5 bg-[#030304]">
                   <div className="flex items-center justify-between">
                     <div>
-                      <CardTitle className="text-sm font-bold flex items-center gap-2">
+                      <CardTitle className="text-sm font-black uppercase tracking-widest flex items-center gap-2 text-white">
                         <TrendingUp className="h-4 w-4 text-primary" />
                         Desempenho de Vendas
                       </CardTitle>
-                      <CardDescription className="text-[10px]">Ganhos líquidos nos últimos 7 dias</CardDescription>
+                      <CardDescription className="text-[9px] uppercase tracking-widest mt-1">Ganhos líquidos nos últimos 7 dias</CardDescription>
                     </div>
                     <div className="flex items-center gap-2">
-                      <div className="flex items-center gap-1.5 px-2 py-1 rounded bg-secondary/50 text-[10px] font-mono">
+                       <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 border border-white/10 bg-[#030304] text-[10px] font-black uppercase tracking-widest">
                         <Calendar className="h-3 w-3" /> 
                         Última semana
                       </div>
@@ -405,17 +410,17 @@ end
           </div>
         )}
 
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className={`mb-6 grid w-full ${isModder ? "grid-cols-3" : "grid-cols-1"}`}>
-            <TabsTrigger value="purchases" className="gap-1.5 text-xs sm:text-sm">
-              <ShoppingBag className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> <span className="hidden sm:inline">Meus </span>Scripts Comprados
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="font-mono">
+          <TabsList className={`mb-8 grid w-full ${isModder ? "grid-cols-3" : "grid-cols-1"} p-1 bg-[#050505] border border-white/10 rounded-none h-14`}>
+            <TabsTrigger value="purchases" className="text-[9px] sm:text-[10px] tracking-widest uppercase font-black gap-2 data-[state=active]:bg-[#030304] data-[state=active]:text-neon-purple rounded-none h-full">
+              <Key className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> <span className="hidden sm:inline">Meus </span>Arquivos Comprados
             </TabsTrigger>
             {isModder && (
               <>
-                <TabsTrigger value="my-scripts" className="gap-1.5 text-xs sm:text-sm">
-                  <Code className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> <span className="hidden sm:inline">Minhas </span>Publicações
+                <TabsTrigger value="my-scripts" className="text-[9px] sm:text-[10px] tracking-widest uppercase font-black gap-2 data-[state=active]:bg-[#030304] data-[state=active]:text-neon-green rounded-none h-full">
+                  <Code className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> Minhas Publicações
                 </TabsTrigger>
-                <TabsTrigger value="finance" className="gap-1.5 text-xs sm:text-sm">
+                <TabsTrigger value="finance" className="text-[9px] sm:text-[10px] tracking-widest uppercase font-black gap-2 data-[state=active]:bg-[#030304] data-[state=active]:text-accent rounded-none h-full">
                   <DollarSign className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> <span className="hidden sm:inline">Meu </span>Financeiro
                 </TabsTrigger>
               </>
@@ -424,10 +429,10 @@ end
 
           {/* Purchased Scripts Tab */}
           <TabsContent value="purchases">
-            <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-              <Key className="h-5 w-5 text-primary" /> Scripts Adquiridos
+            <h2 className="text-sm font-black uppercase tracking-widest mb-6 flex items-center gap-2 text-white bg-[#030304] border border-white/5 p-4 rounded-none">
+              <Key className="h-4 w-4 text-neon-purple" /> Scripts Adquiridos
             </h2>
-            <div className="space-y-3">
+            <div className="space-y-4">
               {myLicenses?.map((license: any) => (
                 <Card key={license.id} className="neon-border bg-card/80">
                   <CardContent className="p-4">
@@ -539,39 +544,42 @@ end
 
           {/* Modder Scripts Tab */}
           {isModder && (
-            <TabsContent value="my-scripts">
+            <TabsContent value="my-scripts" className="space-y-6">
               {/* Upload form */}
               {showForm && (
-                <Card className="neon-border bg-card/80 mb-8">
-                  <CardHeader>
-                    <CardTitle>Nova Publicação</CardTitle>
+                <Card className="border-white/10 bg-[#050505] rounded-none p-2 mb-8 relative font-mono">
+                  <div className="absolute top-0 right-0 p-1 bg-neon-purple/20 border-b border-l border-neon-purple/50">
+                    <span className="text-[8px] uppercase font-black tracking-widest text-neon-purple">MODDER_AUTH_OK</span>
+                  </div>
+                  <CardHeader className="border-b border-white/5 bg-[#030304] pb-4">
+                    <CardTitle className="text-sm font-black uppercase tracking-widest text-white">Init Payload Config</CardTitle>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="pt-6">
                     <form onSubmit={handleSubmit} className="space-y-4">
                       <div>
-                        <Label className="mb-2 block">Tipo de conteúdo</Label>
+                        <Label className="mb-2 block text-[10px] font-black uppercase tracking-widest text-muted-foreground">Classificação do Payload</Label>
                         <Tabs value={scriptType} onValueChange={setScriptType}>
-                          <TabsList className="grid w-full max-w-xs grid-cols-2">
-                            <TabsTrigger value="script" className="gap-2">
-                              <Code className="h-4 w-4" /> Script
+                          <TabsList className="grid w-full max-w-xs grid-cols-2 p-1 bg-[#030304] border border-white/10 rounded-none h-12">
+                            <TabsTrigger value="script" className="text-[10px] tracking-widest uppercase font-black gap-2 data-[state=active]:bg-[#0a0a0c] data-[state=active]:text-neon-cyan rounded-none h-full">
+                              <Code className="h-4 w-4" /> Script LUA
                             </TabsTrigger>
-                            <TabsTrigger value="apk" className="gap-2">
-                              <Package className="h-4 w-4" /> APK / Mod
+                            <TabsTrigger value="apk" className="text-[10px] tracking-widest uppercase font-black gap-2 data-[state=active]:bg-[#0a0a0c] data-[state=active]:text-neon-green rounded-none h-full">
+                              <Package className="h-4 w-4" /> Mod Menu
                             </TabsTrigger>
                           </TabsList>
                         </Tabs>
                       </div>
 
                       <div className="grid md:grid-cols-2 gap-4">
-                        <div>
-                          <Label>Título</Label>
-                          <Input value={title} onChange={(e) => setTitle(e.target.value)} required />
+                        <div className="space-y-2">
+                          <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Nome Operacional</Label>
+                          <Input value={title} onChange={(e) => setTitle(e.target.value)} required className="bg-[#030304] border-white/10 focus-visible:ring-neon-purple rounded-none h-12" />
                         </div>
-                        <div>
-                          <Label>Categoria</Label>
+                        <div className="space-y-2">
+                          <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Classificação Global</Label>
                           <Select value={categoryId} onValueChange={setCategoryId}>
-                            <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
-                            <SelectContent>
+                            <SelectTrigger className="bg-[#030304] border-white/10 focus-visible:ring-neon-purple rounded-none h-12"><SelectValue placeholder="SORT_BY" /></SelectTrigger>
+                            <SelectContent className="bg-[#050505] border-white/10 rounded-none">
                               {categories?.map((c: any) => (
                                 <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
                               ))}
@@ -579,33 +587,33 @@ end
                           </Select>
                         </div>
                       </div>
-                      <div>
-                        <Label>Descrição</Label>
-                        <Textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={4} />
+                      <div className="space-y-2">
+                        <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Documentação (TXT)</Label>
+                        <Textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={4} className="bg-[#030304] border-white/10 focus-visible:ring-neon-purple rounded-none resize-none p-4" />
                       </div>
                       <div className="grid md:grid-cols-2 gap-4">
-                        <div>
-                          <Label>Status</Label>
+                        <div className="space-y-2">
+                          <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Estado Operacional</Label>
                           <Select value={status} onValueChange={setStatus}>
-                            <SelectTrigger><SelectValue /></SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="working">Working</SelectItem>
-                              <SelectItem value="detected">Detected</SelectItem>
-                              <SelectItem value="updating">Updating</SelectItem>
+                            <SelectTrigger className="bg-[#030304] border-white/10 focus-visible:ring-neon-purple rounded-none h-12 text-xs"><SelectValue /></SelectTrigger>
+                            <SelectContent className="bg-[#050505] border-white/10 rounded-none text-xs">
+                              <SelectItem value="working">WORKING_OK</SelectItem>
+                              <SelectItem value="detected">DETECTED_RISK</SelectItem>
+                              <SelectItem value="updating">UPDATING_NOW</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
-                        <div className="flex items-center gap-4 pt-6">
-                          <Switch checked={isPaid} onCheckedChange={setIsPaid} />
-                          <Label>Pago</Label>
-                          {isPaid && <Input type="number" placeholder="Preço (R$)" value={price} onChange={(e) => setPrice(e.target.value)} className="w-32" step="0.01" />}
+                        <div className="flex items-center gap-4 pt-8">
+                          <Switch checked={isPaid} onCheckedChange={setIsPaid} className="data-[state=checked]:bg-neon-purple" />
+                          <Label className="uppercase text-[10px] font-black tracking-widest text-white">Monetização</Label>
+                          {isPaid && <Input type="number" placeholder="Value (R$)" value={price} onChange={(e) => setPrice(e.target.value)} className="w-32 bg-[#030304] border-white/10 focus-visible:ring-neon-purple rounded-none text-neon-green font-mono" step="0.01" />}
                         </div>
                       </div>
 
                       <div className="grid md:grid-cols-2 gap-4">
-                        <div>
-                          <Label>Arquivo (upload)</Label>
-                          <Input type="file" onChange={async (e) => {
+                        <div className="space-y-2">
+                          <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Upload Raw File</Label>
+                          <Input type="file" className="bg-[#030304] border-white/10 focus-visible:ring-neon-purple rounded-none h-12 file:bg-[#050505] file:text-white file:border-0 file:mr-4 file:h-full cursor-pointer text-xs" onChange={async (e) => {
                             const f = e.target.files?.[0] ?? null;
                             if (!f) {
                               setFile(null);
@@ -620,13 +628,13 @@ end
                             setFile(f);
                           }} />
                         </div>
-                        <div>
-                          <Label>Miniatura (upload)</Label>
-                          <div className="flex gap-2">
-                            <Input 
+                        <div className="space-y-2">
+                          <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">URL da Miniatura / Link Externo</Label>
+                          <div className="flex gap-2 h-12">
+                             <Input 
                               type="file" 
                               accept=".jpg,.jpeg,.png,.webp"
-                              className="text-xs"
+                               className="bg-[#030304] border-white/10 focus-visible:ring-neon-purple rounded-none h-12 file:bg-[#050505] file:text-white file:border-0 file:mr-4 file:h-full cursor-pointer text-xs w-full"
                               onChange={async (e) => {
                                 const f = e.target.files?.[0];
                                 if (!f) return;
@@ -643,71 +651,80 @@ end
                                   return;
                                 }
                                 const { data: publicData } = supabase.storage.from("scripts").getPublicUrl(path);
-                                setExternalLink(publicData.publicUrl); // Using externalLink as a temporary holder or I should add a state
+                                setExternalLink(publicData.publicUrl);
                                 toast.success("Miniatura enviada!");
                               }}
                             />
                           </div>
-                          <p className="text-[10px] text-muted-foreground mt-1">Apenas JPG/PNG/WebP, Máx 1MB.</p>
+                          <p className="text-[9px] text-muted-foreground mt-1 uppercase tracking-widest font-mono">JPG/PNG/WebP, 1MB Max.</p>
                         </div>
                       </div>
 
-                      <div>
-                        <Label>Link externo ou URL da Miniatura</Label>
-                        <Input value={externalLink} onChange={(e) => setExternalLink(e.target.value)} placeholder="https://..." />
+                      <div className="space-y-2 pt-2">
+                        <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Endpoint / Thumbnail URL</Label>
+                        <Input value={externalLink} onChange={(e) => setExternalLink(e.target.value)} placeholder="https://..." className="bg-[#030304] border-white/10 focus-visible:ring-neon-purple rounded-none h-12 font-mono text-xs" />
                       </div>
-                      <Button type="submit" disabled={submitting} className="neon-glow-purple">
-                        {submitting ? "Publicando..." : `Publicar ${scriptType === "script" ? "Script" : "APK/Mod"}`}
+                      <Button type="submit" disabled={submitting} className="w-full bg-neon-purple hover:bg-neon-purple/90 text-white shadow-[0_0_15px_rgba(168,85,247,0.3)] rounded-none font-black uppercase tracking-widest text-[10px] sm:text-xs h-12 mt-4">
+                        {submitting ? "Executando..." : `Deploy ${scriptType === "script" ? "LUA" : "MOD"}`}
                       </Button>
                     </form>
                   </CardContent>
                 </Card>
               )}
 
-              <h2 className="text-xl font-bold mb-4">Minhas Publicações</h2>
-              <div className="space-y-3">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-sm font-black uppercase tracking-widest text-white flex items-center gap-2">
+                  <Code className="h-4 w-4 text-neon-green" /> Payload Submissions
+                </h2>
+                <Badge variant="outline" className="text-[10px] uppercase font-mono tracking-widest border-white/10 bg-[#030304] text-muted-foreground">
+                  TOTAL: {myScripts?.length ?? 0}
+                </Badge>
+              </div>
+              <div className="space-y-4">
                 {myScripts?.map((script: any) => (
-                  <Card key={script.id} className={`neon-border bg-card/80 ${!script.is_active ? 'opacity-60' : ''}`}>
-                    <CardContent className="p-3 sm:p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                      <div>
-                        <div className="flex items-center gap-2 mb-1">
+                  <Card key={script.id} className={`bg-[#050505] border border-white/5 rounded-none hover:bg-[#08080a] transition-colors p-0 shadow-none ${!script.is_active ? 'opacity-50 grayscale' : ''}`}>
+                    <CardContent className="p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 font-mono">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-2 flex-wrap">
                           {script.script_type === "apk" ? (
-                            <Package className="h-4 w-4 text-primary" />
+                            <Package className="h-4 w-4 text-neon-green" />
                           ) : (
-                            <Code className="h-4 w-4 text-primary" />
+                            <Code className="h-4 w-4 text-neon-cyan" />
                           )}
-                          <p className="font-semibold">{script.title}</p>
-                          {script.is_paid && <Badge variant="secondary" className="text-[10px]">R$ {Number(script.price).toFixed(2)}</Badge>}
-                          {!script.is_active && <Badge variant="destructive" className="text-[10px]">Inativo</Badge>}
+                          <p className="font-black text-sm uppercase tracking-tight text-white truncate italic">{script.title}</p>
+                          {script.is_paid && <Badge variant="secondary" className="text-[9px] uppercase tracking-widest bg-neon-purple/20 text-neon-purple hover:bg-neon-purple/30 rounded-none border-t border-neon-purple/50">R$ {Number(script.price).toFixed(2)}</Badge>}
+                          {!script.is_active && <Badge variant="destructive" className="text-[9px] uppercase tracking-widest rounded-none">INATIVO</Badge>}
                         </div>
-                         <div className="flex flex-wrap gap-2 sm:gap-3 text-xs text-muted-foreground mt-1">
-                           <span>{script.categories?.name}</span>
-                           <span>{script.download_count} downloads</span>
-                           <Badge variant="outline" className="text-[10px]">{script.status}</Badge>
-                           <Badge variant="secondary" className="text-[10px]">{script.script_type === "apk" ? "APK" : "Script"}</Badge>
+                         <div className="flex flex-wrap gap-3 text-[10px] text-muted-foreground uppercase tracking-widest">
+                           <span className="flex items-center gap-1"><FolderOpen className="h-3 w-3" /> {script.categories?.name}</span>
+                           <span className="flex items-center gap-1"><Download className="h-3 w-3" /> {script.download_count}</span>
+                           <Badge variant="outline" className="text-[9px] border-white/10 bg-[#030304] rounded-none">{script.status}</Badge>
+                           <Badge variant="secondary" className="text-[9px] border-white/10 bg-[#030304] rounded-none">{script.script_type === "apk" ? "MOD" : "LUA"}</Badge>
                          </div>
                       </div>
-                      <div className="flex gap-1">
-                        <Button variant="ghost" size="icon" onClick={() => navigate(`/script/${script.id}/edit`)}>
+                      <div className="flex gap-2 shrink-0">
+                        <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-white/5 rounded-none text-muted-foreground hover:text-white transition-colors" onClick={() => navigate(`/script/${script.id}/edit`)}>
                           <Pencil className="h-4 w-4" />
                         </Button>
                         <Button
                           variant="ghost"
                           size="icon"
-                          className={script.is_active ? "text-primary" : "text-accent"}
+                          className={`h-8 w-8 hover:bg-white/5 rounded-none transition-colors ${script.is_active ? "text-neon-cyan hover:text-neon-cyan" : "text-muted-foreground hover:text-white"}`}
                           onClick={() => handleToggleActive(script.id, script.is_active)}
                           title={script.is_active ? "Desativar script" : "Reativar script"}
                         >
                           {script.is_active ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                         </Button>
-                        <Button variant="ghost" size="icon" className="text-destructive" onClick={() => handleDelete(script.id)}>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-destructive/10 rounded-none text-destructive transition-colors" onClick={() => handleDelete(script.id)}>
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
                     </CardContent>
                   </Card>
                 ))}
-                {myScripts?.length === 0 && <p className="text-muted-foreground">Nenhuma publicação ainda.</p>}
+                <div className="flex border-t border-white/5 mt-4 pt-4 justify-center">
+                  {myScripts?.length === 0 && <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">Nenhuma transmissão encontrada no terminal.</p>}
+                </div>
               </div>
             </TabsContent>
           )}
