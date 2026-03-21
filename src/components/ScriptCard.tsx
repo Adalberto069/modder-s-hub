@@ -65,11 +65,6 @@ export function ScriptCard({
           {/* Glitch Overlay Effect on Hover */}
           <div className="absolute inset-0 bg-neon-purple/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 mix-blend-overlay pointer-events-none" />
         </div>
-
-          {/* Hover overlay */}
-          <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-        </div>
-
         {/* Content */}
         <CardContent className="p-4 flex-1 flex flex-col gap-3 font-mono">
           {/* Title + Modder */}
