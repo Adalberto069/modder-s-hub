@@ -1,9 +1,10 @@
 import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { Download, Star, Code, ShoppingCart, Unlock } from "lucide-react";
+import { Download, Star, Code, ShoppingCart, Unlock, Heart } from "lucide-react";
 import { UserRoleBadge } from "@/components/UserRoleBadge";
 import { UserBadges } from "@/components/UserBadges";
+import { useFavorites } from "@/hooks/use-favorites";
 
 interface ScriptCardProps {
   id: string;
@@ -29,6 +30,8 @@ export function ScriptCard({
   id, title, modderName, modderId, status, downloadCount, averageRating, isPaid, price, thumbnailUrl, categorySlug,
 }: ScriptCardProps) {
   const st = statusConfig[status];
+  const { isFavorite, toggleFavorite } = useFavorites();
+  const fav = isFavorite(id);
 
   return (
     <Link to={`/script/${id}`} className="block h-full">
@@ -46,10 +49,17 @@ export function ScriptCard({
             <Code className="h-6 w-6 sm:h-10 sm:w-10 text-white/5 shadow-neon-cyan" />
           )}
 
-          {/* Status badge */}
-          <div className="absolute top-0 right-0 p-1 bg-[#050505] border-b border-l border-white/10 z-10 hidden sm:block">
-             <span className="text-[7px] text-muted-foreground uppercase font-mono tracking-widest">[{id.substring(0,6)}]</span>
-          </div>
+          {/* Favorite button */}
+          <button
+            className="absolute top-2 right-2 z-20 p-1.5 bg-[#050505]/80 border border-white/10 hover:border-neon-pink/50 transition-all duration-200"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              toggleFavorite.mutate(id);
+            }}
+          >
+            <Heart className={`h-3.5 w-3.5 transition-colors ${fav ? "text-neon-pink fill-neon-pink" : "text-muted-foreground hover:text-neon-pink"}`} />
+          </button>
 
           <div className="absolute bottom-2 left-2 z-10 flex flex-wrap gap-1">
             <Badge variant="outline" className={`${st.className} text-[8px] sm:text-[9px] rounded-none font-mono uppercase tracking-widest`}>
@@ -62,12 +72,10 @@ export function ScriptCard({
             )}
           </div>
 
-          {/* Glitch Overlay Effect on Hover */}
           <div className="absolute inset-0 bg-neon-purple/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 mix-blend-overlay pointer-events-none" />
         </div>
         {/* Content */}
         <CardContent className="p-4 flex-1 flex flex-col gap-3 font-mono">
-          {/* Title + Modder */}
           <div className="flex-1 space-y-2">
             <h3 className="font-black text-sm uppercase tracking-tight text-white group-hover:text-neon-purple transition-colors duration-300 leading-tight italic truncate">
               {title}
@@ -98,8 +106,8 @@ export function ScriptCard({
             </span>
           </div>
 
-          {/* CTA — price + buy button (ALWAYS at bottom) */}
-          <div className={`mt-auto pt-3 border-t border-white/5 flex items-center justify-between gap-2`}>
+          {/* CTA */}
+          <div className="mt-auto pt-3 border-t border-white/5 flex items-center justify-between gap-2">
             {isPaid ? (
               <>
                 <div className="flex flex-col leading-none space-y-1">

@@ -8,7 +8,9 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { useModderProfiles } from "@/hooks/use-modder-profiles";
-import { Search, Code, Package, Store, SlidersHorizontal, Sparkles } from "lucide-react";
+import { useFavorites } from "@/hooks/use-favorites";
+import { useAuth } from "@/lib/auth";
+import { Search, Code, Package, Store, SlidersHorizontal, Sparkles, ArrowDownAZ, TrendingUp, Star, Heart } from "lucide-react";
 import { motion } from "framer-motion";
 
 function ScriptCardSkeleton() {
@@ -33,6 +35,10 @@ export default function Marketplace() {
   const activeCategory = searchParams.get("category") ?? "all";
   const priceFilter = searchParams.get("price") ?? "all";
   const activeTab = searchParams.get("type") ?? "script";
+  const sortBy = searchParams.get("sort") ?? "recent";
+  const showFavs = searchParams.get("favs") === "1";
+  const { user } = useAuth();
+  const { favorites } = useFavorites();
 
   const { data: categories } = useQuery({
     queryKey: ["categories"],
@@ -43,15 +49,14 @@ export default function Marketplace() {
   });
 
   const { data: scripts, isLoading } = useQuery({
-    queryKey: ["scripts", activeCategory, priceFilter, search, activeTab],
+    queryKey: ["scripts", activeCategory, priceFilter, search, activeTab, sortBy],
     queryFn: async () => {
       let query = supabase
         .from("scripts")
         .select("*, categories(slug, name)")
         .eq("script_type", activeTab)
         .eq("is_verified", true)
-        .eq("is_active", true)
-        .order("created_at", { ascending: false });
+        .eq("is_active", true);
 
       if (activeCategory !== "all") {
         const cat = categories?.find((c: any) => c.slug === activeCategory);
@@ -63,16 +68,30 @@ export default function Marketplace() {
 
       if (search) query = query.ilike("title", `%${search}%`);
 
+      // Sorting
+      if (sortBy === "popular") query = query.order("download_count", { ascending: false });
+      else if (sortBy === "rating") query = query.order("average_rating", { ascending: false });
+      else query = query.order("created_at", { ascending: false });
+
       const { data } = await query;
       return data ?? [];
     },
     enabled: !!categories,
   });
 
+  // Filter favorites client-side
+  const displayScripts = useMemo(() => {
+    if (!scripts) return [];
+    if (showFavs && favorites.length > 0) {
+      return scripts.filter((s: any) => favorites.includes(s.id));
+    }
+    return scripts;
+  }, [scripts, showFavs, favorites]);
+
   const modderIds = useMemo(() => {
-    const ids = scripts?.map((s: any) => s.modder_id) ?? [];
+    const ids = displayScripts?.map((s: any) => s.modder_id) ?? [];
     return [...new Set(ids)];
-  }, [scripts]);
+  }, [displayScripts]);
 
   const { data: modderProfiles } = useModderProfiles(modderIds);
 
@@ -89,7 +108,14 @@ export default function Marketplace() {
     setSearchParams(params);
   };
 
-  const totalResults = scripts?.length ?? 0;
+  const toggleFavs = () => {
+    const params = new URLSearchParams(searchParams);
+    if (showFavs) params.delete("favs");
+    else params.set("favs", "1");
+    setSearchParams(params);
+  };
+
+  const totalResults = displayScripts?.length ?? 0;
 
   return (
     <Layout>
@@ -152,11 +178,13 @@ export default function Marketplace() {
                 </TabsList>
               </Tabs>
 
-              {!isLoading && (
-                <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground hidden sm:block">
-                  <span className="font-black text-neon-green">[{totalResults}]</span> RECORDS FOUND
-                </p>
-              )}
+              <div className="flex items-center gap-2">
+                {!isLoading && (
+                  <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground hidden sm:block">
+                    <span className="font-black text-neon-green">[{totalResults}]</span> RECORDS
+                  </p>
+                )}
+              </div>
             </div>
 
             {/* Filter Bar */}
@@ -191,8 +219,8 @@ export default function Marketplace() {
               <div className="flex items-center gap-2 shrink-0 lg:border-l border-white/5 lg:pl-4 pt-4 lg:pt-0 border-t lg:border-t-0">
                 {[
                   { key: "all", label: "TUDO", active: "bg-white/10 text-white border-white/20" },
-                  { key: "free", label: "FREE ACCESS", active: "bg-neon-green/10 text-neon-green border-neon-green/30" },
-                  { key: "paid", label: "RESTRICTED", active: "bg-neon-pink/10 text-neon-pink border-neon-pink/30" },
+                  { key: "free", label: "FREE", active: "bg-neon-green/10 text-neon-green border-neon-green/30" },
+                  { key: "paid", label: "PAID", active: "bg-neon-pink/10 text-neon-pink border-neon-pink/30" },
                 ].map((item) => (
                   <Badge
                     key={item.key}
@@ -207,6 +235,40 @@ export default function Marketplace() {
                 ))}
               </div>
             </div>
+
+            {/* Sort + Favorites Bar */}
+            <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none font-mono">
+              {[
+                { key: "recent", label: "Recentes", icon: ArrowDownAZ },
+                { key: "popular", label: "Popular", icon: TrendingUp },
+                { key: "rating", label: "Avaliação", icon: Star },
+              ].map((item) => (
+                <Badge
+                  key={item.key}
+                  variant="outline"
+                  className={`cursor-pointer px-3 py-1.5 transition-all text-[9px] font-black uppercase tracking-widest whitespace-nowrap rounded-none flex items-center gap-1.5 ${
+                    sortBy === item.key ? "bg-neon-cyan/10 text-neon-cyan border-neon-cyan/30" : "border-white/10 bg-[#030304] text-muted-foreground hover:bg-white/5"
+                  }`}
+                  onClick={() => setFilter("sort", item.key)}
+                >
+                  <item.icon className="h-3 w-3" />
+                  {item.label}
+                </Badge>
+              ))}
+
+              {user && (
+                <Badge
+                  variant="outline"
+                  className={`cursor-pointer px-3 py-1.5 transition-all text-[9px] font-black uppercase tracking-widest whitespace-nowrap rounded-none flex items-center gap-1.5 ml-auto ${
+                    showFavs ? "bg-neon-pink/10 text-neon-pink border-neon-pink/30" : "border-white/10 bg-[#030304] text-muted-foreground hover:bg-white/5"
+                  }`}
+                  onClick={toggleFavs}
+                >
+                  <Heart className={`h-3 w-3 ${showFavs ? "fill-neon-pink" : ""}`} />
+                  Favoritos {favorites.length > 0 && `(${favorites.length})`}
+                </Badge>
+              )}
+            </div>
           </div>
         </motion.div>
 
@@ -217,14 +279,14 @@ export default function Marketplace() {
               <ScriptCardSkeleton key={i} />
             ))}
           </div>
-        ) : scripts && scripts.length > 0 ? (
+        ) : displayScripts && displayScripts.length > 0 ? (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.4, delay: 0.1 }}
             className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5"
           >
-            {scripts.map((script: any, index: number) => (
+            {displayScripts.map((script: any, index: number) => (
               <motion.div
                 key={script.id}
                 initial={{ opacity: 0, y: 16 }}
@@ -254,12 +316,14 @@ export default function Marketplace() {
             className="flex flex-col items-center justify-center py-20 text-center font-mono"
           >
             <div className="p-4 bg-[#030304] border border-white/5 mb-4 shadow-[0_0_15px_rgba(255,255,255,0.05)]">
-              <Search className="h-8 w-8 text-muted-foreground" />
+              {showFavs ? <Heart className="h-8 w-8 text-muted-foreground" /> : <Search className="h-8 w-8 text-muted-foreground" />}
             </div>
             <p className="text-[11px] font-black uppercase tracking-widest text-muted-foreground mb-1">
-              {activeTab === "script" ? "SYS_ERR: NO PAYLOAD FOUND" : "SYS_ERR: NO MOD FOUND"}
+              {showFavs ? "SYS: NENHUM FAVORITO ENCONTRADO" : activeTab === "script" ? "SYS_ERR: NO PAYLOAD FOUND" : "SYS_ERR: NO MOD FOUND"}
             </p>
-            <p className="text-[9px] uppercase tracking-widest text-[#a855f7]">Verifique os parâmetros de busca e filtros ativos.</p>
+            <p className="text-[9px] uppercase tracking-widest text-[#a855f7]">
+              {showFavs ? "Adicione scripts aos favoritos clicando no ❤️" : "Verifique os parâmetros de busca e filtros ativos."}
+            </p>
           </motion.div>
         )}
       </div>

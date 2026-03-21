@@ -17,7 +17,8 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import {
   Upload, Download, Star, DollarSign, Plus, Trash2, Code, Package, Pencil, Key, 
-  Copy, ShoppingBag, EyeOff, Eye, Clock, RefreshCw, TrendingUp, Calendar, ArrowUpRight
+  Copy, ShoppingBag, EyeOff, Eye, Clock, RefreshCw, TrendingUp, Calendar, ArrowUpRight,
+  FolderOpen
 } from "lucide-react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { 
@@ -221,7 +222,7 @@ end
       if (scriptIds.length === 0) return [];
       const { data } = await supabase
         .from("purchases")
-        .select("amount, platform_commission, modder_earnings")
+        .select("amount, platform_commission, modder_earnings, created_at")
         .in("script_id", scriptIds);
       return data ?? [];
     },
