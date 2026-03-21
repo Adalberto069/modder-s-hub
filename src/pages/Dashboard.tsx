@@ -17,7 +17,8 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import {
   Upload, Download, Star, DollarSign, Plus, Trash2, Code, Package, Pencil, Key, 
-  Copy, ShoppingBag, EyeOff, Eye, Clock, RefreshCw, TrendingUp, Calendar, ArrowUpRight
+  Copy, ShoppingBag, EyeOff, Eye, Clock, RefreshCw, TrendingUp, Calendar, ArrowUpRight,
+  FolderOpen
 } from "lucide-react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { 
