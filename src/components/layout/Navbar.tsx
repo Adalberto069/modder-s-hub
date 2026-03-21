@@ -28,8 +28,8 @@ export function Navbar() {
       <div className="container flex h-16 items-center justify-between">
         <Link to="/" className="flex items-center gap-2">
           <Terminal className="h-6 w-6 text-neon-purple" />
-          <span className="text-xl font-black font-mono tracking-tight uppercase italic">
-            Nexus<span className="text-neon-purple ml-0.5">Society</span>
+          <span className="text-xl font-black font-mono tracking-tight">
+            Hidden<span className="text-neon-green">Mod</span>
           </span>
         </Link>
 

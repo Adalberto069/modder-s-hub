@@ -313,7 +313,7 @@ export default function ScriptDetail() {
 
     const loaderCode = `-- ========================================
 -- ${script.title} - Loader
--- Powered by Nexus Society License System
+-- Powered by HiddenMod License System
 -- ========================================
 
 local license = "${(license as any).license_key}"

@@ -44,7 +44,7 @@ const NotFound = () => {
           <code className="font-mono text-neon-purple bg-neon-purple/10 px-1.5 py-0.5 rounded text-xs">
             {location.pathname}
           </code>{" "}
-          não existe na Nexus Society.
+          não existe no HiddenMod.
         </p>
 
         {/* Actions */}

@@ -10,8 +10,8 @@ export function Footer() {
           <div className="space-y-3">
             <div className="flex items-center gap-2">
               <Terminal className="h-5 w-5 text-neon-purple" />
-              <span className="font-mono font-black text-lg uppercase italic">
-                Nexus<span className="text-neon-purple ml-0.5">Society</span>
+              <span className="font-mono font-black text-lg">
+                Hidden<span className="text-neon-green">Mod</span>
               </span>
             </div>
             <p className="text-sm text-muted-foreground leading-relaxed">
@@ -53,7 +53,7 @@ export function Footer() {
 
         <div className="border-t border-border/50 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
           <p className="text-xs text-muted-foreground">
-            © {new Date().getFullYear()} Nexus Society. Todos os direitos reservados.
+            © {new Date().getFullYear()} HiddenMod. Todos os direitos reservados.
           </p>
           <p className="text-xs text-muted-foreground font-mono">
             Feito para Modders 🎮
