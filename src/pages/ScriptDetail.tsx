@@ -695,19 +695,22 @@ end
               </div>
             )}
 
-            {/* Code Preview */}
-            {luaCode && (
+            {/* Code Preview — only visible to the script owner */}
+            {luaCode && isOwner && (
               <section className="space-y-3">
                 <div className="flex items-center justify-between">
                   <h3 className="text-base sm:text-lg font-bold flex items-center gap-2">
-                    <FileCode className="h-4 w-4 sm:h-5 sm:w-5 text-accent" /> Estrutura do Código
+                    <FileCode className="h-4 w-4 sm:h-5 sm:w-5 text-neon-purple" /> Seu Código (Revisão)
                   </h3>
-                  <Badge variant="outline" className="border-accent/30 text-accent bg-accent/5 text-[10px]">Preview Seguro</Badge>
+                  <Badge variant="outline" className="border-neon-purple/30 text-neon-purple bg-neon-purple/5 text-[10px]">
+                    👁️ Visível só para você
+                  </Badge>
                 </div>
                 <CodeBlock code={luaCode.split("\n").slice(0, 20).join("\n") + (luaCode.split("\n").length > 20 ? "\n-- ..." : "")} />
                 <ScriptAnalysis code={luaCode} scriptId={id} />
               </section>
             )}
+
 
             {/* Related Tutorial */}
             {relatedTutorial && (
