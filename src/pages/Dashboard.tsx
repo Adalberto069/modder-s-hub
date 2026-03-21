@@ -222,7 +222,7 @@ end
       if (scriptIds.length === 0) return [];
       const { data } = await supabase
         .from("purchases")
-        .select("amount, platform_commission, modder_earnings")
+        .select("amount, platform_commission, modder_earnings, created_at")
         .in("script_id", scriptIds);
       return data ?? [];
     },
