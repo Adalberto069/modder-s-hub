@@ -5,25 +5,9 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
 }
 
-serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders })
-  }
+const SYSTEM_PROMPT = `Você é um especialista em modding mobile, scripts Lua, Game Guardian e jogos Android. Gere tutoriais claros, práticos e acessíveis para iniciantes e intermediários. Evite termos excessivamente técnicos sem explicação. Estruture sempre com: introdução, pré-requisitos, passo a passo numerado e conclusão. Responda sempre em português brasileiro.
 
-  try {
-    const { title } = await req.json()
-    const apiKey = Deno.env.get('LOVABLE_API_KEY')
-
-    if (!apiKey) {
-      return new Response(
-        JSON.stringify({ error: 'LOVABLE_API_KEY não configurada' }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      )
-    }
-
-    const systemPrompt = `Você é um MESTRE absoluto em modding mobile, engenharia reversa Android e scripting Lua para Game Guardian. Você tem 10+ anos de experiência prática.
-
-## Seu Conhecimento Técnico Profundo
+## Seu Conhecimento Técnico
 
 ### Game Guardian API
 - Busca: gg.searchNumber, gg.searchAddress, gg.searchFuzzy, gg.refineNumber, gg.refineAddress
@@ -36,146 +20,145 @@ serve(async (req) => {
 - Memória: gg.getRangesList, gg.allocatePage, gg.bytes, gg.dump
 - Utilidades: gg.sleep, gg.getFile, gg.makeRequest, gg.copyText, gg.getLocale
 
-### Técnicas Avançadas de Modding
-- **Group Search**: Busca agrupada por offsets entre valores para encontrar estruturas na memória
-- **Pointer Scanning**: Rastreamento de ponteiros para encontrar endereços base estáveis
-- **Lib Dumping**: Extração de bibliotecas .so da memória do processo
-- **Offset Calculation**: Cálculo de offsets relativos entre endereços de memória
-- **XOR Encryption**: Valores cifrados com XOR que precisam de chave para decodificar
-- **Fuzzy Search**: Busca incremental para valores desconhecidos (aumentou/diminuiu/não mudou)
-- **Refined Search**: Refinamento progressivo de resultados
-- **Memory Patching**: Alteração de instruções ARM/ARM64 na memória (NOP, branch, MOV)
-- **Hook Functions**: Interceptação de funções nativas via modificação de GOT/PLT
-- **Anti-detection bypass**: Técnicas para contornar verificações de integridade
+### Técnicas de Modding
+- Group Search, Pointer Scanning, Lib Dumping, Offset Calculation
+- XOR Encryption, Fuzzy Search, Refined Search, Memory Patching
+- Hook Functions, Anti-detection bypass
 
-### Ferramentas do Ecossistema
-- Game Guardian (Android), GameGuardian (iOS via checkra1n/unc0ver)
-- APK Editor / APKTool / MT Manager para edição de APK
-- IDA Pro / Ghidra / Binary Ninja para análise de binários
-- Frida para hooking dinâmico
-- Logcat / ADB para debugging
+### Ferramentas
+- Game Guardian, APK Editor, APKTool, MT Manager, IDA Pro, Ghidra, Frida, ADB
 
-## Regras para Geração de Tutoriais
+## Regras
+1. Código Lua DEVE ser funcional e usar a API correta do GG
+2. Inclua exemplos REAIS com valores plausíveis
+3. Explique o PORQUÊ de cada passo
+4. Inclua tratamento de erros
+5. Use menus interativos quando aplicável
+6. Gere conteúdo EXTENSO com pelo menos 8-12 blocos
+7. Inclua blocos de código com exemplos práticos
+8. Se o título não for de modding, adapte para o contexto de Game Guardian
+9. Inclua dicas de performance e boas práticas`
 
-1. TODO código Lua DEVE ser funcional, testado e usar a API correta do GG
-2. Inclua exemplos REAIS com valores e offsets plausíveis
-3. Explique o PORQUÊ de cada passo, não apenas o quê
-4. Inclua tratamento de erros (verificação de resultados, fallbacks)
-5. Use menus interativos (gg.choice/gg.multiChoice) quando aplicável
-6. Escreva em Português do Brasil, claro e profissional
-7. Gere conteúdo EXTENSO e DETALHADO com pelo menos 8-12 blocos
-8. Inclua blocos de código com exemplos práticos sempre que possível
-9. Se o título não for relacionado a modding, adapte criativamente para o contexto de Game Guardian
-10. Inclua dicas de performance e boas práticas`
+serve(async (req) => {
+  if (req.method === 'OPTIONS') {
+    return new Response('ok', { headers: corsHeaders })
+  }
+
+  try {
+    const { title } = await req.json()
+    const apiKey = Deno.env.get('ANTHROPIC_API_KEY')
+
+    if (!apiKey) {
+      return new Response(
+        JSON.stringify({ error: 'ANTHROPIC_API_KEY não configurada' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
 
     const userPrompt = `Gere um tutorial técnico COMPLETO e DETALHADO sobre: "${title}"
 
-O tutorial deve ser extenso, com múltiplos exemplos de código funcional, explicações detalhadas de cada conceito, e dicas práticas baseadas em experiência real.`
+O tutorial deve ser extenso, com múltiplos exemplos de código funcional, explicações detalhadas de cada conceito, e dicas práticas baseadas em experiência real.
 
-    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+Responda APENAS com o tool call solicitado.`
+
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${apiKey}`,
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'google/gemini-3-flash-preview',
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 8192,
+        system: SYSTEM_PROMPT,
         messages: [
-          { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt },
         ],
         tools: [
           {
-            type: 'function',
-            function: {
-              name: 'generate_tutorial',
-              description: 'Gera um tutorial técnico estruturado e completo sobre modding mobile e Game Guardian.',
-              parameters: {
-                type: 'object',
-                properties: {
-                  description: {
-                    type: 'string',
-                    description: 'Descrição atraente do tutorial (2-3 frases)'
-                  },
-                  blocks: {
-                    type: 'array',
-                    description: 'Blocos de conteúdo do tutorial. Gere pelo menos 8-12 blocos variados.',
-                    items: {
-                      type: 'object',
-                      properties: {
-                        type: {
-                          type: 'string',
-                          enum: ['text', 'step', 'code', 'tip', 'warning', 'video'],
-                          description: 'Tipo do bloco: text (explicação), step (passo numerado), code (código Lua funcional), tip (dica útil), warning (aviso importante), video (referência a vídeo)'
-                        },
-                        content: {
-                          type: 'string',
-                          description: 'Conteúdo do bloco. Para code, deve ser código Lua funcional e comentado.'
-                        },
-                        language: {
-                          type: 'string',
-                          description: 'Linguagem do código (apenas para type=code). Geralmente "lua".'
-                        }
+            name: 'generate_tutorial',
+            description: 'Gera um tutorial técnico estruturado e completo sobre modding mobile e Game Guardian.',
+            input_schema: {
+              type: 'object',
+              properties: {
+                description: {
+                  type: 'string',
+                  description: 'Descrição atraente do tutorial (2-3 frases)'
+                },
+                blocks: {
+                  type: 'array',
+                  description: 'Blocos de conteúdo do tutorial. Gere pelo menos 8-12 blocos variados.',
+                  items: {
+                    type: 'object',
+                    properties: {
+                      type: {
+                        type: 'string',
+                        enum: ['text', 'step', 'code', 'tip', 'warning', 'video'],
+                        description: 'Tipo do bloco'
                       },
-                      required: ['type', 'content'],
-                      additionalProperties: false
-                    }
-                  },
-                  tips: {
-                    type: 'array',
-                    items: { type: 'string' },
-                    description: 'Pelo menos 3-5 dicas extras baseadas em experiência real'
-                  },
-                  troubleshooting: {
-                    type: 'array',
-                    items: {
-                      type: 'object',
-                      properties: {
-                        problem: { type: 'string' },
-                        solution: { type: 'string' }
+                      content: {
+                        type: 'string',
+                        description: 'Conteúdo do bloco. Para code, deve ser código Lua funcional e comentado.'
                       },
-                      required: ['problem', 'solution'],
-                      additionalProperties: false
+                      language: {
+                        type: 'string',
+                        description: 'Linguagem do código (apenas para type=code). Geralmente "lua".'
+                      }
                     },
-                    description: 'Pelo menos 3-5 problemas comuns com soluções detalhadas'
+                    required: ['type', 'content']
                   }
                 },
-                required: ['description', 'blocks', 'tips', 'troubleshooting'],
-                additionalProperties: false
-              }
+                tips: {
+                  type: 'array',
+                  items: { type: 'string' },
+                  description: 'Pelo menos 3-5 dicas extras baseadas em experiência real'
+                },
+                troubleshooting: {
+                  type: 'array',
+                  items: {
+                    type: 'object',
+                    properties: {
+                      problem: { type: 'string' },
+                      solution: { type: 'string' }
+                    },
+                    required: ['problem', 'solution']
+                  },
+                  description: 'Pelo menos 3-5 problemas comuns com soluções detalhadas'
+                }
+              },
+              required: ['description', 'blocks', 'tips', 'troubleshooting']
             }
           }
         ],
-        tool_choice: { type: 'function', function: { name: 'generate_tutorial' } },
+        tool_choice: { type: 'tool', name: 'generate_tutorial' },
       }),
     })
 
     if (!response.ok) {
+      const errorText = await response.text()
+      console.error('Anthropic API error:', response.status, errorText)
+      
       if (response.status === 429) {
         return new Response(
           JSON.stringify({ error: 'Limite de requisições excedido. Tente novamente em alguns segundos.' }),
           { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         )
       }
-      if (response.status === 402) {
-        return new Response(
-          JSON.stringify({ error: 'Créditos insuficientes. Adicione créditos ao workspace.' }),
-          { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        )
-      }
-      const errorText = await response.text()
-      console.error('AI gateway error:', response.status, errorText)
-      throw new Error(`Erro na IA: ${response.status}`)
+      
+      throw new Error(`Erro na API Anthropic: ${response.status}`)
     }
 
     const data = await response.json()
     
-    const toolCall = data.choices?.[0]?.message?.tool_calls?.[0]
-    if (!toolCall?.function?.arguments) {
-      throw new Error('A IA não retornou dados estruturados.')
+    // Claude returns tool_use blocks in content array
+    const toolUse = data.content?.find((block: any) => block.type === 'tool_use' && block.name === 'generate_tutorial')
+    
+    if (!toolUse?.input) {
+      throw new Error('O Claude não retornou dados estruturados.')
     }
 
-    const tutorialData = JSON.parse(toolCall.function.arguments)
+    const tutorialData = toolUse.input
 
     if (!tutorialData.blocks || !Array.isArray(tutorialData.blocks)) {
       throw new Error('A estrutura do tutorial gerada é inválida.')
