@@ -103,7 +103,7 @@ export default function ScriptDetail() {
   const { id } = useParams<{ id: string }>();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
   const queryClient = useQueryClient();
   const [galleryIndex, setGalleryIndex] = useState(0);
   const [newRating, setNewRating] = useState(0);
@@ -227,6 +227,21 @@ export default function ScriptDetail() {
         .eq("status", "active")
         .maybeSingle();
       return data;
+    },
+    enabled: !!id && !!user && !!script?.is_paid,
+  });
+
+  const { data: hasPurchased } = useQuery({
+    queryKey: ["script-purchase-completed", id, user?.id],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("purchases")
+        .select("id")
+        .eq("script_id", id!)
+        .eq("user_id", user!.id)
+        .eq("status", "completed")
+        .maybeSingle();
+      return !!data;
     },
     enabled: !!id && !!user && !!script?.is_paid,
   });
@@ -825,7 +840,12 @@ end
                 </div>
 
                 <div className="space-y-3">
-                  {script.is_paid ? (
+                  {isOwner ? (
+                    <div className="bg-primary/10 border border-primary/20 rounded-xl p-4 text-center">
+                      <Badge className="bg-primary text-primary-foreground mb-2">Seu script</Badge>
+                      <p className="text-sm font-bold text-primary">Você é o criador deste script.</p>
+                    </div>
+                  ) : script.is_paid && !isAdmin && !hasPurchased ? (
                     <>
                       {purchaseSuccess || (existingLicense && !isLicenseExpired) ? (
                         <div className="space-y-4">
