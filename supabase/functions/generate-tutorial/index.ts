@@ -37,7 +37,24 @@ const SYSTEM_PROMPT = `Você é um especialista em modding mobile, scripts Lua, 
 6. Gere conteúdo EXTENSO com pelo menos 8-12 blocos
 7. Inclua blocos de código com exemplos práticos
 8. Se o título não for de modding, adapte para o contexto de Game Guardian
-9. Inclua dicas de performance e boas práticas`
+9. Inclua dicas de performance e boas práticas
+
+## FORMATO DE RESPOSTA OBRIGATÓRIO
+Você DEVE responder APENAS com um JSON válido (sem markdown, sem \`\`\`, sem texto antes ou depois) com esta estrutura exata:
+{
+  "description": "Descrição atraente do tutorial (2-3 frases)",
+  "blocks": [
+    { "type": "text|step|code|tip|warning", "content": "...", "language": "lua" }
+  ],
+  "tips": ["dica1", "dica2", "dica3"],
+  "troubleshooting": [
+    { "problem": "...", "solution": "..." }
+  ]
+}
+
+Tipos de blocos permitidos: text, step, code, tip, warning.
+Para blocos de código, inclua "language": "lua".
+Gere pelo menos 8-12 blocos variados, 3-5 dicas e 3-5 troubleshooting.`
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -46,11 +63,11 @@ serve(async (req) => {
 
   try {
     const { title } = await req.json()
-    const apiKey = Deno.env.get('ANTHROPIC_API_KEY')
+    const lovableApiKey = Deno.env.get('LOVABLE_API_KEY')
 
-    if (!apiKey) {
+    if (!lovableApiKey) {
       return new Response(
-        JSON.stringify({ error: 'ANTHROPIC_API_KEY não configurada' }),
+        JSON.stringify({ error: 'LOVABLE_API_KEY não configurada' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
@@ -59,85 +76,28 @@ serve(async (req) => {
 
 O tutorial deve ser extenso, com múltiplos exemplos de código funcional, explicações detalhadas de cada conceito, e dicas práticas baseadas em experiência real.
 
-Responda APENAS com o tool call solicitado.`
+Responda APENAS com JSON válido, sem markdown e sem texto adicional.`
 
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
+    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01',
+        'Authorization': `Bearer ${lovableApiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 8192,
-        system: SYSTEM_PROMPT,
+        model: 'google/gemini-2.5-flash',
         messages: [
+          { role: 'system', content: SYSTEM_PROMPT },
           { role: 'user', content: userPrompt },
         ],
-        tools: [
-          {
-            name: 'generate_tutorial',
-            description: 'Gera um tutorial técnico estruturado e completo sobre modding mobile e Game Guardian.',
-            input_schema: {
-              type: 'object',
-              properties: {
-                description: {
-                  type: 'string',
-                  description: 'Descrição atraente do tutorial (2-3 frases)'
-                },
-                blocks: {
-                  type: 'array',
-                  description: 'Blocos de conteúdo do tutorial. Gere pelo menos 8-12 blocos variados.',
-                  items: {
-                    type: 'object',
-                    properties: {
-                      type: {
-                        type: 'string',
-                        enum: ['text', 'step', 'code', 'tip', 'warning', 'video'],
-                        description: 'Tipo do bloco'
-                      },
-                      content: {
-                        type: 'string',
-                        description: 'Conteúdo do bloco. Para code, deve ser código Lua funcional e comentado.'
-                      },
-                      language: {
-                        type: 'string',
-                        description: 'Linguagem do código (apenas para type=code). Geralmente "lua".'
-                      }
-                    },
-                    required: ['type', 'content']
-                  }
-                },
-                tips: {
-                  type: 'array',
-                  items: { type: 'string' },
-                  description: 'Pelo menos 3-5 dicas extras baseadas em experiência real'
-                },
-                troubleshooting: {
-                  type: 'array',
-                  items: {
-                    type: 'object',
-                    properties: {
-                      problem: { type: 'string' },
-                      solution: { type: 'string' }
-                    },
-                    required: ['problem', 'solution']
-                  },
-                  description: 'Pelo menos 3-5 problemas comuns com soluções detalhadas'
-                }
-              },
-              required: ['description', 'blocks', 'tips', 'troubleshooting']
-            }
-          }
-        ],
-        tool_choice: { type: 'tool', name: 'generate_tutorial' },
+        temperature: 0.7,
+        max_tokens: 8192,
       }),
     })
 
     if (!response.ok) {
       const errorText = await response.text()
-      console.error('Anthropic API error:', response.status, errorText)
+      console.error('Lovable AI error:', response.status, errorText)
       
       if (response.status === 429) {
         return new Response(
@@ -146,19 +106,23 @@ Responda APENAS com o tool call solicitado.`
         )
       }
       
-      throw new Error(`Erro na API Anthropic: ${response.status}`)
+      throw new Error(`Erro na API: ${response.status}`)
     }
 
     const data = await response.json()
-    
-    // Claude returns tool_use blocks in content array
-    const toolUse = data.content?.find((block: any) => block.type === 'tool_use' && block.name === 'generate_tutorial')
-    
-    if (!toolUse?.input) {
-      throw new Error('O Claude não retornou dados estruturados.')
+    const content = data.choices?.[0]?.message?.content
+
+    if (!content) {
+      throw new Error('A IA não retornou conteúdo.')
     }
 
-    const tutorialData = toolUse.input
+    // Clean markdown fences if present
+    let jsonStr = content.trim()
+    if (jsonStr.startsWith('```')) {
+      jsonStr = jsonStr.replace(/^```(?:json)?\s*\n?/, '').replace(/\n?```\s*$/, '')
+    }
+
+    const tutorialData = JSON.parse(jsonStr)
 
     if (!tutorialData.blocks || !Array.isArray(tutorialData.blocks)) {
       throw new Error('A estrutura do tutorial gerada é inválida.')
