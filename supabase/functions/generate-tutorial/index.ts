@@ -151,15 +151,35 @@ Responda APENAS com o tool call solicitado.`
 
     const data = await response.json()
     
+    let tutorialData = null;
+
+    // Try finding tool_use first
     const toolUse = data.content?.find((block: any) => block.type === 'tool_use' && block.name === 'generate_tutorial')
     
-    if (!toolUse?.input) {
+    if (toolUse?.input) {
+      tutorialData = toolUse.input;
+    } else {
+      // Fallback: look for JSON in the text content (data.content[0].text)
+      const textContent = data.content?.find((block: any) => block.type === 'text')?.text || data.content?.[0]?.text;
+      if (textContent) {
+        try {
+          // Attempt to extract JSON if wrapped in markdown
+          const jsonMatch = textContent.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+          const jsonString = jsonMatch ? jsonMatch[1] : textContent;
+          tutorialData = JSON.parse(jsonString.trim());
+        } catch (e) {
+          console.error("Failed to parse JSON from text:", textContent);
+        }
+      }
+    }
+
+    if (!tutorialData) {
+      console.error("Full Claude Response:", JSON.stringify(data, null, 2));
       throw new Error('O Claude não retornou dados estruturados.')
     }
 
-    const tutorialData = toolUse.input
-
     if (!tutorialData.blocks || !Array.isArray(tutorialData.blocks)) {
+      console.error("Invalid Structure:", JSON.stringify(tutorialData, null, 2));
       throw new Error('A estrutura do tutorial gerada é inválida.')
     }
 
