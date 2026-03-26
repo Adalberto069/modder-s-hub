@@ -34,10 +34,12 @@ const SYSTEM_PROMPT = `Você é um especialista em modding mobile, scripts Lua, 
 3. Explique o PORQUÊ de cada passo
 4. Inclua tratamento de erros
 5. Use menus interativos quando aplicável
-6. Gere conteúdo EXTENSO com pelo menos 8-12 blocos
+6. Gere conteúdo com 4-6 blocos objetivos
 7. Inclua blocos de código com exemplos práticos
 8. Se o título não for de modding, adapte para o contexto de Game Guardian
-9. Inclua dicas de performance e boas práticas`
+9. Inclua dicas de performance e boas práticas
+10. Gere apenas UM ÚNICO tutorial por chamada. NUNCA gere múltiplos tutoriais na mesma resposta.
+11. O tutorial deve ter no máximo 500 palavras. Seja direto e objetivo, sem repetições.`
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -55,11 +57,11 @@ serve(async (req) => {
       )
     }
 
-    const userPrompt = `Gere um tutorial técnico COMPLETO e DETALHADO sobre: "${title}"
+    const userPrompt = `Gere UM ÚNICO tutorial técnico sobre: "${title}"
 
-O tutorial deve ser extenso, com múltiplos exemplos de código funcional, explicações detalhadas de cada conceito, e dicas práticas baseadas em experiência real.
+O tutorial deve ser conciso (máximo 500 palavras), direto e sem repetições. Inclua exemplos de código funcional e explicações claras.
 
-Responda APENAS com o tool call solicitado.`
+Gere apenas UM tutorial. NÃO gere múltiplos tutoriais. Responda APENAS com o tool call solicitado.`
 
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -70,7 +72,7 @@ Responda APENAS com o tool call solicitado.`
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
-        max_tokens: 8192,
+        max_tokens: 1200,
         system: SYSTEM_PROMPT,
         messages: [
           { role: 'user', content: userPrompt },
@@ -88,7 +90,7 @@ Responda APENAS com o tool call solicitado.`
                 },
                 blocks: {
                   type: 'array',
-                  description: 'Blocos de conteúdo do tutorial. Gere pelo menos 8-12 blocos variados.',
+                  description: 'Blocos de conteúdo do tutorial. Gere 4-6 blocos objetivos.',
                   items: {
                     type: 'object',
                     properties: {
@@ -112,7 +114,7 @@ Responda APENAS com o tool call solicitado.`
                 tips: {
                   type: 'array',
                   items: { type: 'string' },
-                  description: 'Pelo menos 3-5 dicas extras baseadas em experiência real'
+                  description: '2-3 dicas extras'
                 },
                 troubleshooting: {
                   type: 'array',
@@ -124,7 +126,7 @@ Responda APENAS com o tool call solicitado.`
                     },
                     required: ['problem', 'solution']
                   },
-                  description: 'Pelo menos 3-5 problemas comuns com soluções detalhadas'
+                  description: '2-3 problemas comuns com soluções'
                 }
               },
               required: ['description', 'blocks', 'tips', 'troubleshooting']
