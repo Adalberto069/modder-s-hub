@@ -126,7 +126,7 @@ Gere apenas UM tutorial. NÃO gere múltiplos tutoriais. Responda APENAS com o t
                     },
                     required: ['problem', 'solution']
                   },
-                  description: 'Pelo menos 3-5 problemas comuns com soluções detalhadas'
+                  description: '2-3 problemas comuns com soluções'
                 }
               },
               required: ['description', 'blocks', 'tips', 'troubleshooting']
