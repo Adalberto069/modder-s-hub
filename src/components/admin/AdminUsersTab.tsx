@@ -25,10 +25,17 @@ export function AdminUsersTab() {
 
   const filtered = users?.filter((u: any) => {
     const q = search.toLowerCase();
+    const name = (u.display_name || u.username || "").toLowerCase();
+    const email = (u.email || "").toLowerCase();
+    const userId = (u.user_id || "").toLowerCase();
+    const profileId = (u.id || "").toLowerCase();
+    
     return (
+      name.includes(q) ||
       u.username?.toLowerCase().includes(q) ||
-      u.display_name?.toLowerCase().includes(q) ||
-      u.user_id?.toLowerCase().includes(q)
+      email.includes(q) ||
+      userId.includes(q) ||
+      profileId.includes(q)
     );
   });
 
@@ -145,6 +152,7 @@ export function AdminUsersTab() {
                   </div>
                   <div className="flex gap-3 text-[10px] text-muted-foreground">
                     <span>@{user.username}</span>
+                    {user.email && <span className="text-secondary-foreground/60">{user.email}</span>}
                     <span>Rep: {user.reputation_score ?? 0}</span>
                     <span>Downloads: {user.total_downloads ?? 0}</span>
                   </div>
