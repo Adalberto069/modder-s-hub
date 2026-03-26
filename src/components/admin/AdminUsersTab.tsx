@@ -1,0 +1,170 @@
+import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useQuery } from "@tanstack/react-query";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
+import { UserCheck, LogIn, Search, Shield, Code, User } from "lucide-react";
+
+export function AdminUsersTab() {
+  const [search, setSearch] = useState("");
+  const [impersonating, setImpersonating] = useState<string | null>(null);
+
+  const { data: users } = useQuery({
+    queryKey: ["admin-all-users"],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("profiles")
+        .select("*, user_roles:user_id(role, approved)")
+        .order("created_at", { ascending: false });
+      return data ?? [];
+    },
+  });
+
+  const filtered = users?.filter((u: any) => {
+    const q = search.toLowerCase();
+    return (
+      u.username?.toLowerCase().includes(q) ||
+      u.display_name?.toLowerCase().includes(q) ||
+      u.user_id?.toLowerCase().includes(q)
+    );
+  });
+
+  const getRoleBadges = (userRoles: any[]) => {
+    if (!userRoles) return null;
+    return userRoles
+      .filter((r: any) => r.approved)
+      .map((r: any) => {
+        const colors: Record<string, string> = {
+          admin: "bg-destructive/20 text-destructive border-destructive/30",
+          modder: "bg-accent/20 text-accent border-accent/30",
+          user: "bg-muted text-muted-foreground border-border",
+        };
+        return (
+          <Badge key={r.role} variant="outline" className={`text-[10px] ${colors[r.role] || ""}`}>
+            {r.role === "admin" && <Shield className="h-3 w-3 mr-1" />}
+            {r.role === "modder" && <Code className="h-3 w-3 mr-1" />}
+            {r.role === "user" && <User className="h-3 w-3 mr-1" />}
+            {r.role}
+          </Badge>
+        );
+      });
+  };
+
+  const handleImpersonate = async (targetUserId: string, displayName: string) => {
+    if (!window.confirm(`⚠️ Você vai entrar na conta de "${displayName}" para suporte. Deseja continuar?`)) return;
+
+    setImpersonating(targetUserId);
+    try {
+      // Save current admin session
+      const { data: { session: adminSession } } = await supabase.auth.getSession();
+      if (!adminSession) {
+        toast.error("Sessão admin não encontrada");
+        return;
+      }
+
+      // Call edge function to get magic link token
+      const { data, error } = await supabase.functions.invoke("impersonate-user", {
+        body: { target_user_id: targetUserId },
+      });
+
+      if (error || !data?.token_hash) {
+        toast.error(data?.error || "Erro ao gerar link de acesso");
+        return;
+      }
+
+      // Store admin session for restoration
+      localStorage.setItem("admin_impersonation", JSON.stringify({
+        refresh_token: adminSession.refresh_token,
+        targetName: displayName,
+      }));
+
+      // Sign in as the target user using the magic link token
+      const { error: otpError } = await supabase.auth.verifyOtp({
+        email: data.email,
+        token: data.token_hash,
+        type: "magiclink",
+      });
+
+      if (otpError) {
+        console.error("OTP error:", otpError);
+        localStorage.removeItem("admin_impersonation");
+        toast.error("Erro ao fazer login como o usuário: " + otpError.message);
+        return;
+      }
+
+      toast.success(`Logado como ${displayName}!`);
+      window.location.href = "/";
+    } catch (e) {
+      console.error("Impersonate error:", e);
+      localStorage.removeItem("admin_impersonation");
+      toast.error("Erro inesperado ao impersonar usuário");
+    } finally {
+      setImpersonating(null);
+    }
+  };
+
+  return (
+    <Card className="border-white/10 bg-[#050505] rounded-none">
+      <CardHeader className="border-b border-white/5 bg-[#030304]">
+        <CardTitle className="text-sm font-black uppercase tracking-widest flex items-center gap-2 text-white">
+          <UserCheck className="w-4 h-4 text-neon-purple" />
+          Gerenciamento de Usuários
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="pt-4">
+        <div className="relative mb-4">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Buscar por username, nome ou ID..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="pl-10 bg-[#030304] border-white/10 rounded-none text-sm"
+          />
+        </div>
+
+        <div className="text-[10px] text-muted-foreground mb-2 uppercase tracking-widest">
+          {filtered?.length ?? 0} usuário(s) encontrado(s)
+        </div>
+
+        <div className="space-y-1 max-h-[600px] overflow-y-auto">
+          {filtered?.map((user: any) => {
+            const name = user.display_name || user.username;
+            const isAdmin = user.user_roles?.some((r: any) => r.role === "admin" && r.approved);
+            return (
+              <div
+                key={user.id}
+                className="flex items-center justify-between p-3 border-b border-white/5 bg-[#050505] hover:bg-[#08080a] transition-colors gap-3"
+              >
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap mb-1">
+                    <span className="font-bold text-sm text-white truncate">{name}</span>
+                    {getRoleBadges(user.user_roles)}
+                  </div>
+                  <div className="flex gap-3 text-[10px] text-muted-foreground">
+                    <span>@{user.username}</span>
+                    <span>Rep: {user.reputation_score ?? 0}</span>
+                    <span>Downloads: {user.total_downloads ?? 0}</span>
+                  </div>
+                </div>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  disabled={isAdmin || impersonating === user.user_id}
+                  onClick={() => handleImpersonate(user.user_id, name)}
+                  className="text-[10px] uppercase tracking-widest font-bold gap-1 rounded-none border-primary/30 text-primary hover:bg-primary/10 disabled:opacity-30"
+                  title={isAdmin ? "Não é possível impersonar outro admin" : "Entrar como este usuário"}
+                >
+                  <LogIn className="h-3 w-3" />
+                  {impersonating === user.user_id ? "Entrando..." : "Entrar como"}
+                </Button>
+              </div>
+            );
+          })}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
