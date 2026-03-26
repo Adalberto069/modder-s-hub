@@ -140,40 +140,49 @@ export function AdminUsersTab() {
         </div>
 
         <div className="space-y-1 max-h-[600px] overflow-y-auto">
-          {filtered?.map((user: any) => {
-            const name = user.display_name || user.username;
-            const isAdmin = user.user_roles?.some((r: any) => r.role === "admin" && r.approved);
-            return (
-              <div
-                key={user.id}
-                className="flex items-center justify-between p-3 border-b border-white/5 bg-[#050505] hover:bg-[#08080a] transition-colors gap-3"
-              >
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 flex-wrap mb-1">
-                    <span className="font-bold text-sm text-white truncate">{name}</span>
-                    {getRoleBadges(user.user_roles)}
-                  </div>
-                  <div className="flex gap-3 text-[10px] text-muted-foreground">
-                    <span>@{user.username}</span>
-                    {user.email && <span className="text-secondary-foreground/60">{user.email}</span>}
-                    <span>Rep: {user.reputation_score ?? 0}</span>
-                    <span>Downloads: {user.total_downloads ?? 0}</span>
-                  </div>
-                </div>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  disabled={isAdmin || impersonating === user.user_id}
-                  onClick={() => handleImpersonate(user.user_id, name)}
-                  className="text-[10px] uppercase tracking-widest font-bold gap-1 rounded-none border-primary/30 text-primary hover:bg-primary/10 disabled:opacity-30"
-                  title={isAdmin ? "Não é possível impersonar outro admin" : "Entrar como este usuário"}
+          {filtered && filtered.length > 0 ? (
+            filtered.map((user: any) => {
+              const name = user.display_name || user.username;
+              const isAdmin = user.user_roles?.some((r: any) => r.role === "admin" && r.approved);
+              return (
+                <div
+                  key={user.id}
+                  className="flex items-center justify-between p-3 border-b border-white/5 bg-[#050505] hover:bg-[#08080a] transition-colors gap-3"
                 >
-                  <LogIn className="h-3 w-3" />
-                  {impersonating === user.user_id ? "Entrando..." : "Entrar como"}
-                </Button>
-              </div>
-            );
-          })}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap mb-1">
+                      <span className="font-bold text-sm text-white truncate">{name}</span>
+                      {getRoleBadges(user.user_roles)}
+                    </div>
+                    <div className="flex gap-3 text-[10px] text-muted-foreground">
+                      <span>@{user.username}</span>
+                      {user.email && <span className="text-secondary-foreground/60">{user.email}</span>}
+                      <span>Rep: {user.reputation_score ?? 0}</span>
+                      <span>Downloads: {user.total_downloads ?? 0}</span>
+                    </div>
+                  </div>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    disabled={isAdmin || impersonating === user.user_id}
+                    onClick={() => handleImpersonate(user.user_id, name)}
+                    className="text-[10px] uppercase tracking-widest font-bold gap-1 rounded-none border-primary/30 text-primary hover:bg-primary/10 disabled:opacity-30"
+                    title={isAdmin ? "Não é possível impersonar outro admin" : "Entrar como este usuário"}
+                  >
+                    <LogIn className="h-3 w-3" />
+                    {impersonating === user.user_id ? "Entrando..." : "Entrar como"}
+                  </Button>
+                </div>
+              );
+            })
+          ) : (
+            <div className="py-12 text-center border border-dashed border-white/5 bg-[#030304]/50">
+              <Search className="h-8 w-8 text-muted-foreground/20 mx-auto mb-2" />
+              <p className="text-sm text-muted-foreground">
+                {search ? `Nenhum usuário encontrado para "${search}"` : "Nenhum usuário registrado"}
+              </p>
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>

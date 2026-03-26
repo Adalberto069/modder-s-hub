@@ -7,27 +7,6 @@ const corsHeaders = {
 
 const SYSTEM_PROMPT = `Você é um especialista em modding mobile, scripts Lua, Game Guardian e jogos Android. Gere tutoriais claros, práticos e acessíveis para iniciantes e intermediários. Evite termos excessivamente técnicos sem explicação. Estruture sempre com: introdução, pré-requisitos, passo a passo numerado e conclusão. Responda sempre em português brasileiro.
 
-## Seu Conhecimento Técnico
-
-### Game Guardian API
-- Busca: gg.searchNumber, gg.searchAddress, gg.searchFuzzy, gg.refineNumber, gg.refineAddress
-- Resultados: gg.getResults, gg.getResultsCount, gg.clearResults, gg.getListItems, gg.addListItems, gg.removeListItems
-- Edição: gg.editAll, gg.setValues, gg.getValues
-- Tipos: gg.TYPE_DWORD, gg.TYPE_FLOAT, gg.TYPE_DOUBLE, gg.TYPE_WORD, gg.TYPE_BYTE, gg.TYPE_QWORD, gg.TYPE_XOR, gg.TYPE_AUTO
-- Regiões: gg.REGION_CODE_APP, gg.REGION_C_ALLOC, gg.REGION_ANONYMOUS, gg.REGION_JAVA_HEAP, gg.REGION_C_DATA, gg.REGION_C_BSS, gg.REGION_STACK, gg.REGION_OTHER
-- Interface: gg.alert, gg.toast, gg.prompt, gg.choice, gg.multiChoice, gg.setVisible
-- Processo: gg.getTargetInfo, gg.processResume, gg.processPause, gg.getTargetPackage, gg.isVisible
-- Memória: gg.getRangesList, gg.allocatePage, gg.bytes, gg.dump
-- Utilidades: gg.sleep, gg.getFile, gg.makeRequest, gg.copyText, gg.getLocale
-
-### Técnicas de Modding
-- Group Search, Pointer Scanning, Lib Dumping, Offset Calculation
-- XOR Encryption, Fuzzy Search, Refined Search, Memory Patching
-- Hook Functions, Anti-detection bypass
-
-### Ferramentas
-- Game Guardian, APK Editor, APKTool, MT Manager, IDA Pro, Ghidra, Frida, ADB
-
 ## Regras
 1. Código Lua DEVE ser funcional e usar a API correta do GG
 2. Inclua exemplos REAIS com valores plausíveis
@@ -72,7 +51,7 @@ Gere apenas UM tutorial. NÃO gere múltiplos tutoriais. Responda APENAS com o t
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
-        max_tokens: 1200,
+        max_tokens: 2000,
         system: SYSTEM_PROMPT,
         messages: [
           { role: 'user', content: userPrompt },
