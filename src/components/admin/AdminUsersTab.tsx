@@ -24,15 +24,18 @@ export function AdminUsersTab() {
   });
 
   const filtered = users?.filter((u: any) => {
-    const q = search.toLowerCase();
-    const name = (u.display_name || u.username || "").toLowerCase();
+    const q = search.toLowerCase().trim();
+    if (!q) return true;
+
+    const username = (u.username || "").toLowerCase();
+    const displayName = (u.display_name || "").toLowerCase();
     const email = (u.email || "").toLowerCase();
     const userId = (u.user_id || "").toLowerCase();
     const profileId = (u.id || "").toLowerCase();
     
     return (
-      name.includes(q) ||
-      u.username?.toLowerCase().includes(q) ||
+      username.includes(q) ||
+      displayName.includes(q) ||
       email.includes(q) ||
       userId.includes(q) ||
       profileId.includes(q)
