@@ -114,7 +114,7 @@ Gere apenas UM tutorial. NÃO gere múltiplos tutoriais. Responda APENAS com o t
                 tips: {
                   type: 'array',
                   items: { type: 'string' },
-                  description: 'Pelo menos 3-5 dicas extras baseadas em experiência real'
+                  description: '2-3 dicas extras'
                 },
                 troubleshooting: {
                   type: 'array',
