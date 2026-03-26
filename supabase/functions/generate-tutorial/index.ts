@@ -57,11 +57,11 @@ serve(async (req) => {
       )
     }
 
-    const userPrompt = `Gere um tutorial técnico COMPLETO e DETALHADO sobre: "${title}"
+    const userPrompt = `Gere UM ÚNICO tutorial técnico sobre: "${title}"
 
-O tutorial deve ser extenso, com múltiplos exemplos de código funcional, explicações detalhadas de cada conceito, e dicas práticas baseadas em experiência real.
+O tutorial deve ser conciso (máximo 500 palavras), direto e sem repetições. Inclua exemplos de código funcional e explicações claras.
 
-Responda APENAS com o tool call solicitado.`
+Gere apenas UM tutorial. NÃO gere múltiplos tutoriais. Responda APENAS com o tool call solicitado.`
 
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
