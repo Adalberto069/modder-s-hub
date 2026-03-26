@@ -17,7 +17,7 @@ export function AdminUsersTab() {
     queryFn: async () => {
       const { data } = await supabase
         .from("profiles")
-        .select("*, user_roles:user_id(role, approved)")
+        .select("*, user_roles(role, approved)")
         .order("created_at", { ascending: false });
       return data ?? [];
     },
@@ -128,7 +128,7 @@ export function AdminUsersTab() {
         <div className="relative mb-4">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Buscar por username, nome ou ID..."
+            placeholder="Buscar por email, username, nome ou ID..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="pl-10 bg-[#030304] border-white/10 rounded-none text-sm"
