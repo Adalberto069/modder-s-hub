@@ -34,10 +34,12 @@ const SYSTEM_PROMPT = `Você é um especialista em modding mobile, scripts Lua, 
 3. Explique o PORQUÊ de cada passo
 4. Inclua tratamento de erros
 5. Use menus interativos quando aplicável
-6. Gere conteúdo EXTENSO com pelo menos 8-12 blocos
+6. Gere conteúdo com 4-6 blocos objetivos
 7. Inclua blocos de código com exemplos práticos
 8. Se o título não for de modding, adapte para o contexto de Game Guardian
-9. Inclua dicas de performance e boas práticas`
+9. Inclua dicas de performance e boas práticas
+10. Gere apenas UM ÚNICO tutorial por chamada. NUNCA gere múltiplos tutoriais na mesma resposta.
+11. O tutorial deve ter no máximo 500 palavras. Seja direto e objetivo, sem repetições.`
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
