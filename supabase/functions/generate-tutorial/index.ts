@@ -90,7 +90,7 @@ Gere apenas UM tutorial. NÃO gere múltiplos tutoriais. Responda APENAS com o t
                 },
                 blocks: {
                   type: 'array',
-                  description: 'Blocos de conteúdo do tutorial. Gere pelo menos 8-12 blocos variados.',
+                  description: 'Blocos de conteúdo do tutorial. Gere 4-6 blocos objetivos.',
                   items: {
                     type: 'object',
                     properties: {
