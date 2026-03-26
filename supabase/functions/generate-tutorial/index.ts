@@ -1,9 +1,10 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
-}
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
+};
 
 const SYSTEM_PROMPT = `Você é um especialista em modding mobile, scripts Lua, Game Guardian e jogos Android. Gere tutoriais claros, práticos e acessíveis para iniciantes e intermediários. Evite termos excessivamente técnicos sem explicação. Estruture sempre com: introdução, pré-requisitos, passo a passo numerado e conclusão. Responda sempre em português brasileiro.
 
@@ -18,130 +19,128 @@ const SYSTEM_PROMPT = `Você é um especialista em modding mobile, scripts Lua, 
 8. Se o título não for de modding, adapte para o contexto de Game Guardian
 9. Inclua dicas de performance e boas práticas
 10. Gere apenas UM ÚNICO tutorial por chamada. NUNCA gere múltiplos tutoriais na mesma resposta.
-11. O tutorial deve ter no máximo 500 palavras. Seja direto e objetivo, sem repetições.`
+11. O tutorial deve ter no máximo 10000 palavras. Seja direto e objetivo, sem repetições.`;
 
 serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders })
+  if (req.method === "OPTIONS") {
+    return new Response("ok", { headers: corsHeaders });
   }
 
   try {
-    const { title } = await req.json()
-    const apiKey = Deno.env.get('ANTHROPIC_API_KEY')
+    const { title } = await req.json();
+    const apiKey = Deno.env.get("ANTHROPIC_API_KEY");
 
     if (!apiKey) {
-      return new Response(
-        JSON.stringify({ error: 'ANTHROPIC_API_KEY não configurada' }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      )
+      return new Response(JSON.stringify({ error: "ANTHROPIC_API_KEY não configurada" }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
     const userPrompt = `Gere UM ÚNICO tutorial técnico sobre: "${title}"
 
 O tutorial deve ser conciso (máximo 500 palavras), direto e sem repetições. Inclua exemplos de código funcional e explicações claras.
 
-Gere apenas UM tutorial. NÃO gere múltiplos tutoriais. Responda APENAS com o tool call solicitado.`
+Gere apenas UM tutorial. NÃO gere múltiplos tutoriais. Responda APENAS com o tool call solicitado.`;
 
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
       headers: {
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01',
-        'Content-Type': 'application/json',
+        "x-api-key": apiKey,
+        "anthropic-version": "2023-06-01",
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 8192,
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 10000,
         system: SYSTEM_PROMPT,
-        messages: [
-          { role: 'user', content: userPrompt },
-        ],
+        messages: [{ role: "user", content: userPrompt }],
         tools: [
           {
-            name: 'generate_tutorial',
-            description: 'Gera um tutorial técnico estruturado e completo sobre modding mobile e Game Guardian.',
+            name: "generate_tutorial",
+            description: "Gera um tutorial técnico estruturado e completo sobre modding mobile e Game Guardian.",
             input_schema: {
-              type: 'object',
+              type: "object",
               properties: {
                 description: {
-                  type: 'string',
-                  description: 'Descrição atraente do tutorial (2-3 frases)'
+                  type: "string",
+                  description: "Descrição atraente do tutorial (2-3 frases)",
                 },
                 blocks: {
-                  type: 'array',
-                  description: 'Blocos de conteúdo do tutorial. Gere 4-6 blocos objetivos.',
+                  type: "array",
+                  description: "Blocos de conteúdo do tutorial. Gere 4-6 blocos objetivos.",
                   items: {
-                    type: 'object',
+                    type: "object",
                     properties: {
                       type: {
-                        type: 'string',
-                        enum: ['text', 'step', 'code', 'tip', 'warning', 'video'],
-                        description: 'Tipo do bloco'
+                        type: "string",
+                        enum: ["text", "step", "code", "tip", "warning", "video"],
+                        description: "Tipo do bloco",
                       },
                       content: {
-                        type: 'string',
-                        description: 'Conteúdo do bloco. Para code, deve ser código Lua funcional e comentado.'
+                        type: "string",
+                        description: "Conteúdo do bloco. Para code, deve ser código Lua funcional e comentado.",
                       },
                       language: {
-                        type: 'string',
-                        description: 'Linguagem do código (apenas para type=code). Geralmente "lua".'
-                      }
+                        type: "string",
+                        description: 'Linguagem do código (apenas para type=code). Geralmente "lua".',
+                      },
                     },
-                    required: ['type', 'content']
-                  }
+                    required: ["type", "content"],
+                  },
                 },
                 tips: {
-                  type: 'array',
-                  items: { type: 'string' },
-                  description: '2-3 dicas extras'
+                  type: "array",
+                  items: { type: "string" },
+                  description: "2-3 dicas extras",
                 },
                 troubleshooting: {
-                  type: 'array',
+                  type: "array",
                   items: {
-                    type: 'object',
+                    type: "object",
                     properties: {
-                      problem: { type: 'string' },
-                      solution: { type: 'string' }
+                      problem: { type: "string" },
+                      solution: { type: "string" },
                     },
-                    required: ['problem', 'solution']
+                    required: ["problem", "solution"],
                   },
-                  description: '2-3 problemas comuns com soluções'
-                }
+                  description: "2-3 problemas comuns com soluções",
+                },
               },
-              required: ['description', 'blocks', 'tips', 'troubleshooting']
-            }
-          }
+              required: ["description", "blocks", "tips", "troubleshooting"],
+            },
+          },
         ],
-        tool_choice: { type: 'tool', name: 'generate_tutorial' },
+        tool_choice: { type: "tool", name: "generate_tutorial" },
       }),
-    })
+    });
 
     if (!response.ok) {
-      const errorText = await response.text()
-      console.error('Anthropic API error:', response.status, errorText)
-      
+      const errorText = await response.text();
+      console.error("Anthropic API error:", response.status, errorText);
+
       if (response.status === 429) {
         return new Response(
-          JSON.stringify({ error: 'Limite de requisições excedido. Tente novamente em alguns segundos.' }),
-          { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        )
+          JSON.stringify({ error: "Limite de requisições excedido. Tente novamente em alguns segundos." }),
+          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        );
       }
-      
-      throw new Error(`Erro na API Anthropic: ${response.status}`)
+
+      throw new Error(`Erro na API Anthropic: ${response.status}`);
     }
 
-    const data = await response.json()
-    
+    const data = await response.json();
+
     let tutorialData = null;
 
     // Try finding tool_use first
-    const toolUse = data.content?.find((block: any) => block.type === 'tool_use' && block.name === 'generate_tutorial')
-    
+    const toolUse = data.content?.find((block: any) => block.type === "tool_use" && block.name === "generate_tutorial");
+
     if (toolUse?.input) {
       tutorialData = toolUse.input;
     } else {
       // Fallback: look for JSON in the text content (data.content[0].text)
-      const textContent = data.content?.find((block: any) => block.type === 'text')?.text || data.content?.[0]?.text;
+      const textContent = data.content?.find((block: any) => block.type === "text")?.text || data.content?.[0]?.text;
       if (textContent) {
         try {
           // Attempt to extract JSON if wrapped in markdown
@@ -156,24 +155,22 @@ Gere apenas UM tutorial. NÃO gere múltiplos tutoriais. Responda APENAS com o t
 
     if (!tutorialData) {
       console.error("Full Claude Response:", JSON.stringify(data, null, 2));
-      throw new Error('O Claude não retornou dados estruturados.')
+      throw new Error("O Claude não retornou dados estruturados.");
     }
 
     if (!tutorialData.blocks || !Array.isArray(tutorialData.blocks)) {
       console.error("Invalid Structure:", JSON.stringify(tutorialData, null, 2));
-      throw new Error('A estrutura do tutorial gerada é inválida.')
+      throw new Error("A estrutura do tutorial gerada é inválida.");
     }
 
-    return new Response(
-      JSON.stringify(tutorialData),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    )
-
+    return new Response(JSON.stringify(tutorialData), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   } catch (error) {
-    console.error('generate-tutorial error:', error)
-    return new Response(
-      JSON.stringify({ error: (error as Error).message }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    )
+    console.error("generate-tutorial error:", error);
+    return new Response(JSON.stringify({ error: (error as Error).message }), {
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   }
-})
+});
