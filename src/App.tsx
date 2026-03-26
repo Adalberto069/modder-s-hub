@@ -20,6 +20,7 @@ import Forum from "./pages/Forum";
 import Ferramentas from "./pages/Ferramentas";
 import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
+import { ImpersonationBanner } from "@/components/ImpersonationBanner";
 
 const queryClient = new QueryClient();
 
@@ -28,6 +29,7 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
+      <ImpersonationBanner />
       <BrowserRouter>
         <AuthProvider>
           <Routes>

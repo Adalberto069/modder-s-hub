@@ -24,6 +24,7 @@ import { AdminBadges } from "@/components/admin/AdminBadges";
 import { AdminFlaggedScripts } from "@/components/admin/AdminFlaggedScripts";
 import { AdminModerationQueue } from "@/components/admin/AdminModerationQueue";
 import { AdminWithdrawalsTab } from "@/components/admin/AdminWithdrawalsTab";
+import { AdminUsersTab } from "@/components/admin/AdminUsersTab";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import LuaCodeEditor from "@/components/LuaCodeEditor";
@@ -571,9 +572,12 @@ export default function Admin() {
 
         {/* Main admin tabs */}
         <Tabs defaultValue="scripts" className="font-mono">
-          <TabsList className="mb-6 grid w-full grid-cols-5 p-1 bg-[#050505] border border-white/10 rounded-none h-14">
+          <TabsList className="mb-6 grid w-full grid-cols-6 p-1 bg-[#050505] border border-white/10 rounded-none h-14">
             <TabsTrigger value="scripts" className="text-[10px] sm:text-xs tracking-widest uppercase font-black gap-2 data-[state=active]:bg-[#030304] data-[state=active]:text-neon-purple rounded-none h-full">
               <Code className="h-4 w-4" /> <span className="hidden sm:inline">Scripts</span>
+            </TabsTrigger>
+            <TabsTrigger value="users" className="text-[10px] sm:text-xs tracking-widest uppercase font-black gap-2 data-[state=active]:bg-[#030304] data-[state=active]:text-neon-cyan rounded-none h-full">
+              <Users className="h-4 w-4" /> <span className="hidden sm:inline">Usuários</span>
             </TabsTrigger>
             <TabsTrigger value="licenses" className="text-[10px] sm:text-xs tracking-widest uppercase font-black gap-2 data-[state=active]:bg-[#030304] data-[state=active]:text-neon-green rounded-none h-full">
               <Key className="h-4 w-4" /> <span className="hidden sm:inline">Licenças</span>
@@ -637,6 +641,11 @@ export default function Admin() {
                 </Tabs>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* Users Tab */}
+          <TabsContent value="users">
+            <AdminUsersTab />
           </TabsContent>
 
           {/* Licenses Tab */}
