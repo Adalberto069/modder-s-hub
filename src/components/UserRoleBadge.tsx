@@ -10,11 +10,14 @@ export function UserRoleBadge({ userId }: UserRoleBadgeProps) {
   const { data: role } = useQuery({
     queryKey: ["user-role-display", userId],
     queryFn: async () => {
-      const { data, error } = await supabase.rpc("get_user_display_role", {
+      const { data, error } = await (supabase.rpc as any)("get_user_display_role", {
         _user_id: userId,
       });
       if (error || !data) return "member" as const;
-      return data as "admin" | "modder" | "member";
+      const r = data as string;
+      if (r === "admin") return "admin" as const;
+      if (r === "modder") return "modder" as const;
+      return "member" as const;
     },
     enabled: !!userId,
     staleTime: 5 * 60 * 1000,
