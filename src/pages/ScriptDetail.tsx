@@ -476,7 +476,16 @@ end
   ];
   const scriptFeatures = (script as any).features ?? [];
   const scriptTags = (script as any).tags ?? [];
-  const luaCode = (script as any).lua_code;
+  // lua_code is now in script_code table - only visible to owner/admin
+  const { data: scriptCodeData } = useQuery({
+    queryKey: ["script-code", script.id],
+    queryFn: async () => {
+      const { data } = await (supabase as any).from("script_code").select("lua_code").eq("script_id", script.id).single();
+      return data?.lua_code ?? null;
+    },
+    enabled: !!user && (user.id === script.modder_id || isAdmin),
+  });
+  const luaCode = scriptCodeData ?? null;
   const gameName = (script as any).game_name;
   const scriptVersion = (script as any).version;
 
