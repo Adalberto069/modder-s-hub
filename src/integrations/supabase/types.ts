@@ -649,7 +649,6 @@ export type Database = {
           expires_at: string | null
           id: string
           is_permanent: boolean
-          password: string | null
           password_hash: string | null
           script_id: string
           updated_at: string
@@ -659,7 +658,6 @@ export type Database = {
           expires_at?: string | null
           id?: string
           is_permanent?: boolean
-          password?: string | null
           password_hash?: string | null
           script_id: string
           updated_at?: string
@@ -669,7 +667,6 @@ export type Database = {
           expires_at?: string | null
           id?: string
           is_permanent?: boolean
-          password?: string | null
           password_hash?: string | null
           script_id?: string
           updated_at?: string
