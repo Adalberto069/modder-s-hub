@@ -697,7 +697,6 @@ export type Database = {
           is_paid: boolean
           is_verified: boolean
           license_duration_days: number | null
-          lua_code: string | null
           modder_id: string
           price: number | null
           publish_status: string
@@ -728,7 +727,6 @@ export type Database = {
           is_paid?: boolean
           is_verified?: boolean
           license_duration_days?: number | null
-          lua_code?: string | null
           modder_id: string
           price?: number | null
           publish_status?: string
@@ -759,7 +757,6 @@ export type Database = {
           is_paid?: boolean
           is_verified?: boolean
           license_duration_days?: number | null
-          lua_code?: string | null
           modder_id?: string
           price?: number | null
           publish_status?: string
@@ -1017,6 +1014,7 @@ export type Database = {
         Returns: undefined
       }
       generate_license_key: { Args: never; Returns: string }
+      get_script_file_url: { Args: { _script_id: string }; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
