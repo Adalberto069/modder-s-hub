@@ -211,8 +211,10 @@ export default function Admin() {
 
   const viewCode = async (script: any) => {
     setCodeDialogTitle(script.title);
-    if (script.lua_code) {
-      setCodeDialogContent(script.lua_code);
+    // Try script_code table first
+    const { data: codeData } = await supabase.from("script_code").select("lua_code").eq("script_id", script.id).single();
+    if (codeData?.lua_code) {
+      setCodeDialogContent(codeData.lua_code);
       setCodeDialogOpen(true);
       return;
     }

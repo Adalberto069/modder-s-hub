@@ -122,10 +122,10 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Get the script
+    // Get the script metadata
     const { data: script } = await supabase
       .from("scripts")
-      .select("lua_code, file_url, title")
+      .select("file_url, title")
       .eq("id", license.script_id)
       .single();
 
@@ -136,8 +136,14 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Get raw code
-    let code = script.lua_code;
+    // Get lua_code from script_code table
+    const { data: codeData } = await supabase
+      .from("script_code")
+      .select("lua_code")
+      .eq("script_id", license.script_id)
+      .single();
+
+    let code = codeData?.lua_code ?? null;
     if (!code && script.file_url) {
       try {
         const res = await fetch(script.file_url);
