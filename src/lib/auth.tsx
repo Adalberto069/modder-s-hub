@@ -40,6 +40,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
+      // [FIX CWE-598] Clear OAuth tokens from URL fragment
+      if (window.location.hash && window.location.hash.includes('access_token')) {
+        window.history.replaceState({}, '', window.location.pathname + window.location.search);
+      }
       if (session?.user) {
         setTimeout(() => {
           fetchProfile(session.user.id);

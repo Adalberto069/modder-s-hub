@@ -650,6 +650,7 @@ export type Database = {
           id: string
           is_permanent: boolean
           password: string
+          password_hash: string | null
           script_id: string
           updated_at: string
         }
@@ -659,6 +660,7 @@ export type Database = {
           id?: string
           is_permanent?: boolean
           password: string
+          password_hash?: string | null
           script_id: string
           updated_at?: string
         }
@@ -668,6 +670,7 @@ export type Database = {
           id?: string
           is_permanent?: boolean
           password?: string
+          password_hash?: string | null
           script_id?: string
           updated_at?: string
         }
