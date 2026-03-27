@@ -111,7 +111,7 @@ export default function ScriptEditor() {
       setThumbnailUrl(existingScript.thumbnail_url ?? "");
       setScriptType(existingScript.script_type);
       // lua_code now lives in script_code table - fetch separately
-      supabase.from("script_code").select("lua_code").eq("script_id", existingScript.id).single().then(({ data }) => {
+      (supabase as any).from("script_code").select("lua_code").eq("script_id", existingScript.id).single().then(({ data }: any) => {
         setLuaCode(data?.lua_code ?? "");
       });
       setFeatures((existingScript as any).features ?? []);
@@ -291,7 +291,7 @@ export default function ScriptEditor() {
     } else {
       // Save lua_code to script_code table
       if (savedScriptId && luaCode) {
-        await supabase.from("script_code").upsert({ script_id: savedScriptId, lua_code: luaCode, updated_at: new Date().toISOString() }, { onConflict: "script_id" });
+        await (supabase as any).from("script_code").upsert({ script_id: savedScriptId, lua_code: luaCode, updated_at: new Date().toISOString() }, { onConflict: "script_id" });
       }
       // Auto-scan if publishing or submitting for review, and script has Lua code
       if (savedScriptId && luaCode && luaCode.trim().length > 10 &&

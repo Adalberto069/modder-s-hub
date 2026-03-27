@@ -480,7 +480,7 @@ end
   const { data: scriptCodeData } = useQuery({
     queryKey: ["script-code", script.id],
     queryFn: async () => {
-      const { data } = await supabase.from("script_code").select("lua_code").eq("script_id", script.id).single();
+      const { data } = await (supabase as any).from("script_code").select("lua_code").eq("script_id", script.id).single();
       return data?.lua_code ?? null;
     },
     enabled: !!user && (user.id === script.modder_id || isAdmin),
