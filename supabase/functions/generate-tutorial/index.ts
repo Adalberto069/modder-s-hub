@@ -52,7 +52,7 @@ Gere apenas UM tutorial. NÃO gere múltiplos tutoriais. Responda APENAS com o t
       },
       body: JSON.stringify({
         model: "claude-sonnet-4-20250514",
-        max_tokens: 10000,
+        max_tokens: 8192,
         system: SYSTEM_PROMPT,
         messages: [{ role: "user", content: userPrompt }],
         tools: [
