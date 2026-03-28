@@ -954,7 +954,7 @@ end
                   </div>
                   <div className="flex-1">
                     <p className="text-xs font-bold mb-0.5">Verificado</p>
-                    <p className="text-[10px] text-muted-foreground leading-relaxed">Testado pela equipe Nexus.</p>
+                    <p className="text-[10px] text-muted-foreground leading-relaxed">Testado pela equipe HiddenMod.</p>
                   </div>
                 </div>
               </CardContent>

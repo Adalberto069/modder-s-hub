@@ -15,7 +15,7 @@ import { toast } from "sonner";
 import {
   ArrowLeft, BookOpen, Clock, Star, Play, MessageSquare, Send,
   Loader2, Lightbulb, AlertTriangle, ChevronRight, Lock, Copy, Check,
-  List, ChevronUp, Eye, Hash, Video
+  List, ChevronUp, Eye, Hash, Video, Link2
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { formatDistanceToNow } from "date-fns";
@@ -152,10 +152,20 @@ function parseContent(content: string): ParsedBlock[] {
 }
 
 function renderInline(text: string) {
-  const parts = text.split(/(\*\*[^*]+\*\*)/g);
+  // Bold: **text**
+  // Link: [label](url)
+  const parts = text.split(/(\*\*[^*]+\*\*|\[[^\]]+\]\([^)]+\))/g);
   return parts.map((part, i) => {
     if (part.startsWith("**") && part.endsWith("**")) {
       return <strong key={i} className="text-foreground font-semibold">{part.slice(2, -2)}</strong>;
+    }
+    const linkMatch = part.match(/\[([^\]]+)\]\(([^)]+)\)/);
+    if (linkMatch) {
+      return (
+        <a key={i} href={linkMatch[2]} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline font-medium">
+          {linkMatch[1]}
+        </a>
+      );
     }
     return part;
   });
@@ -348,6 +358,32 @@ function ContentRenderer({ content, onSectionIds }: { content: string; onSection
                 </div>
               </motion.div>
             );
+
+          case 'bullet_list':
+            return (
+              <ul key={idx} className="space-y-2 pl-2">
+                {(block as any).items?.map((item: string, i: number) => (
+                  <li key={i} className="flex gap-3 items-start">
+                    <ChevronRight className="h-4 w-4 text-primary mt-1 shrink-0" />
+                    <p className="text-[15px] text-foreground/85 leading-relaxed">{renderInline(item)}</p>
+                  </li>
+                ))}
+              </ul>
+            );
+
+          case 'link':
+            return (
+              <div key={idx} className="my-4">
+                <a href={block.url} target="_blank" rel="noopener noreferrer" 
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary/10 border border-primary/20 text-primary hover:bg-primary/20 transition-all font-bold text-sm">
+                  <Link2 className="h-4 w-4" />
+                  {(block as any).label || block.content}
+                </a>
+              </div>
+            );
+
+          case 'divider':
+            return <Separator key={idx} className="my-8 bg-border/20" />;
 
           default:
             return <p key={idx} className="text-[15px] text-foreground/80 leading-relaxed">{renderInline(block.content)}</p>;

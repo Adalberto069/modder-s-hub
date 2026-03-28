@@ -9,7 +9,7 @@ interface CodeTerminalProps {
   title?: string;
 }
 
-export function CodeTerminal({ code, title = "nexus_forge_output.lua" }: CodeTerminalProps) {
+export function CodeTerminal({ code, title = "hidden_forge_output.lua" }: CodeTerminalProps) {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = () => {
@@ -66,7 +66,7 @@ export function CodeTerminal({ code, title = "nexus_forge_output.lua" }: CodeTer
             <span>Language: Lua</span>
           </div>
           <div className="text-[9px] font-black uppercase tracking-wider text-neon-purple/40 italic">
-            Nexus Forge System Verified
+            HiddenForge System Verified
           </div>
         </div>
       </div>

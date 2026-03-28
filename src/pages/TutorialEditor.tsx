@@ -19,7 +19,7 @@ import {
   ArrowLeft, Save, Eye, Send, Plus, Trash2, Loader2,
   FileText, Video, BookOpen, Lightbulb, AlertTriangle,
   Image, Code, Link2, GripVertical, ChevronRight, Sparkles, Wand2,
-  ArrowUp, ArrowDown, Copy, Check, Hash, Star
+  ArrowUp, ArrowDown, Copy, Check, Hash, Star, Minus
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { validateFileWithToast } from "@/lib/secure-upload";
@@ -39,10 +39,13 @@ const TAG_SUGGESTIONS = [
 
 interface ContentBlock {
   id: string;
-  type: "text" | "step" | "code" | "image" | "tip" | "warning" | "video";
+  type: "text" | "step" | "code" | "image" | "tip" | "warning" | "video" | "link" | "bullet_list" | "divider";
   content: string;
   language?: string;
   imageUrl?: string;
+  url?: string;
+  label?: string;
+  items?: string[];
   stepNumber?: number;
 }
 
@@ -91,6 +94,9 @@ function serializeContent(form: TutorialFormData): string {
       case "video": if (block.content.trim()) parts.push(`[video](${block.content.trim()})`); break;
       case "tip": parts.push(`💡 ${block.content}`); break;
       case "warning": parts.push(`⚠️ ${block.content}`); break;
+      case "link": if (block.url) parts.push(`[${block.label || block.content}](${block.url})`); break;
+      case "divider": parts.push("---"); break;
+      case "bullet_list": if (block.items) block.items.forEach(item => parts.push(`- ${item}`)); break;
     }
   });
 
@@ -250,6 +256,9 @@ function BlockEditor({ block, onChange, onRemove, onMoveUp, onMoveDown, isFirst,
     video: { label: "Vídeo", icon: Video, color: "text-neon-pink", bgColor: "bg-neon-pink/10" },
     tip: { label: "Dica", icon: Lightbulb, color: "text-neon-cyan", bgColor: "bg-neon-cyan/10" },
     warning: { label: "Aviso", icon: AlertTriangle, color: "text-destructive", bgColor: "bg-destructive/10" },
+    link: { label: "Link", icon: Link2, color: "text-primary", bgColor: "bg-primary/10" },
+    bullet_list: { label: "Lista", icon: List, color: "text-neon-purple", bgColor: "bg-neon-purple/10" },
+    divider: { label: "Divisor", icon: Minus, color: "text-muted-foreground", bgColor: "bg-muted/10" },
   };
 
   const info = typeLabel[block.type];
@@ -343,6 +352,49 @@ function BlockEditor({ block, onChange, onRemove, onMoveUp, onMoveDown, isFirst,
               );
             })()}
           </div>
+        ) : block.type === "link" ? (
+          <div className="grid grid-cols-2 gap-3">
+            <Input
+              placeholder="Rótulo (ex: Baixar Script)"
+              value={block.label || ""}
+              onChange={(e) => onChange({ ...block, label: e.target.value })}
+              className="h-9 text-sm bg-background/50 border-border/20"
+            />
+            <Input
+              placeholder="URL (https://...)"
+              value={block.url || ""}
+              onChange={(e) => onChange({ ...block, url: e.target.value })}
+              className="h-9 text-sm bg-background/50 border-border/20"
+            />
+          </div>
+        ) : block.type === "bullet_list" ? (
+          <div className="space-y-2">
+            {(block.items || [""]).map((item, i) => (
+              <div key={i} className="flex gap-2">
+                <Input
+                  value={item}
+                  onChange={(e) => {
+                    const items = [...(block.items || [""])];
+                    items[i] = e.target.value;
+                    onChange({ ...block, items });
+                  }}
+                  placeholder="Item da lista..."
+                  className="h-8 text-sm bg-background/50 border-border/20"
+                />
+                <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => {
+                  const items = (block.items || []).filter((_, idx) => idx !== i);
+                  onChange({ ...block, items: items.length ? items : [""] });
+                }}>
+                  <Trash2 className="h-3 w-3" />
+                </Button>
+              </div>
+            ))}
+            <Button variant="outline" size="sm" className="h-7 text-[10px] gap-1" onClick={() => onChange({ ...block, items: [...(block.items || []), ""] })}>
+              <Plus className="h-3 w-3" /> Adicionar Item
+            </Button>
+          </div>
+        ) : block.type === "divider" ? (
+          <div className="h-px bg-border/20 my-4" />
         ) : (
           <Textarea
             placeholder={
@@ -487,6 +539,32 @@ function LivePreview({ form }: { form: TutorialFormData }) {
                 </div>
               ) : null;
 
+            case "link":
+              return block.url ? (
+                <div key={idx} className="my-4">
+                  <a href={block.url} target="_blank" rel="noopener noreferrer" 
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary/10 border border-primary/20 text-primary hover:bg-primary/20 transition-all font-bold text-sm">
+                    <Link2 className="h-4 w-4" />
+                    {block.label || block.content || "Link"}
+                  </a>
+                </div>
+              ) : null;
+
+            case "bullet_list":
+              return block.items ? (
+                <ul key={idx} className="space-y-2 pl-2">
+                  {block.items.map((item, i) => (
+                    <li key={i} className="flex gap-3 items-start">
+                      <ChevronRight className="h-4 w-4 text-primary mt-1 shrink-0" />
+                      <p className="text-[15px] text-foreground/85 leading-relaxed">{renderInline(item)}</p>
+                    </li>
+                  ))}
+                </ul>
+              ) : null;
+
+            case "divider":
+              return <Separator key={idx} className="my-8 bg-border/20" />;
+
             default: return null;
           }
         })}
@@ -598,8 +676,14 @@ export default function TutorialEditor() {
           ...f,
           description: data.description || f.description,
           contentBlocks: data.blocks.map((b: any) => ({
-            id: crypto.randomUUID(), type: b.type, content: b.content,
-            language: b.language || (b.type === "code" ? "lua" : undefined)
+            id: crypto.randomUUID(), 
+            type: b.type, 
+            content: b.content || "",
+            language: b.language || (b.type === "code" ? "lua" : undefined),
+            url: b.url,
+            label: b.label,
+            items: b.items,
+            imageUrl: b.imageUrl || (b.type === "image" ? b.url : undefined)
           })),
           tips: data.tips?.length > 0 ? data.tips : f.tips,
           troubleshooting: data.troubleshooting?.length > 0 ? data.troubleshooting : f.troubleshooting

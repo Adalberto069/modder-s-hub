@@ -183,7 +183,7 @@ export function NotificationCenter() {
 
                 <div className="p-3 bg-black/40 border-t border-white/5 text-center">
                   <p className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/40 italic">
-                    Nexus Intelligence System v2.0
+                    Hidden Intelligence System v2.0
                   </p>
                 </div>
               </div>

@@ -22,7 +22,9 @@ const SYSTEM_PROMPT = `Você é um especialista em modding mobile, scripts Lua, 
 8. Se o título não for de modding, adapte para o contexto de Game Guardian
 9. Gere apenas UM ÚNICO tutorial por chamada
 10. Use linguagem simples e amigável — o leitor pode ser um iniciante total
-11. Prefira mostrar um exemplo prático logo no início ao invés de teoria extensa`;
+11. Gere o conteúdo de forma detalhada e completa, aproveitando o espaço disponível. Seja direto e objetivo, sem repetições.
+12. Use blocos de LINK para referências externas importantes.
+13. Use blocos de IMAGE (com URLs de exemplo se necessário) para ilustrar passos visuais.`;
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -88,17 +90,30 @@ NÃO enrole. Gere apenas UM tutorial. Responda APENAS com o tool call.`;
                     properties: {
                       type: {
                         type: "string",
-                        enum: ["text", "step", "code", "tip", "warning"],
-                        description: "Tipo do bloco",
+                        enum: ['text', 'step', 'code', 'tip', 'warning', 'video', 'image', 'link', 'bullet_list', 'divider'],
+                        description: 'Tipo do bloco'
                       },
                       content: {
                         type: "string",
                         description: "Conteúdo do bloco. Parágrafos curtos (2-3 frases). Código Lua funcional e comentado.",
                       },
-                      language: {
-                        type: "string",
-                        description: 'Linguagem (apenas para code). Geralmente "lua".',
+                      url: {
+                        type: 'string',
+                        description: 'URL para blocos de image, video ou link.'
                       },
+                      label: {
+                        type: 'string',
+                        description: 'Rótulo/texto para o link.'
+                      },
+                      items: {
+                        type: 'array',
+                        items: { type: 'string' },
+                        description: 'Itens para o bloco bullet_list.'
+                      },
+                      language: {
+                        type: 'string',
+                        description: 'Linguagem do código (apenas para type=code). Geralmente "lua".'
+                      }
                     },
                     required: ["type", "content"],
                   },

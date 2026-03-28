@@ -328,7 +328,7 @@ export default function ScriptEditor() {
             <h1 className="text-4xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-br from-white to-white/60 uppercase">
               {isEditing ? "Editar Script Elite" : "Novo Script Elite"}
             </h1>
-            <p className="text-xs text-muted-foreground font-mono tracking-widest uppercase">Nexus Marketplace / Forge</p>
+            <p className="text-xs text-muted-foreground font-mono tracking-widest uppercase">HiddenMarket / Forge</p>
           </div>
           {publishStatus !== "published" && (
             <Badge className="bg-neon-purple/20 text-neon-purple border-neon-purple/30 backdrop-blur-md px-4 py-1.5 animate-pulse">
@@ -367,7 +367,7 @@ export default function ScriptEditor() {
                   <Input 
                     value={title} 
                     onChange={(e) => setTitle(e.target.value)} 
-                    placeholder="Ex: Nexus Auto Kill v2" 
+                    placeholder="Ex: HiddenMod Auto Kill v2" 
                     className="bg-white/5 border-white/10 focus:border-neon-purple/50 focus:ring-neon-purple/20 h-12"
                     required 
                   />
@@ -539,7 +539,7 @@ export default function ScriptEditor() {
             <Card className="relative overflow-hidden border-neon-green/20 bg-[#060608]/90 backdrop-blur-xl shadow-2xl">
               <CardHeader className="pb-4 border-b border-white/5">
                 <CardTitle className="text-sm font-black uppercase tracking-[0.2em] flex items-center gap-2 text-neon-green">
-                  <Code className="h-4 w-4" /> Nexus Forge Editor
+                  <Code className="h-4 w-4" /> HiddenForge Editor
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-6">
@@ -564,7 +564,7 @@ export default function ScriptEditor() {
                   <div className="mt-8 pt-8 border-t border-white/5">
                     <div className="mb-4 space-y-1">
                       <h4 className="text-xs font-black uppercase tracking-widest text-neon-green">Análise de Segurança Automática</h4>
-                      <p className="text-[10px] text-muted-foreground">O Nexus Marketplace analisa seu código em tempo real para garantir padrões de segurança.</p>
+                      <p className="text-[10px] text-muted-foreground">O HiddenMarket analisa seu código em tempo real para garantir padrões de segurança.</p>
                     </div>
                     <ScriptAnalysis code={luaCode} scriptId={id} onAnalysisComplete={setLastAnalysis} />
                   </div>
