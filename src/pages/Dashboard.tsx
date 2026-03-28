@@ -164,7 +164,7 @@ export default function Dashboard() {
 
     const loaderCode = `-- ========================================
 -- ${script.title} - Loader
--- Powered by HiddenMod License System
+-- Powered by Terminal Modder Intelligence
 -- ========================================
 
 local license = "${license.license_key}"
