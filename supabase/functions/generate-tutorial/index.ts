@@ -86,7 +86,7 @@ NÃO seja superficial. Cada parágrafo deve agregar valor real ao leitor. Gere a
                 },
                 blocks: {
                   type: "array",
-                  description: "Blocos de conteúdo do tutorial. Gere 4-6 blocos objetivos.",
+                  description: "Blocos de conteúdo do tutorial. Gere entre 8 e 14 blocos variados e detalhados. Cada bloco de texto deve ter 3-4 parágrafos. Blocos de código devem ter 15+ linhas.",
                   items: {
                     type: "object",
                     properties: {
@@ -110,7 +110,7 @@ NÃO seja superficial. Cada parágrafo deve agregar valor real ao leitor. Gere a
                 tips: {
                   type: "array",
                   items: { type: "string" },
-                  description: "2-3 dicas extras",
+                  description: "4-5 dicas extras úteis e práticas",
                 },
                 troubleshooting: {
                   type: "array",
@@ -122,7 +122,7 @@ NÃO seja superficial. Cada parágrafo deve agregar valor real ao leitor. Gere a
                     },
                     required: ["problem", "solution"],
                   },
-                  description: "2-3 problemas comuns com soluções",
+                  description: "3-4 problemas comuns com soluções detalhadas",
                 },
               },
               required: ["description", "blocks", "tips", "troubleshooting"],
