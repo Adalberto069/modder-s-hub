@@ -82,22 +82,22 @@ NÃO enrole. Gere apenas UM tutorial. Responda APENAS com o tool call.`;
                 },
                 blocks: {
                   type: "array",
-                  description: "Blocos de conteúdo do tutorial. Gere entre 8 e 14 blocos variados e detalhados. Cada bloco de texto deve ter 3-4 parágrafos. Blocos de código devem ter 15+ linhas.",
+                  description: "Blocos de conteúdo. Adapte a quantidade ao tema: 4-6 para iniciante, 6-8 intermediário, 8-12 avançado. Parágrafos curtos.",
                   items: {
                     type: "object",
                     properties: {
                       type: {
                         type: "string",
-                        enum: ["text", "step", "code", "tip", "warning", "video"],
+                        enum: ["text", "step", "code", "tip", "warning"],
                         description: "Tipo do bloco",
                       },
                       content: {
                         type: "string",
-                        description: "Conteúdo do bloco. Para code, deve ser código Lua funcional e comentado.",
+                        description: "Conteúdo do bloco. Parágrafos curtos (2-3 frases). Código Lua funcional e comentado.",
                       },
                       language: {
                         type: "string",
-                        description: 'Linguagem do código (apenas para type=code). Geralmente "lua".',
+                        description: 'Linguagem (apenas para code). Geralmente "lua".',
                       },
                     },
                     required: ["type", "content"],
@@ -106,7 +106,7 @@ NÃO enrole. Gere apenas UM tutorial. Responda APENAS com o tool call.`;
                 tips: {
                   type: "array",
                   items: { type: "string" },
-                  description: "4-5 dicas extras úteis e práticas",
+                  description: "2-3 dicas extras curtas e úteis",
                 },
                 troubleshooting: {
                   type: "array",
@@ -118,7 +118,7 @@ NÃO enrole. Gere apenas UM tutorial. Responda APENAS com o tool call.`;
                     },
                     required: ["problem", "solution"],
                   },
-                  description: "3-4 problemas comuns com soluções detalhadas",
+                  description: "2-3 problemas comuns com soluções objetivas",
                 },
               },
               required: ["description", "blocks", "tips", "troubleshooting"],
