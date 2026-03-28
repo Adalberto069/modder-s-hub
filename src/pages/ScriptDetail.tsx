@@ -176,17 +176,34 @@ export default function ScriptDetail() {
     }, 5000);
   }, [id, user?.id, queryClient]);
 
-  const { data: script } = useQuery({
+  const { data: script, isLoading: scriptLoading } = useQuery({
     queryKey: ["script", id],
     queryFn: async () => {
-      const { data } = await supabase
-        .from("scripts")
-        .select("*, categories(name, slug)")
-        .eq("id", id!)
-        .single();
+      const { data, error } = await supabase.from("scripts").select("*, categories(name, slug)").eq("id", id!).single();
+      if (error) throw error;
       return data;
     },
     enabled: !!id,
+  });
+
+  const { data: scriptCode } = useQuery({
+    queryKey: ["script-code", id],
+    queryFn: async () => {
+      const { data, error } = await (supabase as any).from("script_code").select("lua_code").eq("script_id", id!).single();
+      if (error) throw error;
+      return data?.lua_code ?? null;
+    },
+    enabled: !!id && !!script && !!user && (user.id === script.modder_id || isAdmin),
+  });
+
+  const { data: scriptPurchases } = useQuery({
+    queryKey: ["script-purchases", id],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("purchases").select("*").eq("script_id", id!);
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!id && !!script,
   });
 
   const { data: modderProfile } = useQuery({
@@ -476,16 +493,7 @@ end
   ];
   const scriptFeatures = (script as any).features ?? [];
   const scriptTags = (script as any).tags ?? [];
-  // lua_code is now in script_code table - only visible to owner/admin
-  const { data: scriptCodeData } = useQuery({
-    queryKey: ["script-code", script.id],
-    queryFn: async () => {
-      const { data } = await (supabase as any).from("script_code").select("lua_code").eq("script_id", script.id).single();
-      return data?.lua_code ?? null;
-    },
-    enabled: !!user && (user.id === script.modder_id || isAdmin),
-  });
-  const luaCode = scriptCodeData ?? null;
+  const luaCode = scriptCode?.lua_code ?? null;
   const gameName = (script as any).game_name;
   const scriptVersion = (script as any).version;
 

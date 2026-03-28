@@ -83,6 +83,47 @@ export default function Dashboard() {
     enabled: !!user,
   });
 
+  const totalDownloads = myScripts?.reduce((sum: number, s: any) => sum + s.download_count, 0) ?? 0;
+
+  // Real earnings from purchases
+  const { data: modderPurchases } = useQuery({
+    queryKey: ["modder-earnings", user?.id],
+    queryFn: async () => {
+      // Get all script IDs from this modder
+      const scriptIds = myScripts?.map((s: any) => s.id) ?? [];
+      if (scriptIds.length === 0) return [];
+      const { data } = await supabase
+        .from("purchases")
+        .select("amount, platform_commission, modder_earnings, created_at")
+        .in("script_id", scriptIds);
+      return data ?? [];
+    },
+    enabled: !!user && isModder && (myScripts?.length ?? 0) > 0,
+  });
+
+  const totalEarnings = modderPurchases?.reduce((sum: number, p: any) => sum + Number(p.modder_earnings || 0), 0) ?? 0;
+  const totalSales = modderPurchases?.length ?? 0;
+
+  // Prepare chart data for last 7 days
+  const chartData = Array.from({ length: 7 }, (_, i) => {
+    const date = subDays(new Date(), 6 - i);
+    const dayPurchases = modderPurchases?.filter((p: any) => 
+      isSameDay(parseISO(p.created_at), date)
+    ) ?? [];
+    
+    const earnings = dayPurchases.reduce((sum: number, p: any) => 
+      sum + Number(p.modder_earnings || 0), 0
+    );
+
+    return {
+      name: format(date, "EEE", { locale: ptBR }),
+      date: format(date, "dd/MM"),
+      earnings,
+    };
+  });
+
+  const dailyGrowth = chartData?.[6]?.earnings > (chartData?.[5]?.earnings ?? 0);
+
   if (loading) return <Layout><div className="container py-16 text-center">Carregando...</div></Layout>;
   if (!user) return <Navigate to="/auth" />;
 
@@ -211,46 +252,6 @@ end
     toast.success("Loader baixado!");
   };
 
-  const totalDownloads = myScripts?.reduce((sum: number, s: any) => sum + s.download_count, 0) ?? 0;
-
-  // Real earnings from purchases
-  const { data: modderPurchases } = useQuery({
-    queryKey: ["modder-earnings", user?.id],
-    queryFn: async () => {
-      // Get all script IDs from this modder
-      const scriptIds = myScripts?.map((s: any) => s.id) ?? [];
-      if (scriptIds.length === 0) return [];
-      const { data } = await supabase
-        .from("purchases")
-        .select("amount, platform_commission, modder_earnings, created_at")
-        .in("script_id", scriptIds);
-      return data ?? [];
-    },
-    enabled: !!user && isModder && (myScripts?.length ?? 0) > 0,
-  });
-
-  const totalEarnings = modderPurchases?.reduce((sum: number, p: any) => sum + Number(p.modder_earnings || 0), 0) ?? 0;
-  const totalSales = modderPurchases?.length ?? 0;
-
-  // Prepare chart data for last 7 days
-  const chartData = Array.from({ length: 7 }, (_, i) => {
-    const date = subDays(new Date(), 6 - i);
-    const dayPurchases = modderPurchases?.filter((p: any) => 
-      isSameDay(parseISO(p.created_at), date)
-    ) ?? [];
-    
-    const earnings = dayPurchases.reduce((sum: number, p: any) => 
-      sum + Number(p.modder_earnings || 0), 0
-    );
-
-    return {
-      name: format(date, "EEE", { locale: ptBR }),
-      date: format(date, "dd/MM"),
-      earnings,
-    };
-  });
-
-  const dailyGrowth = chartData[6].earnings > chartData[5].earnings;
 
   return (
     <Layout>
