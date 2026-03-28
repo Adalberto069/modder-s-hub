@@ -40,20 +40,22 @@ serve(async (req) => {
       });
     }
 
-    const userPrompt = `Gere UM ÚNICO tutorial técnico COMPLETO e DETALHADO sobre: "${title}"
+    const userPrompt = `Gere UM ÚNICO tutorial sobre: "${title}"
 
-IMPORTANTE: O tutorial deve ser EXTENSO e RICO em conteúdo:
-- Mínimo de 1500 palavras, idealmente 2000-3000 palavras
-- Entre 8 e 14 blocos de conteúdo variados (text, step, code, tip, warning)
-- Pelo menos 2 blocos de código Lua completos e funcionais (15+ linhas cada)
-- Pelo menos 3 blocos de "step" com instruções detalhadas
-- Pelo menos 2 blocos de "tip" com dicas práticas
-- Pelo menos 1 bloco de "warning" com avisos importantes
-- Explicações profundas e contextualizadas, não superficiais
-- 4-5 dicas extras úteis e práticas
-- 3-4 problemas comuns com soluções detalhadas
+IMPORTANTE — ADAPTE o tamanho à complexidade:
+- Se for tema SIMPLES/INICIANTE: seja CURTO e direto. 4-6 blocos. O leitor quer aprender rápido, não ler um livro.
+- Se for tema INTERMEDIÁRIO: 6-8 blocos com bom equilíbrio.
+- Se for tema AVANÇADO: 8-12 blocos mais detalhados.
 
-NÃO seja superficial. Cada parágrafo deve agregar valor real ao leitor. Gere apenas UM tutorial. Responda APENAS com o tool call solicitado.`;
+Regras:
+- Pelo menos 1 bloco de código Lua funcional (8-25 linhas conforme complexidade)
+- Pelo menos 1 step com instrução prática
+- 2-3 dicas extras úteis
+- 2-3 problemas comuns com soluções curtas
+- Mostre um exemplo prático o mais cedo possível no tutorial
+- Parágrafos CURTOS (2-3 frases). Vá direto ao ponto.
+
+NÃO enrole. Gere apenas UM tutorial. Responda APENAS com o tool call.`;
 
     const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
