@@ -6,20 +6,29 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const SYSTEM_PROMPT = `Você é um especialista em modding mobile, scripts Lua, Game Guardian e jogos Android. Gere tutoriais claros, práticos e acessíveis para iniciantes e intermediários. Evite termos excessivamente técnicos sem explicação. Estruture sempre com: introdução, pré-requisitos, passo a passo numerado e conclusão. Responda sempre em português brasileiro.
+const SYSTEM_PROMPT = `Você é um especialista em modding mobile, scripts Lua, Game Guardian e jogos Android. Gere tutoriais COMPLETOS, DETALHADOS e EXTENSOS. Responda sempre em português brasileiro.
 
-## Regras
-1. Código Lua DEVE ser funcional e usar a API correta do GG
+## Regras OBRIGATÓRIAS
+1. Código Lua DEVE ser funcional, comentado linha a linha, e usar a API correta do GG
 2. Inclua exemplos REAIS com valores plausíveis
-3. Explique o PORQUÊ de cada passo
-4. Inclua tratamento de erros
+3. Explique o PORQUÊ de cada passo em detalhes
+4. Inclua tratamento de erros nos códigos
 5. Use menus interativos quando aplicável
-6. Gere conteúdo com 4-6 blocos objetivos
-7. Inclua blocos de código com exemplos práticos
-8. Se o título não for de modding, adapte para o contexto de Game Guardian
-9. Inclua dicas de performance e boas práticas
-10. Gere apenas UM ÚNICO tutorial por chamada. NUNCA gere múltiplos tutoriais na mesma resposta.
-11. O tutorial deve ter no máximo 10000 palavras. Seja direto e objetivo, sem repetições.`;
+6. Gere entre 8 e 14 blocos de conteúdo — NUNCA menos que 8
+7. Cada bloco de texto deve ter pelo menos 3-4 parágrafos com explicações ricas
+8. Cada bloco de código deve ter pelo menos 15 linhas com comentários explicativos
+9. Inclua pelo menos 2 blocos de código com exemplos práticos diferentes
+10. Inclua passos numerados detalhados (tipo "step") com instruções claras
+11. Inclua blocos de "tip" e "warning" com informações relevantes
+12. Se o título não for de modding, adapte para o contexto de Game Guardian
+13. Gere apenas UM ÚNICO tutorial por chamada
+14. O tutorial deve ter entre 1500 e 3000 palavras — seja DETALHADO e COMPLETO
+15. Inclua uma introdução explicando o contexto e importância do tema
+16. Inclua pré-requisitos necessários
+17. Termine com uma conclusão e próximos passos
+18. Gere pelo menos 4 dicas extras úteis
+19. Gere pelo menos 3 problemas comuns com soluções detalhadas
+20. NUNCA gere conteúdo genérico ou superficial — cada seção deve ter profundidade`;
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -37,11 +46,20 @@ serve(async (req) => {
       });
     }
 
-    const userPrompt = `Gere UM ÚNICO tutorial técnico sobre: "${title}"
+    const userPrompt = `Gere UM ÚNICO tutorial técnico COMPLETO e DETALHADO sobre: "${title}"
 
-O tutorial deve ser conciso (máximo 500 palavras), direto e sem repetições. Inclua exemplos de código funcional e explicações claras.
+IMPORTANTE: O tutorial deve ser EXTENSO e RICO em conteúdo:
+- Mínimo de 1500 palavras, idealmente 2000-3000 palavras
+- Entre 8 e 14 blocos de conteúdo variados (text, step, code, tip, warning)
+- Pelo menos 2 blocos de código Lua completos e funcionais (15+ linhas cada)
+- Pelo menos 3 blocos de "step" com instruções detalhadas
+- Pelo menos 2 blocos de "tip" com dicas práticas
+- Pelo menos 1 bloco de "warning" com avisos importantes
+- Explicações profundas e contextualizadas, não superficiais
+- 4-5 dicas extras úteis e práticas
+- 3-4 problemas comuns com soluções detalhadas
 
-Gere apenas UM tutorial. NÃO gere múltiplos tutoriais. Responda APENAS com o tool call solicitado.`;
+NÃO seja superficial. Cada parágrafo deve agregar valor real ao leitor. Gere apenas UM tutorial. Responda APENAS com o tool call solicitado.`;
 
     const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
@@ -68,7 +86,7 @@ Gere apenas UM tutorial. NÃO gere múltiplos tutoriais. Responda APENAS com o t
                 },
                 blocks: {
                   type: "array",
-                  description: "Blocos de conteúdo do tutorial. Gere 4-6 blocos objetivos.",
+                  description: "Blocos de conteúdo do tutorial. Gere entre 8 e 14 blocos variados e detalhados. Cada bloco de texto deve ter 3-4 parágrafos. Blocos de código devem ter 15+ linhas.",
                   items: {
                     type: "object",
                     properties: {
@@ -92,7 +110,7 @@ Gere apenas UM tutorial. NÃO gere múltiplos tutoriais. Responda APENAS com o t
                 tips: {
                   type: "array",
                   items: { type: "string" },
-                  description: "2-3 dicas extras",
+                  description: "4-5 dicas extras úteis e práticas",
                 },
                 troubleshooting: {
                   type: "array",
@@ -104,7 +122,7 @@ Gere apenas UM tutorial. NÃO gere múltiplos tutoriais. Responda APENAS com o t
                     },
                     required: ["problem", "solution"],
                   },
-                  description: "2-3 problemas comuns com soluções",
+                  description: "3-4 problemas comuns com soluções detalhadas",
                 },
               },
               required: ["description", "blocks", "tips", "troubleshooting"],
