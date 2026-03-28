@@ -6,29 +6,23 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const SYSTEM_PROMPT = `Você é um especialista em modding mobile, scripts Lua, Game Guardian e jogos Android. Gere tutoriais COMPLETOS, DETALHADOS e EXTENSOS. Responda sempre em português brasileiro.
+const SYSTEM_PROMPT = `Você é um especialista em modding mobile, scripts Lua, Game Guardian e jogos Android. Gere tutoriais claros e diretos. Responda sempre em português brasileiro.
 
 ## Regras OBRIGATÓRIAS
-1. Código Lua DEVE ser funcional, comentado linha a linha, e usar a API correta do GG
+1. Código Lua DEVE ser funcional, comentado, e usar a API correta do GG
 2. Inclua exemplos REAIS com valores plausíveis
-3. Explique o PORQUÊ de cada passo em detalhes
-4. Inclua tratamento de erros nos códigos
-5. Use menus interativos quando aplicável
-6. Gere entre 8 e 14 blocos de conteúdo — NUNCA menos que 8
-7. Cada bloco de texto deve ter pelo menos 3-4 parágrafos com explicações ricas
-8. Cada bloco de código deve ter pelo menos 15 linhas com comentários explicativos
-9. Inclua pelo menos 2 blocos de código com exemplos práticos diferentes
-10. Inclua passos numerados detalhados (tipo "step") com instruções claras
-11. Inclua blocos de "tip" e "warning" com informações relevantes
-12. Se o título não for de modding, adapte para o contexto de Game Guardian
-13. Gere apenas UM ÚNICO tutorial por chamada
-14. O tutorial deve ter entre 1500 e 3000 palavras — seja DETALHADO e COMPLETO
-15. Inclua uma introdução explicando o contexto e importância do tema
-16. Inclua pré-requisitos necessários
-17. Termine com uma conclusão e próximos passos
-18. Gere pelo menos 4 dicas extras úteis
-19. Gere pelo menos 3 problemas comuns com soluções detalhadas
-20. NUNCA gere conteúdo genérico ou superficial — cada seção deve ter profundidade`;
+3. Explique de forma CLARA e OBJETIVA — sem enrolação
+4. ADAPTE o tamanho ao nível do tema:
+   - Tema INICIANTE (ex: "meu primeiro script", "como começar"): 4-6 blocos, 400-800 palavras. Seja CONCISO e acolhedor. Um iniciante quer resultados rápidos, não um livro.
+   - Tema INTERMEDIÁRIO (ex: "busca por grupo", "menus interativos"): 6-8 blocos, 800-1200 palavras. 
+   - Tema AVANÇADO (ex: "anti-ban", "criptografia", "bypass"): 8-12 blocos, 1200-2000 palavras. Aqui sim, detalhe mais.
+5. NUNCA gere mais conteúdo do que o necessário — qualidade > quantidade
+6. Cada parágrafo deve ser curto (2-3 frases) e ir direto ao ponto
+7. Blocos de código: entre 8-25 linhas dependendo da complexidade. Comentários breves.
+8. Se o título não for de modding, adapte para o contexto de Game Guardian
+9. Gere apenas UM ÚNICO tutorial por chamada
+10. Use linguagem simples e amigável — o leitor pode ser um iniciante total
+11. Prefira mostrar um exemplo prático logo no início ao invés de teoria extensa`;
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -46,20 +40,22 @@ serve(async (req) => {
       });
     }
 
-    const userPrompt = `Gere UM ÚNICO tutorial técnico COMPLETO e DETALHADO sobre: "${title}"
+    const userPrompt = `Gere UM ÚNICO tutorial sobre: "${title}"
 
-IMPORTANTE: O tutorial deve ser EXTENSO e RICO em conteúdo:
-- Mínimo de 1500 palavras, idealmente 2000-3000 palavras
-- Entre 8 e 14 blocos de conteúdo variados (text, step, code, tip, warning)
-- Pelo menos 2 blocos de código Lua completos e funcionais (15+ linhas cada)
-- Pelo menos 3 blocos de "step" com instruções detalhadas
-- Pelo menos 2 blocos de "tip" com dicas práticas
-- Pelo menos 1 bloco de "warning" com avisos importantes
-- Explicações profundas e contextualizadas, não superficiais
-- 4-5 dicas extras úteis e práticas
-- 3-4 problemas comuns com soluções detalhadas
+IMPORTANTE — ADAPTE o tamanho à complexidade:
+- Se for tema SIMPLES/INICIANTE: seja CURTO e direto. 4-6 blocos. O leitor quer aprender rápido, não ler um livro.
+- Se for tema INTERMEDIÁRIO: 6-8 blocos com bom equilíbrio.
+- Se for tema AVANÇADO: 8-12 blocos mais detalhados.
 
-NÃO seja superficial. Cada parágrafo deve agregar valor real ao leitor. Gere apenas UM tutorial. Responda APENAS com o tool call solicitado.`;
+Regras:
+- Pelo menos 1 bloco de código Lua funcional (8-25 linhas conforme complexidade)
+- Pelo menos 1 step com instrução prática
+- 2-3 dicas extras úteis
+- 2-3 problemas comuns com soluções curtas
+- Mostre um exemplo prático o mais cedo possível no tutorial
+- Parágrafos CURTOS (2-3 frases). Vá direto ao ponto.
+
+NÃO enrole. Gere apenas UM tutorial. Responda APENAS com o tool call.`;
 
     const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
@@ -86,22 +82,22 @@ NÃO seja superficial. Cada parágrafo deve agregar valor real ao leitor. Gere a
                 },
                 blocks: {
                   type: "array",
-                  description: "Blocos de conteúdo do tutorial. Gere entre 8 e 14 blocos variados e detalhados. Cada bloco de texto deve ter 3-4 parágrafos. Blocos de código devem ter 15+ linhas.",
+                  description: "Blocos de conteúdo. Adapte a quantidade ao tema: 4-6 para iniciante, 6-8 intermediário, 8-12 avançado. Parágrafos curtos.",
                   items: {
                     type: "object",
                     properties: {
                       type: {
                         type: "string",
-                        enum: ["text", "step", "code", "tip", "warning", "video"],
+                        enum: ["text", "step", "code", "tip", "warning"],
                         description: "Tipo do bloco",
                       },
                       content: {
                         type: "string",
-                        description: "Conteúdo do bloco. Para code, deve ser código Lua funcional e comentado.",
+                        description: "Conteúdo do bloco. Parágrafos curtos (2-3 frases). Código Lua funcional e comentado.",
                       },
                       language: {
                         type: "string",
-                        description: 'Linguagem do código (apenas para type=code). Geralmente "lua".',
+                        description: 'Linguagem (apenas para code). Geralmente "lua".',
                       },
                     },
                     required: ["type", "content"],
@@ -110,7 +106,7 @@ NÃO seja superficial. Cada parágrafo deve agregar valor real ao leitor. Gere a
                 tips: {
                   type: "array",
                   items: { type: "string" },
-                  description: "4-5 dicas extras úteis e práticas",
+                  description: "2-3 dicas extras curtas e úteis",
                 },
                 troubleshooting: {
                   type: "array",
@@ -122,7 +118,7 @@ NÃO seja superficial. Cada parágrafo deve agregar valor real ao leitor. Gere a
                     },
                     required: ["problem", "solution"],
                   },
-                  description: "3-4 problemas comuns com soluções detalhadas",
+                  description: "2-3 problemas comuns com soluções objetivas",
                 },
               },
               required: ["description", "blocks", "tips", "troubleshooting"],
