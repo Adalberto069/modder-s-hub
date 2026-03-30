@@ -52,6 +52,9 @@ const App = () => (
             <Route path="/forum" element={<Forum />} />
             <Route path="/ferramentas" element={<Ferramentas />} />
             <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/termos" element={<TermosDeUso />} />
+            <Route path="/privacidade" element={<PoliticaPrivacidade />} />
+            <Route path="*" element={<NotFound />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
