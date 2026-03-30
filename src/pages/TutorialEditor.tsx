@@ -19,7 +19,7 @@ import {
   ArrowLeft, Save, Eye, Send, Plus, Trash2, Loader2,
   FileText, Video, BookOpen, Lightbulb, AlertTriangle,
   Image, Code, Link2, GripVertical, ChevronRight, Sparkles, Wand2,
-  ArrowUp, ArrowDown, Copy, Check, Hash, Star, Minus
+  ArrowUp, ArrowDown, Copy, Check, Hash, Star, Minus, List
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { validateFileWithToast } from "@/lib/secure-upload";

@@ -58,12 +58,15 @@ Deno.serve(async (req) => {
     if (allDocsError) throw allDocsError;
 
     // Format the response for the GG Loader
-    const scriptsList = allLicenses.map(l => ({
-      key: l.license_key,
-      id: l.scripts.id,
-      title: l.scripts.title,
-      description: l.scripts.description
-    }));
+    const scriptsList = allLicenses.map(l => {
+      const script = Array.isArray(l.scripts) ? l.scripts[0] : l.scripts;
+      return {
+        key: l.license_key,
+        id: script?.id,
+        title: script?.title,
+        description: script?.description
+      };
+    });
 
     return new Response(JSON.stringify({ scripts: scriptsList }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },

@@ -71,7 +71,7 @@ function StarRating({ rating, onRate, interactive = false, size = "md" }: {
 
 /** Parse content into structured blocks */
 interface ParsedBlock {
-  type: 'heading' | 'tip' | 'warning' | 'code' | 'step' | 'bullet' | 'image' | 'video' | 'text';
+  type: 'heading' | 'tip' | 'warning' | 'code' | 'step' | 'bullet' | 'image' | 'video' | 'text' | 'bullet_list' | 'link' | 'divider';
   content: string;
   lang?: string;
   alt?: string;
