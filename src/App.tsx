@@ -20,6 +20,8 @@ import Forum from "./pages/Forum";
 import Ferramentas from "./pages/Ferramentas";
 import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
+import TermosDeUso from "./pages/TermosDeUso";
+import PoliticaPrivacidade from "./pages/PoliticaPrivacidade";
 import { ImpersonationBanner } from "@/components/ImpersonationBanner";
 
 const queryClient = new QueryClient();
