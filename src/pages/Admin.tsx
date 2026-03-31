@@ -112,9 +112,16 @@ export default function Admin() {
     queryFn: async () => {
       const { data } = await supabase
         .from("licenses")
-        .select("*, scripts(title), profiles:user_id(username, display_name)")
+        .select("*, scripts(title)")
         .order("created_at", { ascending: false });
-      return data ?? [];
+      if (!data || data.length === 0) return [];
+      const userIds = [...new Set(data.map((l: any) => l.user_id))];
+      const { data: profiles } = await supabase
+        .from("profiles")
+        .select("user_id, username, display_name")
+        .in("user_id", userIds);
+      const profileMap = Object.fromEntries((profiles ?? []).map((p: any) => [p.user_id, p]));
+      return data.map((l: any) => ({ ...l, profiles: profileMap[l.user_id] || null }));
     },
     enabled: isAdmin,
   });
@@ -125,9 +132,16 @@ export default function Admin() {
     queryFn: async () => {
       const { data } = await supabase
         .from("purchases")
-        .select("*, scripts(title), profiles:user_id(username, display_name)")
+        .select("*, scripts(title)")
         .order("created_at", { ascending: false });
-      return data ?? [];
+      if (!data || data.length === 0) return [];
+      const userIds = [...new Set(data.map((p: any) => p.user_id))];
+      const { data: profiles } = await supabase
+        .from("profiles")
+        .select("user_id, username, display_name")
+        .in("user_id", userIds);
+      const profileMap = Object.fromEntries((profiles ?? []).map((p: any) => [p.user_id, p]));
+      return data.map((p: any) => ({ ...p, profiles: profileMap[p.user_id] || null }));
     },
     enabled: isAdmin,
   });
