@@ -371,6 +371,8 @@ export type Database = {
           display_name: string | null
           email: string | null
           id: string
+          pix_key: string | null
+          pix_key_type: string | null
           reputation_score: number
           total_downloads: number
           total_positive_reviews: number
@@ -385,6 +387,8 @@ export type Database = {
           display_name?: string | null
           email?: string | null
           id?: string
+          pix_key?: string | null
+          pix_key_type?: string | null
           reputation_score?: number
           total_downloads?: number
           total_positive_reviews?: number
@@ -399,6 +403,8 @@ export type Database = {
           display_name?: string | null
           email?: string | null
           id?: string
+          pix_key?: string | null
+          pix_key_type?: string | null
           reputation_score?: number
           total_downloads?: number
           total_positive_reviews?: number
