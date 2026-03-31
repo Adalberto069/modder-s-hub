@@ -52,15 +52,70 @@ export function ModderFinanceTab({ totalEarnings }: ModderFinanceTabProps) {
 
   const availableBalance = totalEarnings - totalWithdrawnOrPending;
 
+  const validatePixKey = (key: string, type: string): string | null => {
+    const cleaned = key.trim();
+    if (!cleaned) return "Chave PIX não pode estar vazia.";
+    
+    switch (type) {
+      case "cpf": {
+        const cpf = cleaned.replace(/\D/g, "");
+        if (cpf.length !== 11) return "CPF deve ter 11 dígitos.";
+        if (/^(\d)\1{10}$/.test(cpf)) return "CPF inválido.";
+        // Validate CPF check digits
+        let sum = 0;
+        for (let i = 0; i < 9; i++) sum += parseInt(cpf[i]) * (10 - i);
+        let rest = (sum * 10) % 11;
+        if (rest === 10) rest = 0;
+        if (rest !== parseInt(cpf[9])) return "CPF inválido.";
+        sum = 0;
+        for (let i = 0; i < 10; i++) sum += parseInt(cpf[i]) * (11 - i);
+        rest = (sum * 10) % 11;
+        if (rest === 10) rest = 0;
+        if (rest !== parseInt(cpf[10])) return "CPF inválido.";
+        return null;
+      }
+      case "cnpj": {
+        const cnpj = cleaned.replace(/\D/g, "");
+        if (cnpj.length !== 14) return "CNPJ deve ter 14 dígitos.";
+        if (/^(\d)\1{13}$/.test(cnpj)) return "CNPJ inválido.";
+        return null;
+      }
+      case "email": {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(cleaned)) return "E-mail inválido.";
+        return null;
+      }
+      case "telefone": {
+        const phone = cleaned.replace(/\D/g, "");
+        if (phone.length < 10 || phone.length > 13) return "Telefone deve ter entre 10 e 13 dígitos (com DDD).";
+        return null;
+      }
+      case "aleatoria": {
+        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+        if (!uuidRegex.test(cleaned)) return "Chave aleatória deve estar no formato UUID.";
+        return null;
+      }
+      default:
+        return "Tipo de chave inválido.";
+    }
+  };
+
   const handleSavePix = async () => {
     if (!pixKey || !pixKeyType) {
       toast.error("Preencha a chave PIX e o tipo.");
       return;
     }
+    
+    const validationError = validatePixKey(pixKey, pixKeyType);
+    if (validationError) {
+      toast.error(validationError);
+      return;
+    }
+    
     setSavingPix(true);
     const { error } = await (supabase as any)
       .from("profiles")
-      .update({ pix_key: pixKey, pix_key_type: pixKeyType } as any)
+      .update({ pix_key: pixKey.trim(), pix_key_type: pixKeyType } as any)
       .eq("user_id", user?.id);
 
     if (error) {
