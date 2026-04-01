@@ -66,7 +66,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Generate magic link for the target user
+    // Generate magic link and immediately verify it server-side to get session tokens
     const { data: linkData, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
       type: "magiclink",
       email: targetUser.email!,
@@ -80,9 +80,29 @@ Deno.serve(async (req) => {
       });
     }
 
+    // Verify OTP server-side immediately (no expiration risk)
+    const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
+    const anonClient = createClient(supabaseUrl, anonKey, {
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
+
+    const { data: sessionData, error: verifyError } = await anonClient.auth.verifyOtp({
+      email: targetUser.email!,
+      token: linkData.properties?.hashed_token,
+      type: "magiclink",
+    });
+
+    if (verifyError || !sessionData?.session) {
+      console.error("Verify OTP error:", verifyError);
+      return new Response(JSON.stringify({ error: "Erro ao verificar token de acesso" }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     return new Response(JSON.stringify({
-      email: targetUser.email,
-      token_hash: linkData.properties?.hashed_token,
+      access_token: sessionData.session.access_token,
+      refresh_token: sessionData.session.refresh_token,
     }), {
       status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
