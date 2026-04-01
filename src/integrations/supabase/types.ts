@@ -1021,6 +1021,42 @@ export type Database = {
           },
         ]
       }
+      withdrawals: {
+        Row: {
+          admin_notes: string | null
+          amount: number
+          completed_at: string | null
+          created_at: string
+          id: string
+          modder_id: string
+          pix_key: string | null
+          pix_key_type: string | null
+          status: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          amount: number
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          modder_id: string
+          pix_key?: string | null
+          pix_key_type?: string | null
+          status?: string
+        }
+        Update: {
+          admin_notes?: string | null
+          amount?: number
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          modder_id?: string
+          pix_key?: string | null
+          pix_key_type?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
