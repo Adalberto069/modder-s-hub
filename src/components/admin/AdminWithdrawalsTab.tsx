@@ -38,7 +38,7 @@ export function AdminWithdrawalsTab() {
       if (!wData || wData.length === 0) return [];
       
       // Fetch profiles separately since there's no FK
-      const modderIds = [...new Set(wData.map((w: any) => w.modder_id as string))];
+      const modderIds: string[] = [...new Set(wData.map((w: any) => String(w.modder_id)))];
       const { data: profiles } = await supabase
         .from("profiles")
         .select("user_id, username, display_name")
