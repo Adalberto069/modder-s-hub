@@ -31,11 +31,24 @@ export function AdminWithdrawalsTab() {
   const { data: withdrawals } = useQuery({
     queryKey: ["admin-withdrawals"],
     queryFn: async () => {
-      const { data } = await (supabase as any)
+      const { data: wData } = await (supabase as any)
         .from("withdrawals")
-        .select("*, profiles:modder_id(username, display_name)")
+        .select("*")
         .order("created_at", { ascending: false });
-      return data ?? [];
+      if (!wData || wData.length === 0) return [];
+      
+      // Fetch profiles separately since there's no FK
+      const modderIds = [...new Set(wData.map((w: any) => w.modder_id))];
+      const { data: profiles } = await supabase
+        .from("profiles")
+        .select("user_id, username, display_name")
+        .in("user_id", modderIds);
+      
+      const profileMap = new Map(profiles?.map(p => [p.user_id, p]) ?? []);
+      return wData.map((w: any) => ({
+        ...w,
+        profiles: profileMap.get(w.modder_id) || null,
+      }));
     },
     enabled: isAdmin,
   });

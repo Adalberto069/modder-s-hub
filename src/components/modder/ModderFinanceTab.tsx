@@ -230,8 +230,8 @@ export function ModderFinanceTab({ totalEarnings }: ModderFinanceTabProps) {
                   <SelectItem value="cpf">CPF</SelectItem>
                   <SelectItem value="cnpj">CNPJ</SelectItem>
                   <SelectItem value="email">E-mail</SelectItem>
-                  <SelectItem value="phone">Telefone</SelectItem>
-                  <SelectItem value="random">Chave Aleatória</SelectItem>
+                  <SelectItem value="telefone">Telefone</SelectItem>
+                  <SelectItem value="aleatoria">Chave Aleatória</SelectItem>
                 </SelectContent>
               </Select>
             </div>
