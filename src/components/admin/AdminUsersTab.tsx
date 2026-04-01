@@ -75,13 +75,13 @@ export function AdminUsersTab() {
         return;
       }
 
-      // Call edge function to get magic link token
+      // Call edge function to get session tokens directly
       const { data, error } = await supabase.functions.invoke("impersonate-user", {
         body: { target_user_id: targetUserId },
       });
 
-      if (error || !data?.token_hash) {
-        toast.error(data?.error || "Erro ao gerar link de acesso");
+      if (error || !data?.access_token) {
+        toast.error(data?.error || "Erro ao gerar acesso");
         return;
       }
 
@@ -91,17 +91,16 @@ export function AdminUsersTab() {
         targetName: displayName,
       }));
 
-      // Sign in as the target user using the magic link token
-      const { error: otpError } = await supabase.auth.verifyOtp({
-        email: data.email,
-        token: data.token_hash,
-        type: "magiclink",
+      // Set the impersonated session directly
+      const { error: sessionError } = await supabase.auth.setSession({
+        access_token: data.access_token,
+        refresh_token: data.refresh_token,
       });
 
-      if (otpError) {
-        console.error("OTP error:", otpError);
+      if (sessionError) {
+        console.error("Session error:", sessionError);
         localStorage.removeItem("admin_impersonation");
-        toast.error("Erro ao fazer login como o usuário: " + otpError.message);
+        toast.error("Erro ao fazer login como o usuário: " + sessionError.message);
         return;
       }
 
