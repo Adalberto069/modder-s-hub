@@ -602,7 +602,7 @@ export default function Admin() {
               <ShoppingCart className="h-4 w-4" /> <span className="hidden sm:inline">Compras</span>
             </TabsTrigger>
             <TabsTrigger value="withdrawals" className="text-[10px] sm:text-xs tracking-widest uppercase font-black gap-2 data-[state=active]:bg-[#030304] data-[state=active]:text-primary rounded-none h-full">
-              <Landmark className="h-4 w-4" /> <span className="hidden sm:inline">Saques</span>
+              <Landmark className="h-4 w-4" /> <span className="hidden sm:inline">Pagamentos</span>
             </TabsTrigger>
             <TabsTrigger value="leaks" className="text-[10px] sm:text-xs tracking-widest uppercase font-black gap-2 data-[state=active]:bg-[#030304] data-[state=active]:text-destructive rounded-none h-full">
               <AlertTriangle className="h-4 w-4" /> <span className="hidden sm:inline">Vazamentos</span>

@@ -251,6 +251,42 @@ export type Database = {
           },
         ]
       }
+      modder_mp_accounts: {
+        Row: {
+          connected_at: string
+          id: string
+          mp_access_token: string
+          mp_public_key: string | null
+          mp_refresh_token: string
+          mp_token_expires_at: string | null
+          mp_user_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          connected_at?: string
+          id?: string
+          mp_access_token: string
+          mp_public_key?: string | null
+          mp_refresh_token: string
+          mp_token_expires_at?: string | null
+          mp_user_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          connected_at?: string
+          id?: string
+          mp_access_token?: string
+          mp_public_key?: string | null
+          mp_refresh_token?: string
+          mp_token_expires_at?: string | null
+          mp_user_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       moderation_logs: {
         Row: {
           action: string
@@ -371,8 +407,6 @@ export type Database = {
           display_name: string | null
           email: string | null
           id: string
-          pix_key: string | null
-          pix_key_type: string | null
           reputation_score: number
           total_downloads: number
           total_positive_reviews: number
@@ -387,8 +421,6 @@ export type Database = {
           display_name?: string | null
           email?: string | null
           id?: string
-          pix_key?: string | null
-          pix_key_type?: string | null
           reputation_score?: number
           total_downloads?: number
           total_positive_reviews?: number
@@ -403,8 +435,6 @@ export type Database = {
           display_name?: string | null
           email?: string | null
           id?: string
-          pix_key?: string | null
-          pix_key_type?: string | null
           reputation_score?: number
           total_downloads?: number
           total_positive_reviews?: number
@@ -1020,42 +1050,6 @@ export type Database = {
             referencedColumns: ["user_id"]
           },
         ]
-      }
-      withdrawals: {
-        Row: {
-          admin_notes: string | null
-          amount: number
-          completed_at: string | null
-          created_at: string
-          id: string
-          modder_id: string
-          pix_key: string | null
-          pix_key_type: string | null
-          status: string
-        }
-        Insert: {
-          admin_notes?: string | null
-          amount: number
-          completed_at?: string | null
-          created_at?: string
-          id?: string
-          modder_id: string
-          pix_key?: string | null
-          pix_key_type?: string | null
-          status?: string
-        }
-        Update: {
-          admin_notes?: string | null
-          amount?: number
-          completed_at?: string | null
-          created_at?: string
-          id?: string
-          modder_id?: string
-          pix_key?: string | null
-          pix_key_type?: string | null
-          status?: string
-        }
-        Relationships: []
       }
     }
     Views: {
