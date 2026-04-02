@@ -52,7 +52,7 @@ Deno.serve(async (req) => {
 
     const { data: script, error: scriptError } = await serviceClient
       .from("scripts")
-      .select("id, title, price, is_paid, license_duration_days")
+      .select("id, title, price, is_paid, license_duration_days, modder_id")
       .eq("id", script_id)
       .single();
 
@@ -65,6 +65,20 @@ Deno.serve(async (req) => {
 
     if (!script.is_paid || !script.price || script.price <= 0) {
       return new Response(JSON.stringify({ error: "Script is free" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // Get modder's MP account for split payment
+    const { data: modderMp } = await serviceClient
+      .from("modder_mp_accounts")
+      .select("mp_access_token, mp_user_id, mp_token_expires_at")
+      .eq("user_id", script.modder_id)
+      .single();
+
+    if (!modderMp) {
+      return new Response(JSON.stringify({ error: "Modder has not connected Mercado Pago. Payment unavailable." }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -107,11 +121,15 @@ Deno.serve(async (req) => {
       });
     }
 
-    // ===== CARD PAYMENT (Checkout Pro) =====
-    if (payment_method === "card") {
-      const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-      const webhookUrl = `${supabaseUrl}/functions/v1/mercadopago-webhook`;
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const webhookUrl = `${supabaseUrl}/functions/v1/mercadopago-webhook`;
 
+    // Marketplace split: payment created with platform's token,
+    // marketplace_fee goes to platform, rest goes to modder's MP account
+    const marketplaceFee = platformCommission;
+
+    // ===== CARD PAYMENT (Checkout Pro with split) =====
+    if (payment_method === "card") {
       const prefResponse = await fetch("https://api.mercadopago.com/checkout/preferences", {
         method: "POST",
         headers: {
@@ -130,12 +148,14 @@ Deno.serve(async (req) => {
           payer: { email: userEmail },
           external_reference: purchase.id,
           back_urls: {
-            success: `${req.headers.get("origin") || "https://localhost"}/script/${script.id}?payment=success`,
-            failure: `${req.headers.get("origin") || "https://localhost"}/script/${script.id}?payment=failure`,
-            pending: `${req.headers.get("origin") || "https://localhost"}/script/${script.id}?payment=pending`,
+            success: `${req.headers.get("origin") || "https://mod-alchemist-den.lovable.app"}/script/${script.id}?payment=success`,
+            failure: `${req.headers.get("origin") || "https://mod-alchemist-den.lovable.app"}/script/${script.id}?payment=failure`,
+            pending: `${req.headers.get("origin") || "https://mod-alchemist-den.lovable.app"}/script/${script.id}?payment=pending`,
           },
           auto_return: "approved",
           notification_url: webhookUrl,
+          marketplace_fee: marketplaceFee,
+          collector_id: Number(modderMp.mp_user_id),
           payment_methods: {
             excluded_payment_types: [{ id: "ticket" }],
             installments: 12,
@@ -157,7 +177,7 @@ Deno.serve(async (req) => {
         JSON.stringify({
           purchase_id: purchase.id,
           payment_method: "card",
-          init_point: prefData.sandbox_init_point || prefData.init_point,
+          init_point: prefData.init_point,
           preference_id: prefData.id,
         }),
         {
@@ -167,7 +187,7 @@ Deno.serve(async (req) => {
       );
     }
 
-    // ===== PIX PAYMENT =====
+    // ===== PIX PAYMENT with marketplace split =====
     const idempotencyKey = `pix-${purchase.id}-${Date.now()}`;
 
     const mpResponse = await fetch("https://api.mercadopago.com/v1/payments", {
@@ -183,6 +203,12 @@ Deno.serve(async (req) => {
         payment_method_id: "pix",
         payer: { email: userEmail },
         external_reference: purchase.id,
+        notification_url: webhookUrl,
+        // Marketplace split: modder receives payment, platform keeps fee
+        application_fee: marketplaceFee,
+        collector: {
+          id: Number(modderMp.mp_user_id),
+        },
       }),
     });
 
