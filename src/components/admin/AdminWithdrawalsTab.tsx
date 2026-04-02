@@ -34,7 +34,7 @@ export function AdminWithdrawalsTab() {
         .select("user_id, mp_user_id, connected_at")
         .in("user_id", userIds);
 
-      const mpMap = new Map((mpAccounts ?? []).map((a: any) => [a.user_id, a]));
+      const mpMap = new Map<string, any>((mpAccounts ?? []).map((a: any) => [a.user_id, a]));
 
       return (profiles ?? []).map(p => ({
         ...p,
