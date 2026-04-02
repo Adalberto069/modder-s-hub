@@ -1,244 +1,188 @@
-import { useState } from "react";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { toast } from "sonner";
-import { CheckCircle, XCircle, Clock, Copy, Landmark } from "lucide-react";
+import { CheckCircle2, XCircle, LinkIcon } from "lucide-react";
 
 export function AdminWithdrawalsTab() {
   const { isAdmin } = useAuth();
-  const queryClient = useQueryClient();
 
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [selectedWithdrawal, setSelectedWithdrawal] = useState<any>(null);
-  const [actionType, setActionType] = useState<"complete" | "reject" | null>(null);
-  const [adminNotes, setAdminNotes] = useState("");
-  const [processing, setProcessing] = useState(false);
-
-  // Fetch withdrawals
-  const { data: withdrawals } = useQuery({
-    queryKey: ["admin-withdrawals"],
+  // Fetch all modder profiles with their MP connection status
+  const { data: modders } = useQuery({
+    queryKey: ["admin-modder-accounts"],
     queryFn: async () => {
-      const { data: wData } = await (supabase as any)
-        .from("withdrawals")
-        .select("*")
-        .order("created_at", { ascending: false });
-      if (!wData || wData.length === 0) return [];
-      
-      // Fetch profiles separately since there's no FK
-      const modderIds = Array.from(new Set(wData.map((w: any) => String(w.modder_id))));
+      // Get all modder role users
+      const { data: roles } = await supabase
+        .from("user_roles")
+        .select("user_id")
+        .eq("role", "modder")
+        .eq("approved", true);
+
+      if (!roles || roles.length === 0) return [];
+
+      const userIds = roles.map(r => r.user_id);
+
       const { data: profiles } = await supabase
         .from("profiles")
         .select("user_id, username, display_name")
-        .in("user_id", modderIds as string[]);
-      
-      const profileMap = new Map(profiles?.map(p => [p.user_id, p]) ?? []);
-      return wData.map((w: any) => ({
-        ...w,
-        profiles: profileMap.get(w.modder_id) || null,
+        .in("user_id", userIds);
+
+      // Check MP connections (admin can see via service - we query what's available)
+      const { data: mpAccounts } = await (supabase as any)
+        .from("modder_mp_accounts")
+        .select("user_id, mp_user_id, connected_at")
+        .in("user_id", userIds);
+
+      const mpMap = new Map((mpAccounts ?? []).map((a: any) => [a.user_id, a]));
+
+      return (profiles ?? []).map(p => ({
+        ...p,
+        mp_connected: mpMap.has(p.user_id),
+        mp_user_id: mpMap.get(p.user_id)?.mp_user_id,
+        mp_connected_at: mpMap.get(p.user_id)?.connected_at,
       }));
     },
     enabled: isAdmin,
   });
 
-  const pending = withdrawals?.filter((w) => w.status === "pending") ?? [];
-  const history = withdrawals?.filter((w) => w.status !== "pending") ?? [];
+  // Fetch completed purchases to show earnings per modder
+  const { data: purchases } = useQuery({
+    queryKey: ["admin-modder-earnings"],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("purchases")
+        .select("script_id, modder_earnings, status, amount, platform_commission")
+        .eq("status", "completed");
+      return data ?? [];
+    },
+    enabled: isAdmin,
+  });
 
-  const openActionDialog = (withdrawal: any, type: "complete" | "reject") => {
-    setSelectedWithdrawal(withdrawal);
-    setActionType(type);
-    setAdminNotes(withdrawal.admin_notes || "");
-    setDialogOpen(true);
-  };
+  // Get script -> modder mapping
+  const { data: scripts } = useQuery({
+    queryKey: ["admin-scripts-modder-map"],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("scripts")
+        .select("id, modder_id");
+      return data ?? [];
+    },
+    enabled: isAdmin,
+  });
 
-  const handleProcess = async () => {
-    if (!selectedWithdrawal || !actionType) return;
-    
-    setProcessing(true);
-    const newStatus = actionType === "complete" ? "completed" : "rejected";
-    
-    const { error } = await (supabase as any)
-      .from("withdrawals")
-      .update({
-        status: newStatus,
-        admin_notes: adminNotes || null,
-        completed_at: newStatus === "completed" ? new Date().toISOString() : null,
-      })
-      .eq("id", selectedWithdrawal.id);
+  const scriptModderMap = new Map((scripts ?? []).map(s => [s.id, s.modder_id]));
 
-    if (error) {
-      toast.error(`Erro ao ${actionType === "complete" ? "concluir" : "rejeitar"} saque: ` + error.message);
-    } else {
-      toast.success(actionType === "complete" ? "Saque concluído com sucesso!" : "Saque rejeitado.");
-      setDialogOpen(false);
-      queryClient.invalidateQueries({ queryKey: ["admin-withdrawals"] });
-    }
-    setProcessing(false);
-  };
+  const modderEarnings = new Map<string, { total: number; platformTotal: number; count: number }>();
+  (purchases ?? []).forEach(p => {
+    const modderId = scriptModderMap.get(p.script_id);
+    if (!modderId) return;
+    const existing = modderEarnings.get(modderId) || { total: 0, platformTotal: 0, count: 0 };
+    existing.total += Number(p.modder_earnings);
+    existing.platformTotal += Number(p.platform_commission);
+    existing.count += 1;
+    modderEarnings.set(modderId, existing);
+  });
 
-  const copyPix = (key: string) => {
-    navigator.clipboard.writeText(key);
-    toast.success("Chave PIX copiada!");
-  };
+  const connected = modders?.filter(m => m.mp_connected) ?? [];
+  const notConnected = modders?.filter(m => !m.mp_connected) ?? [];
+
+  const totalPlatformRevenue = Array.from(modderEarnings.values()).reduce((s, e) => s + e.platformTotal, 0);
 
   return (
     <div className="space-y-6">
-      <Card className="neon-border bg-card/80">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Clock className="w-5 h-5 text-accent" />
-            Saques Pendentes ({pending.length})
-          </CardTitle>
-          <CardDescription>
-            Realize o pagamento manualmente via PIX e então marque o saque como concluído.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            {pending.map((w) => (
-              <div key={w.id} className="p-4 rounded-lg bg-secondary/30 border border-border/50">
-                <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
-                  <div className="space-y-1">
-                    <p className="font-semibold text-lg text-primary">R$ {Number(w.amount).toFixed(2)}</p>
-                    <p className="text-sm font-medium">Modder: {w.profiles?.display_name || w.profiles?.username}</p>
-                    <p className="text-xs text-muted-foreground">
-                      Solicitado em: {new Date(w.created_at).toLocaleDateString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
-                    </p>
-                  </div>
-
-                  <div className="bg-background/50 p-3 rounded border border-border/50 min-w-[250px]">
-                    <p className="text-xs text-muted-foreground mb-1 uppercase tracking-wider font-semibold">
-                      Chave PIX ({w.pix_key_type})
-                    </p>
-                    <div className="flex items-center gap-2">
-                      <code className="text-sm font-mono bg-secondary px-2 py-1 rounded flex-1 select-all">
-                        {w.pix_key}
-                      </code>
-                      <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => copyPix(w.pix_key)}>
-                        <Copy className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-
-                  <div className="flex gap-2">
-                    <Button 
-                      variant="outline" 
-                      className="border-accent text-accent hover:bg-accent/10 h-10" 
-                      onClick={() => openActionDialog(w, "complete")}
-                    >
-                      <CheckCircle className="h-4 w-4 mr-2" /> Concluir
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      className="border-destructive text-destructive hover:bg-destructive/10 h-10" 
-                      onClick={() => openActionDialog(w, "reject")}
-                    >
-                      <XCircle className="h-4 w-4 mr-2" /> Rejeitar
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            ))}
-
-            {pending.length === 0 && (
-              <p className="text-center text-muted-foreground py-6">Nenhum saque pendente no momento.</p>
-            )}
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card className="neon-border bg-card/80">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Landmark className="w-5 h-5" />
-            Histórico (Últimos saques processados)
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            {history.slice(0, 20).map((w) => (
-              <div key={w.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 rounded-lg bg-secondary/30 border border-border/50 gap-3">
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <p className="font-semibold text-sm">R$ {Number(w.amount).toFixed(2)}</p>
-                    <Badge variant={w.status === "completed" ? "default" : "destructive"} className="text-[10px]">
-                      {w.status === "completed" ? "Concluído" : "Rejeitado"}
-                    </Badge>
-                  </div>
-                  <p className="text-xs text-muted-foreground">Modder: {w.profiles?.display_name || w.profiles?.username}</p>
-                  <p className="text-xs text-muted-foreground">Processado em: {new Date(w.completed_at || w.created_at).toLocaleDateString("pt-BR", { hour: "2-digit", minute: "2-digit" })}</p>
-                  {w.admin_notes && (
-                    <p className="text-[11px] text-muted-foreground mt-1 px-2 py-1 bg-background rounded max-w-lg">Nota: {w.admin_notes}</p>
-                  )}
-                </div>
-              </div>
-            ))}
-            {history.length === 0 && (
-              <p className="text-center text-muted-foreground py-6">Nenhum histórico encontrado.</p>
-            )}
-          </div>
-        </CardContent>
-      </Card>
-
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>
-              {actionType === "complete" ? "Confirmar Pagamento de Saque" : "Rejeitar Saque"}
-            </DialogTitle>
-            <DialogDescription>
-              {actionType === "complete" 
-                ? "Confirme que você já realizou a transferência PIX para a conta do Modder."
-                : "Informe o motivo (opcional) pelo qual este saque está sendo cancelado."}
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="space-y-4 py-4 border-t">
-            {selectedWithdrawal && (
-              <div className="text-sm bg-secondary/30 p-3 rounded">
-                <p><strong>Modder:</strong> {selectedWithdrawal.profiles?.display_name}</p>
-                <p><strong>Valor:</strong> R$ {Number(selectedWithdrawal.amount).toFixed(2)}</p>
-                <p><strong>Chave PIX:</strong> {selectedWithdrawal.pix_key} ({selectedWithdrawal.pix_key_type})</p>
-              </div>
-            )}
-            
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Nota Interna / Motivo</label>
-              <Input 
-                value={adminNotes} 
-                onChange={(e) => setAdminNotes(e.target.value)} 
-                placeholder="Ex: Comprovante #1234, ou motivo da rejeição..." 
-              />
+      {/* Platform Revenue Summary */}
+      <Card className="bg-[#050505] border-white/10 rounded-none font-mono">
+        <CardContent className="p-6">
+          <div className="flex items-center gap-4">
+            <div className="bg-primary/5 border border-primary/20 p-3">
+              <LinkIcon className="h-5 w-5 text-primary" />
+            </div>
+            <div>
+              <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-black">Receita Plataforma (20%)</p>
+              <p className="text-2xl font-bold text-foreground mt-1">R$ {totalPlatformRevenue.toFixed(2)}</p>
+              <p className="text-[9px] text-muted-foreground mt-1">
+                {connected.length} modder(s) conectado(s) • Split automático via Mercado Pago Marketplace
+              </p>
             </div>
           </div>
-          
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setDialogOpen(false)} disabled={processing}>
-              Cancelar
-            </Button>
-            <Button 
-              variant={actionType === "complete" ? "default" : "destructive"} 
-              onClick={handleProcess} 
-              disabled={processing}
-              className={actionType === "complete" ? "neon-glow-green text-foreground" : ""}
-            >
-              {processing ? "Processando..." : actionType === "complete" ? "Confirmar Pagamento" : "Rejeitar agora"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+        </CardContent>
+      </Card>
+
+      {/* Connected Modders */}
+      <Card className="bg-[#050505] border-white/10 rounded-none font-mono">
+        <CardHeader className="border-b border-white/5 bg-[#030304]">
+          <CardTitle className="text-sm font-black uppercase tracking-widest text-foreground flex items-center gap-2">
+            <CheckCircle2 className="h-4 w-4 text-accent" />
+            Modders Conectados ({connected.length})
+          </CardTitle>
+          <CardDescription className="text-[10px] uppercase font-mono mt-1">
+            Pagamentos são divididos automaticamente: 80% modder, 20% plataforma.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="pt-4">
+          <div className="space-y-2">
+            {connected.map(m => {
+              const earnings = modderEarnings.get(m.user_id);
+              return (
+                <div key={m.user_id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 bg-[#030304] border border-white/5 gap-2">
+                  <div>
+                    <p className="text-xs font-bold text-foreground">{m.display_name || m.username}</p>
+                    <p className="text-[9px] text-muted-foreground">
+                      MP ID: {m.mp_user_id} • Conectado em {new Date(m.mp_connected_at).toLocaleDateString("pt-BR")}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    {earnings && (
+                      <span className="text-[10px] text-muted-foreground">
+                        {earnings.count} vendas • R$ {earnings.total.toFixed(2)} recebidos
+                      </span>
+                    )}
+                    <Badge variant="outline" className="text-[9px] rounded-none border-accent/30 text-accent uppercase tracking-widest">
+                      Ativo
+                    </Badge>
+                  </div>
+                </div>
+              );
+            })}
+            {connected.length === 0 && (
+              <p className="text-center text-[10px] text-muted-foreground uppercase tracking-widest py-4">
+                Nenhum modder conectou o Mercado Pago ainda.
+              </p>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Not Connected Modders */}
+      <Card className="bg-[#050505] border-white/10 rounded-none font-mono">
+        <CardHeader className="border-b border-white/5 bg-[#030304]">
+          <CardTitle className="text-sm font-black uppercase tracking-widest text-foreground flex items-center gap-2">
+            <XCircle className="h-4 w-4 text-destructive" />
+            Modders Sem Conexão ({notConnected.length})
+          </CardTitle>
+          <CardDescription className="text-[10px] uppercase font-mono mt-1">
+            Estes modders precisam conectar o Mercado Pago para vender scripts pagos.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="pt-4">
+          <div className="space-y-2">
+            {notConnected.map(m => (
+              <div key={m.user_id} className="flex items-center justify-between p-3 bg-[#030304] border border-white/5">
+                <p className="text-xs font-bold text-foreground">{m.display_name || m.username}</p>
+                <Badge variant="outline" className="text-[9px] rounded-none border-destructive/30 text-destructive uppercase tracking-widest">
+                  Não conectado
+                </Badge>
+              </div>
+            ))}
+            {notConnected.length === 0 && (
+              <p className="text-center text-[10px] text-muted-foreground uppercase tracking-widest py-4">
+                Todos os modders estão conectados!
+              </p>
+            )}
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
