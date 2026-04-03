@@ -194,7 +194,7 @@ Deno.serve(async (req) => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${accessToken}`,
+        "Authorization": `Bearer ${modderAccessToken}`,
         "X-Idempotency-Key": idempotencyKey,
       },
       body: JSON.stringify({
@@ -204,11 +204,7 @@ Deno.serve(async (req) => {
         payer: { email: userEmail },
         external_reference: purchase.id,
         notification_url: webhookUrl,
-        // Marketplace split: modder receives payment, platform keeps fee
         application_fee: marketplaceFee,
-        collector: {
-          id: Number(modderMp.mp_user_id),
-        },
       }),
     });
 
