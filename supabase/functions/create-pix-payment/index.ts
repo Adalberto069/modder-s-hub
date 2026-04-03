@@ -113,9 +113,10 @@ Deno.serve(async (req) => {
       });
     }
 
-    const accessToken = Deno.env.get("MERCADOPAGO_ACCESS_TOKEN");
-    if (!accessToken) {
-      return new Response(JSON.stringify({ error: "Payment gateway not configured" }), {
+    // Use modder's access token for marketplace split
+    const modderAccessToken = modderMp.mp_access_token;
+    if (!modderAccessToken) {
+      return new Response(JSON.stringify({ error: "Modder payment token not available" }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -124,8 +125,8 @@ Deno.serve(async (req) => {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const webhookUrl = `${supabaseUrl}/functions/v1/mercadopago-webhook`;
 
-    // Marketplace split: payment created with platform's token,
-    // marketplace_fee goes to platform, rest goes to modder's MP account
+    // Marketplace split: payment created with modder's token,
+    // application_fee goes to platform, rest goes to modder
     const marketplaceFee = platformCommission;
 
     // ===== CARD PAYMENT (Checkout Pro with split) =====
