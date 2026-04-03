@@ -135,7 +135,7 @@ Deno.serve(async (req) => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${accessToken}`,
+          "Authorization": `Bearer ${modderAccessToken}`,
         },
         body: JSON.stringify({
           items: [
@@ -155,8 +155,7 @@ Deno.serve(async (req) => {
           },
           auto_return: "approved",
           notification_url: webhookUrl,
-          marketplace_fee: marketplaceFee,
-          collector_id: Number(modderMp.mp_user_id),
+          application_fee: marketplaceFee,
           payment_methods: {
             excluded_payment_types: [{ id: "ticket" }],
             installments: 12,
@@ -195,7 +194,7 @@ Deno.serve(async (req) => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${accessToken}`,
+        "Authorization": `Bearer ${modderAccessToken}`,
         "X-Idempotency-Key": idempotencyKey,
       },
       body: JSON.stringify({
@@ -205,11 +204,7 @@ Deno.serve(async (req) => {
         payer: { email: userEmail },
         external_reference: purchase.id,
         notification_url: webhookUrl,
-        // Marketplace split: modder receives payment, platform keeps fee
         application_fee: marketplaceFee,
-        collector: {
-          id: Number(modderMp.mp_user_id),
-        },
       }),
     });
 
