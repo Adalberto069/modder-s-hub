@@ -328,7 +328,7 @@ export default function ScriptEditor() {
             <h1 className="text-4xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-br from-white to-white/60 uppercase">
               {isEditing ? "Editar Script Elite" : "Novo Script Elite"}
             </h1>
-            <p className="text-xs text-muted-foreground font-mono tracking-widest uppercase text-neon-purple/80">Terminal Modder / Acesso Desenvolvedor</p>
+            <p className="text-xs text-muted-foreground font-mono tracking-widest uppercase text-neon-purple/80">Hidden Mod / Acesso Desenvolvedor</p>
           </div>
           {publishStatus !== "published" && (
             <Badge className="bg-neon-purple/20 text-neon-purple border-neon-purple/30 backdrop-blur-md px-4 py-1.5 animate-pulse">
@@ -367,7 +367,7 @@ export default function ScriptEditor() {
                   <Input 
                     value={title} 
                     onChange={(e) => setTitle(e.target.value)} 
-                    placeholder="Ex: Terminal Modder Script v1.0" 
+                    placeholder="Ex: Hidden Mod Script v1.0" 
                     className="bg-white/5 border-white/10 focus:border-neon-purple/50 focus:ring-neon-purple/20 h-12"
                     required 
                   />

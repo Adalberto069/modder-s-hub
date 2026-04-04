@@ -345,7 +345,7 @@ export default function ScriptDetail() {
 
     const loaderCode = `-- ========================================
 -- ${script.title} - Loader
--- Powered by Terminal Modder Intelligence
+    -- Powered by Hidden Mod
 -- ========================================
 
 local license = "${(license as any).license_key}"
@@ -962,7 +962,7 @@ end
                   </div>
                   <div className="flex-1">
                     <p className="text-xs font-bold mb-0.5">Verificado</p>
-                    <p className="text-[10px] text-muted-foreground leading-relaxed">Testado pela equipe Terminal Modder.</p>
+                    <p className="text-[10px] text-muted-foreground leading-relaxed">Testado pela equipe Hidden Mod.</p>
                   </div>
                 </div>
               </CardContent>

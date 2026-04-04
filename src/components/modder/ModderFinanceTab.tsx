@@ -12,6 +12,11 @@ interface ModderFinanceTabProps {
   totalEarnings: number;
 }
 
+const getMercadoPagoRedirectBase = () =>
+  window.location.hostname.includes("id-preview--")
+    ? "https://mod-alchemist-den.lovable.app"
+    : window.location.origin;
+
 export function ModderFinanceTab({ totalEarnings }: ModderFinanceTabProps) {
   const { user } = useAuth();
   const queryClient = useQueryClient();
@@ -36,6 +41,18 @@ export function ModderFinanceTab({ totalEarnings }: ModderFinanceTabProps) {
     const params = new URLSearchParams(window.location.search);
     const code = params.get("code");
     const state = params.get("state");
+    const oauthError = params.get("error_description") || params.get("error");
+
+    if (oauthError) {
+      const decodedError = decodeURIComponent(oauthError.replace(/\+/g, " "));
+      toast.error(
+        decodedError.includes("não está pronto")
+          ? "O app do Mercado Pago da conta PJ ainda não está liberado ou o redirect configurado não bate com o domínio publicado."
+          : decodedError
+      );
+      window.history.replaceState({}, "", window.location.pathname);
+      return;
+    }
 
     if (code && state === user?.id) {
       handleOAuthCallback(code);
@@ -47,7 +64,7 @@ export function ModderFinanceTab({ totalEarnings }: ModderFinanceTabProps) {
   const handleConnectMP = async () => {
     setConnecting(true);
     try {
-      const redirectUri = `${window.location.origin}/dashboard?tab=finance`;
+      const redirectUri = `${getMercadoPagoRedirectBase()}/dashboard?tab=finance`;
       const { data, error } = await supabase.functions.invoke("mp-oauth-start", {
         body: { redirect_uri: redirectUri },
       });
@@ -69,7 +86,7 @@ export function ModderFinanceTab({ totalEarnings }: ModderFinanceTabProps) {
   const handleOAuthCallback = async (code: string) => {
     setConnecting(true);
     try {
-      const redirectUri = `${window.location.origin}/dashboard?tab=finance`;
+      const redirectUri = `${getMercadoPagoRedirectBase()}/dashboard?tab=finance`;
       const { data, error } = await supabase.functions.invoke("mp-oauth-callback", {
         body: { code, redirect_uri: redirectUri },
       });
@@ -182,7 +199,7 @@ export function ModderFinanceTab({ totalEarnings }: ModderFinanceTabProps) {
                 {connecting ? "Conectando..." : "Conectar Minha Conta Mercado Pago"}
               </Button>
               <p className="text-[9px] text-muted-foreground text-center uppercase tracking-widest">
-                Você será redirecionado para o Mercado Pago para autorizar a conexão.
+                Você será redirecionado para o app publicado para autorizar a conexão com segurança.
               </p>
             </div>
           )}

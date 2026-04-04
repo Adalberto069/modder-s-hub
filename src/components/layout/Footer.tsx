@@ -53,7 +53,7 @@ export function Footer() {
 
         <div className="border-t border-border/50 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
           <p className="text-xs text-muted-foreground">
-            © {new Date().getFullYear()} Terminal Modder. Todos os direitos reservados.
+            © {new Date().getFullYear()} Hidden Mod. Todos os direitos reservados.
           </p>
           <p className="text-xs text-muted-foreground font-mono">
             Feito para Modders 🎮

@@ -29,7 +29,7 @@ export function Navbar() {
         <Link to="/" className="flex items-center gap-2">
           <Terminal className="h-6 w-6 text-neon-purple" />
           <span className="text-xl font-black font-mono tracking-tight uppercase">
-            Terminal <span className="text-neon-purple">Modder</span>
+            Hidden <span className="text-neon-purple">Mod</span>
           </span>
         </Link>
 
