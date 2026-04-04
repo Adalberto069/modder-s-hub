@@ -116,13 +116,14 @@ export default function ProfileSettings() {
     setSaving(true);
     const { error } = await supabase
       .from("profiles")
-      .update({
+      .upsert({
+        user_id: user.id,
+        email: user.email ?? null,
         display_name: displayName || null,
         username: username.trim(),
         bio: bio || null,
         avatar_url: avatarUrl || null,
-      })
-      .eq("user_id", user.id);
+      }, { onConflict: "user_id" });
 
     if (error) {
       toast.error("Erro ao salvar: " + error.message);

@@ -245,7 +245,7 @@ export default function Index() {
                <div className="relative z-10 flex flex-col sm:flex-row sm:items-end justify-between gap-6">
                  <div>
                     <Store className="w-10 h-10 text-white mb-6" />
-                    <h3 className="text-2xl sm:text-3xl font-black uppercase tracking-tight text-white mb-2 leading-none">Terminal Modder Marketplace</h3>
+                    <h3 className="text-2xl sm:text-3xl font-black uppercase tracking-tight text-white mb-2 leading-none">Hidden Mod Marketplace</h3>
                     <p className="text-muted-foreground font-mono text-sm max-w-sm">Compre e venda seguro. O ponto de encontro oficial para modders sérios monetizarem sua arte.</p>
                  </div>
                  <Button onClick={() => navigate("/marketplace")} variant="outline" className="shrink-0 bg-transparent border-white/20 hover:bg-white hover:text-black hover:border-white uppercase font-black text-xs h-12 px-6 rounded-none">

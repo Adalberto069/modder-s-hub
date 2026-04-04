@@ -205,7 +205,7 @@ export default function Dashboard() {
 
     const loaderCode = `-- ========================================
 -- ${script.title} - Loader
--- Powered by Terminal Modder Intelligence
+    -- Powered by Hidden Mod
 -- ========================================
 
 local license = "${license.license_key}"
@@ -259,7 +259,7 @@ end
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-8 border border-white/10 bg-[#030304] p-6 relative overflow-hidden">
           <div className="absolute top-0 right-0 w-64 h-64 bg-neon-purple/10 blur-[80px] pointer-events-none" />
           <div className="relative z-10 space-y-1">
-            <h1 className="text-3xl font-black uppercase tracking-tighter text-white">Terminal Modder</h1>
+            <h1 className="text-3xl font-black uppercase tracking-tighter text-white">Hidden Mod</h1>
             <p className="text-[10px] text-muted-foreground uppercase font-mono tracking-widest flex items-center gap-2">
               <Code className="w-3 h-3 text-neon-purple" /> Acesso Desenvolvedor
             </p>

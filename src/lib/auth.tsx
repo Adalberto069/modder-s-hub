@@ -28,6 +28,33 @@ const AuthContext = createContext<AuthContextType>({
 
 export const useAuth = () => useContext(AuthContext);
 
+const normalizeUsername = (value: string) =>
+  value
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9_]/g, "_")
+    .replace(/_+/g, "_")
+    .replace(/^_+|_+$/g, "")
+    .slice(0, 24);
+
+const buildCandidateUsernames = (user: User) => {
+  const emailBase = user.email?.split("@")[0] ?? "user";
+  const metadataUsername =
+    (user.user_metadata?.username as string | undefined) ??
+    (user.user_metadata?.user_name as string | undefined) ??
+    (user.user_metadata?.preferred_username as string | undefined);
+
+  const base =
+    normalizeUsername(metadataUsername || emailBase) ||
+    `user_${user.id.slice(0, 8).toLowerCase()}`;
+
+  return [
+    base,
+    `${base}_${user.id.slice(0, 4).toLowerCase()}`,
+    `modder_${user.id.slice(0, 8).toLowerCase()}`,
+  ];
+};
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
@@ -72,13 +99,76 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => subscription.unsubscribe();
   }, []);
 
+  const ensureProfile = async (currentUser: User) => {
+    const { data: existingProfile } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("user_id", currentUser.id)
+      .maybeSingle();
+
+    if (existingProfile) {
+      setProfile(existingProfile);
+      return existingProfile;
+    }
+
+    const candidates = buildCandidateUsernames(currentUser);
+
+    for (const candidate of candidates) {
+      const { data: takenProfile } = await supabase
+        .from("profiles")
+        .select("user_id")
+        .eq("username", candidate)
+        .maybeSingle();
+
+      if (takenProfile?.user_id && takenProfile.user_id !== currentUser.id) {
+        continue;
+      }
+
+      const { data: createdProfile } = await supabase
+        .from("profiles")
+        .upsert(
+          {
+            user_id: currentUser.id,
+            username: candidate,
+            email: currentUser.email ?? null,
+            display_name:
+              (currentUser.user_metadata?.display_name as string | undefined) ??
+              (currentUser.user_metadata?.full_name as string | undefined) ??
+              null,
+            avatar_url:
+              (currentUser.user_metadata?.avatar_url as string | undefined) ??
+              (currentUser.user_metadata?.picture as string | undefined) ??
+              null,
+          },
+          { onConflict: "user_id" }
+        )
+        .select()
+        .single();
+
+      if (createdProfile) {
+        setProfile(createdProfile);
+        return createdProfile;
+      }
+    }
+
+    setProfile(null);
+    return null;
+  };
+
   const fetchProfile = async (userId: string) => {
+    const currentUser = user?.id === userId ? user : session?.user?.id === userId ? session.user : null;
+
+    if (currentUser) {
+      await ensureProfile(currentUser);
+      return;
+    }
+
     const { data } = await supabase
       .from("profiles")
       .select("*")
       .eq("user_id", userId)
-      .single();
-    setProfile(data);
+      .maybeSingle();
+    setProfile(data ?? null);
   };
 
   const fetchRoles = async (userId: string) => {
