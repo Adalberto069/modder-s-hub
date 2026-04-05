@@ -931,6 +931,26 @@ end
                   )}
                 </div>
 
+                {/* Checkout trust info */}
+                <div className="p-3 rounded-xl bg-accent/5 border border-accent/10 space-y-1.5 mt-1">
+                  <p className="text-[9px] text-muted-foreground leading-relaxed flex items-start gap-1.5">
+                    <ShieldCheck className="h-3 w-3 text-accent shrink-0 mt-0.5" />
+                    Pagamento processado com segurança pelo Mercado Pago
+                  </p>
+                  <p className="text-[9px] text-muted-foreground leading-relaxed flex items-start gap-1.5">
+                    <CreditCard className="h-3 w-3 text-primary shrink-0 mt-0.5" />
+                    Aceitamos Pix e Cartão de crédito
+                  </p>
+                  <p className="text-[9px] text-muted-foreground leading-relaxed flex items-start gap-1.5">
+                    <Info className="h-3 w-3 text-muted-foreground shrink-0 mt-0.5" />
+                    No Pix, aparecerá o nome do vendedor cadastrado no banco
+                  </p>
+                  <p className="text-[9px] text-muted-foreground leading-relaxed flex items-start gap-1.5">
+                    <CheckCircle className="h-3 w-3 text-accent shrink-0 mt-0.5" />
+                    Compra protegida — entrega automática após confirmação
+                  </p>
+                </div>
+
                 <div className="grid grid-cols-2 gap-3 pt-4 border-t border-white/5">
                   <div className="text-center">
                     <p className="text-[9px] text-muted-foreground uppercase font-bold tracking-widest">Reviews</p>
