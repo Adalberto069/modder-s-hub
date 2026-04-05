@@ -77,12 +77,18 @@ export default function ModderProfile() {
   const { data: topModders } = useQuery({
     queryKey: ["top-modders"],
     queryFn: async () => {
-      const { data } = await supabase.from("profiles").select("id").order("reputation_score", { ascending: false }).limit(4);
+      // Only consider profiles that actually have published scripts and meaningful reputation
+      const { data } = await supabase
+        .from("profiles")
+        .select("user_id")
+        .gt("reputation_score", 0)
+        .order("reputation_score", { ascending: false })
+        .limit(4);
       return data ?? [];
     },
   });
 
-  const isElite = topModders?.some((m: any) => m.id === profile?.id);
+  const isElite = topModders && topModders.length > 0 && topModders.some((m: any) => m.user_id === profile?.user_id);
 
   // If they are elite, they are "modder-elite". 
   // If they have scripts or the modder role, they are "modder".

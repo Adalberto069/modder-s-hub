@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Wallet, DollarSign, CheckCircle2, LinkIcon, Loader2 } from "lucide-react";
+import { Wallet, DollarSign, CheckCircle2, LinkIcon, Loader2, Info } from "lucide-react";
 
 interface ModderFinanceTabProps {
   totalEarnings: number;
@@ -203,6 +203,30 @@ export function ModderFinanceTab({ totalEarnings }: ModderFinanceTabProps) {
               </p>
             </div>
           )}
+        </CardContent>
+      </Card>
+
+      {/* Sistema de Pagamento Info */}
+      <Card className="bg-[#050505] border-accent/20 rounded-none font-mono">
+        <CardHeader className="border-b border-accent/10 bg-accent/5">
+          <div className="flex items-center gap-2">
+            <Info className="h-4 w-4 text-accent" />
+            <CardTitle className="text-sm font-black uppercase tracking-widest text-accent">Sistema de Pagamento</CardTitle>
+          </div>
+        </CardHeader>
+        <CardContent className="pt-6 space-y-3">
+          {[
+            { icon: "💰", text: "Utilizamos o Mercado Pago por ter as menores taxas do mercado" },
+            { icon: "💳", text: "Aceitamos Pix e Cartão de crédito" },
+            { icon: "⚡", text: "O dinheiro cai direto na sua conta, podendo movimentar imediatamente" },
+            { icon: "🏦", text: "No pagamento via Pix, aparecerá o nome cadastrado no seu banco para o comprador" },
+            { icon: "🔜", text: "Em breve novas formas de pagamento" },
+          ].map((item, i) => (
+            <div key={i} className="flex items-start gap-3 p-3 bg-[#030304] border border-white/5">
+              <span className="text-sm shrink-0">{item.icon}</span>
+              <p className="text-[10px] text-muted-foreground uppercase tracking-widest leading-relaxed">{item.text}</p>
+            </div>
+          ))}
         </CardContent>
       </Card>
 
