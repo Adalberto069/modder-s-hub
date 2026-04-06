@@ -87,7 +87,6 @@ Deno.serve(async (req) => {
     });
 
     const { data: sessionData, error: verifyError } = await anonClient.auth.verifyOtp({
-      email: targetUser.email!,
       token_hash: linkData.properties?.hashed_token,
       type: "magiclink",
     });
