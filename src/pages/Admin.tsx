@@ -38,7 +38,7 @@ const publishStatusConfig: Record<string, { label: string; className: string }> 
 };
 
 export default function Admin() {
-  const { user, isAdmin, loading } = useAuth();
+  const { user, isAdmin, loading, rolesLoading } = useAuth();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const [codeDialogOpen, setCodeDialogOpen] = useState(false);
