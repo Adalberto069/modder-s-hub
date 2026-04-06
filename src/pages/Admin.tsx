@@ -165,7 +165,7 @@ export default function Admin() {
     };
   });
 
-  if (loading) return <Layout><div className="container py-16 text-center">Carregando...</div></Layout>;
+  if (loading || rolesLoading) return <Layout><div className="container py-16 text-center">Carregando...</div></Layout>;
   if (!user || !isAdmin) return <Navigate to="/" />;
 
   const approveModder = async (roleId: string, userId: string) => {
