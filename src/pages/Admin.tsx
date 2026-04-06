@@ -38,7 +38,7 @@ const publishStatusConfig: Record<string, { label: string; className: string }> 
 };
 
 export default function Admin() {
-  const { user, isAdmin, loading } = useAuth();
+  const { user, isAdmin, loading, rolesLoading } = useAuth();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const [codeDialogOpen, setCodeDialogOpen] = useState(false);
@@ -165,7 +165,7 @@ export default function Admin() {
     };
   });
 
-  if (loading) return <Layout><div className="container py-16 text-center">Carregando...</div></Layout>;
+  if (loading || rolesLoading) return <Layout><div className="container py-16 text-center">Carregando...</div></Layout>;
   if (!user || !isAdmin) return <Navigate to="/" />;
 
   const approveModder = async (roleId: string, userId: string) => {
