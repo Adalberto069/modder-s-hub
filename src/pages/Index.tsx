@@ -43,7 +43,7 @@ export default function Index() {
     queryFn: async () => {
       const { data } = await supabase
         .from("profiles")
-        .select("*")
+        .select("id, user_id, username, display_name, avatar_url, bio, reputation_score, total_downloads, total_positive_reviews, created_at, updated_at")
         .order("reputation_score", { ascending: false })
         .limit(4);
       return data ?? [];
