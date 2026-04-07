@@ -998,39 +998,59 @@ end
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
           <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.2 }}>
             <Card className="w-full max-w-sm bg-card border-primary/20">
-              <CardHeader className="text-center pb-2">
+               <CardHeader className="text-center pb-2">
                 <CardTitle className="text-lg">Método de Pagamento</CardTitle>
                 <p className="text-xs text-muted-foreground">
-                  {script?.price ? `R$ ${Number(script.price).toFixed(2)}` : ""}
-                  {pendingRenewal ? " (Renovação)" : ""}
+                  {pendingRenewal ? "Renovação" : ""}
                 </p>
               </CardHeader>
               <CardContent className="space-y-3">
-                <Button
-                  className="w-full h-14 justify-start gap-3 bg-accent/10 border border-accent/20 hover:bg-accent/15 text-foreground"
-                  variant="outline"
-                  onClick={() => handlePurchase(pendingRenewal, "pix")}
-                  disabled={purchasing}
-                >
-                  <QrCode className="h-5 w-5 text-accent shrink-0" />
-                  <div className="text-left">
-                    <p className="font-semibold text-sm">PIX</p>
-                    <p className="text-[10px] text-muted-foreground">Pagamento instantâneo</p>
-                  </div>
-                </Button>
+                {(() => {
+                  const basePrice = Number(script?.price ?? 0);
+                  const pixFee = Math.round(basePrice * 0.01 * 100) / 100;
+                  const cardFee = Math.round(basePrice * 0.0499 * 100) / 100;
+                  const pixTotal = Math.round((basePrice + pixFee) * 100) / 100;
+                  const cardTotal = Math.round((basePrice + cardFee) * 100) / 100;
+                  return (
+                    <>
+                      <Button
+                        className="w-full h-auto py-3 justify-start gap-3 bg-accent/10 border border-accent/20 hover:bg-accent/15 text-foreground"
+                        variant="outline"
+                        onClick={() => handlePurchase(pendingRenewal, "pix")}
+                        disabled={purchasing}
+                      >
+                        <QrCode className="h-5 w-5 text-accent shrink-0" />
+                        <div className="text-left flex-1">
+                          <p className="font-semibold text-sm">PIX</p>
+                          <p className="text-[10px] text-muted-foreground">Pagamento instantâneo</p>
+                          <div className="mt-1 text-[10px] text-muted-foreground space-y-0.5">
+                            <p>Subtotal: R$ {basePrice.toFixed(2)}</p>
+                            <p>Taxa de pagamento (Pix 1%): R$ {pixFee.toFixed(2)}</p>
+                            <p className="text-foreground font-semibold">Total: R$ {pixTotal.toFixed(2)}</p>
+                          </div>
+                        </div>
+                      </Button>
 
-                <Button
-                  className="w-full h-14 justify-start gap-3 bg-primary/10 border border-primary/20 hover:bg-primary/15 text-foreground"
-                  variant="outline"
-                  onClick={() => handlePurchase(pendingRenewal, "card")}
-                  disabled={purchasing}
-                >
-                  <CreditCard className="h-5 w-5 text-primary shrink-0" />
-                  <div className="text-left">
-                    <p className="font-semibold text-sm">Cartão de Crédito</p>
-                    <p className="text-[10px] text-muted-foreground">Parcele em até 12x</p>
-                  </div>
-                </Button>
+                      <Button
+                        className="w-full h-auto py-3 justify-start gap-3 bg-primary/10 border border-primary/20 hover:bg-primary/15 text-foreground"
+                        variant="outline"
+                        onClick={() => handlePurchase(pendingRenewal, "card")}
+                        disabled={purchasing}
+                      >
+                        <CreditCard className="h-5 w-5 text-primary shrink-0" />
+                        <div className="text-left flex-1">
+                          <p className="font-semibold text-sm">Cartão de Crédito</p>
+                          <p className="text-[10px] text-muted-foreground">Parcele em até 12x</p>
+                          <div className="mt-1 text-[10px] text-muted-foreground space-y-0.5">
+                            <p>Subtotal: R$ {basePrice.toFixed(2)}</p>
+                            <p>Taxa de pagamento (Cartão 4.99%): R$ {cardFee.toFixed(2)}</p>
+                            <p className="text-foreground font-semibold">Total: R$ {cardTotal.toFixed(2)}</p>
+                          </div>
+                        </div>
+                      </Button>
+                    </>
+                  );
+                })()}
 
                 <Button
                   variant="ghost"
