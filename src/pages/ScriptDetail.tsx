@@ -412,9 +412,14 @@ end
     }
     await supabase.from("scripts").update({ download_count: script.download_count + 1 }).eq("id", script.id);
 
-    const downloadUrl = script.file_url || script.external_link;
+    // Use download-script edge function to get secure URL
+    const { data: downloadData, error: dlError } = await supabase.functions.invoke("download-script", {
+      body: { script_id: script.id },
+    });
+
+    const downloadUrl = downloadData?.url || script.external_link;
     if (downloadUrl) {
-      const gameName = (script as any).game_name;
+      const gameName = downloadData?.game_name || (script as any).game_name;
       const safeName = [gameName, script.title]
         .filter(Boolean)
         .join(" - ")
