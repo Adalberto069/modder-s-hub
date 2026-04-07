@@ -137,14 +137,15 @@ export default function Dashboard() {
       const safeName = await validateFileWithToast({ file, type: "script", maxSizeMB: 20 });
       if (!safeName) { setSubmitting(false); return; }
       const path = `${user.id}/${safeName}`;
-      const { error: uploadError } = await supabase.storage.from("scripts").upload(path, file);
+      // Upload .lua files to private bucket
+      const { error: uploadError } = await supabase.storage.from("scripts-private").upload(path, file, { upsert: true });
       if (uploadError) {
         toast.error("Erro no upload: " + uploadError.message);
         setSubmitting(false);
         return;
       }
-      const { data: publicData } = supabase.storage.from("scripts").getPublicUrl(path);
-      fileUrl = publicData.publicUrl;
+      // Store just the path, not a public URL
+      fileUrl = path;
     }
 
     const { error } = await supabase.from("scripts").insert({
