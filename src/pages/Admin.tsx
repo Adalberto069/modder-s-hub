@@ -234,10 +234,22 @@ export default function Admin() {
     }
     if (script.file_url) {
       try {
-        const res = await fetch(script.file_url);
-        const text = await res.text();
-        setCodeDialogContent(text);
-        setCodeDialogOpen(true);
+        let fetchUrl = script.file_url;
+        // If it's a private path, use download-script edge function
+        if (!script.file_url.startsWith("http")) {
+          const { data: dlData } = await supabase.functions.invoke("download-script", {
+            body: { script_id: script.id },
+          });
+          fetchUrl = dlData?.url;
+        }
+        if (fetchUrl) {
+          const res = await fetch(fetchUrl);
+          const text = await res.text();
+          setCodeDialogContent(text);
+          setCodeDialogOpen(true);
+        } else {
+          toast.error("Não foi possível carregar o arquivo.");
+        }
       } catch {
         toast.error("Não foi possível carregar o arquivo.");
       }
