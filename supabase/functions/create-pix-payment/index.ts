@@ -84,10 +84,14 @@ Deno.serve(async (req) => {
       });
     }
 
-    const amount = Number(script.price);
+    const baseAmount = Number(script.price);
+    // Payment processing fee passed to buyer: 1% for PIX, 4.99% for card
+    const feeRate = payment_method === "card" ? 0.0499 : 0.01;
+    const fee = Math.round(baseAmount * feeRate * 100) / 100;
+    const amount = Math.round((baseAmount + fee) * 100) / 100;
     const commissionRate = 0.20;
-    const platformCommission = Math.round(amount * commissionRate * 100) / 100;
-    const modderEarnings = Math.round((amount - platformCommission) * 100) / 100;
+    const platformCommission = Math.round(baseAmount * commissionRate * 100) / 100;
+    const modderEarnings = Math.round((baseAmount - platformCommission) * 100) / 100;
 
     // Create purchase record
     const { data: purchase, error: purchaseError } = await serviceClient
