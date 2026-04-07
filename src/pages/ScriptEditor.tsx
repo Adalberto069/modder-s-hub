@@ -149,13 +149,14 @@ export default function ScriptEditor() {
     if (!code || code.trim().length < 10) return requestedStatus;
 
     try {
+      // Pass script_id so the edge function updates security status server-side
       const { data: scanResult, error } = await supabase.functions.invoke("analyze-script", {
-        body: { code },
+        body: { code, script_id: scriptId },
       });
 
       if (error || scanResult?.error) {
         console.error("Auto-scan failed:", error || scanResult?.error);
-        return requestedStatus; // Don't block on scan failure
+        return requestedStatus;
       }
 
       // Save analysis
@@ -171,39 +172,20 @@ export default function ScriptEditor() {
 
       setLastAnalysis(scanResult);
 
-      // Route based on classification
+      // Route based on server-side classification result
       if (scanResult.classification === "malicious") {
-        // Block: force to draft and flag
-        await supabase.from("scripts").update({
-          publish_status: "draft",
-          security_status: "flagged",
-        } as any).eq("id", scriptId);
         toast.error("🚫 Script MALICIOSO detectado! Publicação bloqueada automaticamente.");
         return "draft";
       }
 
       if (scanResult.classification === "suspicious") {
-        // Hold for review
         const finalStatus = requestedStatus === "published" ? "pending_review" : requestedStatus;
-        await supabase.from("scripts").update({
-          publish_status: finalStatus,
-          security_status: "under_review",
-        } as any).eq("id", scriptId);
         toast.warning("⚠️ Padrões suspeitos detectados. Script enviado para moderação.");
         return finalStatus;
       }
 
-      // Safe: publish as requested and mark verified
       if (requestedStatus === "published") {
-        await supabase.from("scripts").update({
-          security_status: "verified",
-          is_verified: true,
-        } as any).eq("id", scriptId);
         toast.success("✅ Script verificado e publicado automaticamente!");
-      } else {
-        await supabase.from("scripts").update({
-          security_status: "safe",
-        } as any).eq("id", scriptId);
       }
 
       return requestedStatus;
@@ -235,14 +217,15 @@ export default function ScriptEditor() {
       const safeName = await validateFileWithToast({ file, type: "script", maxSizeMB: 20 });
       if (!safeName) { setSubmitting(false); return; }
       const path = `${user.id}/${safeName}`;
-      const { error: uploadError } = await supabase.storage.from("scripts").upload(path, file);
+      // Upload .lua files to private bucket
+      const { error: uploadError } = await supabase.storage.from("scripts-private").upload(path, file, { upsert: true });
       if (uploadError) {
         toast.error("Erro no upload: " + uploadError.message);
         setSubmitting(false);
         return;
       }
-      const { data: publicData } = supabase.storage.from("scripts").getPublicUrl(path);
-      fileUrl = publicData.publicUrl;
+      // Store just the path, not a public URL
+      fileUrl = path;
     }
 
     const scriptData: any = {

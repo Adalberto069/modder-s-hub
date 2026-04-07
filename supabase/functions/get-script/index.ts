@@ -146,8 +146,22 @@ Deno.serve(async (req) => {
     let code = codeData?.lua_code ?? null;
     if (!code && script.file_url) {
       try {
-        const res = await fetch(script.file_url);
-        code = await res.text();
+        let fileContent: string | null = null;
+        // If file_url is a private path (not a full URL), use signed URL
+        if (!script.file_url.startsWith("http")) {
+          const { data: signedData } = await supabase.storage
+            .from("scripts-private")
+            .createSignedUrl(script.file_url, 60);
+          if (signedData?.signedUrl) {
+            const res = await fetch(signedData.signedUrl);
+            fileContent = await res.text();
+          }
+        } else {
+          // Legacy public URL
+          const res = await fetch(script.file_url);
+          fileContent = await res.text();
+        }
+        code = fileContent;
       } catch {
         return new Response(JSON.stringify({ error: "Failed to fetch script file" }), {
           status: 500,
