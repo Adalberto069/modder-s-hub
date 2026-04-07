@@ -8,7 +8,7 @@ export function useModderProfiles(modderIds: string[]) {
       if (modderIds.length === 0) return {};
       const { data } = await supabase
         .from("profiles")
-        .select("*")
+        .select("id, user_id, username, display_name, avatar_url, bio, reputation_score, total_downloads, total_positive_reviews, created_at, updated_at")
         .or(`id.in.(${modderIds.join(",")}),user_id.in.(${modderIds.join(",")})`);
       const map: Record<string, any> = {};
       data?.forEach((p: any) => { 
