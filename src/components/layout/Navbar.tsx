@@ -47,6 +47,9 @@ export function Navbar() {
           <Link to="/ferramentas" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
             Ferramentas
           </Link>
+          <Link to="/bounties" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+            Encomendas
+          </Link>
           {!user ? (
             <div className="flex gap-2">
               <Button variant="ghost" size="sm" onClick={() => navigate("/auth")}>
@@ -121,6 +124,9 @@ export function Navbar() {
           </Link>
           <Link to="/ferramentas" className="block text-sm text-muted-foreground hover:text-foreground" onClick={() => setMobileOpen(false)}>
             Ferramentas
+          </Link>
+          <Link to="/bounties" className="block text-sm text-muted-foreground hover:text-foreground" onClick={() => setMobileOpen(false)}>
+            Encomendas
           </Link>
           {!user ? (
             <div className="flex gap-2 pt-2">

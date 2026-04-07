@@ -1,6 +1,6 @@
 
 
-# ModHub - Marketplace & Comunidade para Modders Mobile
+# HIDDEN MOD - Marketplace & Comunidade para Modders Mobile
 
 ## Visão Geral
 Plataforma dark mode com estética gamer/hacker para modders mobile compartilharem e descobrirem Scripts Lua (Game Guardian) e APKs Mod. MVP focado nas funcionalidades essenciais.
