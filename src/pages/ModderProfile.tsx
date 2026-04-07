@@ -20,7 +20,7 @@ export default function ModderProfile() {
     queryFn: async () => {
       const { data } = await supabase
         .from("profiles")
-        .select("*")
+        .select("id, user_id, username, display_name, avatar_url, bio, reputation_score, total_downloads, total_positive_reviews, created_at, updated_at")
         .or(`id.eq.${userId},user_id.eq.${userId}`)
         .maybeSingle();
       return data;
