@@ -82,24 +82,35 @@ export function BountyCard({ bounty }: BountyCardProps) {
             )}
           </div>
 
-          {/* Footer */}
+          {/* Reward */}
           <div className="flex items-center justify-between pt-2 border-t border-white/5">
-            <div className="flex items-center gap-3">
-              <span className="flex items-center gap-1 text-[10px] text-muted-foreground/70">
-                <User className="h-2.5 w-2.5" />
-                {bounty.profiles?.display_name ?? bounty.profiles?.username ?? "Anônimo"}
+            {bounty.reward_amount > 0 ? (
+              <span className="text-sm font-black text-neon-green tracking-tight">
+                R$ {bounty.reward_amount.toFixed(2).replace('.', ',')}
               </span>
-              <span className="flex items-center gap-1 text-[10px] text-muted-foreground/50">
-                <Clock className="h-2.5 w-2.5" />
-                {timeAgo}
+            ) : (
+              <span className="text-[10px] font-bold uppercase tracking-widest text-neon-cyan/70">
+                Voluntário
               </span>
-            </div>
+            )}
             {appCount > 0 && (
               <span className="flex items-center gap-1 text-[10px] font-bold text-neon-cyan/80">
                 <Users className="h-2.5 w-2.5" />
-                {appCount}
+                {appCount} candidatura{appCount !== 1 ? 's' : ''}
               </span>
             )}
+          </div>
+
+          {/* Footer */}
+          <div className="flex items-center gap-3">
+            <span className="flex items-center gap-1 text-[10px] text-muted-foreground/70">
+              <User className="h-2.5 w-2.5" />
+              {bounty.profiles?.display_name ?? bounty.profiles?.username ?? "Anônimo"}
+            </span>
+            <span className="flex items-center gap-1 text-[10px] text-muted-foreground/50">
+              <Clock className="h-2.5 w-2.5" />
+              {timeAgo}
+            </span>
           </div>
         </div>
       </div>
