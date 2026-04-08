@@ -418,19 +418,20 @@ export default function BountyDetail() {
             {/* Delivery info */}
             {bounty.status === "in_progress" && (isRequester || bounty.assigned_modder_id === user?.id) && (
               <div className="bg-neon-cyan/5 border border-neon-cyan/20 p-4">
-                <p className="text-[10px] uppercase tracking-widest text-neon-cyan font-mono font-bold mb-2">📦 Entrega do Script</p>
+                <p className="text-[10px] uppercase tracking-widest text-neon-cyan font-mono font-bold mb-2">🔐 Entrega Segura (Escrow)</p>
                 <p className="text-xs text-foreground/70 leading-relaxed">
-                  O modder pode entregar o script de duas formas:
+                  O modder envia o script .lua pelo botão de upload no chat. O arquivo fica <strong className="text-neon-green">protegido e trancado</strong> até o pagamento ser confirmado.
                 </p>
                 <ul className="text-xs text-foreground/60 mt-1 space-y-1 ml-4 list-disc">
-                  <li>Publicar no Marketplace e enviar o link aqui no chat</li>
-                  <li>Enviar o arquivo diretamente pelo chat da encomenda</li>
+                  <li>Modder faz upload → arquivo fica em custódia</li>
+                  <li>Solicitante paga a recompensa → download é liberado automaticamente</li>
+                  <li>Ninguém pode pegar o script sem pagar, e ninguém paga sem o script estar entregue</li>
                 </ul>
                 {isPaid && !isPurchaseCompleted && isRequester && (
                   <div className="mt-3 p-3 bg-neon-green/5 border border-neon-green/20">
                     <p className="text-[10px] text-neon-green font-mono font-bold mb-1">💰 Pagamento Pendente</p>
                     <p className="text-[10px] text-foreground/60">
-                      Ao clicar em "Marcar Concluída", você será direcionado ao pagamento de R$ {rewardAmount.toFixed(2).replace('.', ',')} + taxa.
+                      Ao clicar em "Pagar e Concluir", o download do script será liberado automaticamente.
                     </p>
                     <div className="flex gap-4 mt-2 text-[9px] text-muted-foreground font-mono">
                       <span>Pix: R$ {pixTotal.toFixed(2).replace('.', ',')} (+1%)</span>
@@ -439,7 +440,7 @@ export default function BountyDetail() {
                   </div>
                 )}
                 {isPurchaseCompleted && (
-                  <p className="text-[10px] text-neon-green font-mono mt-2">✅ Pagamento confirmado!</p>
+                  <p className="text-[10px] text-neon-green font-mono mt-2">✅ Pagamento confirmado — download liberado!</p>
                 )}
               </div>
             )}
@@ -656,6 +657,8 @@ export default function BountyDetail() {
             requesterId={bounty.requester_id}
             assignedModderId={bounty.assigned_modder_id}
             isAdmin={isAdmin}
+            isPaid={isPaid}
+            isPurchaseCompleted={isPurchaseCompleted}
           />
         )}
 

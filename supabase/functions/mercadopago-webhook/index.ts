@@ -110,6 +110,12 @@ Deno.serve(async (req) => {
         .update({ status: "completed", completed_at: new Date().toISOString() })
         .eq("id", bp.bounty_id);
 
+      // Release all deliveries for this bounty
+      await serviceClient
+        .from("bounty_deliveries")
+        .update({ released: true, released_at: new Date().toISOString() })
+        .eq("bounty_id", bp.bounty_id);
+
       // Notify modder
       const { data: bounty } = await serviceClient
         .from("bounties")
