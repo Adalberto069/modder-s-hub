@@ -478,8 +478,16 @@ export default function BountyDetail() {
             {(isRequester || isAdmin) && bounty.status !== "completed" && bounty.status !== "cancelled" && (
               <div className="flex flex-wrap gap-2 border-t border-white/5 pt-4">
                 {bounty.status === "in_progress" && (
-                  <Button onClick={handleMarkCompleted} size="sm" className="bg-neon-green/10 hover:bg-neon-green/20 text-neon-green border border-neon-green/30 rounded-none font-black uppercase tracking-widest text-[10px]">
-                    <Trophy className="h-3.5 w-3.5 mr-1.5" /> {isPaid && isRequester && !isPurchaseCompleted ? "Pagar e Concluir" : "Marcar Concluída"}
+                  <Button
+                    onClick={handleMarkCompleted}
+                    size="sm"
+                    disabled={isRequester && !isAdmin && (hasOpenDispute || (isPaid && hasAnyDelivery && !hasApprovedDelivery))}
+                    className="bg-neon-green/10 hover:bg-neon-green/20 text-neon-green border border-neon-green/30 rounded-none font-black uppercase tracking-widest text-[10px] disabled:opacity-30"
+                  >
+                    <Trophy className="h-3.5 w-3.5 mr-1.5" />
+                    {isPaid && isRequester && !isPurchaseCompleted
+                      ? hasApprovedDelivery ? "Pagar e Concluir" : "Aprove o script para pagar"
+                      : "Marcar Concluída"}
                   </Button>
                 )}
                 <Button onClick={handleCancelBounty} size="sm" variant="outline" className="border-destructive/30 text-destructive hover:bg-destructive/10 rounded-none font-black uppercase tracking-widest text-[10px]">
