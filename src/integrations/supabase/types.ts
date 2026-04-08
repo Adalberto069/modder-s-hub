@@ -50,6 +50,97 @@ export type Database = {
         }
         Relationships: []
       }
+      bounties: {
+        Row: {
+          assigned_modder_id: string | null
+          category_id: string | null
+          completed_at: string | null
+          created_at: string
+          deadline: string | null
+          description: string
+          game_name: string | null
+          id: string
+          requester_id: string
+          reward_amount: number
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          assigned_modder_id?: string | null
+          category_id?: string | null
+          completed_at?: string | null
+          created_at?: string
+          deadline?: string | null
+          description: string
+          game_name?: string | null
+          id?: string
+          requester_id: string
+          reward_amount?: number
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          assigned_modder_id?: string | null
+          category_id?: string | null
+          completed_at?: string | null
+          created_at?: string
+          deadline?: string | null
+          description?: string
+          game_name?: string | null
+          id?: string
+          requester_id?: string
+          reward_amount?: number
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bounties_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      bounty_applications: {
+        Row: {
+          bounty_id: string
+          created_at: string
+          id: string
+          message: string
+          modder_id: string
+          status: string
+        }
+        Insert: {
+          bounty_id: string
+          created_at?: string
+          id?: string
+          message: string
+          modder_id: string
+          status?: string
+        }
+        Update: {
+          bounty_id?: string
+          created_at?: string
+          id?: string
+          message?: string
+          modder_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bounty_applications_bounty_id_fkey"
+            columns: ["bounty_id"]
+            isOneToOne: false
+            referencedRelation: "bounties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       categories: {
         Row: {
           created_at: string
