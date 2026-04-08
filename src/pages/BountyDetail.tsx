@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { BountyChat } from "@/components/bounties/BountyChat";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { Layout } from "@/components/layout/Layout";
 import { supabase } from "@/integrations/supabase/client";
@@ -385,6 +386,16 @@ export default function BountyDetail() {
             )}
           </div>
         </div>
+
+        {/* Chat — visible only when modder is assigned */}
+        {bounty.assigned_modder_id && (
+          <BountyChat
+            bountyId={bounty.id}
+            bountyStatus={bounty.status}
+            requesterId={bounty.requester_id}
+            assignedModderId={bounty.assigned_modder_id}
+          />
+        )}
       </div>
     </Layout>
   );
