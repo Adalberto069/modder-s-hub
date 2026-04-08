@@ -91,15 +91,6 @@ export default function BountyDetail() {
     toast.success("Candidatura enviada! 🚀");
     setApplyMessage("");
     queryClient.invalidateQueries({ queryKey: ["bounty-applications", id] });
-
-    // Notify requester
-    await (supabase as any).from("notifications").insert({
-      user_id: bounty?.requester_id,
-      title: "Nova candidatura! 👾",
-      message: `Um modder se candidatou à sua encomenda: "${bounty?.title}"`,
-      type: "info",
-      link: `/bounties/${id}`,
-    });
   };
 
   const handleAcceptModder = async (application: any) => {
@@ -127,16 +118,6 @@ export default function BountyDetail() {
       .eq("id", id);
 
     toast.success("Modder aceito! A encomenda está em andamento. ✅");
-
-    // Notify modder
-    await (supabase as any).from("notifications").insert({
-      user_id: application.modder_id,
-      title: "Candidatura aceita! 🎯",
-      message: `Sua candidatura para "${bounty?.title}" foi aceita! Entre em contato com o solicitante.`,
-      type: "success",
-      link: `/bounties/${id}`,
-    });
-
     queryClient.invalidateQueries({ queryKey: ["bounty", id] });
     queryClient.invalidateQueries({ queryKey: ["bounty-applications", id] });
   };

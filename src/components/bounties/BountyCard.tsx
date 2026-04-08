@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
-import { Target, Gamepad2, Clock, DollarSign, User } from "lucide-react";
+import { Target, Gamepad2, Clock, User, Users } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
@@ -16,6 +16,7 @@ interface BountyCardProps {
     created_at: string;
     profiles?: { username?: string; display_name?: string } | null;
     categories?: { name?: string; icon?: string } | null;
+    application_count?: number;
   };
 }
 
@@ -30,14 +31,14 @@ export function BountyCard({ bounty }: BountyCardProps) {
   const status = statusConfig[bounty.status] ?? statusConfig.open;
   const isExpired = bounty.deadline && new Date(bounty.deadline) < new Date();
   const timeAgo = formatDistanceToNow(new Date(bounty.created_at), { locale: ptBR, addSuffix: true });
+  const appCount = bounty.application_count ?? 0;
 
   return (
     <Link to={`/bounties/${bounty.id}`} className="group block">
-      <div className="relative overflow-hidden border border-white/5 bg-[#050505] hover:border-neon-purple/30 hover:bg-[#07070a] transition-all duration-300 hover:shadow-[0_0_20px_rgba(168,85,247,0.08)]">
-        {/* Top accent line animated on hover */}
+      <div className="relative overflow-hidden border border-white/5 bg-[#050505] hover:border-neon-purple/30 hover:bg-[#07070a] transition-all duration-300 hover:shadow-[0_0_20px_rgba(168,85,247,0.08)] h-full flex flex-col">
         <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-neon-purple/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
-        <div className="p-5 space-y-3">
+        <div className="p-5 space-y-3 flex-1 flex flex-col">
           {/* Header row */}
           <div className="flex items-start justify-between gap-3">
             <div className="flex items-center gap-2 min-w-0">
@@ -57,7 +58,7 @@ export function BountyCard({ bounty }: BountyCardProps) {
           </div>
 
           {/* Description */}
-          <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
+          <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2 flex-1">
             {bounty.description}
           </p>
 
@@ -93,6 +94,12 @@ export function BountyCard({ bounty }: BountyCardProps) {
                 {timeAgo}
               </span>
             </div>
+            {appCount > 0 && (
+              <span className="flex items-center gap-1 text-[10px] font-bold text-neon-cyan/80">
+                <Users className="h-2.5 w-2.5" />
+                {appCount}
+              </span>
+            )}
           </div>
         </div>
       </div>

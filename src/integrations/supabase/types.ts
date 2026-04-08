@@ -98,11 +98,39 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "bounties_assigned_modder_id_fkey"
+            columns: ["assigned_modder_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "bounties_assigned_modder_id_fkey"
+            columns: ["assigned_modder_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_public"
+            referencedColumns: ["user_id"]
+          },
+          {
             foreignKeyName: "bounties_category_id_fkey"
             columns: ["category_id"]
             isOneToOne: false
             referencedRelation: "categories"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bounties_requester_id_fkey"
+            columns: ["requester_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "bounties_requester_id_fkey"
+            columns: ["requester_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_public"
+            referencedColumns: ["user_id"]
           },
         ]
       }
@@ -138,6 +166,20 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "bounties"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bounty_applications_modder_id_fkey"
+            columns: ["modder_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "bounty_applications_modder_id_fkey"
+            columns: ["modder_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_public"
+            referencedColumns: ["user_id"]
           },
         ]
       }
