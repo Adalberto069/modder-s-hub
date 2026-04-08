@@ -229,6 +229,68 @@ export type Database = {
           },
         ]
       }
+      bounty_purchases: {
+        Row: {
+          amount: number
+          base_amount: number
+          bounty_id: string
+          commission_rate: number
+          created_at: string
+          fee: number
+          id: string
+          modder_earnings: number
+          modder_id: string
+          payer_id: string
+          payment_id: string | null
+          payment_method: string | null
+          platform_commission: number
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          amount?: number
+          base_amount?: number
+          bounty_id: string
+          commission_rate?: number
+          created_at?: string
+          fee?: number
+          id?: string
+          modder_earnings?: number
+          modder_id: string
+          payer_id: string
+          payment_id?: string | null
+          payment_method?: string | null
+          platform_commission?: number
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          base_amount?: number
+          bounty_id?: string
+          commission_rate?: number
+          created_at?: string
+          fee?: number
+          id?: string
+          modder_earnings?: number
+          modder_id?: string
+          payer_id?: string
+          payment_id?: string | null
+          payment_method?: string | null
+          platform_commission?: number
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bounty_purchases_bounty_id_fkey"
+            columns: ["bounty_id"]
+            isOneToOne: false
+            referencedRelation: "bounties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       categories: {
         Row: {
           created_at: string
