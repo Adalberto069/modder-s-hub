@@ -108,14 +108,31 @@ export default function BountyDetail() {
     enabled: !!id && !!user,
   });
 
+  // Check deliveries for approval/dispute status
+  const { data: deliveries } = useQuery({
+    queryKey: ["bounty-deliveries-status", id],
+    queryFn: async () => {
+      const { data } = await (supabase as any)
+        .from("bounty_deliveries")
+        .select("id, test_approved, disputed, dispute_resolved, released")
+        .eq("bounty_id", id);
+      return data ?? [];
+    },
+    enabled: !!id && !!user,
+  });
+
   const isRequester = user?.id === bounty?.requester_id;
   const hasApplied = applications?.some((a: any) => a.modder_id === user?.id);
   const myApplication = applications?.find((a: any) => a.modder_id === user?.id);
+  const hasApprovedDelivery = deliveries?.some((d: any) => d.test_approved);
+  const hasOpenDispute = deliveries?.some((d: any) => d.disputed && !d.dispute_resolved);
+  const hasAnyDelivery = deliveries && deliveries.length > 0;
 
   const invalidateAll = () => {
     queryClient.invalidateQueries({ queryKey: ["bounty", id] });
     queryClient.invalidateQueries({ queryKey: ["bounty-applications", id] });
     queryClient.invalidateQueries({ queryKey: ["bounty-purchase", id] });
+    queryClient.invalidateQueries({ queryKey: ["bounty-deliveries-status", id] });
   };
 
   const handleApply = async () => {
