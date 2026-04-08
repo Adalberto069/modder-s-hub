@@ -14,8 +14,14 @@ import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import {
   Target, Gamepad2, Clock, DollarSign, User, CheckCircle, XCircle,
-  ArrowLeft, Send, Shield, Trophy, AlertTriangle, Calendar
+  ArrowLeft, Send, Shield, Trophy, AlertTriangle, Calendar, Heart,
+  Trash2, RefreshCw, UserMinus, MessageSquareOff
 } from "lucide-react";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel,
+  AlertDialogContent, AlertDialogDescription, AlertDialogFooter,
+  AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 const statusConfig: Record<string, { label: string; color: string; bg: string; border: string }> = {
   open: { label: "Aberta", color: "text-neon-green", bg: "bg-neon-green/10", border: "border-neon-green/30" },
@@ -69,6 +75,11 @@ export default function BountyDetail() {
   const hasApplied = applications?.some((a: any) => a.modder_id === user?.id);
   const myApplication = applications?.find((a: any) => a.modder_id === user?.id);
 
+  const invalidateAll = () => {
+    queryClient.invalidateQueries({ queryKey: ["bounty", id] });
+    queryClient.invalidateQueries({ queryKey: ["bounty-applications", id] });
+  };
+
   const handleApply = async () => {
     if (!user) { toast.error("Faça login para se candidatar."); return; }
     if (!isModder) { toast.error("Apenas modders aprovados podem se candidatar."); return; }
@@ -91,13 +102,12 @@ export default function BountyDetail() {
 
     toast.success("Candidatura enviada! 🚀");
     setApplyMessage("");
-    queryClient.invalidateQueries({ queryKey: ["bounty-applications", id] });
+    invalidateAll();
   };
 
   const handleAcceptModder = async (application: any) => {
     if (!isRequester && !isAdmin) return;
 
-    // Update application status to accepted
     const { error: appError } = await (supabase as any)
       .from("bounty_applications")
       .update({ status: "accepted" })
@@ -105,22 +115,19 @@ export default function BountyDetail() {
 
     if (appError) { toast.error(appError.message); return; }
 
-    // Reject all others
     await (supabase as any)
       .from("bounty_applications")
       .update({ status: "rejected" })
       .eq("bounty_id", id)
       .neq("id", application.id);
 
-    // Update bounty status
     await (supabase as any)
       .from("bounties")
       .update({ status: "in_progress", assigned_modder_id: application.modder_id })
       .eq("id", id);
 
     toast.success("Modder aceito! A encomenda está em andamento. ✅");
-    queryClient.invalidateQueries({ queryKey: ["bounty", id] });
-    queryClient.invalidateQueries({ queryKey: ["bounty-applications", id] });
+    invalidateAll();
   };
 
   const handleMarkCompleted = async () => {
@@ -130,15 +137,54 @@ export default function BountyDetail() {
       .update({ status: "completed", completed_at: new Date().toISOString() })
       .eq("id", id);
     toast.success("Encomenda marcada como concluída! 🏆");
-    queryClient.invalidateQueries({ queryKey: ["bounty", id] });
+    invalidateAll();
   };
 
   const handleCancelBounty = async () => {
     if (!isRequester && !isAdmin) return;
-    if (!window.confirm("Tem certeza que quer cancelar essa encomenda?")) return;
     await (supabase as any).from("bounties").update({ status: "cancelled" }).eq("id", id);
     toast.success("Encomenda cancelada.");
     navigate("/bounties");
+  };
+
+  // ---- Admin actions ----
+  const handleDeleteBounty = async () => {
+    if (!isAdmin) return;
+    // Delete messages, applications, then bounty
+    await (supabase as any).from("bounty_messages").delete().eq("bounty_id", id);
+    await (supabase as any).from("bounty_applications").delete().eq("bounty_id", id);
+    const { error } = await (supabase as any).from("bounties").delete().eq("id", id);
+    if (error) { toast.error("Erro ao excluir: " + error.message); return; }
+    toast.success("Encomenda excluída pelo admin.");
+    navigate("/bounties");
+  };
+
+  const handleChangeStatus = async (newStatus: string) => {
+    if (!isAdmin) return;
+    const updates: any = { status: newStatus };
+    if (newStatus === "completed") updates.completed_at = new Date().toISOString();
+    if (newStatus === "open") { updates.assigned_modder_id = null; }
+    await (supabase as any).from("bounties").update(updates).eq("id", id);
+    toast.success(`Status alterado para: ${statusConfig[newStatus]?.label ?? newStatus}`);
+    invalidateAll();
+  };
+
+  const handleUnassignModder = async () => {
+    if (!isAdmin) return;
+    // Reset to open and unassign
+    await (supabase as any).from("bounties").update({ status: "open", assigned_modder_id: null }).eq("id", id);
+    // Reset all applications to pending
+    await (supabase as any).from("bounty_applications").update({ status: "pending" }).eq("bounty_id", id);
+    toast.success("Modder desatribuído. Encomenda reaberta.");
+    invalidateAll();
+  };
+
+  const handleDeleteApplication = async (appId: string) => {
+    if (!isAdmin) return;
+    const { error } = await (supabase as any).from("bounty_applications").delete().eq("id", appId);
+    if (error) { toast.error(error.message); return; }
+    toast.success("Candidatura removida.");
+    invalidateAll();
   };
 
   if (isLoading) {
@@ -167,6 +213,8 @@ export default function BountyDetail() {
 
   const status = statusConfig[bounty.status] ?? statusConfig.open;
   const isDeadlineExpired = bounty.deadline && new Date(bounty.deadline) < new Date();
+  const rewardAmount = Number(bounty.reward_amount);
+  const isPaid = rewardAmount > 0;
 
   return (
     <Layout>
@@ -181,9 +229,9 @@ export default function BountyDetail() {
           <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-neon-purple/50 via-neon-cyan/30 to-transparent" />
 
           <div className="p-8 space-y-6">
-            {/* Title + Status */}
+            {/* Title + Status + Reward */}
             <div className="flex items-start justify-between gap-4 flex-wrap">
-              <div className="space-y-2">
+              <div className="space-y-2 flex-1">
                 <div className="flex items-center gap-2">
                   <Target className="h-5 w-5 text-neon-purple" />
                   <h1 className="text-2xl font-black uppercase tracking-tighter text-white">{bounty.title}</h1>
@@ -210,16 +258,27 @@ export default function BountyDetail() {
                 </div>
               </div>
 
-              {/* Reward — only visible to requester and admin */}
-              {(isRequester || isAdmin) && Number(bounty.reward_amount) > 0 && (
-                <div className="text-right">
-                  <p className="text-[10px] text-muted-foreground uppercase tracking-widest">Recompensa (privada)</p>
-                  <p className="text-3xl font-black text-neon-green font-mono flex items-center gap-1">
-                    <DollarSign className="h-6 w-6" />
-                    R$ {Number(bounty.reward_amount).toFixed(2)}
-                  </p>
-                </div>
-              )}
+              {/* Reward — PUBLIC */}
+              <div className="text-right shrink-0">
+                {isPaid ? (
+                  <>
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-widest">Recompensa</p>
+                    <p className="text-3xl font-black text-neon-green font-mono flex items-center gap-1 justify-end">
+                      <DollarSign className="h-6 w-6" />
+                      R$ {rewardAmount.toFixed(2).replace('.', ',')}
+                    </p>
+                    <p className="text-[9px] text-muted-foreground/50 font-mono mt-0.5">
+                      Pagamento via Mercado Pago
+                    </p>
+                  </>
+                ) : (
+                  <div className="flex flex-col items-end gap-1">
+                    <Heart className="h-5 w-5 text-neon-cyan" />
+                    <p className="text-sm font-black text-neon-cyan uppercase tracking-widest">Voluntário</p>
+                    <p className="text-[9px] text-muted-foreground/50 font-mono">Sem recompensa</p>
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Description */}
@@ -229,7 +288,7 @@ export default function BountyDetail() {
             </div>
 
             {/* Meta info */}
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-xs font-mono border-t border-white/5 pt-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs font-mono border-t border-white/5 pt-4">
               <div>
                 <p className="text-[10px] text-muted-foreground uppercase tracking-widest mb-1">Solicitante</p>
                 <Link to={`/modder/${bounty.profiles?.user_id}`} className="flex items-center gap-1 text-neon-purple hover:underline">
@@ -253,11 +312,37 @@ export default function BountyDetail() {
                   </span>
                 </div>
               )}
+              <div>
+                <p className="text-[10px] text-muted-foreground uppercase tracking-widest mb-1">Tipo</p>
+                <span className={`flex items-center gap-1 ${isPaid ? "text-neon-green" : "text-neon-cyan"}`}>
+                  {isPaid ? <DollarSign className="h-3 w-3" /> : <Heart className="h-3 w-3" />}
+                  {isPaid ? `R$ ${rewardAmount.toFixed(2).replace('.', ',')}` : "Voluntário"}
+                </span>
+              </div>
             </div>
 
-            {/* Owner actions */}
+            {/* Delivery info */}
+            {bounty.status === "in_progress" && (isRequester || bounty.assigned_modder_id === user?.id) && (
+              <div className="bg-neon-cyan/5 border border-neon-cyan/20 p-4">
+                <p className="text-[10px] uppercase tracking-widest text-neon-cyan font-mono font-bold mb-2">📦 Entrega do Script</p>
+                <p className="text-xs text-foreground/70 leading-relaxed">
+                  O modder pode entregar o script de duas formas:
+                </p>
+                <ul className="text-xs text-foreground/60 mt-1 space-y-1 ml-4 list-disc">
+                  <li>Publicar no Marketplace e enviar o link aqui no chat</li>
+                  <li>Enviar o arquivo diretamente pelo chat da encomenda</li>
+                </ul>
+                {isPaid && (
+                  <p className="text-[10px] text-neon-green/70 font-mono mt-2">
+                    💰 Ao concluir, o pagamento de R$ {rewardAmount.toFixed(2).replace('.', ',')} será processado via Mercado Pago (split 80/20).
+                  </p>
+                )}
+              </div>
+            )}
+
+            {/* Owner/Admin actions */}
             {(isRequester || isAdmin) && bounty.status !== "completed" && bounty.status !== "cancelled" && (
-              <div className="flex gap-2 border-t border-white/5 pt-4">
+              <div className="flex flex-wrap gap-2 border-t border-white/5 pt-4">
                 {bounty.status === "in_progress" && (
                   <Button onClick={handleMarkCompleted} size="sm" className="bg-neon-green/10 hover:bg-neon-green/20 text-neon-green border border-neon-green/30 rounded-none font-black uppercase tracking-widest text-[10px]">
                     <Trophy className="h-3.5 w-3.5 mr-1.5" /> Marcar Concluída
@@ -266,6 +351,69 @@ export default function BountyDetail() {
                 <Button onClick={handleCancelBounty} size="sm" variant="outline" className="border-destructive/30 text-destructive hover:bg-destructive/10 rounded-none font-black uppercase tracking-widest text-[10px]">
                   <XCircle className="h-3.5 w-3.5 mr-1.5" /> Cancelar Encomenda
                 </Button>
+              </div>
+            )}
+
+            {/* Admin Panel */}
+            {isAdmin && (
+              <div className="border border-neon-purple/20 bg-neon-purple/5 p-4 space-y-3">
+                <p className="text-[10px] font-black uppercase tracking-widest text-neon-purple flex items-center gap-1.5">
+                  <Shield className="h-3.5 w-3.5" /> Painel Admin
+                </p>
+
+                <div className="flex flex-wrap gap-2">
+                  {/* Change status */}
+                  {bounty.status !== "open" && (
+                    <Button size="sm" variant="outline" onClick={() => handleChangeStatus("open")}
+                      className="rounded-none text-[10px] font-bold uppercase tracking-widest border-neon-green/20 text-neon-green hover:bg-neon-green/10">
+                      <RefreshCw className="h-3 w-3 mr-1" /> Reabrir
+                    </Button>
+                  )}
+                  {bounty.status !== "completed" && (
+                    <Button size="sm" variant="outline" onClick={() => handleChangeStatus("completed")}
+                      className="rounded-none text-[10px] font-bold uppercase tracking-widest border-neon-purple/20 text-neon-purple hover:bg-neon-purple/10">
+                      <Trophy className="h-3 w-3 mr-1" /> Forçar Conclusão
+                    </Button>
+                  )}
+                  {bounty.status !== "cancelled" && (
+                    <Button size="sm" variant="outline" onClick={() => handleChangeStatus("cancelled")}
+                      className="rounded-none text-[10px] font-bold uppercase tracking-widest border-destructive/20 text-destructive hover:bg-destructive/10">
+                      <XCircle className="h-3 w-3 mr-1" /> Forçar Cancelamento
+                    </Button>
+                  )}
+
+                  {/* Unassign modder */}
+                  {bounty.assigned_modder_id && (
+                    <Button size="sm" variant="outline" onClick={handleUnassignModder}
+                      className="rounded-none text-[10px] font-bold uppercase tracking-widest border-yellow-500/20 text-yellow-500 hover:bg-yellow-500/10">
+                      <UserMinus className="h-3 w-3 mr-1" /> Desatribuir Modder
+                    </Button>
+                  )}
+
+                  {/* Delete bounty */}
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button size="sm" variant="outline"
+                        className="rounded-none text-[10px] font-bold uppercase tracking-widest border-destructive/30 text-destructive hover:bg-destructive/10">
+                        <Trash2 className="h-3 w-3 mr-1" /> Excluir Encomenda
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent className="bg-[#050505] border-white/10 rounded-none">
+                      <AlertDialogHeader>
+                        <AlertDialogTitle className="text-white">Excluir encomenda?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Isso excluirá permanentemente a encomenda, todas as candidaturas e mensagens do chat. Essa ação não pode ser desfeita.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel className="rounded-none">Cancelar</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleDeleteBounty} className="bg-destructive hover:bg-destructive/90 rounded-none">
+                          Excluir
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </div>
               </div>
             )}
           </div>
@@ -282,10 +430,20 @@ export default function BountyDetail() {
           </div>
 
           <div className="p-5 space-y-4">
-            {/* Apply form — only for modders who haven't applied and aren't the requester */}
+            {/* Apply form */}
             {isModder && !isRequester && bounty.status === "open" && !hasApplied && (
               <div className="bg-[#030304] border border-neon-purple/20 p-5 space-y-3">
                 <p className="text-[10px] font-black uppercase tracking-widest text-neon-purple">Enviar Candidatura</p>
+                {isPaid && (
+                  <p className="text-xs text-neon-green/70 font-mono">
+                    💰 Recompensa: R$ {rewardAmount.toFixed(2).replace('.', ',')} (você recebe 80%)
+                  </p>
+                )}
+                {!isPaid && (
+                  <p className="text-xs text-neon-cyan/70 font-mono">
+                    💙 Encomenda voluntária — sem recompensa em dinheiro
+                  </p>
+                )}
                 <Textarea
                   id="apply-message"
                   placeholder="> Descreva sua experiência, prazo estimado e como você faria esse script..."
@@ -305,7 +463,7 @@ export default function BountyDetail() {
               </div>
             )}
 
-            {/* Prompt to login if not authenticated */}
+            {/* Prompt to login */}
             {!user && bounty.status === "open" && (
               <div className="py-8 text-center space-y-2">
                 <Target className="h-8 w-8 text-neon-purple/20 mx-auto" />
@@ -313,20 +471,20 @@ export default function BountyDetail() {
               </div>
             )}
 
-            {/* Modder sees only their own application status */}
+            {/* Modder sees own application status */}
             {user && !isRequester && !isAdmin && hasApplied && myApplication && (
               <div className={`p-4 border text-sm font-mono ${
                 myApplication.status === "accepted" ? "border-neon-green/30 bg-neon-green/5 text-neon-green" :
                 myApplication.status === "rejected" ? "border-destructive/30 bg-destructive/5 text-destructive" :
                 "border-white/10 bg-white/5 text-muted-foreground"
               }`}>
-                {myApplication.status === "accepted" && "✅ Sua candidatura foi aceita! Entre em contato com o solicitante."}
+                {myApplication.status === "accepted" && "✅ Sua candidatura foi aceita! Use o chat abaixo para comunicação."}
                 {myApplication.status === "rejected" && "❌ Sua candidatura foi recusada."}
                 {myApplication.status === "pending" && "⏳ Candidatura enviada. Aguardando resposta do solicitante."}
               </div>
             )}
 
-            {/* Non-modder authenticated user who isn't requester/admin */}
+            {/* Non-modder */}
             {user && !isRequester && !isAdmin && !isModder && bounty.status === "open" && (
               <div className="py-8 text-center">
                 <p className="text-sm text-muted-foreground font-mono">Apenas modders aprovados podem se candidatar.</p>
@@ -362,17 +520,30 @@ export default function BountyDetail() {
                           <p className="text-sm text-foreground/70 leading-relaxed">{app.message}</p>
                         </div>
 
-                        {/* Accept button */}
-                        {bounty.status === "open" && app.status === "pending" && (
-                          <Button
-                            size="sm"
-                            onClick={() => handleAcceptModder(app)}
-                            className="shrink-0 bg-neon-green/10 hover:bg-neon-green/20 text-neon-green border border-neon-green/30 rounded-none font-black uppercase tracking-widest text-[10px] h-8 px-3"
-                          >
-                            <CheckCircle className="h-3.5 w-3.5 mr-1" />
-                            Aceitar
-                          </Button>
-                        )}
+                        <div className="flex gap-1.5 shrink-0">
+                          {/* Accept button */}
+                          {bounty.status === "open" && app.status === "pending" && (
+                            <Button
+                              size="sm"
+                              onClick={() => handleAcceptModder(app)}
+                              className="shrink-0 bg-neon-green/10 hover:bg-neon-green/20 text-neon-green border border-neon-green/30 rounded-none font-black uppercase tracking-widest text-[10px] h-8 px-3"
+                            >
+                              <CheckCircle className="h-3.5 w-3.5 mr-1" />
+                              Aceitar
+                            </Button>
+                          )}
+                          {/* Admin: delete application */}
+                          {isAdmin && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleDeleteApplication(app.id)}
+                              className="h-8 w-8 p-0 border-destructive/20 text-destructive hover:bg-destructive/10 rounded-none"
+                            >
+                              <Trash2 className="h-3 w-3" />
+                            </Button>
+                          )}
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -394,6 +565,7 @@ export default function BountyDetail() {
             bountyStatus={bounty.status}
             requesterId={bounty.requester_id}
             assignedModderId={bounty.assigned_modder_id}
+            isAdmin={isAdmin}
           />
         )}
       </div>

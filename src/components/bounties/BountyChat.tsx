@@ -4,7 +4,7 @@ import { useAuth } from "@/lib/auth";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { Send, MessageSquare, Lock } from "lucide-react";
+import { Send, MessageSquare, Lock, Trash2, Shield } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import DOMPurify from "dompurify";
@@ -14,9 +14,10 @@ interface BountyChatProps {
   bountyStatus: string;
   requesterId: string;
   assignedModderId: string | null;
+  isAdmin?: boolean;
 }
 
-export function BountyChat({ bountyId, bountyStatus, requesterId, assignedModderId }: BountyChatProps) {
+export function BountyChat({ bountyId, bountyStatus, requesterId, assignedModderId, isAdmin }: BountyChatProps) {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [message, setMessage] = useState("");
@@ -24,6 +25,7 @@ export function BountyChat({ bountyId, bountyStatus, requesterId, assignedModder
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const isParticipant = user && (user.id === requesterId || user.id === assignedModderId);
+  const canView = isParticipant || isAdmin;
   const canSend = isParticipant && bountyStatus === "in_progress";
 
   const { data: messages } = useQuery({
@@ -39,19 +41,19 @@ export function BountyChat({ bountyId, bountyStatus, requesterId, assignedModder
         .order("created_at", { ascending: true });
       return data ?? [];
     },
-    enabled: !!isParticipant,
+    enabled: !!canView,
   });
 
   // Realtime subscription
   useEffect(() => {
-    if (!isParticipant) return;
+    if (!canView) return;
 
     const channel = supabase
       .channel(`bounty-chat-${bountyId}`)
       .on(
         "postgres_changes",
         {
-          event: "INSERT",
+          event: "*",
           schema: "public",
           table: "bounty_messages",
           filter: `bounty_id=eq.${bountyId}`,
@@ -65,9 +67,9 @@ export function BountyChat({ bountyId, bountyStatus, requesterId, assignedModder
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [bountyId, isParticipant, queryClient]);
+  }, [bountyId, canView, queryClient]);
 
-  // Auto-scroll to bottom on new messages
+  // Auto-scroll
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
@@ -99,6 +101,14 @@ export function BountyChat({ bountyId, bountyStatus, requesterId, assignedModder
     setMessage("");
   };
 
+  const handleDeleteMessage = async (msgId: string) => {
+    if (!isAdmin) return;
+    const { error } = await (supabase as any).from("bounty_messages").delete().eq("id", msgId);
+    if (error) { toast.error(error.message); return; }
+    toast.success("Mensagem removida.");
+    queryClient.invalidateQueries({ queryKey: ["bounty-messages", bountyId] });
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
@@ -106,7 +116,7 @@ export function BountyChat({ bountyId, bountyStatus, requesterId, assignedModder
     }
   };
 
-  if (!isParticipant) return null;
+  if (!canView) return null;
 
   return (
     <div className="border border-white/5 bg-[#050505]">
@@ -116,11 +126,18 @@ export function BountyChat({ bountyId, bountyStatus, requesterId, assignedModder
           <MessageSquare className="h-4 w-4 text-neon-cyan" />
           Chat da Encomenda
         </h2>
-        <div className="flex items-center gap-1.5">
-          <Lock className="h-3 w-3 text-muted-foreground/50" />
-          <span className="text-[10px] font-mono text-muted-foreground/50 uppercase tracking-widest">
-            Privado
-          </span>
+        <div className="flex items-center gap-2">
+          {isAdmin && !isParticipant && (
+            <span className="text-[10px] font-mono text-neon-purple/70 uppercase tracking-widest flex items-center gap-1">
+              <Shield className="h-3 w-3" /> Visualizando como admin
+            </span>
+          )}
+          <div className="flex items-center gap-1.5">
+            <Lock className="h-3 w-3 text-muted-foreground/50" />
+            <span className="text-[10px] font-mono text-muted-foreground/50 uppercase tracking-widest">
+              Privado
+            </span>
+          </div>
         </div>
       </div>
 
@@ -147,7 +164,7 @@ export function BountyChat({ bountyId, bountyStatus, requesterId, assignedModder
             return (
               <div
                 key={msg.id}
-                className={`flex flex-col gap-1 ${isMine ? "items-end" : "items-start"}`}
+                className={`flex flex-col gap-1 ${isMine ? "items-end" : "items-start"} group`}
               >
                 {/* Sender info */}
                 <div className="flex items-center gap-1.5">
@@ -161,6 +178,15 @@ export function BountyChat({ bountyId, bountyStatus, requesterId, assignedModder
                   <span className="text-[9px] text-muted-foreground/40 font-mono">
                     {formatDistanceToNow(new Date(msg.created_at), { locale: ptBR, addSuffix: true })}
                   </span>
+                  {isAdmin && (
+                    <button
+                      onClick={() => handleDeleteMessage(msg.id)}
+                      className="opacity-0 group-hover:opacity-100 transition-opacity text-destructive/50 hover:text-destructive p-0.5"
+                      title="Excluir mensagem"
+                    >
+                      <Trash2 className="h-3 w-3" />
+                    </button>
+                  )}
                 </div>
 
                 {/* Bubble */}
@@ -208,6 +234,12 @@ export function BountyChat({ bountyId, bountyStatus, requesterId, assignedModder
         <div className="p-3 border-t border-white/5 text-center">
           <p className="text-[10px] text-muted-foreground/40 font-mono uppercase tracking-widest">
             Encomenda concluída — chat encerrado
+          </p>
+        </div>
+      ) : isAdmin && !isParticipant ? (
+        <div className="p-3 border-t border-white/5 text-center">
+          <p className="text-[10px] text-muted-foreground/40 font-mono uppercase tracking-widest">
+            Modo visualização admin — somente leitura
           </p>
         </div>
       ) : null}
