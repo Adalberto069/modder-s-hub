@@ -15,7 +15,6 @@ Deno.serve(async (req) => {
     const body = await req.json();
     console.log("Webhook received:", JSON.stringify(body));
 
-    // Mercado Pago sends different notification types
     if (body.type !== "payment" && body.action !== "payment.updated" && body.action !== "payment.created") {
       console.log("Ignoring non-payment notification:", body.type, body.action);
       return new Response(JSON.stringify({ received: true }), {
@@ -33,7 +32,6 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Get payment details from Mercado Pago
     const accessToken = Deno.env.get("MERCADOPAGO_ACCESS_TOKEN");
     if (!accessToken) {
       console.error("MERCADOPAGO_ACCESS_TOKEN not configured");
@@ -59,9 +57,9 @@ Deno.serve(async (req) => {
       });
     }
 
-    const purchaseId = mpData.external_reference;
-    if (!purchaseId) {
-      console.error("No external_reference (purchase_id) in payment");
+    const externalRef = mpData.external_reference;
+    if (!externalRef) {
+      console.error("No external_reference in payment");
       return new Response(JSON.stringify({ received: true }), {
         status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -73,7 +71,72 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
-    // Check if already completed
+    // ===== BOUNTY PAYMENT =====
+    if (externalRef.startsWith("bounty:")) {
+      const bountyPurchaseId = externalRef.replace("bounty:", "");
+      console.log("Processing bounty payment:", bountyPurchaseId);
+
+      const { data: bp } = await serviceClient
+        .from("bounty_purchases")
+        .select("*")
+        .eq("id", bountyPurchaseId)
+        .single();
+
+      if (!bp) {
+        console.error("Bounty purchase not found:", bountyPurchaseId);
+        return new Response(JSON.stringify({ received: true }), {
+          status: 200,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      if (bp.status === "completed") {
+        console.log("Bounty purchase already completed:", bountyPurchaseId);
+        return new Response(JSON.stringify({ received: true }), {
+          status: 200,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      // Mark bounty purchase as completed
+      await serviceClient
+        .from("bounty_purchases")
+        .update({ status: "completed", payment_id: String(paymentId), updated_at: new Date().toISOString() })
+        .eq("id", bountyPurchaseId);
+
+      // Mark bounty as completed
+      await serviceClient
+        .from("bounties")
+        .update({ status: "completed", completed_at: new Date().toISOString() })
+        .eq("id", bp.bounty_id);
+
+      // Notify modder
+      const { data: bounty } = await serviceClient
+        .from("bounties")
+        .select("title")
+        .eq("id", bp.bounty_id)
+        .single();
+
+      if (bounty) {
+        await serviceClient.from("notifications").insert({
+          user_id: bp.modder_id,
+          title: "💰 Pagamento recebido!",
+          message: `O pagamento de R$ ${bp.modder_earnings} pela encomenda "${bounty.title}" foi confirmado!`,
+          type: "success",
+          link: `/bounties/${bp.bounty_id}`,
+        });
+      }
+
+      console.log("Bounty webhook processed:", bountyPurchaseId);
+      return new Response(JSON.stringify({ received: true, processed: true }), {
+        status: 200,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // ===== SCRIPT PAYMENT (original logic) =====
+    const purchaseId = externalRef;
+
     const { data: purchase } = await serviceClient
       .from("purchases")
       .select("*")
@@ -96,27 +159,23 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Complete the purchase
     await serviceClient
       .from("purchases")
       .update({ status: "completed", payment_id: String(paymentId) })
       .eq("id", purchaseId);
 
-    // Get script for license duration
     const { data: script } = await serviceClient
       .from("scripts")
       .select("license_duration_days")
       .eq("id", purchase.script_id)
       .single();
 
-    // Generate license key
     const { data: licenseKey } = await serviceClient.rpc("generate_license_key");
 
     const expiresAt = script?.license_duration_days
       ? new Date(Date.now() + script.license_duration_days * 86400000).toISOString()
       : null;
 
-    // Check if renewal
     const { data: existingLicense } = await serviceClient
       .from("licenses")
       .select("id, expires_at")
@@ -154,7 +213,6 @@ Deno.serve(async (req) => {
         script_id: purchase.script_id,
       });
 
-      // Increment download count
       const { data: currentScript } = await serviceClient
         .from("scripts")
         .select("download_count")
