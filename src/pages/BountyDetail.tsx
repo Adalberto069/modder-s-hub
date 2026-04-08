@@ -657,6 +657,8 @@ export default function BountyDetail() {
             requesterId={bounty.requester_id}
             assignedModderId={bounty.assigned_modder_id}
             isAdmin={isAdmin}
+            isPaid={isPaid}
+            isPurchaseCompleted={isPurchaseCompleted}
           />
         )}
 
