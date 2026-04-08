@@ -187,32 +187,47 @@ export type Database = {
         Row: {
           bounty_id: string
           delivered_at: string
+          dispute_reason: string | null
+          dispute_resolved: boolean
+          dispute_resolved_by: string | null
+          disputed: boolean
           file_name: string
           file_url: string
           id: string
           modder_id: string
           released: boolean
           released_at: string | null
+          test_approved: boolean
         }
         Insert: {
           bounty_id: string
           delivered_at?: string
+          dispute_reason?: string | null
+          dispute_resolved?: boolean
+          dispute_resolved_by?: string | null
+          disputed?: boolean
           file_name: string
           file_url: string
           id?: string
           modder_id: string
           released?: boolean
           released_at?: string | null
+          test_approved?: boolean
         }
         Update: {
           bounty_id?: string
           delivered_at?: string
+          dispute_reason?: string | null
+          dispute_resolved?: boolean
+          dispute_resolved_by?: string | null
+          disputed?: boolean
           file_name?: string
           file_url?: string
           id?: string
           modder_id?: string
           released?: boolean
           released_at?: string | null
+          test_approved?: boolean
         }
         Relationships: [
           {
