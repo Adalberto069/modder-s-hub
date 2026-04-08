@@ -227,6 +227,18 @@ export default function BountyDetail() {
     const rewardAmount = Number(bounty?.reward_amount);
     const isPaid = rewardAmount > 0;
 
+    // Block if there's an open dispute
+    if (hasOpenDispute && !isAdmin) {
+      toast.error("Há uma disputa em aberto. Aguarde resolução do admin.");
+      return;
+    }
+
+    // Block if paid but no delivery approved (unless admin)
+    if (isPaid && isRequester && hasAnyDelivery && !hasApprovedDelivery && !isAdmin) {
+      toast.error("Teste e aprove o script entregue antes de pagar.");
+      return;
+    }
+
     // If paid bounty and no completed purchase, need to pay first
     if (isPaid && isRequester && (!bountyPurchase || bountyPurchase.status !== "completed")) {
       setShowPaymentDialog(true);
