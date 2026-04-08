@@ -183,6 +183,47 @@ export type Database = {
           },
         ]
       }
+      bounty_deliveries: {
+        Row: {
+          bounty_id: string
+          delivered_at: string
+          file_name: string
+          file_url: string
+          id: string
+          modder_id: string
+          released: boolean
+          released_at: string | null
+        }
+        Insert: {
+          bounty_id: string
+          delivered_at?: string
+          file_name: string
+          file_url: string
+          id?: string
+          modder_id: string
+          released?: boolean
+          released_at?: string | null
+        }
+        Update: {
+          bounty_id?: string
+          delivered_at?: string
+          file_name?: string
+          file_url?: string
+          id?: string
+          modder_id?: string
+          released?: boolean
+          released_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bounty_deliveries_bounty_id_fkey"
+            columns: ["bounty_id"]
+            isOneToOne: false
+            referencedRelation: "bounties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       bounty_messages: {
         Row: {
           bounty_id: string
