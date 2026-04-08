@@ -108,14 +108,31 @@ export default function BountyDetail() {
     enabled: !!id && !!user,
   });
 
+  // Check deliveries for approval/dispute status
+  const { data: deliveries } = useQuery({
+    queryKey: ["bounty-deliveries-status", id],
+    queryFn: async () => {
+      const { data } = await (supabase as any)
+        .from("bounty_deliveries")
+        .select("id, test_approved, disputed, dispute_resolved, released")
+        .eq("bounty_id", id);
+      return data ?? [];
+    },
+    enabled: !!id && !!user,
+  });
+
   const isRequester = user?.id === bounty?.requester_id;
   const hasApplied = applications?.some((a: any) => a.modder_id === user?.id);
   const myApplication = applications?.find((a: any) => a.modder_id === user?.id);
+  const hasApprovedDelivery = deliveries?.some((d: any) => d.test_approved);
+  const hasOpenDispute = deliveries?.some((d: any) => d.disputed && !d.dispute_resolved);
+  const hasAnyDelivery = deliveries && deliveries.length > 0;
 
   const invalidateAll = () => {
     queryClient.invalidateQueries({ queryKey: ["bounty", id] });
     queryClient.invalidateQueries({ queryKey: ["bounty-applications", id] });
     queryClient.invalidateQueries({ queryKey: ["bounty-purchase", id] });
+    queryClient.invalidateQueries({ queryKey: ["bounty-deliveries-status", id] });
   };
 
   const handleApply = async () => {
@@ -209,6 +226,18 @@ export default function BountyDetail() {
 
     const rewardAmount = Number(bounty?.reward_amount);
     const isPaid = rewardAmount > 0;
+
+    // Block if there's an open dispute
+    if (hasOpenDispute && !isAdmin) {
+      toast.error("Há uma disputa em aberto. Aguarde resolução do admin.");
+      return;
+    }
+
+    // Block if paid but no delivery approved (unless admin)
+    if (isPaid && isRequester && hasAnyDelivery && !hasApprovedDelivery && !isAdmin) {
+      toast.error("Teste e aprove o script entregue antes de pagar.");
+      return;
+    }
 
     // If paid bounty and no completed purchase, need to pay first
     if (isPaid && isRequester && (!bountyPurchase || bountyPurchase.status !== "completed")) {
@@ -449,8 +478,16 @@ export default function BountyDetail() {
             {(isRequester || isAdmin) && bounty.status !== "completed" && bounty.status !== "cancelled" && (
               <div className="flex flex-wrap gap-2 border-t border-white/5 pt-4">
                 {bounty.status === "in_progress" && (
-                  <Button onClick={handleMarkCompleted} size="sm" className="bg-neon-green/10 hover:bg-neon-green/20 text-neon-green border border-neon-green/30 rounded-none font-black uppercase tracking-widest text-[10px]">
-                    <Trophy className="h-3.5 w-3.5 mr-1.5" /> {isPaid && isRequester && !isPurchaseCompleted ? "Pagar e Concluir" : "Marcar Concluída"}
+                  <Button
+                    onClick={handleMarkCompleted}
+                    size="sm"
+                    disabled={isRequester && !isAdmin && (hasOpenDispute || (isPaid && hasAnyDelivery && !hasApprovedDelivery))}
+                    className="bg-neon-green/10 hover:bg-neon-green/20 text-neon-green border border-neon-green/30 rounded-none font-black uppercase tracking-widest text-[10px] disabled:opacity-30"
+                  >
+                    <Trophy className="h-3.5 w-3.5 mr-1.5" />
+                    {isPaid && isRequester && !isPurchaseCompleted
+                      ? hasApprovedDelivery ? "Pagar e Concluir" : "Aprove o script para pagar"
+                      : "Marcar Concluída"}
                   </Button>
                 )}
                 <Button onClick={handleCancelBounty} size="sm" variant="outline" className="border-destructive/30 text-destructive hover:bg-destructive/10 rounded-none font-black uppercase tracking-widest text-[10px]">
