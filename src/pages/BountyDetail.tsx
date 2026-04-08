@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { BountyChat } from "@/components/bounties/BountyChat";
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { useParams, Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Layout } from "@/components/layout/Layout";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -15,13 +15,16 @@ import { ptBR } from "date-fns/locale";
 import {
   Target, Gamepad2, Clock, DollarSign, User, CheckCircle, XCircle,
   ArrowLeft, Send, Shield, Trophy, AlertTriangle, Calendar, Heart,
-  Trash2, RefreshCw, UserMinus, MessageSquareOff
+  Trash2, RefreshCw, UserMinus, CreditCard, QrCode, Loader2, Copy, CheckCheck
 } from "lucide-react";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel,
   AlertDialogContent, AlertDialogDescription, AlertDialogFooter,
   AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription
+} from "@/components/ui/dialog";
 
 const statusConfig: Record<string, { label: string; color: string; bg: string; border: string }> = {
   open: { label: "Aberta", color: "text-neon-green", bg: "bg-neon-green/10", border: "border-neon-green/30" },
@@ -35,8 +38,26 @@ export default function BountyDetail() {
   const { user, isModder, isAdmin } = useAuth();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [applyMessage, setApplyMessage] = useState("");
   const [applying, setApplying] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<"pix" | "card">("pix");
+  const [paymentLoading, setPaymentLoading] = useState(false);
+  const [showPaymentDialog, setShowPaymentDialog] = useState(false);
+  const [pixData, setPixData] = useState<any>(null);
+  const [copied, setCopied] = useState(false);
+
+  // Handle payment callback
+  useEffect(() => {
+    const paymentStatus = searchParams.get("payment");
+    if (paymentStatus === "success") {
+      toast.success("Pagamento confirmado! 🎉");
+      queryClient.invalidateQueries({ queryKey: ["bounty", id] });
+      queryClient.invalidateQueries({ queryKey: ["bounty-purchase", id] });
+    } else if (paymentStatus === "failure") {
+      toast.error("Pagamento falhou. Tente novamente.");
+    }
+  }, [searchParams, id, queryClient]);
 
   const { data: bounty, isLoading } = useQuery({
     queryKey: ["bounty", id],
@@ -71,6 +92,22 @@ export default function BountyDetail() {
     enabled: !!id,
   });
 
+  // Check existing bounty purchase
+  const { data: bountyPurchase } = useQuery({
+    queryKey: ["bounty-purchase", id],
+    queryFn: async () => {
+      const { data } = await (supabase as any)
+        .from("bounty_purchases")
+        .select("*")
+        .eq("bounty_id", id)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      return data;
+    },
+    enabled: !!id && !!user,
+  });
+
   const isRequester = user?.id === bounty?.requester_id;
   const hasApplied = applications?.some((a: any) => a.modder_id === user?.id);
   const myApplication = applications?.find((a: any) => a.modder_id === user?.id);
@@ -78,6 +115,7 @@ export default function BountyDetail() {
   const invalidateAll = () => {
     queryClient.invalidateQueries({ queryKey: ["bounty", id] });
     queryClient.invalidateQueries({ queryKey: ["bounty-applications", id] });
+    queryClient.invalidateQueries({ queryKey: ["bounty-purchase", id] });
   };
 
   const handleApply = async () => {
@@ -130,8 +168,54 @@ export default function BountyDetail() {
     invalidateAll();
   };
 
+  // ---- Payment ----
+  const handleInitPayment = async () => {
+    if (!user || !isRequester) return;
+
+    setPaymentLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("create-bounty-payment", {
+        body: { bounty_id: id, payment_method: paymentMethod },
+      });
+
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+
+      if (paymentMethod === "card" && data?.init_point) {
+        window.open(data.init_point, "_blank");
+        setShowPaymentDialog(false);
+        toast.info("Redirecionando para o Mercado Pago...");
+      } else if (paymentMethod === "pix") {
+        setPixData(data);
+      }
+    } catch (err: any) {
+      toast.error("Erro ao criar pagamento: " + (err.message || "Tente novamente"));
+    } finally {
+      setPaymentLoading(false);
+    }
+  };
+
+  const handleCopyPix = async () => {
+    if (pixData?.qr_code) {
+      await navigator.clipboard.writeText(pixData.qr_code);
+      setCopied(true);
+      toast.success("Código Pix copiado!");
+      setTimeout(() => setCopied(false), 3000);
+    }
+  };
+
   const handleMarkCompleted = async () => {
     if (!isRequester && !isAdmin) return;
+
+    const rewardAmount = Number(bounty?.reward_amount);
+    const isPaid = rewardAmount > 0;
+
+    // If paid bounty and no completed purchase, need to pay first
+    if (isPaid && isRequester && (!bountyPurchase || bountyPurchase.status !== "completed")) {
+      setShowPaymentDialog(true);
+      return;
+    }
+
     await (supabase as any)
       .from("bounties")
       .update({ status: "completed", completed_at: new Date().toISOString() })
@@ -150,9 +234,9 @@ export default function BountyDetail() {
   // ---- Admin actions ----
   const handleDeleteBounty = async () => {
     if (!isAdmin) return;
-    // Delete messages, applications, then bounty
     await (supabase as any).from("bounty_messages").delete().eq("bounty_id", id);
     await (supabase as any).from("bounty_applications").delete().eq("bounty_id", id);
+    await (supabase as any).from("bounty_purchases").delete().eq("bounty_id", id);
     const { error } = await (supabase as any).from("bounties").delete().eq("id", id);
     if (error) { toast.error("Erro ao excluir: " + error.message); return; }
     toast.success("Encomenda excluída pelo admin.");
@@ -171,9 +255,7 @@ export default function BountyDetail() {
 
   const handleUnassignModder = async () => {
     if (!isAdmin) return;
-    // Reset to open and unassign
     await (supabase as any).from("bounties").update({ status: "open", assigned_modder_id: null }).eq("id", id);
-    // Reset all applications to pending
     await (supabase as any).from("bounty_applications").update({ status: "pending" }).eq("bounty_id", id);
     toast.success("Modder desatribuído. Encomenda reaberta.");
     invalidateAll();
@@ -215,6 +297,13 @@ export default function BountyDetail() {
   const isDeadlineExpired = bounty.deadline && new Date(bounty.deadline) < new Date();
   const rewardAmount = Number(bounty.reward_amount);
   const isPaid = rewardAmount > 0;
+  const isPurchaseCompleted = bountyPurchase?.status === "completed";
+
+  // Fee calculations for display
+  const pixFee = Math.round(rewardAmount * 0.01 * 100) / 100;
+  const cardFee = Math.round(rewardAmount * 0.0499 * 100) / 100;
+  const pixTotal = Math.round((rewardAmount + pixFee) * 100) / 100;
+  const cardTotal = Math.round((rewardAmount + cardFee) * 100) / 100;
 
   return (
     <Layout>
@@ -254,6 +343,11 @@ export default function BountyDetail() {
                     <span className="text-[10px] font-medium text-destructive bg-destructive/10 border border-destructive/20 px-2 py-0.5 flex items-center gap-1">
                       <AlertTriangle className="h-2.5 w-2.5" /> PRAZO EXPIRADO
                     </span>
+                  )}
+                  {isPurchaseCompleted && (
+                    <Badge variant="outline" className="text-[10px] font-black uppercase tracking-widest rounded-none text-neon-green bg-neon-green/10 border-neon-green/30">
+                      ✅ Pago
+                    </Badge>
                   )}
                 </div>
               </div>
@@ -332,10 +426,20 @@ export default function BountyDetail() {
                   <li>Publicar no Marketplace e enviar o link aqui no chat</li>
                   <li>Enviar o arquivo diretamente pelo chat da encomenda</li>
                 </ul>
-                {isPaid && (
-                  <p className="text-[10px] text-neon-green/70 font-mono mt-2">
-                    💰 Ao concluir, o pagamento de R$ {rewardAmount.toFixed(2).replace('.', ',')} será processado via Mercado Pago (split 80/20).
-                  </p>
+                {isPaid && !isPurchaseCompleted && isRequester && (
+                  <div className="mt-3 p-3 bg-neon-green/5 border border-neon-green/20">
+                    <p className="text-[10px] text-neon-green font-mono font-bold mb-1">💰 Pagamento Pendente</p>
+                    <p className="text-[10px] text-foreground/60">
+                      Ao clicar em "Marcar Concluída", você será direcionado ao pagamento de R$ {rewardAmount.toFixed(2).replace('.', ',')} + taxa.
+                    </p>
+                    <div className="flex gap-4 mt-2 text-[9px] text-muted-foreground font-mono">
+                      <span>Pix: R$ {pixTotal.toFixed(2).replace('.', ',')} (+1%)</span>
+                      <span>Cartão: R$ {cardTotal.toFixed(2).replace('.', ',')} (+4,99%)</span>
+                    </div>
+                  </div>
+                )}
+                {isPurchaseCompleted && (
+                  <p className="text-[10px] text-neon-green font-mono mt-2">✅ Pagamento confirmado!</p>
                 )}
               </div>
             )}
@@ -345,7 +449,7 @@ export default function BountyDetail() {
               <div className="flex flex-wrap gap-2 border-t border-white/5 pt-4">
                 {bounty.status === "in_progress" && (
                   <Button onClick={handleMarkCompleted} size="sm" className="bg-neon-green/10 hover:bg-neon-green/20 text-neon-green border border-neon-green/30 rounded-none font-black uppercase tracking-widest text-[10px]">
-                    <Trophy className="h-3.5 w-3.5 mr-1.5" /> Marcar Concluída
+                    <Trophy className="h-3.5 w-3.5 mr-1.5" /> {isPaid && isRequester && !isPurchaseCompleted ? "Pagar e Concluir" : "Marcar Concluída"}
                   </Button>
                 )}
                 <Button onClick={handleCancelBounty} size="sm" variant="outline" className="border-destructive/30 text-destructive hover:bg-destructive/10 rounded-none font-black uppercase tracking-widest text-[10px]">
@@ -360,9 +464,7 @@ export default function BountyDetail() {
                 <p className="text-[10px] font-black uppercase tracking-widest text-neon-purple flex items-center gap-1.5">
                   <Shield className="h-3.5 w-3.5" /> Painel Admin
                 </p>
-
                 <div className="flex flex-wrap gap-2">
-                  {/* Change status */}
                   {bounty.status !== "open" && (
                     <Button size="sm" variant="outline" onClick={() => handleChangeStatus("open")}
                       className="rounded-none text-[10px] font-bold uppercase tracking-widest border-neon-green/20 text-neon-green hover:bg-neon-green/10">
@@ -381,16 +483,12 @@ export default function BountyDetail() {
                       <XCircle className="h-3 w-3 mr-1" /> Forçar Cancelamento
                     </Button>
                   )}
-
-                  {/* Unassign modder */}
                   {bounty.assigned_modder_id && (
                     <Button size="sm" variant="outline" onClick={handleUnassignModder}
                       className="rounded-none text-[10px] font-bold uppercase tracking-widest border-yellow-500/20 text-yellow-500 hover:bg-yellow-500/10">
                       <UserMinus className="h-3 w-3 mr-1" /> Desatribuir Modder
                     </Button>
                   )}
-
-                  {/* Delete bounty */}
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
                       <Button size="sm" variant="outline"
@@ -402,7 +500,7 @@ export default function BountyDetail() {
                       <AlertDialogHeader>
                         <AlertDialogTitle className="text-white">Excluir encomenda?</AlertDialogTitle>
                         <AlertDialogDescription>
-                          Isso excluirá permanentemente a encomenda, todas as candidaturas e mensagens do chat. Essa ação não pode ser desfeita.
+                          Isso excluirá permanentemente a encomenda, todas as candidaturas, mensagens e pagamentos. Essa ação não pode ser desfeita.
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>
@@ -430,7 +528,6 @@ export default function BountyDetail() {
           </div>
 
           <div className="p-5 space-y-4">
-            {/* Apply form */}
             {isModder && !isRequester && bounty.status === "open" && !hasApplied && (
               <div className="bg-[#030304] border border-neon-purple/20 p-5 space-y-3">
                 <p className="text-[10px] font-black uppercase tracking-widest text-neon-purple">Enviar Candidatura</p>
@@ -463,7 +560,6 @@ export default function BountyDetail() {
               </div>
             )}
 
-            {/* Prompt to login */}
             {!user && bounty.status === "open" && (
               <div className="py-8 text-center space-y-2">
                 <Target className="h-8 w-8 text-neon-purple/20 mx-auto" />
@@ -471,7 +567,6 @@ export default function BountyDetail() {
               </div>
             )}
 
-            {/* Modder sees own application status */}
             {user && !isRequester && !isAdmin && hasApplied && myApplication && (
               <div className={`p-4 border text-sm font-mono ${
                 myApplication.status === "accepted" ? "border-neon-green/30 bg-neon-green/5 text-neon-green" :
@@ -484,14 +579,12 @@ export default function BountyDetail() {
               </div>
             )}
 
-            {/* Non-modder */}
             {user && !isRequester && !isAdmin && !isModder && bounty.status === "open" && (
               <div className="py-8 text-center">
                 <p className="text-sm text-muted-foreground font-mono">Apenas modders aprovados podem se candidatar.</p>
               </div>
             )}
 
-            {/* Full applications list — ONLY for requester and admin */}
             {(isRequester || isAdmin) && (
               applications && applications.length > 0 ? (
                 <div className="space-y-3">
@@ -519,9 +612,7 @@ export default function BountyDetail() {
                           </div>
                           <p className="text-sm text-foreground/70 leading-relaxed">{app.message}</p>
                         </div>
-
                         <div className="flex gap-1.5 shrink-0">
-                          {/* Accept button */}
                           {bounty.status === "open" && app.status === "pending" && (
                             <Button
                               size="sm"
@@ -532,7 +623,6 @@ export default function BountyDetail() {
                               Aceitar
                             </Button>
                           )}
-                          {/* Admin: delete application */}
                           {isAdmin && (
                             <Button
                               size="sm"
@@ -558,7 +648,7 @@ export default function BountyDetail() {
           </div>
         </div>
 
-        {/* Chat — visible only when modder is assigned */}
+        {/* Chat */}
         {bounty.assigned_modder_id && (
           <BountyChat
             bountyId={bounty.id}
@@ -568,6 +658,137 @@ export default function BountyDetail() {
             isAdmin={isAdmin}
           />
         )}
+
+        {/* Payment Dialog */}
+        <Dialog open={showPaymentDialog} onOpenChange={setShowPaymentDialog}>
+          <DialogContent className="bg-[#050505] border-white/10 rounded-none max-w-md">
+            <DialogHeader>
+              <DialogTitle className="text-white font-black uppercase tracking-widest text-sm">
+                💰 Pagar Encomenda
+              </DialogTitle>
+              <DialogDescription className="text-muted-foreground text-xs">
+                Pague a recompensa de R$ {rewardAmount.toFixed(2).replace('.', ',')} para o modder. O valor inclui taxa de processamento.
+              </DialogDescription>
+            </DialogHeader>
+
+            {!pixData ? (
+              <div className="space-y-4">
+                {/* Method selection */}
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    onClick={() => setPaymentMethod("pix")}
+                    className={`p-4 border text-left transition-colors ${
+                      paymentMethod === "pix"
+                        ? "border-neon-green/50 bg-neon-green/5"
+                        : "border-white/10 bg-[#030304] hover:border-white/20"
+                    }`}
+                  >
+                    <QrCode className={`h-5 w-5 mb-2 ${paymentMethod === "pix" ? "text-neon-green" : "text-muted-foreground"}`} />
+                    <p className="text-xs font-black uppercase text-white">Pix</p>
+                    <p className="text-[10px] text-muted-foreground mt-0.5">Taxa: 1%</p>
+                    <p className="text-sm font-black text-neon-green mt-1 font-mono">
+                      R$ {pixTotal.toFixed(2).replace('.', ',')}
+                    </p>
+                  </button>
+                  <button
+                    onClick={() => setPaymentMethod("card")}
+                    className={`p-4 border text-left transition-colors ${
+                      paymentMethod === "card"
+                        ? "border-neon-cyan/50 bg-neon-cyan/5"
+                        : "border-white/10 bg-[#030304] hover:border-white/20"
+                    }`}
+                  >
+                    <CreditCard className={`h-5 w-5 mb-2 ${paymentMethod === "card" ? "text-neon-cyan" : "text-muted-foreground"}`} />
+                    <p className="text-xs font-black uppercase text-white">Cartão</p>
+                    <p className="text-[10px] text-muted-foreground mt-0.5">Taxa: 4,99%</p>
+                    <p className="text-sm font-black text-neon-cyan mt-1 font-mono">
+                      R$ {cardTotal.toFixed(2).replace('.', ',')}
+                    </p>
+                  </button>
+                </div>
+
+                {/* Breakdown */}
+                <div className="bg-[#030304] border border-white/5 p-3 space-y-1.5 text-xs font-mono">
+                  <div className="flex justify-between text-muted-foreground">
+                    <span>Recompensa</span>
+                    <span>R$ {rewardAmount.toFixed(2).replace('.', ',')}</span>
+                  </div>
+                  <div className="flex justify-between text-muted-foreground">
+                    <span>Taxa ({paymentMethod === "pix" ? "1%" : "4,99%"})</span>
+                    <span>R$ {(paymentMethod === "pix" ? pixFee : cardFee).toFixed(2).replace('.', ',')}</span>
+                  </div>
+                  <div className="flex justify-between text-white font-bold border-t border-white/10 pt-1.5">
+                    <span>Total</span>
+                    <span>R$ {(paymentMethod === "pix" ? pixTotal : cardTotal).toFixed(2).replace('.', ',')}</span>
+                  </div>
+                  <div className="flex justify-between text-neon-green/70 text-[10px]">
+                    <span>Modder recebe (80%)</span>
+                    <span>R$ {(rewardAmount * 0.8).toFixed(2).replace('.', ',')}</span>
+                  </div>
+                </div>
+
+                <Button
+                  onClick={handleInitPayment}
+                  disabled={paymentLoading}
+                  className="w-full bg-neon-green/10 hover:bg-neon-green/20 text-neon-green border border-neon-green/30 rounded-none font-black uppercase tracking-widest text-[10px] h-11"
+                >
+                  {paymentLoading ? (
+                    <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Processando...</>
+                  ) : (
+                    <>{paymentMethod === "pix" ? <QrCode className="h-4 w-4 mr-2" /> : <CreditCard className="h-4 w-4 mr-2" />}
+                    Pagar R$ {(paymentMethod === "pix" ? pixTotal : cardTotal).toFixed(2).replace('.', ',')}</>
+                  )}
+                </Button>
+              </div>
+            ) : (
+              /* PIX QR Code */
+              <div className="space-y-4">
+                <div className="text-center">
+                  {pixData.qr_code_base64 && (
+                    <img
+                      src={`data:image/png;base64,${pixData.qr_code_base64}`}
+                      alt="QR Code Pix"
+                      className="mx-auto w-48 h-48 bg-white p-2"
+                    />
+                  )}
+                </div>
+
+                {pixData.qr_code && (
+                  <div className="space-y-2">
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-mono">Pix Copia e Cola</p>
+                    <div className="flex gap-2">
+                      <input
+                        readOnly
+                        value={pixData.qr_code}
+                        className="flex-1 bg-[#030304] border border-white/10 px-3 py-2 text-[10px] font-mono text-foreground/70 truncate"
+                      />
+                      <Button
+                        onClick={handleCopyPix}
+                        size="sm"
+                        variant="outline"
+                        className="rounded-none border-neon-green/30 text-neon-green hover:bg-neon-green/10 shrink-0"
+                      >
+                        {copied ? <CheckCheck className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+                      </Button>
+                    </div>
+                  </div>
+                )}
+
+                <p className="text-[10px] text-muted-foreground/50 font-mono text-center">
+                  Após o pagamento ser confirmado, a encomenda será concluída automaticamente.
+                </p>
+
+                <Button
+                  onClick={() => { setPixData(null); setShowPaymentDialog(false); }}
+                  variant="outline"
+                  className="w-full rounded-none text-[10px] font-bold uppercase tracking-widest"
+                >
+                  Fechar
+                </Button>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
       </div>
     </Layout>
   );
