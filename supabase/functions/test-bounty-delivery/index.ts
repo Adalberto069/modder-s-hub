@@ -5,6 +5,164 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+/**
+ * Generate obfuscated variable names to make tampering harder
+ */
+function obfNames() {
+  const chars = "abcdefghijklmnopqrstuvwxyz";
+  const rand = () => {
+    let s = "_";
+    for (let i = 0; i < 8; i++) s += chars[Math.floor(Math.random() * 26)];
+    return s;
+  };
+  return {
+    start: rand(), limit: rand(), expired: rand(), origAlert: rand(),
+    origToast: rand(), origSleep: rand(), check: rand(), fn: rand(),
+    err: rand(), ok: rand(), errMsg: rand(), elapsed: rand(),
+    remaining: rand(), hash: rand(), selfCheck: rand(),
+  };
+}
+
+/**
+ * Simple XOR obfuscation of the original code so it's not plain text
+ */
+function xorEncode(code: string, key: number): number[] {
+  const result: number[] = [];
+  for (let i = 0; i < code.length; i++) {
+    result.push(code.charCodeAt(i) ^ ((key + i) % 256));
+  }
+  return result;
+}
+
+function buildTestWrapper(originalCode: string, minutes: number): string {
+  const v = obfNames();
+  const expirationSeconds = minutes * 60;
+  const xorKey = Math.floor(Math.random() * 200) + 10;
+  const encoded = xorEncode(originalCode, xorKey);
+
+  // Build the encoded bytes as a Lua table literal (chunked to avoid huge lines)
+  const chunkSize = 80;
+  const chunks: string[] = [];
+  for (let i = 0; i < encoded.length; i += chunkSize) {
+    chunks.push(encoded.slice(i, i + chunkSize).join(","));
+  }
+  const bytesLiteral = `{${chunks.join(",\n")}}`;
+
+  // Integrity hash: sum of all variable name lengths (checked at runtime)
+  const integrityVal = Object.values(v).reduce((s, n) => s + n.length, 0);
+
+  return `--[[ HM ]]
+do
+local ${v.start}=os.time()
+local ${v.limit}=${expirationSeconds}
+local ${v.expired}=false
+local ${v.origAlert}=gg.alert
+local ${v.origToast}=gg.toast
+local ${v.origSleep}=gg.sleep
+local ${v.hash}=${integrityVal}
+
+local function ${v.selfCheck}()
+  local _t=0
+  ${Object.values(v).map(n => `_t=_t+${n.length}`).join("\n  ")}
+  if _t~=${v.hash} then
+    ${v.origAlert}("Arquivo corrompido.","ERRO")
+    os.exit()
+  end
+end
+${v.selfCheck}()
+
+local function ${v.check}()
+  if ${v.expired} then return true end
+  local ${v.elapsed}=os.time()-${v.start}
+  if ${v.elapsed}>=${v.limit} then
+    ${v.expired}=true
+    pcall(function() gg.clearResults() gg.clearList() end)
+    ${v.origAlert}(
+      "⏰ TEMPO DE TESTE ESGOTADO\\n\\n"..
+      "Volte à plataforma para APROVAR ou DISPUTAR.\\n\\n"..
+      "HiddenMod 🔐","HIDDENMOD")
+    os.exit()
+    return true
+  end
+  local ${v.remaining}=${v.limit}-${v.elapsed}
+  if ${v.remaining}<=60 and ${v.remaining}%15<2 then
+    ${v.origToast}("⏰ "..${v.remaining}.."s restantes")
+  end
+  return false
+end
+
+gg.sleep=function(ms)
+  if ${v.check}() then os.exit() return end
+  ${v.origSleep}(ms)
+  if ${v.check}() then os.exit() return end
+end
+
+gg.alert=function(...)
+  if ${v.check}() then os.exit() return end
+  return ${v.origAlert}(...)
+end
+
+gg.toast=function(...)
+  if ${v.check}() then os.exit() return end
+  return ${v.origToast}(...)
+end
+
+gg.choice=function(...)
+  if ${v.check}() then os.exit() return nil end
+  local _oc=gg.choice
+  -- restore temporarily
+  gg.choice=nil
+  -- we can't call ourselves, use the real one via env
+  return select(1,...)
+end
+
+gg.prompt=function(...)
+  if ${v.check}() then os.exit() return nil end
+  return gg.prompt(...)
+end
+
+${v.origToast}("🔬 TESTE: ${minutes}min | HiddenMod")
+${v.origAlert}(
+  "🔬 MODO DE TESTE\\n\\n"..
+  "Você tem ${minutes} minuto(s).\\n"..
+  "Após o tempo o script para automaticamente.\\n\\n"..
+  "Depois volte à plataforma para APROVAR ou DISPUTAR.\\n\\n"..
+  "HiddenMod 🔐","HIDDENMOD - TESTE")
+
+-- Decode
+local _d={}
+local _k=${xorKey}
+local _b=${bytesLiteral}
+for i=1,#_b do
+  _d[i]=string.char(bit32 and bit32.bxor(_b[i],(_k+i-1)%256) or (function(a,b)
+    local r,p=0,1
+    for j=0,7 do
+      local ba=a%2 local bb=b%2
+      if ba+bb==1 then r=r+p end
+      a=math.floor(a/2) b=math.floor(b/2) p=p*2
+    end
+    return r
+  end)(_b[i],(_k+i-1)%256))
+end
+local _src=table.concat(_d)
+
+local ${v.fn},${v.err}=load(_src)
+if not ${v.fn} then
+  ${v.fn},${v.err}=loadstring(_src)
+end
+
+if ${v.fn} then
+  local ${v.ok},${v.errMsg}=pcall(${v.fn})
+  if not ${v.ok} and not ${v.expired} then
+    ${v.origToast}("Erro: "..tostring(${v.errMsg}))
+  end
+else
+  ${v.origAlert}("Erro ao carregar: "..tostring(${v.err}),"ERRO")
+end
+end
+`;
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
@@ -38,11 +196,10 @@ Deno.serve(async (req) => {
       });
     }
 
-    const minutes = Math.min(Math.max(test_minutes || 5, 1), 10); // 1-10 min
+    const minutes = Math.min(Math.max(test_minutes || 5, 1), 10);
 
     const adminClient = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Get delivery + bounty info
     const { data: delivery, error: delError } = await adminClient
       .from("bounty_deliveries")
       .select("*, bounties!inner(requester_id, assigned_modder_id, status, reward_amount)")
@@ -57,21 +214,18 @@ Deno.serve(async (req) => {
 
     const bounty = delivery.bounties;
 
-    // Only requester can test
     if (user.id !== bounty.requester_id) {
       return new Response(JSON.stringify({ error: "Apenas o solicitante pode testar" }), {
         status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    // Already approved or disputed
     if (delivery.test_approved) {
       return new Response(JSON.stringify({ error: "Script já aprovado" }), {
         status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    // Download the original file from storage
     const { data: fileData, error: fileError } = await adminClient.storage
       .from("bounty-deliveries")
       .download(delivery.file_url);
@@ -83,97 +237,8 @@ Deno.serve(async (req) => {
     }
 
     const originalCode = await fileData.text();
+    const wrappedCode = buildTestWrapper(originalCode, minutes);
 
-    // Wrap with time-limited Lua loader
-    const expirationSeconds = minutes * 60;
-    const wrappedCode = `--[[ HIDDENMOD - TESTE TEMPORÁRIO ]]
--- Este script expira em ${minutes} minutos.
--- Após o teste, aprove ou dispute na plataforma.
-
-local _HM_TEST_START = os.time()
-local _HM_TEST_LIMIT = ${expirationSeconds}
-local _HM_EXPIRED = false
-
-local _HM_ORIGINAL_ALERT = gg.alert
-local _HM_ORIGINAL_TOAST = gg.toast
-
--- Timer check wrapper
-local function _HM_CHECK_TIME()
-  if _HM_EXPIRED then return true end
-  local elapsed = os.time() - _HM_TEST_START
-  if elapsed >= _HM_TEST_LIMIT then
-    _HM_EXPIRED = true
-    pcall(function()
-      gg.clearResults()
-      gg.clearList()
-    end)
-    _HM_ORIGINAL_ALERT(
-      "⏰ TEMPO DE TESTE ESGOTADO\\n\\n" ..
-      "O período de teste de ${minutes} minuto(s) terminou.\\n\\n" ..
-      "Se o script funcionou corretamente:\\n" ..
-      "→ Volte à plataforma e clique em APROVAR\\n" ..
-      "→ Depois finalize o pagamento\\n\\n" ..
-      "Se houve problemas:\\n" ..
-      "→ Clique em DISPUTAR na plataforma\\n\\n" ..
-      "HiddenMod - Entrega Segura 🔐",
-      "HIDDENMOD"
-    )
-    return true
-  end
-  -- Show remaining time periodically
-  local remaining = _HM_TEST_LIMIT - elapsed
-  if remaining <= 60 and remaining % 15 == 0 then
-    _HM_ORIGINAL_TOAST("⏰ Teste: " .. remaining .. "s restantes")
-  end
-  return false
-end
-
--- Override gg.sleep to add time checks
-local _HM_ORIGINAL_SLEEP = gg.sleep
-gg.sleep = function(ms)
-  if _HM_CHECK_TIME() then return end
-  _HM_ORIGINAL_SLEEP(ms)
-  _HM_CHECK_TIME()
-end
-
-_HM_ORIGINAL_TOAST("🔬 MODO TESTE: ${minutes} min | HiddenMod")
-_HM_ORIGINAL_ALERT(
-  "🔬 MODO DE TESTE ATIVO\\n\\n" ..
-  "Você tem ${minutes} minuto(s) para testar este script.\\n" ..
-  "Após o tempo, o script será interrompido automaticamente.\\n\\n" ..
-  "Teste à vontade e depois volte à plataforma\\n" ..
-  "para APROVAR ou DISPUTAR.\\n\\n" ..
-  "HiddenMod - Entrega Segura 🔐",
-  "HIDDENMOD - TESTE"
-)
-
--- Run original code in protected environment
-local _HM_FN, _HM_ERR = load([==[
-${originalCode.replace(/\]=*\]/g, (match) => "]" + "=" + match)}
-]==])
-
-if _HM_FN then
-  -- Periodic time checks during execution
-  local _HM_TIMER = coroutine.create(function()
-    while not _HM_EXPIRED do
-      _HM_ORIGINAL_SLEEP(5000)
-      if _HM_CHECK_TIME() then
-        break
-      end
-    end
-  end)
-  
-  -- Start the script
-  local ok, err = pcall(_HM_FN)
-  if not ok and not _HM_EXPIRED then
-    _HM_ORIGINAL_TOAST("Erro no script: " .. tostring(err))
-  end
-else
-  _HM_ORIGINAL_ALERT("Erro ao carregar script de teste: " .. tostring(_HM_ERR), "ERRO")
-end
-`;
-
-    // Return the wrapped test script as downloadable content
     return new Response(JSON.stringify({
       test_code: wrappedCode,
       file_name: `TESTE_${minutes}min_${delivery.file_name}`,
