@@ -680,6 +680,11 @@ export default function Admin() {
             <AdminUsersTab />
           </TabsContent>
 
+          {/* Disputes Tab */}
+          <TabsContent value="disputes">
+            <AdminDisputesTab />
+          </TabsContent>
+
           {/* Licenses Tab */}
           <TabsContent value="licenses">
             <Card className="border-white/10 bg-[#050505] rounded-none">
