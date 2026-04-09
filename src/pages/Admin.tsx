@@ -10,7 +10,7 @@ import { Navigate, useNavigate } from "react-router-dom";
 import {
   Users, Code, CheckCircle, XCircle, Trash2, Plus, Pencil, Eye, EyeOff, Clock, FileX, Send, Shield,
   UserCheck, ShieldCheck, ShieldOff, Key, Ban, ShoppingCart, Copy, DollarSign, Percent, Search, 
-  AlertTriangle, Landmark, TrendingUp, Calendar, BarChart3, Activity
+  AlertTriangle, Landmark, TrendingUp, Calendar, BarChart3, Activity, Gavel
 } from "lucide-react";
 import { 
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
@@ -25,6 +25,7 @@ import { AdminFlaggedScripts } from "@/components/admin/AdminFlaggedScripts";
 import { AdminModerationQueue } from "@/components/admin/AdminModerationQueue";
 import { AdminWithdrawalsTab } from "@/components/admin/AdminWithdrawalsTab";
 import { AdminUsersTab } from "@/components/admin/AdminUsersTab";
+import { AdminDisputesTab } from "@/components/admin/AdminDisputesTab";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import LuaCodeEditor from "@/components/LuaCodeEditor";
@@ -600,7 +601,7 @@ export default function Admin() {
 
         {/* Main admin tabs */}
         <Tabs defaultValue="scripts" className="font-mono">
-          <TabsList className="mb-6 grid w-full grid-cols-6 p-1 bg-[#050505] border border-white/10 rounded-none h-14">
+          <TabsList className="mb-6 grid w-full grid-cols-7 p-1 bg-[#050505] border border-white/10 rounded-none h-14">
             <TabsTrigger value="scripts" className="text-[10px] sm:text-xs tracking-widest uppercase font-black gap-2 data-[state=active]:bg-[#030304] data-[state=active]:text-neon-purple rounded-none h-full">
               <Code className="h-4 w-4" /> <span className="hidden sm:inline">Scripts</span>
             </TabsTrigger>
@@ -612,6 +613,9 @@ export default function Admin() {
             </TabsTrigger>
             <TabsTrigger value="purchases" className="text-[10px] sm:text-xs tracking-widest uppercase font-black gap-2 data-[state=active]:bg-[#030304] data-[state=active]:text-accent rounded-none h-full">
               <ShoppingCart className="h-4 w-4" /> <span className="hidden sm:inline">Compras</span>
+            </TabsTrigger>
+            <TabsTrigger value="disputes" className="text-[10px] sm:text-xs tracking-widest uppercase font-black gap-2 data-[state=active]:bg-[#030304] data-[state=active]:text-orange-400 rounded-none h-full">
+              <Gavel className="h-4 w-4" /> <span className="hidden sm:inline">Disputas</span>
             </TabsTrigger>
             <TabsTrigger value="withdrawals" className="text-[10px] sm:text-xs tracking-widest uppercase font-black gap-2 data-[state=active]:bg-[#030304] data-[state=active]:text-primary rounded-none h-full">
               <Landmark className="h-4 w-4" /> <span className="hidden sm:inline">Pagamentos</span>
@@ -674,6 +678,11 @@ export default function Admin() {
           {/* Users Tab */}
           <TabsContent value="users">
             <AdminUsersTab />
+          </TabsContent>
+
+          {/* Disputes Tab */}
+          <TabsContent value="disputes">
+            <AdminDisputesTab />
           </TabsContent>
 
           {/* Licenses Tab */}
