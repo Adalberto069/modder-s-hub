@@ -24,12 +24,15 @@ function obfNames() {
 }
 
 /**
- * Simple XOR obfuscation of the original code so it's not plain text
+ * XOR obfuscation operating on raw UTF-8 bytes (not char codes)
+ * so multi-byte chars (accents, emojis) stay within 0-255 after XOR.
  */
 function xorEncode(code: string, key: number): number[] {
+  const encoder = new TextEncoder();
+  const bytes = encoder.encode(code); // raw UTF-8 bytes, all 0-255
   const result: number[] = [];
-  for (let i = 0; i < code.length; i++) {
-    result.push(code.charCodeAt(i) ^ ((key + i) % 256));
+  for (let i = 0; i < bytes.length; i++) {
+    result.push(bytes[i] ^ ((key + i) % 256));
   }
   return result;
 }
