@@ -62,6 +62,8 @@ local ${v.expired}=false
 local ${v.origAlert}=gg.alert
 local ${v.origToast}=gg.toast
 local ${v.origSleep}=gg.sleep
+local _origChoice=gg.choice
+local _origPrompt=gg.prompt
 local ${v.hash}=${integrityVal}
 
 local function ${v.selfCheck}()
@@ -81,15 +83,15 @@ local function ${v.check}()
     ${v.expired}=true
     pcall(function() gg.clearResults() gg.clearList() end)
     ${v.origAlert}(
-      "⏰ TEMPO DE TESTE ESGOTADO\\n\\n"..
-      "Volte à plataforma para APROVAR ou DISPUTAR.\\n\\n"..
-      "HiddenMod 🔐","HIDDENMOD")
+      "TEMPO DE TESTE ESGOTADO\\n\\n"..
+      "Volte a plataforma para APROVAR ou DISPUTAR.\\n\\n"..
+      "HiddenMod","HIDDENMOD")
     os.exit()
     return true
   end
   local ${v.remaining}=${v.limit}-${v.elapsed}
   if ${v.remaining}<=60 and ${v.remaining}%15<2 then
-    ${v.origToast}("⏰ "..${v.remaining}.."s restantes")
+    ${v.origToast}(">> "..${v.remaining}.."s restantes")
   end
   return false
 end
@@ -112,40 +114,39 @@ end
 
 gg.choice=function(...)
   if ${v.check}() then os.exit() return nil end
-  local _oc=gg.choice
-  -- restore temporarily
-  gg.choice=nil
-  -- we can't call ourselves, use the real one via env
-  return select(1,...)
+  return _origChoice(...)
 end
 
 gg.prompt=function(...)
   if ${v.check}() then os.exit() return nil end
-  return gg.prompt(...)
+  return _origPrompt(...)
 end
 
-${v.origToast}("🔬 TESTE: ${minutes}min | HiddenMod")
+${v.origToast}("TESTE: ${minutes}min | HiddenMod")
 ${v.origAlert}(
-  "🔬 MODO DE TESTE\\n\\n"..
-  "Você tem ${minutes} minuto(s).\\n"..
-  "Após o tempo o script para automaticamente.\\n\\n"..
-  "Depois volte à plataforma para APROVAR ou DISPUTAR.\\n\\n"..
-  "HiddenMod 🔐","HIDDENMOD - TESTE")
+  "MODO DE TESTE\\n\\n"..
+  "Voce tem ${minutes} minuto(s).\\n"..
+  "Apos o tempo o script para automaticamente.\\n\\n"..
+  "Depois volte a plataforma para APROVAR ou DISPUTAR.\\n\\n"..
+  "HiddenMod","HIDDENMOD - TESTE")
+
+-- XOR helper
+local function _xor(a,b)
+  local r,p=0,1
+  for j=0,7 do
+    local ba=a%2 local bb=b%2
+    if ba+bb==1 then r=r+p end
+    a=math.floor(a/2) b=math.floor(b/2) p=p*2
+  end
+  return r
+end
 
 -- Decode
 local _d={}
 local _k=${xorKey}
 local _b=${bytesLiteral}
 for i=1,#_b do
-  _d[i]=string.char(bit32 and bit32.bxor(_b[i],(_k+i-1)%256) or (function(a,b)
-    local r,p=0,1
-    for j=0,7 do
-      local ba=a%2 local bb=b%2
-      if ba+bb==1 then r=r+p end
-      a=math.floor(a/2) b=math.floor(b/2) p=p*2
-    end
-    return r
-  end)(_b[i],(_k+i-1)%256))
+  _d[i]=string.char(_xor(_b[i],(_k+i-1)%256))
 end
 local _src=table.concat(_d)
 
