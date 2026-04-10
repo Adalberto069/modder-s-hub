@@ -43,20 +43,34 @@ export function ModderFinanceTab({ totalEarnings }: ModderFinanceTabProps) {
     const state = params.get("state");
     const oauthError = params.get("error_description") || params.get("error");
 
+    // Log all MP OAuth params for debugging
+    const allMpParams = ["error", "error_description", "code", "state"].reduce((acc, key) => {
+      const val = params.get(key);
+      if (val) acc[key] = val;
+      return acc;
+    }, {} as Record<string, string>);
+    if (Object.keys(allMpParams).length > 0) {
+      console.log("[MP OAuth] Params recebidos:", allMpParams);
+    }
+
     if (oauthError) {
       const decodedError = decodeURIComponent(oauthError.replace(/\+/g, " "));
-      toast.error(
-        decodedError.includes("não está pronto")
-          ? "O app do Mercado Pago da conta PJ ainda não está liberado ou o redirect configurado não bate com o domínio publicado."
-          : decodedError
-      );
+      console.error("[MP OAuth] Erro do Mercado Pago:", decodedError);
+      
+      let userMessage = decodedError;
+      if (decodedError.includes("não está pronto")) {
+        userMessage = "O app do Mercado Pago da conta PJ ainda não está liberado ou o redirect configurado não bate com o domínio publicado.";
+      } else if (decodedError.includes("não foi possível conectar")) {
+        userMessage = "O Mercado Pago rejeitou a conexão. Verifique se a conta tem identidade verificada e e-mail confirmado.";
+      }
+      
+      toast.error(userMessage, { duration: 10000 });
       window.history.replaceState({}, "", window.location.pathname);
       return;
     }
 
     if (code && state === user?.id) {
       handleOAuthCallback(code);
-      // Clean URL
       window.history.replaceState({}, "", window.location.pathname);
     }
   }, [user?.id]);
