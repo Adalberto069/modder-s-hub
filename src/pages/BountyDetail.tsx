@@ -51,9 +51,11 @@ export default function BountyDetail() {
   useEffect(() => {
     const paymentStatus = searchParams.get("payment");
     if (paymentStatus === "success") {
-      toast.success("Pagamento confirmado! 🎉");
+      toast.success("Pagamento confirmado! 🎉 O download já está liberado.");
       queryClient.invalidateQueries({ queryKey: ["bounty", id] });
       queryClient.invalidateQueries({ queryKey: ["bounty-purchase", id] });
+      queryClient.invalidateQueries({ queryKey: ["bounty-deliveries-status", id] });
+      queryClient.invalidateQueries({ queryKey: ["bounty-deliveries", id] });
     } else if (paymentStatus === "failure") {
       toast.error("Pagamento falhou. Tente novamente.");
     }
