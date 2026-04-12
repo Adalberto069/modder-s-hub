@@ -5,9 +5,6 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-/**
- * Generate obfuscated variable names to make tampering harder
- */
 function obfNames() {
   const chars = "abcdefghijklmnopqrstuvwxyz";
   const rand = () => {
@@ -20,16 +17,17 @@ function obfNames() {
     origToast: rand(), origSleep: rand(), check: rand(), fn: rand(),
     err: rand(), ok: rand(), errMsg: rand(), elapsed: rand(),
     remaining: rand(), hash: rand(), selfCheck: rand(),
+    decKey: rand(), decData: rand(), decFunc: rand(),
   };
 }
 
 /**
- * XOR obfuscation operating on raw UTF-8 bytes (not char codes)
- * so multi-byte chars (accents, emojis) stay within 0-255 after XOR.
+ * Double-layer XOR: first XOR the code bytes, then XOR the resulting array
+ * values with a second key so they can't simply be read from the Lua table.
  */
 function xorEncode(code: string, key: number): number[] {
   const encoder = new TextEncoder();
-  const bytes = encoder.encode(code); // raw UTF-8 bytes, all 0-255
+  const bytes = encoder.encode(code);
   const result: number[] = [];
   for (let i = 0; i < bytes.length; i++) {
     result.push(bytes[i] ^ ((key + i) % 256));
@@ -37,21 +35,25 @@ function xorEncode(code: string, key: number): number[] {
   return result;
 }
 
+function scrambleArray(arr: number[], scrambleKey: number): number[] {
+  return arr.map((v, i) => v ^ ((scrambleKey + i * 3) % 256));
+}
+
 function buildTestWrapper(originalCode: string, minutes: number): string {
   const v = obfNames();
   const expirationSeconds = minutes * 60;
   const xorKey = Math.floor(Math.random() * 200) + 10;
+  const scrambleKey = Math.floor(Math.random() * 200) + 10;
   const encoded = xorEncode(originalCode, xorKey);
+  const scrambled = scrambleArray(encoded, scrambleKey);
 
-  // Build the encoded bytes as a Lua table literal (chunked to avoid huge lines)
   const chunkSize = 80;
   const chunks: string[] = [];
-  for (let i = 0; i < encoded.length; i += chunkSize) {
-    chunks.push(encoded.slice(i, i + chunkSize).join(","));
+  for (let i = 0; i < scrambled.length; i += chunkSize) {
+    chunks.push(scrambled.slice(i, i + chunkSize).join(","));
   }
   const bytesLiteral = `{${chunks.join(",\n")}}`;
 
-  // Integrity hash: sum of all variable name lengths (checked at runtime)
   const integrityVal = Object.values(v).reduce((s, n) => s + n.length, 0);
 
   return `--[[ HM ]]
@@ -141,19 +143,25 @@ local function _xor(a,b)
   return r
 end
 
--- Decode
+-- Descramble + Decode (double layer)
+local _sk=${scrambleKey}
+local _b=${bytesLiteral}
 local _d={}
 local _k=${xorKey}
-local _b=${bytesLiteral}
 for i=1,#_b do
-  _d[i]=string.char(_xor(_b[i],(_k+i-1)%256))
+  local ${v.decData}=_xor(_b[i],(_sk+(i-1)*3)%256)
+  _d[i]=string.char(_xor(${v.decData},(_k+i-1)%256))
 end
 local _src=table.concat(_d)
+
+-- Anti-dump: clear decode vars
+_b=nil _d=nil _sk=nil _k=nil
 
 local ${v.fn},${v.err}=load(_src)
 if not ${v.fn} then
   ${v.fn},${v.err}=loadstring(_src)
 end
+_src=nil
 
 if ${v.fn} then
   local ${v.ok},${v.errMsg}=pcall(${v.fn})
