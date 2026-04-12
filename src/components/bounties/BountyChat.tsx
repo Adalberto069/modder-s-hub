@@ -239,7 +239,20 @@ export function BountyChat({ bountyId, bountyStatus, requesterId, assignedModder
       });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
-      if (data?.url) {
+
+      if (data?.code && data?.obfuscated) {
+        // Obfuscated code returned as text — create blob download
+        const blob = new Blob([data.code], { type: "text/plain" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = data.file_name || "script.lua";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        toast.success("Download iniciado (protegido)! 🔒");
+      } else if (data?.url) {
         const a = document.createElement("a");
         a.href = data.url;
         a.download = data.file_name || "script.lua";
