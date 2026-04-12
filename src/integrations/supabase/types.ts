@@ -1021,6 +1021,7 @@ export type Database = {
         Row: {
           average_rating: number
           category_id: string | null
+          code_hash: string | null
           created_at: string
           description: string | null
           download_count: number
@@ -1051,6 +1052,7 @@ export type Database = {
         Insert: {
           average_rating?: number
           category_id?: string | null
+          code_hash?: string | null
           created_at?: string
           description?: string | null
           download_count?: number
@@ -1081,6 +1083,7 @@ export type Database = {
         Update: {
           average_rating?: number
           category_id?: string | null
+          code_hash?: string | null
           created_at?: string
           description?: string | null
           download_count?: number
