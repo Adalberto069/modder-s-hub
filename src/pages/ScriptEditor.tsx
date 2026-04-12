@@ -275,6 +275,35 @@ export default function ScriptEditor() {
       // Save lua_code to script_code table
       if (savedScriptId && luaCode) {
         await (supabase as any).from("script_code").upsert({ script_id: savedScriptId, lua_code: luaCode, updated_at: new Date().toISOString() }, { onConflict: "script_id" });
+
+        // Anti-resale: compute code hash and check for duplicates on publish
+        if (targetPublishStatus === "published" || targetPublishStatus === "pending_review") {
+          const codeNormalized = luaCode.replace(/\s+/g, " ").trim();
+          const hashBuffer = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(codeNormalized));
+          const codeHash = Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, "0")).join("");
+
+          // Check if another script has the same hash
+          const { data: duplicates } = await (supabase as any)
+            .from("scripts")
+            .select("id, title, modder_id")
+            .eq("code_hash", codeHash)
+            .neq("id", savedScriptId!)
+            .eq("publish_status", "published");
+
+          if (duplicates && duplicates.length > 0) {
+            const dup = duplicates[0];
+            if (dup.modder_id !== user.id) {
+              toast.error(`🚫 Código duplicado detectado! Este script é idêntico a "${dup.title}" já publicado por outro modder. Publicação bloqueada.`);
+              // Revert to draft
+              await supabase.from("scripts").update({ publish_status: "draft" } as any).eq("id", savedScriptId!);
+              setSubmitting(false);
+              return;
+            }
+          }
+
+          // Save the hash
+          await supabase.from("scripts").update({ code_hash: codeHash } as any).eq("id", savedScriptId!);
+        }
       }
       // Auto-scan if publishing or submitting for review, and script has Lua code
       if (savedScriptId && luaCode && luaCode.trim().length > 10 &&
