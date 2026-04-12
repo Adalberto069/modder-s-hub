@@ -283,10 +283,10 @@ export default function ScriptEditor() {
           const codeHash = Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, "0")).join("");
 
           // Check if another script has the same hash
-          const { data: duplicates } = await supabase
+          const { data: duplicates } = await (supabase as any)
             .from("scripts")
             .select("id, title, modder_id")
-            .eq("code_hash" as any, codeHash)
+            .eq("code_hash", codeHash)
             .neq("id", savedScriptId!)
             .eq("publish_status", "published");
 
