@@ -114,6 +114,7 @@ export default function ScriptDetail() {
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
   const [showPaymentMethodModal, setShowPaymentMethodModal] = useState(false);
   const [pendingRenewal, setPendingRenewal] = useState(false);
+  const [testingScript, setTestingScript] = useState(false);
   const [pixData, setPixData] = useState<{
     purchase_id: string;
     qr_code: string | null;
@@ -443,6 +444,34 @@ end
       }
     }
     toast.success("Download iniciado!");
+  };
+
+  const handleTestScript = async () => {
+    if (!user) { setShowLoginPrompt(true); return; }
+    if (!script) return;
+    setTestingScript(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("test-marketplace-script", {
+        body: { script_id: script.id },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+
+      const blob = new Blob([data.test_code], { type: "text/plain" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = data.file_name || "teste.lua";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      toast.success(`Teste de ${data.expires_minutes} minutos baixado! Execute no GameGuardian.`);
+    } catch (err: any) {
+      toast.error(err.message || "Erro ao gerar teste");
+    } finally {
+      setTestingScript(false);
+    }
   };
 
   const handleReview = async () => {
