@@ -21,10 +21,6 @@ function obfNames() {
   };
 }
 
-/**
- * Double-layer XOR: first XOR the code bytes, then XOR the resulting array
- * values with a second key so they can't simply be read from the Lua table.
- */
 function xorEncode(code: string, key: number): number[] {
   const encoder = new TextEncoder();
   const bytes = encoder.encode(code);
@@ -56,7 +52,7 @@ function buildTestWrapper(originalCode: string, minutes: number): string {
 
   const integrityVal = Object.values(v).reduce((s, n) => s + n.length, 0);
 
-  return `--[[ HM ]]
+  return `--[[ HM-TEST ]]
 do
 local ${v.start}=os.time()
 local ${v.limit}=${expirationSeconds}
@@ -86,7 +82,7 @@ local function ${v.check}()
     pcall(function() gg.clearResults() gg.clearList() end)
     ${v.origAlert}(
       "TEMPO DE TESTE ESGOTADO\\n\\n"..
-      "Volte a plataforma para APROVAR ou DISPUTAR.\\n\\n"..
+      "Gostou? Compre o script completo no marketplace!\\n\\n"..
       "HiddenMod","HIDDENMOD")
     os.exit()
     return true
@@ -126,13 +122,12 @@ end
 
 ${v.origToast}("TESTE: ${minutes}min | HiddenMod")
 ${v.origAlert}(
-  "MODO DE TESTE\\n\\n"..
-  "Voce tem ${minutes} minuto(s).\\n"..
+  "MODO DE TESTE - MARKETPLACE\\n\\n"..
+  "Voce tem ${minutes} minuto(s) para testar.\\n"..
   "Apos o tempo o script para automaticamente.\\n\\n"..
-  "Depois volte a plataforma para APROVAR ou DISPUTAR.\\n\\n"..
+  "Se gostar, compre no marketplace!\\n\\n"..
   "HiddenMod","HIDDENMOD - TESTE")
 
--- XOR helper
 local function _xor(a,b)
   local r,p=0,1
   for j=0,7 do
@@ -143,7 +138,6 @@ local function _xor(a,b)
   return r
 end
 
--- Descramble + Decode (double layer)
 local _sk=${scrambleKey}
 local _b=${bytesLiteral}
 local _d={}
@@ -154,7 +148,6 @@ for i=1,#_b do
 end
 local _src=table.concat(_d)
 
--- Anti-dump: clear decode vars
 _b=nil _d=nil _sk=nil _k=nil
 
 local ${v.fn},${v.err}=load(_src)
@@ -201,59 +194,102 @@ Deno.serve(async (req) => {
       });
     }
 
-    const { delivery_id, test_minutes } = await req.json();
-    if (!delivery_id) {
-      return new Response(JSON.stringify({ error: "delivery_id obrigatório" }), {
+    const { script_id } = await req.json();
+    if (!script_id) {
+      return new Response(JSON.stringify({ error: "script_id obrigatório" }), {
         status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    const minutes = Math.min(Math.max(test_minutes || 3, 1), 10);
-
     const adminClient = createClient(supabaseUrl, supabaseServiceKey);
 
-    const { data: delivery, error: delError } = await adminClient
-      .from("bounty_deliveries")
-      .select("*, bounties!inner(requester_id, assigned_modder_id, status, reward_amount)")
-      .eq("id", delivery_id)
+    // Check script exists and is paid
+    const { data: script, error: scriptError } = await adminClient
+      .from("scripts")
+      .select("id, title, file_url, is_paid, modder_id, publish_status, is_active")
+      .eq("id", script_id)
       .single();
 
-    if (delError || !delivery) {
-      return new Response(JSON.stringify({ error: "Entrega não encontrada" }), {
+    if (scriptError || !script) {
+      return new Response(JSON.stringify({ error: "Script não encontrado" }), {
         status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    const bounty = delivery.bounties;
-
-    if (user.id !== bounty.requester_id) {
-      return new Response(JSON.stringify({ error: "Apenas o solicitante pode testar" }), {
-        status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    if (delivery.test_approved) {
-      return new Response(JSON.stringify({ error: "Script já aprovado" }), {
+    if (!script.is_paid) {
+      return new Response(JSON.stringify({ error: "Scripts gratuitos podem ser baixados diretamente" }), {
         status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    const { data: fileData, error: fileError } = await adminClient.storage
-      .from("bounty-deliveries")
-      .download(delivery.file_url);
-
-    if (fileError || !fileData) {
-      return new Response(JSON.stringify({ error: "Erro ao acessar arquivo" }), {
-        status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+    if (script.publish_status !== "published" || !script.is_active) {
+      return new Response(JSON.stringify({ error: "Script não disponível" }), {
+        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    const originalCode = await fileData.text();
+    // Owner doesn't need test
+    if (user.id === script.modder_id) {
+      return new Response(JSON.stringify({ error: "Você é o dono deste script" }), {
+        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // Check if already purchased
+    const { data: existingPurchase } = await adminClient
+      .from("purchases")
+      .select("id")
+      .eq("script_id", script_id)
+      .eq("user_id", user.id)
+      .eq("status", "completed")
+      .maybeSingle();
+
+    if (existingPurchase) {
+      return new Response(JSON.stringify({ error: "Você já comprou este script" }), {
+        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // Get the code from script_code table
+    const { data: codeData } = await adminClient
+      .from("script_code")
+      .select("lua_code")
+      .eq("script_id", script_id)
+      .single();
+
+    let originalCode: string | null = null;
+
+    if (codeData?.lua_code) {
+      originalCode = codeData.lua_code;
+    } else if (script.file_url) {
+      // Try downloading from storage
+      const filePath = script.file_url.startsWith("http")
+        ? null
+        : script.file_url;
+
+      if (filePath) {
+        const { data: fileData, error: fileError } = await adminClient.storage
+          .from("scripts-private")
+          .download(filePath);
+
+        if (!fileError && fileData) {
+          originalCode = await fileData.text();
+        }
+      }
+    }
+
+    if (!originalCode) {
+      return new Response(JSON.stringify({ error: "Código do script não disponível para teste" }), {
+        status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const minutes = 3;
     const wrappedCode = buildTestWrapper(originalCode, minutes);
 
     return new Response(JSON.stringify({
       test_code: wrappedCode,
-      file_name: `TESTE_${minutes}min_${delivery.file_name}`,
+      file_name: `TESTE_${minutes}min_${script.title.replace(/[^a-zA-Z0-9\-_]/g, "_")}.lua`,
       expires_minutes: minutes,
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
