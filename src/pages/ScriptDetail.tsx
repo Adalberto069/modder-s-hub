@@ -114,6 +114,7 @@ export default function ScriptDetail() {
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
   const [showPaymentMethodModal, setShowPaymentMethodModal] = useState(false);
   const [pendingRenewal, setPendingRenewal] = useState(false);
+  const [testingScript, setTestingScript] = useState(false);
   const [pixData, setPixData] = useState<{
     purchase_id: string;
     qr_code: string | null;
@@ -443,6 +444,34 @@ end
       }
     }
     toast.success("Download iniciado!");
+  };
+
+  const handleTestScript = async () => {
+    if (!user) { setShowLoginPrompt(true); return; }
+    if (!script) return;
+    setTestingScript(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("test-marketplace-script", {
+        body: { script_id: script.id },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+
+      const blob = new Blob([data.test_code], { type: "text/plain" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = data.file_name || "teste.lua";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      toast.success(`Teste de ${data.expires_minutes} minutos baixado! Execute no GameGuardian.`);
+    } catch (err: any) {
+      toast.error(err.message || "Erro ao gerar teste");
+    } finally {
+      setTestingScript(false);
+    }
   };
 
   const handleReview = async () => {
@@ -917,10 +946,21 @@ end
                           </Button>
                         </div>
                       ) : (
-                        <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold h-11 rounded-xl overflow-hidden relative group" onClick={openPaymentMethodModal} disabled={purchasing}>
-                          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-                          <CreditCard className="mr-2 h-4 w-4" /> {purchasing ? "Processando..." : "Comprar Agora"}
-                        </Button>
+                        <div className="space-y-2">
+                          <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold h-11 rounded-xl overflow-hidden relative group" onClick={openPaymentMethodModal} disabled={purchasing}>
+                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+                            <CreditCard className="mr-2 h-4 w-4" /> {purchasing ? "Processando..." : "Comprar Agora"}
+                          </Button>
+                          <Button
+                            variant="outline"
+                            className="w-full h-9 rounded-xl border-accent/30 text-accent hover:bg-accent/10 text-xs font-bold"
+                            onClick={handleTestScript}
+                            disabled={testingScript}
+                          >
+                            <Play className="mr-2 h-3.5 w-3.5" />
+                            {testingScript ? "Gerando teste..." : "Testar 3min antes de comprar"}
+                          </Button>
+                        </div>
                       )}
                     </>
                   ) : (
