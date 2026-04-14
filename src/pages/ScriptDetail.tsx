@@ -946,10 +946,21 @@ end
                           </Button>
                         </div>
                       ) : (
-                        <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold h-11 rounded-xl overflow-hidden relative group" onClick={openPaymentMethodModal} disabled={purchasing}>
-                          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-                          <CreditCard className="mr-2 h-4 w-4" /> {purchasing ? "Processando..." : "Comprar Agora"}
-                        </Button>
+                        <div className="space-y-2">
+                          <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold h-11 rounded-xl overflow-hidden relative group" onClick={openPaymentMethodModal} disabled={purchasing}>
+                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+                            <CreditCard className="mr-2 h-4 w-4" /> {purchasing ? "Processando..." : "Comprar Agora"}
+                          </Button>
+                          <Button
+                            variant="outline"
+                            className="w-full h-9 rounded-xl border-accent/30 text-accent hover:bg-accent/10 text-xs font-bold"
+                            onClick={handleTestScript}
+                            disabled={testingScript}
+                          >
+                            <Play className="mr-2 h-3.5 w-3.5" />
+                            {testingScript ? "Gerando teste..." : "Testar 3min antes de comprar"}
+                          </Button>
+                        </div>
                       )}
                     </>
                   ) : (
