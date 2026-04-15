@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { BountyChat } from "@/components/bounties/BountyChat";
 import { useParams, Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Layout } from "@/components/layout/Layout";
@@ -15,7 +15,7 @@ import { ptBR } from "date-fns/locale";
 import {
   Target, Gamepad2, Clock, DollarSign, User, CheckCircle, XCircle,
   ArrowLeft, Send, Shield, Trophy, AlertTriangle, Calendar, Heart,
-  Trash2, RefreshCw, UserMinus, CreditCard, QrCode, Loader2, Copy, CheckCheck
+  Trash2, RefreshCw, UserMinus, CreditCard, QrCode, Loader2, Copy, CheckCheck, Download
 } from "lucide-react";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel,
@@ -46,16 +46,60 @@ export default function BountyDetail() {
   const [showPaymentDialog, setShowPaymentDialog] = useState(false);
   const [pixData, setPixData] = useState<any>(null);
   const [copied, setCopied] = useState(false);
+  const [pollingStatus, setPollingStatus] = useState<string | null>(null);
+  const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Cleanup polling on unmount
+  useEffect(() => {
+    return () => {
+      if (pollingRef.current) clearInterval(pollingRef.current);
+    };
+  }, []);
+
+  // Start polling for PIX payment
+  const startPixPolling = useCallback((purchaseId: string) => {
+    if (pollingRef.current) clearInterval(pollingRef.current);
+    setPollingStatus("pending");
+    
+    const poll = async () => {
+      try {
+        const { data, error } = await supabase.functions.invoke("check-bounty-payment", {
+          body: { purchase_id: purchaseId },
+        });
+        if (error) return;
+        
+        const status = data?.status;
+        setPollingStatus(status);
+        
+        if (status === "completed") {
+          if (pollingRef.current) clearInterval(pollingRef.current);
+          pollingRef.current = null;
+          toast.success("Pagamento confirmado! 🎉 O download já está liberado.");
+          setPixData(null);
+          setShowPaymentDialog(false);
+          invalidateAll();
+        } else if (status === "rejected" || status === "cancelled") {
+          if (pollingRef.current) clearInterval(pollingRef.current);
+          pollingRef.current = null;
+          toast.error("Pagamento " + (status === "rejected" ? "rejeitado" : "cancelado") + ". Tente novamente.");
+          setPixData(null);
+        }
+      } catch (err) {
+        console.error("Polling error:", err);
+      }
+    };
+
+    // Poll every 5 seconds
+    poll();
+    pollingRef.current = setInterval(poll, 5000);
+  }, [queryClient, id]);
 
   // Handle payment callback
   useEffect(() => {
     const paymentStatus = searchParams.get("payment");
     if (paymentStatus === "success") {
       toast.success("Pagamento confirmado! 🎉 O download já está liberado.");
-      queryClient.invalidateQueries({ queryKey: ["bounty", id] });
-      queryClient.invalidateQueries({ queryKey: ["bounty-purchase", id] });
-      queryClient.invalidateQueries({ queryKey: ["bounty-deliveries-status", id] });
-      queryClient.invalidateQueries({ queryKey: ["bounty-deliveries", id] });
+      invalidateAll();
     } else if (paymentStatus === "failure") {
       toast.error("Pagamento falhou. Tente novamente.");
     }
@@ -206,6 +250,10 @@ export default function BountyDetail() {
         toast.info("Redirecionando para o Mercado Pago...");
       } else if (paymentMethod === "pix") {
         setPixData(data);
+        // Start auto-polling for PIX payment confirmation
+        if (data?.purchase_id) {
+          startPixPolling(data.purchase_id);
+        }
       }
     } catch (err: any) {
       toast.error("Erro ao criar pagamento: " + (err.message || "Tente novamente"));
@@ -472,6 +520,37 @@ export default function BountyDetail() {
                 )}
                 {isPurchaseCompleted && (
                   <p className="text-[10px] text-neon-green font-mono mt-2">✅ Pagamento confirmado — download liberado!</p>
+                )}
+
+                {/* Unified action area — pay OR download */}
+                {isPaid && isRequester && !isPurchaseCompleted && hasApprovedDelivery && (
+                  <div className="mt-4 p-4 bg-neon-green/5 border-2 border-neon-green/30 space-y-3">
+                    <div className="flex items-center gap-2">
+                      <Trophy className="h-4 w-4 text-neon-green" />
+                      <p className="text-xs font-black text-neon-green uppercase tracking-widest">Script aprovado — pronto para pagar!</p>
+                    </div>
+                    <p className="text-[10px] text-foreground/60 font-mono">
+                      O download será liberado automaticamente após a confirmação do pagamento.
+                    </p>
+                    <Button
+                      onClick={handleMarkCompleted}
+                      className="w-full bg-neon-green/20 hover:bg-neon-green/30 text-neon-green border border-neon-green/50 rounded-none font-black uppercase tracking-widest text-xs h-12"
+                    >
+                      <DollarSign className="h-4 w-4 mr-2" />
+                      Pagar R$ {rewardAmount.toFixed(2).replace('.', ',')} e Liberar Download
+                    </Button>
+                  </div>
+                )}
+                {isPurchaseCompleted && isRequester && (
+                  <div className="mt-4 p-4 bg-neon-green/5 border-2 border-neon-green/30 space-y-2">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="h-4 w-4 text-neon-green" />
+                      <p className="text-xs font-black text-neon-green uppercase tracking-widest">Pagamento confirmado!</p>
+                    </div>
+                    <p className="text-[10px] text-foreground/60 font-mono">
+                      O download do script está disponível na seção de entregas abaixo. 👇
+                    </p>
+                  </div>
                 )}
               </div>
             )}
@@ -783,7 +862,7 @@ export default function BountyDetail() {
                 </Button>
               </div>
             ) : (
-              /* PIX QR Code */
+              /* PIX QR Code with auto-polling */
               <div className="space-y-4">
                 <div className="text-center">
                   {pixData.qr_code_base64 && (
@@ -816,12 +895,36 @@ export default function BountyDetail() {
                   </div>
                 )}
 
-                <p className="text-[10px] text-muted-foreground/50 font-mono text-center">
-                  Após o pagamento ser confirmado, a encomenda será concluída automaticamente.
-                </p>
+                {/* Polling status indicator */}
+                <div className="flex items-center justify-center gap-2 py-2">
+                  {pollingStatus === "pending" ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin text-neon-cyan" />
+                      <p className="text-xs text-neon-cyan font-mono animate-pulse">
+                        Aguardando pagamento... verificando automaticamente
+                      </p>
+                    </>
+                  ) : pollingStatus === "completed" ? (
+                    <>
+                      <CheckCircle className="h-4 w-4 text-neon-green" />
+                      <p className="text-xs text-neon-green font-mono font-bold">
+                        Pagamento confirmado! ✅
+                      </p>
+                    </>
+                  ) : (
+                    <p className="text-[10px] text-muted-foreground/50 font-mono text-center">
+                      O pagamento será confirmado automaticamente após o Pix.
+                    </p>
+                  )}
+                </div>
 
                 <Button
-                  onClick={() => { setPixData(null); setShowPaymentDialog(false); }}
+                  onClick={() => { 
+                    if (pollingRef.current) clearInterval(pollingRef.current);
+                    pollingRef.current = null;
+                    setPixData(null); 
+                    setShowPaymentDialog(false); 
+                  }}
                   variant="outline"
                   className="w-full rounded-none text-[10px] font-bold uppercase tracking-widest"
                 >
