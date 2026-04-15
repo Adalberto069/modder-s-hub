@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { BountyChat } from "@/components/bounties/BountyChat";
 import { useParams, Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Layout } from "@/components/layout/Layout";
@@ -15,7 +15,7 @@ import { ptBR } from "date-fns/locale";
 import {
   Target, Gamepad2, Clock, DollarSign, User, CheckCircle, XCircle,
   ArrowLeft, Send, Shield, Trophy, AlertTriangle, Calendar, Heart,
-  Trash2, RefreshCw, UserMinus, CreditCard, QrCode, Loader2, Copy, CheckCheck
+  Trash2, RefreshCw, UserMinus, CreditCard, QrCode, Loader2, Copy, CheckCheck, Download
 } from "lucide-react";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel,
@@ -46,6 +46,8 @@ export default function BountyDetail() {
   const [showPaymentDialog, setShowPaymentDialog] = useState(false);
   const [pixData, setPixData] = useState<any>(null);
   const [copied, setCopied] = useState(false);
+  const [pollingStatus, setPollingStatus] = useState<string | null>(null);
+  const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Handle payment callback
   useEffect(() => {
