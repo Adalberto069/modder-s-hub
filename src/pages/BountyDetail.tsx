@@ -49,15 +49,57 @@ export default function BountyDetail() {
   const [pollingStatus, setPollingStatus] = useState<string | null>(null);
   const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  // Cleanup polling on unmount
+  useEffect(() => {
+    return () => {
+      if (pollingRef.current) clearInterval(pollingRef.current);
+    };
+  }, []);
+
+  // Start polling for PIX payment
+  const startPixPolling = useCallback((purchaseId: string) => {
+    if (pollingRef.current) clearInterval(pollingRef.current);
+    setPollingStatus("pending");
+    
+    const poll = async () => {
+      try {
+        const { data, error } = await supabase.functions.invoke("check-bounty-payment", {
+          body: { purchase_id: purchaseId },
+        });
+        if (error) return;
+        
+        const status = data?.status;
+        setPollingStatus(status);
+        
+        if (status === "completed") {
+          if (pollingRef.current) clearInterval(pollingRef.current);
+          pollingRef.current = null;
+          toast.success("Pagamento confirmado! 🎉 O download já está liberado.");
+          setPixData(null);
+          setShowPaymentDialog(false);
+          invalidateAll();
+        } else if (status === "rejected" || status === "cancelled") {
+          if (pollingRef.current) clearInterval(pollingRef.current);
+          pollingRef.current = null;
+          toast.error("Pagamento " + (status === "rejected" ? "rejeitado" : "cancelado") + ". Tente novamente.");
+          setPixData(null);
+        }
+      } catch (err) {
+        console.error("Polling error:", err);
+      }
+    };
+
+    // Poll every 5 seconds
+    poll();
+    pollingRef.current = setInterval(poll, 5000);
+  }, [queryClient, id]);
+
   // Handle payment callback
   useEffect(() => {
     const paymentStatus = searchParams.get("payment");
     if (paymentStatus === "success") {
       toast.success("Pagamento confirmado! 🎉 O download já está liberado.");
-      queryClient.invalidateQueries({ queryKey: ["bounty", id] });
-      queryClient.invalidateQueries({ queryKey: ["bounty-purchase", id] });
-      queryClient.invalidateQueries({ queryKey: ["bounty-deliveries-status", id] });
-      queryClient.invalidateQueries({ queryKey: ["bounty-deliveries", id] });
+      invalidateAll();
     } else if (paymentStatus === "failure") {
       toast.error("Pagamento falhou. Tente novamente.");
     }
