@@ -521,6 +521,37 @@ export default function BountyDetail() {
                 {isPurchaseCompleted && (
                   <p className="text-[10px] text-neon-green font-mono mt-2">✅ Pagamento confirmado — download liberado!</p>
                 )}
+
+                {/* Unified action area — pay OR download */}
+                {isPaid && isRequester && !isPurchaseCompleted && hasApprovedDelivery && (
+                  <div className="mt-4 p-4 bg-neon-green/5 border-2 border-neon-green/30 space-y-3">
+                    <div className="flex items-center gap-2">
+                      <Trophy className="h-4 w-4 text-neon-green" />
+                      <p className="text-xs font-black text-neon-green uppercase tracking-widest">Script aprovado — pronto para pagar!</p>
+                    </div>
+                    <p className="text-[10px] text-foreground/60 font-mono">
+                      O download será liberado automaticamente após a confirmação do pagamento.
+                    </p>
+                    <Button
+                      onClick={handleMarkCompleted}
+                      className="w-full bg-neon-green/20 hover:bg-neon-green/30 text-neon-green border border-neon-green/50 rounded-none font-black uppercase tracking-widest text-xs h-12"
+                    >
+                      <DollarSign className="h-4 w-4 mr-2" />
+                      Pagar R$ {rewardAmount.toFixed(2).replace('.', ',')} e Liberar Download
+                    </Button>
+                  </div>
+                )}
+                {isPurchaseCompleted && isRequester && (
+                  <div className="mt-4 p-4 bg-neon-green/5 border-2 border-neon-green/30 space-y-2">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="h-4 w-4 text-neon-green" />
+                      <p className="text-xs font-black text-neon-green uppercase tracking-widest">Pagamento confirmado!</p>
+                    </div>
+                    <p className="text-[10px] text-foreground/60 font-mono">
+                      O download do script está disponível na seção de entregas abaixo. 👇
+                    </p>
+                  </div>
+                )}
               </div>
             )}
 
