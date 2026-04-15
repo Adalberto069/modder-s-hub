@@ -250,6 +250,10 @@ export default function BountyDetail() {
         toast.info("Redirecionando para o Mercado Pago...");
       } else if (paymentMethod === "pix") {
         setPixData(data);
+        // Start auto-polling for PIX payment confirmation
+        if (data?.purchase_id) {
+          startPixPolling(data.purchase_id);
+        }
       }
     } catch (err: any) {
       toast.error("Erro ao criar pagamento: " + (err.message || "Tente novamente"));
