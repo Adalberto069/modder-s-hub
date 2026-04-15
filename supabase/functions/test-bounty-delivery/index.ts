@@ -238,6 +238,19 @@ Deno.serve(async (req) => {
       });
     }
 
+    // Rate-limit: max 2 tests per user per delivery
+    const { count: testCount } = await adminClient
+      .from("bounty_test_logs")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", user.id)
+      .eq("delivery_id", delivery_id);
+
+    if ((testCount ?? 0) >= 2) {
+      return new Response(JSON.stringify({ error: "Limite de testes atingido (máx. 2 por entrega)" }), {
+        status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const { data: fileData, error: fileError } = await adminClient.storage
       .from("bounty-deliveries")
       .download(delivery.file_url);
@@ -250,6 +263,13 @@ Deno.serve(async (req) => {
 
     const originalCode = await fileData.text();
     const wrappedCode = buildTestWrapper(originalCode, minutes);
+
+    // Log this test attempt
+    await adminClient.from("bounty_test_logs").insert({
+      user_id: user.id,
+      delivery_id: delivery_id,
+      bounty_id: delivery.bounty_id,
+    });
 
     return new Response(JSON.stringify({
       test_code: wrappedCode,

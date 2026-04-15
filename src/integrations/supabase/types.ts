@@ -347,6 +347,45 @@ export type Database = {
           },
         ]
       }
+      bounty_test_logs: {
+        Row: {
+          bounty_id: string
+          created_at: string
+          delivery_id: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          bounty_id: string
+          created_at?: string
+          delivery_id: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          bounty_id?: string
+          created_at?: string
+          delivery_id?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bounty_test_logs_bounty_id_fkey"
+            columns: ["bounty_id"]
+            isOneToOne: false
+            referencedRelation: "bounties"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bounty_test_logs_delivery_id_fkey"
+            columns: ["delivery_id"]
+            isOneToOne: false
+            referencedRelation: "bounty_deliveries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       categories: {
         Row: {
           created_at: string
