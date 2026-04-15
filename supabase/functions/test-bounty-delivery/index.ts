@@ -264,6 +264,13 @@ Deno.serve(async (req) => {
     const originalCode = await fileData.text();
     const wrappedCode = buildTestWrapper(originalCode, minutes);
 
+    // Log this test attempt
+    await adminClient.from("bounty_test_logs").insert({
+      user_id: user.id,
+      delivery_id: delivery_id,
+      bounty_id: delivery.bounty_id,
+    });
+
     return new Response(JSON.stringify({
       test_code: wrappedCode,
       file_name: `TESTE_${minutes}min_${delivery.file_name}`,
