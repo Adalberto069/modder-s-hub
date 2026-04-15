@@ -831,7 +831,7 @@ export default function BountyDetail() {
                 </Button>
               </div>
             ) : (
-              /* PIX QR Code */
+              /* PIX QR Code with auto-polling */
               <div className="space-y-4">
                 <div className="text-center">
                   {pixData.qr_code_base64 && (
@@ -864,12 +864,36 @@ export default function BountyDetail() {
                   </div>
                 )}
 
-                <p className="text-[10px] text-muted-foreground/50 font-mono text-center">
-                  Após o pagamento ser confirmado, a encomenda será concluída automaticamente.
-                </p>
+                {/* Polling status indicator */}
+                <div className="flex items-center justify-center gap-2 py-2">
+                  {pollingStatus === "pending" ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin text-neon-cyan" />
+                      <p className="text-xs text-neon-cyan font-mono animate-pulse">
+                        Aguardando pagamento... verificando automaticamente
+                      </p>
+                    </>
+                  ) : pollingStatus === "completed" ? (
+                    <>
+                      <CheckCircle className="h-4 w-4 text-neon-green" />
+                      <p className="text-xs text-neon-green font-mono font-bold">
+                        Pagamento confirmado! ✅
+                      </p>
+                    </>
+                  ) : (
+                    <p className="text-[10px] text-muted-foreground/50 font-mono text-center">
+                      O pagamento será confirmado automaticamente após o Pix.
+                    </p>
+                  )}
+                </div>
 
                 <Button
-                  onClick={() => { setPixData(null); setShowPaymentDialog(false); }}
+                  onClick={() => { 
+                    if (pollingRef.current) clearInterval(pollingRef.current);
+                    pollingRef.current = null;
+                    setPixData(null); 
+                    setShowPaymentDialog(false); 
+                  }}
                   variant="outline"
                   className="w-full rounded-none text-[10px] font-bold uppercase tracking-widest"
                 >
