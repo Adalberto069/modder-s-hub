@@ -164,7 +164,7 @@ export function BountyChat({ bountyId, bountyStatus, requesterId, assignedModder
     setTesting(deliveryId);
     try {
       const { data, error } = await supabase.functions.invoke("test-bounty-delivery", {
-        body: { delivery_id: deliveryId, test_minutes: 5 },
+        body: { delivery_id: deliveryId },
       });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
