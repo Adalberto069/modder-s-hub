@@ -247,7 +247,7 @@ Deno.serve(async (req) => {
 
     if ((testCount ?? 0) >= 2) {
       return new Response(JSON.stringify({ error: "Limite de testes atingido (máx. 2 por entrega)" }), {
-        status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
