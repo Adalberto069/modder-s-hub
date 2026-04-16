@@ -241,6 +241,21 @@ Deno.serve(async (req) => {
       });
     }
 
+    // IP-based rate limit: max 3 tests per IP per delivery in 24h
+    const since24h = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+    const { count: ipTestCount } = await adminClient
+      .from("bounty_test_logs")
+      .select("id", { count: "exact", head: true })
+      .eq("ip_address", clientIp)
+      .eq("delivery_id", delivery_id)
+      .gte("created_at", since24h);
+
+    if ((ipTestCount ?? 0) >= 3) {
+      return new Response(JSON.stringify({ error: "Limite de testes atingido para este dispositivo. Tente novamente em 24h." }), {
+        status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     // Rate-limit: max 2 tests per user per delivery
     const { count: testCount } = await adminClient
       .from("bounty_test_logs")
@@ -272,6 +287,7 @@ Deno.serve(async (req) => {
       user_id: user.id,
       delivery_id: delivery_id,
       bounty_id: delivery.bounty_id,
+      ip_address: clientIp,
     });
 
     return new Response(JSON.stringify({
