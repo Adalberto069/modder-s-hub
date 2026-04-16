@@ -301,6 +301,11 @@ Deno.serve(async (req) => {
     const minutes = 3;
     const wrappedCode = buildTestWrapper(originalCode, minutes);
 
+    // Log the test to enforce rate limit
+    await adminClient
+      .from("script_test_logs")
+      .insert({ user_id: user.id, script_id });
+
     return new Response(JSON.stringify({
       test_code: wrappedCode,
       file_name: `TESTE_${minutes}min_${script.title.replace(/[^a-zA-Z0-9\-_]/g, "_")}.lua`,
