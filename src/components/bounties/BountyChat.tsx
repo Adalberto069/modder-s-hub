@@ -378,17 +378,21 @@ export function BountyChat({ bountyId, bountyStatus, requesterId, assignedModder
                 {/* Action buttons */}
                 <div className="flex flex-wrap gap-2">
                   {/* Test button — requester only, paid bounties */}
-                  {canTest && (
-                    <Button
-                      size="sm"
-                      onClick={() => handleTestDownload(del.id)}
-                      disabled={testing === del.id}
-                      className="h-7 px-3 rounded-none bg-yellow-500/10 hover:bg-yellow-500/20 text-yellow-500 border border-yellow-500/30 text-[10px] font-black uppercase tracking-widest"
-                    >
-                      {testing === del.id ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : <FlaskConical className="h-3 w-3 mr-1" />}
-                      Testar por 5 min
-                    </Button>
-                  )}
+                  {canTest && (() => {
+                    const usedTests = getTestCountForDelivery(del.id);
+                    const testsExhausted = usedTests >= 2;
+                    return (
+                      <Button
+                        size="sm"
+                        onClick={() => handleTestDownload(del.id)}
+                        disabled={testing === del.id || testsExhausted}
+                        className="h-7 px-3 rounded-none bg-yellow-500/10 hover:bg-yellow-500/20 text-yellow-500 border border-yellow-500/30 text-[10px] font-black uppercase tracking-widest"
+                      >
+                        {testing === del.id ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : <FlaskConical className="h-3 w-3 mr-1" />}
+                        {testsExhausted ? "Testes esgotados" : `Testar (${2 - usedTests}/2)`}
+                      </Button>
+                    );
+                  })()}
 
                   {/* Approve button — requester, after testing */}
                   {isRequesterUser && canTest && (
