@@ -72,6 +72,24 @@ export function BountyChat({ bountyId, bountyStatus, requesterId, assignedModder
     enabled: !!canView,
   });
 
+  // Check test logs for rate limit display
+  const { data: testLogs } = useQuery({
+    queryKey: ["bounty-test-logs", bountyId, user?.id],
+    queryFn: async () => {
+      const { data } = await (supabase as any)
+        .from("bounty_test_logs")
+        .select("delivery_id")
+        .eq("bounty_id", bountyId)
+        .eq("user_id", user!.id);
+      return data ?? [];
+    },
+    enabled: !!canView && !!user,
+  });
+
+  const getTestCountForDelivery = (deliveryId: string) => {
+    return testLogs?.filter((log: any) => log.delivery_id === deliveryId).length ?? 0;
+  };
+
   useEffect(() => {
     if (!canView) return;
     const channel = supabase
