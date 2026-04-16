@@ -250,6 +250,20 @@ Deno.serve(async (req) => {
       });
     }
 
+    // Rate limit: max 1 test per script per account
+    const { data: existingTest } = await adminClient
+      .from("script_test_logs")
+      .select("id")
+      .eq("user_id", user.id)
+      .eq("script_id", script_id)
+      .maybeSingle();
+
+    if (existingTest) {
+      return new Response(JSON.stringify({ error: "Você já utilizou seu teste gratuito para este script. Cada conta tem direito a apenas 1 teste por script." }), {
+        status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     // Get the code from script_code table
     const { data: codeData } = await adminClient
       .from("script_code")
@@ -286,6 +300,11 @@ Deno.serve(async (req) => {
 
     const minutes = 3;
     const wrappedCode = buildTestWrapper(originalCode, minutes);
+
+    // Log the test to enforce rate limit
+    await adminClient
+      .from("script_test_logs")
+      .insert({ user_id: user.id, script_id });
 
     return new Response(JSON.stringify({
       test_code: wrappedCode,
