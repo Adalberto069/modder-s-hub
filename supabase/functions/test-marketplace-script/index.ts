@@ -260,7 +260,7 @@ Deno.serve(async (req) => {
 
     if (existingTest) {
       return new Response(JSON.stringify({ error: "Você já utilizou seu teste gratuito para este script. Cada conta tem direito a apenas 1 teste por script." }), {
-        status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
