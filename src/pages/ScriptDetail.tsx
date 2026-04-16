@@ -264,6 +264,20 @@ export default function ScriptDetail() {
     enabled: !!id && !!user && !!script?.is_paid,
   });
 
+  const { data: hasTestedScript } = useQuery({
+    queryKey: ["script-test-log", id, user?.id],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("script_test_logs")
+        .select("id")
+        .eq("script_id", id!)
+        .eq("user_id", user!.id)
+        .maybeSingle();
+      return !!data;
+    },
+    enabled: !!id && !!user && !!script?.is_paid,
+  });
+
   const isLicenseExpired = existingLicense?.expires_at && new Date(existingLicense.expires_at) < new Date();
 
   const relatedTutorialId = (script as any)?.related_tutorial_id;
@@ -955,10 +969,10 @@ end
                             variant="outline"
                             className="w-full h-9 rounded-xl border-accent/30 text-accent hover:bg-accent/10 text-xs font-bold"
                             onClick={handleTestScript}
-                            disabled={testingScript}
+                            disabled={testingScript || !!hasTestedScript}
                           >
                             <Play className="mr-2 h-3.5 w-3.5" />
-                            {testingScript ? "Gerando teste..." : "Testar 3min antes de comprar"}
+                            {hasTestedScript ? "Teste já utilizado" : testingScript ? "Gerando teste..." : "Testar 3min antes de comprar"}
                           </Button>
                         </div>
                       )}
