@@ -201,14 +201,17 @@ Deno.serve(async (req) => {
       });
     }
 
-    const { delivery_id, test_minutes } = await req.json();
+    const clientIp = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+      req.headers.get("cf-connecting-ip") || "unknown";
+
+    const { delivery_id } = await req.json();
     if (!delivery_id) {
       return new Response(JSON.stringify({ error: "delivery_id obrigatório" }), {
         status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    const minutes = Math.min(Math.max(test_minutes || 3, 1), 10);
+    const minutes = 3;
 
     const adminClient = createClient(supabaseUrl, supabaseServiceKey);
 

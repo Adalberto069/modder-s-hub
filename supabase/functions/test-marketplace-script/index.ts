@@ -194,6 +194,9 @@ Deno.serve(async (req) => {
       });
     }
 
+    const clientIp = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+      req.headers.get("cf-connecting-ip") || "unknown";
+
     const { script_id } = await req.json();
     if (!script_id) {
       return new Response(JSON.stringify({ error: "script_id obrigatório" }), {
@@ -202,6 +205,21 @@ Deno.serve(async (req) => {
     }
 
     const adminClient = createClient(supabaseUrl, supabaseServiceKey);
+
+    // IP-based rate limit: max 3 tests per IP in last 24h (across all accounts)
+    const since24h = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+    const { count: ipTestCount } = await adminClient
+      .from("script_test_logs")
+      .select("id", { count: "exact", head: true })
+      .eq("ip_address", clientIp)
+      .eq("script_id", script_id)
+      .gte("created_at", since24h);
+
+    if ((ipTestCount ?? 0) >= 3) {
+      return new Response(JSON.stringify({ error: "Limite de testes atingido para este dispositivo. Tente novamente em 24h." }), {
+        status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     // Check script exists and is paid
     const { data: script, error: scriptError } = await adminClient
@@ -304,7 +322,7 @@ Deno.serve(async (req) => {
     // Log the test to enforce rate limit
     await adminClient
       .from("script_test_logs")
-      .insert({ user_id: user.id, script_id });
+      .insert({ user_id: user.id, script_id, ip_address: clientIp });
 
     return new Response(JSON.stringify({
       test_code: wrappedCode,
