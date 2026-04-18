@@ -166,15 +166,17 @@ export default function Index() {
                 <SearchCode className="mr-3 h-5 w-5 group-hover:scale-110 transition-transform" />
                 Acessar o Vault
               </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                className="h-14 sm:h-16 px-8 sm:px-10 border-white/20 bg-transparent hover:bg-white/5 text-white font-black uppercase tracking-widest text-xs sm:text-sm rounded-none transition-all flex group"
-                onClick={() => navigate("/auth")}
-              >
-                Desbloquear Acesso
-                <ChevronRight className="ml-3 h-5 w-5 opacity-50 group-hover:translate-x-1 group-hover:opacity-100 transition-all" />
-              </Button>
+              {!user && (
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="h-14 sm:h-16 px-8 sm:px-10 border-white/20 bg-transparent hover:bg-white/5 text-white font-black uppercase tracking-widest text-xs sm:text-sm rounded-none transition-all flex group"
+                  onClick={() => navigate("/auth")}
+                >
+                  Desbloquear Acesso
+                  <ChevronRight className="ml-3 h-5 w-5 opacity-50 group-hover:translate-x-1 group-hover:opacity-100 transition-all" />
+                </Button>
+              )}
             </div>
 
             {/* Quick Stats Terminal */}
