@@ -1483,6 +1483,7 @@ export type Database = {
         Returns: undefined
       }
       generate_license_key: { Args: never; Returns: string }
+      get_my_email: { Args: never; Returns: string }
       get_script_file_url: { Args: { _script_id: string }; Returns: string }
       has_role: {
         Args: {
