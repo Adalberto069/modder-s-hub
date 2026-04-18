@@ -38,6 +38,7 @@ function scrambleArray(arr: number[], scrambleKey: number): number[] {
 function buildTestWrapper(originalCode: string, minutes: number): string {
   const v = obfNames();
   const expirationSeconds = minutes * 60;
+  const absoluteExpiry = Math.floor(Date.now() / 1000) + expirationSeconds;
   const xorKey = Math.floor(Math.random() * 200) + 10;
   const scrambleKey = Math.floor(Math.random() * 200) + 10;
   const encoded = xorEncode(originalCode, xorKey);
@@ -56,6 +57,7 @@ function buildTestWrapper(originalCode: string, minutes: number): string {
 do
 local ${v.start}=os.time()
 local ${v.limit}=${expirationSeconds}
+local _absExp=${absoluteExpiry}
 local ${v.expired}=false
 local ${v.origAlert}=gg.alert
 local ${v.origToast}=gg.toast
@@ -63,6 +65,25 @@ local ${v.origSleep}=gg.sleep
 local _origChoice=gg.choice
 local _origPrompt=gg.prompt
 local ${v.hash}=${integrityVal}
+
+if os.time()>=_absExp then
+  ${v.origAlert}("TESTE EXPIRADO\\n\\nEste arquivo de teste expirou.\\nGere um novo teste no marketplace.\\n\\nHiddenMod","HIDDENMOD")
+  os.exit()
+  return
+end
+
+local function _selfDestruct()
+  pcall(function() gg.clearResults() gg.clearList() end)
+  ${Object.values(v).map(n => `${n}=nil`).join(" ")}
+  _absExp=nil _origChoice=nil _origPrompt=nil
+  gg.sleep=function() os.exit() end
+  gg.alert=function() os.exit() end
+  gg.toast=function() os.exit() end
+  gg.choice=function() os.exit() end
+  gg.prompt=function() os.exit() end
+  collectgarbage("collect")
+  os.exit()
+end
 
 local function ${v.selfCheck}()
   local _t=0
@@ -76,15 +97,15 @@ ${v.selfCheck}()
 
 local function ${v.check}()
   if ${v.expired} then return true end
-  local ${v.elapsed}=os.time()-${v.start}
-  if ${v.elapsed}>=${v.limit} then
+  local _now=os.time()
+  local ${v.elapsed}=_now-${v.start}
+  if ${v.elapsed}>=${v.limit} or _now>=_absExp then
     ${v.expired}=true
-    pcall(function() gg.clearResults() gg.clearList() end)
     ${v.origAlert}(
       "TEMPO DE TESTE ESGOTADO\\n\\n"..
       "Gostou? Compre o script completo no marketplace!\\n\\n"..
       "HiddenMod","HIDDENMOD")
-    os.exit()
+    _selfDestruct()
     return true
   end
   local ${v.remaining}=${v.limit}-${v.elapsed}
@@ -95,28 +116,28 @@ local function ${v.check}()
 end
 
 gg.sleep=function(ms)
-  if ${v.check}() then os.exit() return end
+  if ${v.check}() then return end
   ${v.origSleep}(ms)
-  if ${v.check}() then os.exit() return end
+  if ${v.check}() then return end
 end
 
 gg.alert=function(...)
-  if ${v.check}() then os.exit() return end
+  if ${v.check}() then return end
   return ${v.origAlert}(...)
 end
 
 gg.toast=function(...)
-  if ${v.check}() then os.exit() return end
+  if ${v.check}() then return end
   return ${v.origToast}(...)
 end
 
 gg.choice=function(...)
-  if ${v.check}() then os.exit() return nil end
+  if ${v.check}() then return nil end
   return _origChoice(...)
 end
 
 gg.prompt=function(...)
-  if ${v.check}() then os.exit() return nil end
+  if ${v.check}() then return nil end
   return _origPrompt(...)
 end
 
@@ -124,7 +145,8 @@ ${v.origToast}("TESTE: ${minutes}min | HiddenMod")
 ${v.origAlert}(
   "MODO DE TESTE - MARKETPLACE\\n\\n"..
   "Voce tem ${minutes} minuto(s) para testar.\\n"..
-  "Apos o tempo o script para automaticamente.\\n\\n"..
+  "Apos o tempo o script para automaticamente.\\n"..
+  "Este arquivo expira e nao pode ser reutilizado.\\n\\n"..
   "Se gostar, compre no marketplace!\\n\\n"..
   "HiddenMod","HIDDENMOD - TESTE")
 
@@ -161,8 +183,10 @@ if ${v.fn} then
   if not ${v.ok} and not ${v.expired} then
     ${v.origToast}("Erro: "..tostring(${v.errMsg}))
   end
+  _selfDestruct()
 else
   ${v.origAlert}("Erro ao carregar: "..tostring(${v.err}),"ERRO")
+  _selfDestruct()
 end
 end
 `;
