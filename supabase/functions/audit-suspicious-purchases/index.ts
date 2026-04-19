@@ -70,7 +70,18 @@ Deno.serve(async (req) => {
     const totalIssues =
       (badPurchases?.length || 0) + (badBounties?.length || 0) + orphans.length;
 
+    const source = req.headers.get("x-invoke-source") || "cron";
+
     if (totalIssues === 0) {
+      await supabase.from("audit_runs").insert({
+        source,
+        total_issues: 0,
+        suspicious_purchases_count: 0,
+        suspicious_bounties_count: 0,
+        orphan_access_count: 0,
+        admins_notified: 0,
+        details: {},
+      });
       return new Response(
         JSON.stringify({ ok: true, issues: 0, message: "Nenhuma anomalia detectada" }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
