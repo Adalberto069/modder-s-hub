@@ -182,9 +182,18 @@ export function AdminModerationQueue() {
 
     await logAction(script.id, "message", `Mensagem enviada ao autor: ${msg.substring(0, 100)}`, script.security_status, script.security_status);
 
+    // Notify modder via bell notification
+    await supabase.from("notifications" as any).insert({
+      user_id: script.modder_id,
+      title: "💬 Mensagem da Moderação",
+      message: `Nova mensagem sobre "${script.title}": ${msg.substring(0, 120)}${msg.length > 120 ? "..." : ""}`,
+      type: "info",
+      link: `/dashboard`,
+    } as any);
+
     setMessageText((prev) => ({ ...prev, [script.id]: "" }));
     setSendingMsg(null);
-    toast.success("Mensagem enviada ao autor!");
+    toast.success("Mensagem enviada e modder notificado!");
   };
 
   return (

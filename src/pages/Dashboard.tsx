@@ -2,6 +2,7 @@ import { useState } from "react";
 import { validateFileWithToast } from "@/lib/secure-upload";
 import { Layout } from "@/components/layout/Layout";
 import { ModderFinanceTab } from "@/components/modder/ModderFinanceTab";
+import { ModderModerationInbox } from "@/components/ModderModerationInbox";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -412,6 +413,8 @@ end
             </div>
           </div>
         )}
+
+        {isModder && <ModderModerationInbox />}
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="font-mono">
           <TabsList className={`mb-8 grid w-full ${isModder ? "grid-cols-3" : "grid-cols-1"} p-1 bg-[#050505] border border-white/10 rounded-none h-14`}>
