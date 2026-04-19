@@ -14,6 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      audit_runs: {
+        Row: {
+          admins_notified: number
+          details: Json
+          id: string
+          orphan_access_count: number
+          ran_at: string
+          source: string
+          suspicious_bounties_count: number
+          suspicious_purchases_count: number
+          total_issues: number
+        }
+        Insert: {
+          admins_notified?: number
+          details?: Json
+          id?: string
+          orphan_access_count?: number
+          ran_at?: string
+          source?: string
+          suspicious_bounties_count?: number
+          suspicious_purchases_count?: number
+          total_issues?: number
+        }
+        Update: {
+          admins_notified?: number
+          details?: Json
+          id?: string
+          orphan_access_count?: number
+          ran_at?: string
+          source?: string
+          suspicious_bounties_count?: number
+          suspicious_purchases_count?: number
+          total_issues?: number
+        }
+        Relationships: []
+      }
       badge_definitions: {
         Row: {
           category: string
