@@ -117,7 +117,6 @@ Deno.serve(async (req) => {
     }
 
     // Persistir histórico
-    const source = req.headers.get("x-invoke-source") || "cron";
     await supabase.from("audit_runs").insert({
       source,
       total_issues: totalIssues,
