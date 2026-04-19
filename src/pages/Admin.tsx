@@ -26,6 +26,7 @@ import { AdminModerationQueue } from "@/components/admin/AdminModerationQueue";
 import { AdminWithdrawalsTab } from "@/components/admin/AdminWithdrawalsTab";
 import { AdminUsersTab } from "@/components/admin/AdminUsersTab";
 import { AdminDisputesTab } from "@/components/admin/AdminDisputesTab";
+import { AdminAuditTab } from "@/components/admin/AdminAuditTab";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import LuaCodeEditor from "@/components/LuaCodeEditor";
