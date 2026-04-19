@@ -105,6 +105,22 @@ Deno.serve(async (req) => {
       await supabase.from("notifications").insert(notifications);
     }
 
+    // Persistir histórico
+    const source = req.headers.get("x-invoke-source") || "cron";
+    await supabase.from("audit_runs").insert({
+      source,
+      total_issues: totalIssues,
+      suspicious_purchases_count: badPurchases?.length || 0,
+      suspicious_bounties_count: badBounties?.length || 0,
+      orphan_access_count: orphans.length,
+      admins_notified: admins?.length || 0,
+      details: {
+        suspicious_purchases: badPurchases || [],
+        suspicious_bounties: badBounties || [],
+        orphan_access: orphans,
+      },
+    });
+
     console.log("[audit-suspicious-purchases]", {
       badPurchases: badPurchases?.length || 0,
       badBounties: badBounties?.length || 0,
