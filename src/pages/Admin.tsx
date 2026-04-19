@@ -780,6 +780,11 @@ export default function Admin() {
             <AdminWithdrawalsTab />
           </TabsContent>
 
+          {/* Audit Tab */}
+          <TabsContent value="audit">
+            <AdminAuditTab />
+          </TabsContent>
+
           {/* Leak Tracker Tab */}
           <TabsContent value="leaks">
             <Card className="border-white/10 bg-[#050505] rounded-none">
