@@ -602,7 +602,7 @@ export default function Admin() {
 
         {/* Main admin tabs */}
         <Tabs defaultValue="scripts" className="font-mono">
-          <TabsList className="mb-6 grid w-full grid-cols-7 p-1 bg-[#050505] border border-white/10 rounded-none h-14">
+          <TabsList className="mb-6 grid w-full grid-cols-8 p-1 bg-[#050505] border border-white/10 rounded-none h-14">
             <TabsTrigger value="scripts" className="text-[10px] sm:text-xs tracking-widest uppercase font-black gap-2 data-[state=active]:bg-[#030304] data-[state=active]:text-neon-purple rounded-none h-full">
               <Code className="h-4 w-4" /> <span className="hidden sm:inline">Scripts</span>
             </TabsTrigger>
@@ -620,6 +620,9 @@ export default function Admin() {
             </TabsTrigger>
             <TabsTrigger value="withdrawals" className="text-[10px] sm:text-xs tracking-widest uppercase font-black gap-2 data-[state=active]:bg-[#030304] data-[state=active]:text-primary rounded-none h-full">
               <Landmark className="h-4 w-4" /> <span className="hidden sm:inline">Pagamentos</span>
+            </TabsTrigger>
+            <TabsTrigger value="audit" className="text-[10px] sm:text-xs tracking-widest uppercase font-black gap-2 data-[state=active]:bg-[#030304] data-[state=active]:text-yellow-400 rounded-none h-full">
+              <Shield className="h-4 w-4" /> <span className="hidden sm:inline">Auditoria</span>
             </TabsTrigger>
             <TabsTrigger value="leaks" className="text-[10px] sm:text-xs tracking-widest uppercase font-black gap-2 data-[state=active]:bg-[#030304] data-[state=active]:text-destructive rounded-none h-full">
               <AlertTriangle className="h-4 w-4" /> <span className="hidden sm:inline">Vazamentos</span>
