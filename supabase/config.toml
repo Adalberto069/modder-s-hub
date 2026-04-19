@@ -24,3 +24,6 @@ verify_jwt = false
 [functions.mp-oauth-callback]
 verify_jwt = false
 
+[functions.audit-suspicious-purchases]
+verify_jwt = false
+
