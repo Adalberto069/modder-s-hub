@@ -70,10 +70,10 @@ export default function LuaCodeEditor({
       doc: value,
       extensions: [
         basicSetup,
-        StreamLanguage.define(lua),
+        StreamLanguage.define(lua as any),
         oneDark,
         theme,
-        keymap.of(defaultKeymap),
+        keymap.of(defaultKeymap as any),
         EditorState.readOnly.of(readOnly),
         cmPlaceholder(placeholder),
         ...(onChange
