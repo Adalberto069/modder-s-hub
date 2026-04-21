@@ -192,15 +192,15 @@ IMPORTANTE: Scripts de Game Guardian normalmente acessam memória, editam valore
       throw new Error('credits');
     }
     console.error('AI gateway error:', response.status, await response.text());
-    return performStaticAnalysis(code);
+    return performHeuristicAnalysis(code);
   }
 
   const data = await response.json();
   const toolCall = data.choices?.[0]?.message?.tool_calls?.[0];
 
   if (!toolCall?.function?.arguments) {
-    console.error('AI não retornou tool call, usando fallback estático.');
-    return performStaticAnalysis(code);
+    console.error('AI não retornou tool call, usando fallback heurístico.');
+    return performHeuristicAnalysis(code);
   }
 
   return JSON.parse(toolCall.function.arguments);
