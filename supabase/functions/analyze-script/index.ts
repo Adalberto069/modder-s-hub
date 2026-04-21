@@ -30,11 +30,21 @@ Deno.serve(async (req) => {
     const apiKey = Deno.env.get('LOVABLE_API_KEY');
     let result: any;
 
+    // Always run heuristic behavioral analysis (fast, deterministic)
+    const heuristic = performHeuristicAnalysis(code);
+
     if (!apiKey) {
-      console.warn("LOVABLE_API_KEY não configurada, usando análise estática.");
-      result = performStaticAnalysis(code);
+      console.warn("LOVABLE_API_KEY não configurada, usando apenas análise heurística.");
+      result = heuristic;
     } else {
-      result = await performAIAnalysis(code, apiKey);
+      try {
+        const ai = await performAIAnalysis(code, apiKey);
+        // Merge: take the worst classification between AI and heuristic (priorize segurança)
+        result = mergeAnalyses(ai, heuristic);
+      } catch (e) {
+        console.warn("AI falhou, usando heurística:", (e as Error).message);
+        result = heuristic;
+      }
     }
 
     // If script_id provided, update security status server-side
