@@ -225,38 +225,36 @@ export default function Ferramentas() {
                   </div>
 
                   <div className="flex flex-col gap-2 mt-auto">
-                    {tool.download_url ? (
+                    {tool.download_url && (
                       <Button size="sm" className="w-full bg-neon-green hover:bg-neon-green/90 text-black font-black uppercase tracking-widest text-[10px] h-10 shadow-[0_0_15px_rgba(57,255,20,0.1)] transition-all hover:scale-[1.02] active:scale-95 rounded-none" asChild>
                         <a href={tool.download_url} target="_blank" rel="noopener noreferrer">
                           <Download className="h-4 w-4 mr-2" />
                           Fazer Download
                         </a>
                       </Button>
-                    ) : (
-                       <Button size="sm" variant="outline" className="w-full border-white/10 text-muted-foreground/40 font-black uppercase tracking-widest text-[10px] h-10 pointer-events-none rounded-none">
-                        Indisponível
-                      </Button>
                     )}
-                    
-                    <div className="grid grid-cols-2 gap-2 mt-1">
-                      {tool.external_url && (
-                        <Button size="sm" variant="ghost" className="w-full bg-white/5 hover:bg-white/10 text-white font-black uppercase tracking-widest text-[9px] h-9 transition-colors rounded-none" asChild>
-                          <a href={tool.external_url} target="_blank" rel="noopener noreferrer">
-                            <ExternalLink className="h-3.5 w-3.5 mr-2" />
-                            Site Oficial
-                          </a>
-                        </Button>
-                      )}
 
-                      {tool.tutorial_id && (
-                        <Button size="sm" variant="outline" className={`w-full border-white/10 text-white/70 hover:text-white hover:bg-white/10 font-black uppercase tracking-widest text-[9px] h-9 rounded-none ${!tool.external_url ? 'col-span-2' : ''}`} asChild>
-                          <a href={`/tutorial/${tool.tutorial_id}`}>
-                            <BookOpen className="h-3.5 w-3.5 mr-2" />
-                            Ver Guia
-                          </a>
-                        </Button>
-                      )}
-                    </div>
+                    {(tool.external_url || tool.tutorial_id) && (
+                      <div className={`grid gap-2 ${tool.download_url ? "mt-1" : ""} ${tool.external_url && tool.tutorial_id ? "grid-cols-2" : "grid-cols-1"}`}>
+                        {tool.external_url && (
+                          <Button size="sm" variant="ghost" className="w-full bg-white/5 hover:bg-white/10 text-white font-black uppercase tracking-widest text-[9px] h-9 transition-colors rounded-none" asChild>
+                            <a href={tool.external_url} target="_blank" rel="noopener noreferrer">
+                              <ExternalLink className="h-3.5 w-3.5 mr-2" />
+                              Site Oficial
+                            </a>
+                          </Button>
+                        )}
+
+                        {tool.tutorial_id && (
+                          <Button size="sm" variant="outline" className="w-full border-white/10 text-white/70 hover:text-white hover:bg-white/10 font-black uppercase tracking-widest text-[9px] h-9 rounded-none" asChild>
+                            <a href={`/tutorial/${tool.tutorial_id}`}>
+                              <BookOpen className="h-3.5 w-3.5 mr-2" />
+                              Ver Guia
+                            </a>
+                          </Button>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </CardContent>
               </Card>

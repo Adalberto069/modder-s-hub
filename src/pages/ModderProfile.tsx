@@ -1,19 +1,22 @@
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { Layout } from "@/components/layout/Layout";
 import { ScriptCard } from "@/components/ScriptCard";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
-import { User, Download, Star, Trophy, Calendar, Code, BookOpen, Info } from "lucide-react";
+import { User, Download, Star, Trophy, Calendar, Code, BookOpen, Info, Plus } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { UserBadges } from "@/components/UserBadges";
 import { RoleBadge } from "@/components/RoleBadge";
+import { useAuth } from "@/lib/auth";
 
 export default function ModderProfile() {
   const { userId } = useParams<{ userId: string }>();
+  const { user, isAdmin } = useAuth();
 
   const { data: profile, isLoading: profileLoading } = useQuery({
     queryKey: ["modder-profile", userId],

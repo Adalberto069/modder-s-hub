@@ -135,6 +135,35 @@ export function BountyChat({ bountyId, bountyStatus, requesterId, assignedModder
 
     setUploading(true);
     try {
+      // 1) Read file content for security analysis
+      const code = await file.text();
+
+      // 2) Run heuristic security analysis BEFORE upload
+      toast.info("🔍 Analisando segurança do script...");
+      const { data: analysis, error: analysisError } = await supabase.functions.invoke("analyze-script", {
+        body: { code },
+      });
+      if (analysisError) {
+        console.warn("Falha na análise:", analysisError);
+      }
+
+      // 3) Block if classified as malicious
+      if (analysis?.classification === "malicious") {
+        const reasons = (analysis.threats ?? []).slice(0, 3).map((t: any) => t.description || t.type).join(" • ");
+        toast.error(
+          `🔴 Entrega bloqueada — Alto Risco detectado.\n${reasons || "Padrões suspeitos críticos encontrados."}`,
+          { duration: 8000 }
+        );
+        setUploading(false);
+        if (fileRef.current) fileRef.current.value = "";
+        return;
+      }
+
+      // 4) Warn if suspicious but allow
+      if (analysis?.classification === "suspicious") {
+        toast.warning("🟡 Script suspeito — entrega permitida, mas o solicitante será avisado.", { duration: 6000 });
+      }
+
       const filePath = `${user.id}/${bountyId}/${Date.now()}_${file.name}`;
       const { error: uploadError } = await supabase.storage.from("bounty-deliveries").upload(filePath, file);
       if (uploadError) throw uploadError;
@@ -144,9 +173,10 @@ export function BountyChat({ bountyId, bountyStatus, requesterId, assignedModder
       });
       if (dbError) throw dbError;
 
+      const securityNote = analysis?.classification === "suspicious" ? " ⚠️ (análise: suspeito)" : " ✅ (análise: seguro)";
       await (supabase as any).from("bounty_messages").insert({
         bounty_id: bountyId, sender_id: user.id,
-        content: `📦 Script entregue: "${file.name}" — o solicitante deve testar e aprovar antes do pagamento.`,
+        content: `📦 Script entregue: "${file.name}"${securityNote} — o solicitante deve testar e aprovar antes do pagamento.`,
       });
 
       toast.success("Script entregue com sucesso! 📦");
