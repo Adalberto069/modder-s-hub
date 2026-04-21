@@ -206,58 +206,216 @@ IMPORTANTE: Scripts de Game Guardian normalmente acessam memória, editam valore
   return JSON.parse(toolCall.function.arguments);
 }
 
-function performStaticAnalysis(code: string) {
+/**
+ * Heuristic behavioral analyzer for Lua / Game Guardian scripts.
+ * Detecta INTENÇÃO suspeita (não apenas execução real):
+ *  - keywords sensíveis (token, auth, payload, api...)
+ *  - padrões de encode/decode (string.byte, gsub, base64-like)
+ *  - concatenação de strings (..)
+ *  - delays antes de ações (gg.sleep)
+ *  - ofuscação (tabelas de strings, _G[...], nomes aleatórios)
+ *
+ * Pontuação:
+ *  - palavra suspeita: +15
+ *  - encode/decode: +20
+ *  - concatenação: +10 (só se houver outros sinais)
+ *  - delay: +10
+ *  - ofuscação: +25
+ *
+ * Classificação:
+ *  0–20  → safe       (🟢)
+ *  21–49 → suspicious (🟡)
+ *  50+   → malicious  (🔴 alto risco)
+ */
+function performHeuristicAnalysis(code: string) {
   const threats: Array<{ type: string; severity: string; description: string; line: string }> = [];
+  let score = 0;
 
-  const patterns = [
-    { regex: /os\.execute\s*\(/g, type: "system_command", severity: "critical", desc: "Execução de comando do sistema detectada" },
-    { regex: /io\.popen\s*\(/g, type: "system_command", severity: "critical", desc: "Abertura de processo do sistema detectada" },
-    { regex: /os\.remove\s*\(/g, type: "filesystem", severity: "high", desc: "Remoção de arquivo do sistema detectada" },
-    { regex: /os\.rename\s*\(/g, type: "filesystem", severity: "medium", desc: "Renomeação de arquivo do sistema detectada" },
-    { regex: /io\.open\s*\([^)]*['"]\s*\/(?:etc|tmp|var|usr)/g, type: "filesystem", severity: "critical", desc: "Acesso a diretório sensível do sistema" },
-    { regex: /loadstring\s*\(/g, type: "obfuscation", severity: "high", desc: "Execução dinâmica de código (loadstring)" },
-    { regex: /string\.char\s*\([^)]{50,}\)/g, type: "obfuscation", severity: "high", desc: "Ofuscação via string.char extensa" },
-    { regex: /\\x[0-9a-fA-F]{2}(?:\\x[0-9a-fA-F]{2}){20,}/g, type: "encoded_payload", severity: "high", desc: "Payload hexadecimal embutido" },
-    { regex: /[A-Za-z0-9+\/=]{100,}/g, type: "encoded_payload", severity: "medium", desc: "Possível payload base64 detectado" },
-    { regex: /socket\.connect|socket\.tcp|require\s*\(?\s*['"]socket['"]\s*\)?/g, type: "network_abuse", severity: "high", desc: "Conexão de rede/socket detectada" },
-    { regex: /http\.request|https\.request|wget|curl/g, type: "network_abuse", severity: "medium", desc: "Requisição HTTP detectada" },
-    { regex: /\/bin\/sh|\/bin\/bash|cmd\.exe/g, type: "reverse_shell", severity: "critical", desc: "Referência a shell do sistema detectada" },
-    { regex: /while\s+true\s+do[\s\S]*?os\./g, type: "persistence", severity: "high", desc: "Loop persistente com operação de sistema" },
+  const sample = (idx: number, len: number) => {
+    const start = Math.max(0, idx - 20);
+    const end = Math.min(code.length, idx + len + 20);
+    return code.substring(start, end).replace(/\n/g, " ").trim().substring(0, 120);
+  };
+
+  const addThreat = (
+    points: number,
+    type: string,
+    severity: string,
+    description: string,
+    line: string,
+  ) => {
+    score += points;
+    threats.push({ type, severity, description, line });
+  };
+
+  // ---- 1. Palavras-chave sensíveis (intenção) ----
+  const suspiciousKeywords = [
+    "token", "auth", "password", "passwd", "secret", "apikey", "api_key",
+    "payload", "session", "cookie", "credential",
+    "request", "post", "api", "send", "upload", "exfil",
   ];
-
-  for (const p of patterns) {
-    let match;
-    while ((match = p.regex.exec(code)) !== null) {
-      const start = Math.max(0, match.index - 20);
-      const end = Math.min(code.length, match.index + match[0].length + 20);
-      threats.push({
-        type: p.type,
-        severity: p.severity,
-        description: p.desc,
-        line: code.substring(start, end).replace(/\n/g, " ").trim(),
-      });
+  const seenKeywords = new Set<string>();
+  for (const kw of suspiciousKeywords) {
+    const re = new RegExp(`\\b${kw}\\b`, "gi");
+    const m = re.exec(code);
+    if (m && !seenKeywords.has(kw.toLowerCase())) {
+      seenKeywords.add(kw.toLowerCase());
+      addThreat(15, "data_theft", "medium",
+        `Palavra-chave sensível detectada: "${kw}"`, sample(m.index, m[0].length));
     }
   }
 
-  let classification: "safe" | "suspicious" | "malicious" = "safe";
-  let securityScore = 100;
-
-  for (const t of threats) {
-    if (t.severity === "critical") { classification = "malicious"; securityScore -= 30; }
-    else if (t.severity === "high") { classification = classification === "malicious" ? "malicious" : "suspicious"; securityScore -= 20; }
-    else if (t.severity === "medium") { classification = classification === "safe" ? "suspicious" : classification; securityScore -= 10; }
-    else { securityScore -= 5; }
+  // ---- 2. Encode / Decode patterns ----
+  const encodePatterns: Array<{ re: RegExp; desc: string }> = [
+    { re: /string\.byte\s*\(/g, desc: "Uso de string.byte (possível encode/decode manual)" },
+    { re: /string\.char\s*\(/g, desc: "Uso de string.char (possível decode de payload)" },
+    { re: /:\s*gsub\s*\(/g, desc: "Uso de gsub (possível transformação/encode de strings)" },
+    { re: /\bbase64\b/gi, desc: "Referência a base64 (encode/decode)" },
+    { re: /\b(encode|decode)\b/gi, desc: "Função de encode/decode declarada/usada" },
+    { re: /\bxor\b/gi, desc: "Operação XOR (cifra/ofuscação)" },
+  ];
+  const seenEncode = new Set<string>();
+  for (const p of encodePatterns) {
+    const m = p.re.exec(code);
+    if (m && !seenEncode.has(p.desc)) {
+      seenEncode.add(p.desc);
+      addThreat(20, "encoded_payload", "high", p.desc, sample(m.index, m[0].length));
+    }
   }
 
-  securityScore = Math.max(0, securityScore);
+  // ---- 3. Network / "POST" / "api" literais ----
+  const networkLiterals = [
+    { re: /["']POST["']/g, desc: "Literal \"POST\" (simulação de requisição HTTP)" },
+    { re: /["']GET["']/g, desc: "Literal \"GET\" (simulação de requisição HTTP)" },
+    { re: /https?:\/\/[^\s"']+/g, desc: "URL embutida no script" },
+    { re: /\b(http\.request|https\.request|socket\.|wget|curl)\b/g, desc: "Chamada real de rede" },
+  ];
+  for (const p of networkLiterals) {
+    const m = p.re.exec(code);
+    if (m) {
+      addThreat(20, "network_abuse", "high", p.desc, sample(m.index, m[0].length));
+    }
+  }
+
+  // ---- 4. Concatenação de strings (..) — só conta se já houver outros sinais ----
+  const concatMatches = code.match(/\.\.\s*['"]/g) || [];
+  if (concatMatches.length >= 3 && score > 0) {
+    addThreat(10, "obfuscation", "low",
+      `Múltiplas concatenações de string (${concatMatches.length}) — possível montagem de payload`,
+      "..");
+  }
+
+  // ---- 5. Delays antes de ações (gg.sleep) ----
+  const sleepRegex = /gg\.sleep\s*\(\s*\d+\s*\)/g;
+  const sleepMatch = sleepRegex.exec(code);
+  if (sleepMatch) {
+    // Verifica se há ação suspeita após o sleep
+    const after = code.substring(sleepMatch.index, sleepMatch.index + 400);
+    if (/\b(send|post|request|encode|decode|loadstring|load)\b/i.test(after)) {
+      addThreat(10, "persistence", "medium",
+        "gg.sleep seguido de ação suspeita (atraso intencional)",
+        sample(sleepMatch.index, sleepMatch[0].length));
+    }
+  }
+
+  // ---- 6. Ofuscação ----
+  // 6a. Tabela de strings escondendo identificadores (ex: local a = {"gg","toast"})
+  const tableHide = /local\s+\w+\s*=\s*\{\s*(?:["'][^"']+["']\s*,\s*){2,}["'][^"']+["']\s*\}/g;
+  const tMatch = tableHide.exec(code);
+  if (tMatch) {
+    addThreat(25, "obfuscation", "high",
+      "Tabela de strings usada para esconder identificadores",
+      sample(tMatch.index, tMatch[0].length));
+  }
+  // 6b. Acesso indireto via _G[...]
+  const gAccess = /_G\s*\[/g;
+  const gMatch = gAccess.exec(code);
+  if (gMatch) {
+    addThreat(25, "obfuscation", "high",
+      "Acesso indireto via _G[...] (ofuscação de chamadas globais)",
+      sample(gMatch.index, gMatch[0].length));
+  }
+  // 6c. loadstring / load(string)
+  const loadRe = /\b(loadstring|load)\s*\(/g;
+  const loadMatch = loadRe.exec(code);
+  if (loadMatch) {
+    addThreat(25, "obfuscation", "high",
+      "Execução dinâmica de código (loadstring/load)",
+      sample(loadMatch.index, loadMatch[0].length));
+  }
+  // 6d. Nomes de variáveis aleatórios (>=3 com aspecto random: ≥8 chars sem vogal/consoante alternada)
+  const idents = code.match(/\blocal\s+([a-zA-Z_]\w{7,})\b/g) || [];
+  const random = idents.filter((s) => {
+    const name = s.replace(/^local\s+/, "");
+    // sem vogais OU mistura caótica de letras+dígitos sem padrão
+    return !/[aeiouAEIOU]/.test(name) || /^[a-zA-Z]{2,}\d{3,}[a-zA-Z]{2,}/.test(name);
+  });
+  if (random.length >= 3) {
+    addThreat(25, "obfuscation", "high",
+      `Nomes de variáveis com aparência aleatória (${random.length} encontrados)`,
+      random.slice(0, 3).join(", "));
+  }
+
+  // ---- 7. Padrões críticos diretos (sempre flag) ----
+  const criticalPatterns = [
+    { re: /os\.execute\s*\(/g, desc: "os.execute — execução de comando do sistema", points: 50 },
+    { re: /io\.popen\s*\(/g, desc: "io.popen — abertura de processo do sistema", points: 50 },
+    { re: /\/bin\/sh|\/bin\/bash|cmd\.exe/g, desc: "Referência direta a shell do sistema", points: 50 },
+  ];
+  for (const p of criticalPatterns) {
+    const m = p.re.exec(code);
+    if (m) {
+      addThreat(p.points, "system_command", "critical", p.desc, sample(m.index, m[0].length));
+    }
+  }
+
+  // ---- Classificação ----
+  let classification: "safe" | "suspicious" | "malicious";
+  if (score >= 50) classification = "malicious";
+  else if (score >= 21) classification = "suspicious";
+  else classification = "safe";
+
+  // securityScore: 100 = totalmente seguro, 0 = pior
+  const securityScore = Math.max(0, Math.min(100, 100 - score));
+
+  const summary = threats.length === 0
+    ? "Nenhum padrão suspeito detectado pela análise heurística."
+    : `Análise heurística: ${threats.length} sinal(is) suspeito(s) detectado(s). Pontuação de risco: ${score}.`;
 
   return {
     classification,
     securityScore,
     threats,
-    summary: threats.length === 0
-      ? "O script não apresenta padrões de código malicioso conhecidos."
-      : `Foram detectados ${threats.length} padrão(ões) suspeito(s) no código. Recomenda-se revisão manual.`,
-    functionality: "Análise estática realizada. Para uma descrição detalhada da funcionalidade, é necessária a análise por IA.",
+    summary,
+    functionality: "Análise comportamental heurística realizada. Para descrição detalhada da funcionalidade, use análise por IA.",
+    _heuristicScore: score,
   };
 }
+
+/**
+ * Combina resultado da IA + heurística, sempre priorizando o pior caso (segurança > falsos positivos).
+ */
+function mergeAnalyses(ai: any, heuristic: any) {
+  const order = { safe: 0, suspicious: 1, malicious: 2 } as const;
+  const aiCls = (ai.classification ?? "safe") as keyof typeof order;
+  const heuCls = (heuristic.classification ?? "safe") as keyof typeof order;
+  const worst = order[aiCls] >= order[heuCls] ? aiCls : heuCls;
+
+  // Mescla ameaças (deduplicadas por descrição)
+  const seen = new Set<string>();
+  const threats: any[] = [];
+  for (const t of [...(ai.threats ?? []), ...(heuristic.threats ?? [])]) {
+    const k = `${t.type}|${t.description}`;
+    if (!seen.has(k)) { seen.add(k); threats.push(t); }
+  }
+
+  return {
+    classification: worst,
+    securityScore: Math.min(ai.securityScore ?? 100, heuristic.securityScore ?? 100),
+    threats,
+    summary: ai.summary ?? heuristic.summary,
+    functionality: ai.functionality ?? heuristic.functionality,
+    _heuristicScore: heuristic._heuristicScore,
+  };
+}
+
