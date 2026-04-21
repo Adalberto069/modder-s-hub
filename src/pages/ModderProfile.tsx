@@ -1,19 +1,22 @@
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { Layout } from "@/components/layout/Layout";
 import { ScriptCard } from "@/components/ScriptCard";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
-import { User, Download, Star, Trophy, Calendar, Code, BookOpen, Info } from "lucide-react";
+import { User, Download, Star, Trophy, Calendar, Code, BookOpen, Info, Plus } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { UserBadges } from "@/components/UserBadges";
 import { RoleBadge } from "@/components/RoleBadge";
+import { useAuth } from "@/lib/auth";
 
 export default function ModderProfile() {
   const { userId } = useParams<{ userId: string }>();
+  const { user, isAdmin } = useAuth();
 
   const { data: profile, isLoading: profileLoading } = useQuery({
     queryKey: ["modder-profile", userId],
@@ -262,13 +265,22 @@ export default function ModderProfile() {
           </TabsContent>
 
           {/* Tutorials Tab */}
-          <TabsContent value="tutorials">
+          <TabsContent value="tutorials" className="space-y-4">
+            {isAdmin && (
+              <div className="flex justify-end">
+                <Button asChild size="sm" className="bg-neon-purple hover:bg-neon-purple/90 text-white font-black uppercase tracking-widest text-[10px] gap-2">
+                  <Link to="/tutorial/new">
+                    <Plus className="h-3.5 w-3.5" /> Criar novo tutorial
+                  </Link>
+                </Button>
+              </div>
+            )}
             {tutorials && tutorials.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 {tutorials.map((t: any) => (
                   <Card key={t.id} className="group relative overflow-hidden border-neon-purple/20 bg-card/40 backdrop-blur-md hover:border-neon-purple/40 transition-all duration-500 shadow-lg hover:shadow-neon-purple/10">
                     <CardContent className="p-0">
-                      <a href={`/tutorial/${t.id}`} className="block">
+                      <Link to={`/tutorial/${t.id}`} className="block">
                         <div className="relative h-44 w-full overflow-hidden">
                           {t.thumbnail_url ? (
                             <img src={t.thumbnail_url} alt={t.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
@@ -295,7 +307,7 @@ export default function ModderProfile() {
                             </div>
                           </div>
                         </div>
-                      </a>
+                      </Link>
                     </CardContent>
                   </Card>
                 ))}
@@ -305,6 +317,18 @@ export default function ModderProfile() {
                 <CardContent className="py-20 text-center space-y-3">
                   <BookOpen className="h-10 w-10 text-muted-foreground/20 mx-auto" />
                   <p className="text-muted-foreground font-medium">Nenhum tutorial publicado ainda.</p>
+                  {isAdmin && (
+                    <Button asChild size="sm" variant="outline" className="mt-2 gap-2">
+                      <Link to="/tutorial/new">
+                        <Plus className="h-3.5 w-3.5" /> Criar primeiro tutorial
+                      </Link>
+                    </Button>
+                  )}
+                  {!isAdmin && user?.id === profile.user_id && (
+                    <p className="text-[11px] text-muted-foreground/60 italic">
+                      Apenas administradores publicam tutoriais oficiais. Entre em contato com a equipe para sugerir conteúdo.
+                    </p>
+                  )}
                 </CardContent>
               </Card>
             )}

@@ -4,13 +4,16 @@ import { useAuth } from "@/lib/auth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MessageSquare, ShieldAlert, Check, ExternalLink } from "lucide-react";
+import { MessageSquare, ShieldAlert, Check, ExternalLink, CheckCheck, Archive } from "lucide-react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
+import { useState } from "react";
 
 export function ModderModerationInbox() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
+
+  const [showHistory, setShowHistory] = useState(false);
 
   const { data: messages } = useQuery({
     queryKey: ["modder-moderation-inbox", user?.id],
@@ -20,12 +23,24 @@ export function ModderModerationInbox() {
         .select("*, scripts(id, title)")
         .eq("recipient_id", user!.id)
         .order("created_at", { ascending: false })
-        .limit(20);
+        .limit(50);
       return (data ?? []) as any[];
     },
     enabled: !!user,
     refetchInterval: 30000,
   });
+
+  const markAllRead = async () => {
+    if (!user) return;
+    const unreadIds = (messages ?? []).filter((m) => !m.is_read).map((m) => m.id);
+    if (unreadIds.length === 0) return;
+    const { error } = await supabase
+      .from("moderation_messages" as any)
+      .update({ is_read: true } as any)
+      .in("id", unreadIds);
+    if (error) { toast.error(error.message); return; }
+    queryClient.invalidateQueries({ queryKey: ["modder-moderation-inbox"] });
+  };
 
   const markRead = async (id: string) => {
     const { error } = await supabase
@@ -38,11 +53,31 @@ export function ModderModerationInbox() {
 
   if (!messages || messages.length === 0) return null;
 
-  const unreadCount = messages.filter((m) => !m.is_read).length;
+  const unread = messages.filter((m) => !m.is_read);
+  const read = messages.filter((m) => m.is_read);
+  const visible = showHistory ? messages : unread;
+  const unreadCount = unread.length;
+
+  // Hide entirely when no unread and not viewing history
+  if (unreadCount === 0 && !showHistory && read.length > 0) {
+    return (
+      <Card className="border-white/5 bg-white/[0.02] mb-6">
+        <CardHeader className="pb-3 flex-row items-center justify-between">
+          <CardTitle className="text-sm flex items-center gap-2 font-mono uppercase tracking-widest text-muted-foreground">
+            <ShieldAlert className="h-4 w-4" />
+            Moderação · sem novas mensagens
+          </CardTitle>
+          <Button size="sm" variant="ghost" className="h-7 text-[10px]" onClick={() => setShowHistory(true)}>
+            <Archive className="h-3 w-3 mr-1" /> Ver histórico ({read.length})
+          </Button>
+        </CardHeader>
+      </Card>
+    );
+  }
 
   return (
     <Card className="border-primary/30 bg-primary/5 mb-6">
-      <CardHeader className="pb-3">
+      <CardHeader className="pb-3 flex-row items-center justify-between gap-2 flex-wrap">
         <CardTitle className="text-sm flex items-center gap-2 font-mono uppercase tracking-widest">
           <ShieldAlert className="h-4 w-4 text-primary" />
           Mensagens da Moderação
@@ -52,9 +87,24 @@ export function ModderModerationInbox() {
             </Badge>
           )}
         </CardTitle>
+        <div className="flex items-center gap-1">
+          {unreadCount > 0 && (
+            <Button size="sm" variant="ghost" className="h-7 text-[10px]" onClick={markAllRead}>
+              <CheckCheck className="h-3 w-3 mr-1" /> Marcar todas
+            </Button>
+          )}
+          {read.length > 0 && (
+            <Button size="sm" variant="ghost" className="h-7 text-[10px]" onClick={() => setShowHistory((v) => !v)}>
+              <Archive className="h-3 w-3 mr-1" /> {showHistory ? "Ocultar histórico" : `Histórico (${read.length})`}
+            </Button>
+          )}
+        </div>
       </CardHeader>
       <CardContent className="space-y-2 max-h-[400px] overflow-y-auto">
-        {messages.map((msg: any) => (
+        <p className="text-[10px] text-muted-foreground/70 font-mono mb-2">
+          ⓘ Mensagens lidas são apagadas automaticamente após 30 dias.
+        </p>
+        {visible.map((msg: any) => (
           <div
             key={msg.id}
             className={`p-3 rounded-lg border text-sm ${
@@ -76,9 +126,9 @@ export function ModderModerationInbox() {
                 )}
               </div>
               <div className="flex items-center gap-1">
-                {msg.scripts?.id && (
+                {msg.script_id && (
                   <Button asChild size="sm" variant="ghost" className="h-7 px-2 text-[10px]">
-                    <Link to={`/script/${msg.scripts.id}`}>
+                    <Link to={`/script/${msg.script_id}`}>
                       <ExternalLink className="h-3 w-3 mr-1" />
                       Ver script
                     </Link>

@@ -1530,6 +1530,7 @@ export type Database = {
       }
       is_admin: { Args: { _user_id: string }; Returns: boolean }
       is_modder: { Args: { _user_id: string }; Returns: boolean }
+      purge_old_read_moderation_messages: { Args: never; Returns: number }
       script_has_purchases: { Args: { _script_id: string }; Returns: boolean }
       validate_script_password: {
         Args: { _password: string; _script_id: string }
