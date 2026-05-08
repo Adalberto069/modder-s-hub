@@ -1,65 +1,86 @@
-import { Terminal } from "lucide-react";
 import { Link } from "react-router-dom";
+import { HiddenMark } from "@/components/brand/HiddenMark";
 
 export function Footer() {
   return (
-    <footer className="border-t border-border/50 bg-card/30 py-8 sm:py-12">
-      <div className="container">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 mb-8 sm:mb-10">
-          {/* Brand */}
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <Terminal className="h-5 w-5 text-neon-purple" />
-              <span className="font-mono font-black text-lg">
-                Hidden<span className="text-neon-green">Mod</span>
-              </span>
-            </div>
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              A plataforma #1 para scripts Game Guardian com licenças seguras e ofuscação profissional.
-            </p>
-          </div>
+    <footer className="relative border-t border-white/10 bg-[#030305] py-10 sm:py-14 overflow-hidden">
+      {/* faint grid */}
+      <div className="absolute inset-0 bg-grid-pattern opacity-40 pointer-events-none" />
 
-          {/* Plataforma */}
-          <div className="space-y-3">
-            <h4 className="text-sm font-semibold">Plataforma</h4>
-            <ul className="space-y-2 text-sm text-muted-foreground">
-              <li><Link to="/marketplace" className="hover:text-foreground transition-colors">Marketplace</Link></li>
-              <li><Link to="/tutorials" className="hover:text-foreground transition-colors">Tutoriais</Link></li>
-              <li><Link to="/ferramentas" className="hover:text-foreground transition-colors">Ferramentas</Link></li>
-              <li><Link to="/forum" className="hover:text-foreground transition-colors">Fórum</Link></li>
-            </ul>
-          </div>
-
-          {/* Conta */}
-          <div className="space-y-3">
-            <h4 className="text-sm font-semibold">Conta</h4>
-            <ul className="space-y-2 text-sm text-muted-foreground">
-              <li><Link to="/dashboard" className="hover:text-foreground transition-colors">Painel</Link></li>
-              <li><Link to="/profile/settings" className="hover:text-foreground transition-colors">Configurações</Link></li>
-              <li><Link to="/auth" className="hover:text-foreground transition-colors">Login / Registro</Link></li>
-            </ul>
-          </div>
-
-          {/* Legal */}
-          <div className="space-y-3">
-            <h4 className="text-sm font-semibold">Legal</h4>
-            <ul className="space-y-2 text-sm text-muted-foreground">
-              <li><Link to="/privacidade" className="hover:text-foreground transition-colors">Política de Privacidade</Link></li>
-              <li><Link to="/termos" className="hover:text-foreground transition-colors">Termos de Uso</Link></li>
-              <li><Link to="/forum" className="hover:text-foreground transition-colors">Contato (Fórum)</Link></li>
-            </ul>
-          </div>
+      <div className="container relative">
+        {/* Terminal prompt header */}
+        <div className="mb-8 sm:mb-10 font-mono text-[11px] sm:text-xs text-muted-foreground border-l-2 border-neon-green/40 pl-3">
+          <span className="text-neon-green">visitor@hidden</span>
+          <span className="opacity-60">:~$</span>{" "}
+          <span className="text-foreground/80">cat /etc/hidden/about.txt</span>
         </div>
 
-        <div className="border-t border-border/50 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p className="text-xs text-muted-foreground">
-            © {new Date().getFullYear()} Hidden Mod. Todos os direitos reservados.
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 mb-10">
+          <div className="space-y-3 col-span-2 md:col-span-1">
+            <div className="flex items-center gap-2.5">
+              <HiddenMark size={24} />
+              <span className="font-mono font-black text-base uppercase">
+                Hidden<span className="text-neon-green">//</span>Mod
+              </span>
+            </div>
+            <p className="text-xs text-muted-foreground leading-relaxed font-mono">
+              cofre underground · scripts game guardian · licenças seguras · obfuscação assinada por comprador.
+            </p>
+            <div className="flex items-center gap-2 pt-1 text-[10px] font-mono uppercase tracking-[0.2em] text-muted-foreground">
+              <span className="live-dot" /> sistema operacional
+            </div>
+          </div>
+
+          <FooterCol title="// plataforma" links={[
+            ["Marketplace", "/marketplace"],
+            ["Tutoriais", "/tutorials"],
+            ["Ferramentas", "/ferramentas"],
+            ["Encomendas", "/bounties"],
+            ["Fórum", "/forum"],
+          ]} />
+          <FooterCol title="// conta" links={[
+            ["Painel", "/dashboard"],
+            ["Configurações", "/profile/settings"],
+            ["Login / Registro", "/auth"],
+          ]} />
+          <FooterCol title="// legal" links={[
+            ["Privacidade", "/privacidade"],
+            ["Termos", "/termos"],
+            ["Contato (Fórum)", "/forum"],
+          ]} />
+        </div>
+
+        <div className="border-t border-white/10 pt-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+          <p>
+            © {new Date().getFullYear()} hidden//mod · all signals encrypted
           </p>
-          <p className="text-xs text-muted-foreground font-mono">
-            Feito para Modders 🎮
+          <p className="flex items-center gap-2">
+            <span className="opacity-60">node</span>
+            <span className="text-neon-green">br-sa-1</span>
+            <span className="opacity-30">·</span>
+            <span className="opacity-60">v2.0.4a</span>
           </p>
         </div>
       </div>
     </footer>
+  );
+}
+
+function FooterCol({ title, links }: { title: string; links: [string, string][] }) {
+  return (
+    <div className="space-y-3">
+      <h4 className="text-[11px] font-mono font-bold uppercase tracking-[0.25em] text-neon-purple/80">
+        {title}
+      </h4>
+      <ul className="space-y-2 text-sm text-muted-foreground font-mono">
+        {links.map(([label, href]) => (
+          <li key={href}>
+            <Link to={href} className="hover:text-neon-green transition-colors">
+              {label.toLowerCase()}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
