@@ -1,7 +1,8 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
-import { Terminal, Menu, X, User, LogOut, LayoutDashboard, Shield, Settings } from "lucide-react";
+import { Menu, X, User, LogOut, LayoutDashboard, Shield, Settings } from "lucide-react";
+import { HiddenMark } from "@/components/brand/HiddenMark";
 import { useState } from "react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { NotificationCenter } from "@/components/NotificationCenter";
@@ -26,10 +27,10 @@ export function Navbar() {
   return (
     <nav className="sticky top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-xl">
       <div className="container flex h-16 items-center justify-between">
-        <Link to="/" className="flex items-center gap-2">
-          <Terminal className="h-6 w-6 text-neon-purple" />
-          <span className="text-xl font-black font-mono tracking-tight uppercase">
-            Hidden <span className="text-neon-purple">Mod</span>
+        <Link to="/" className="flex items-center gap-2.5 group">
+          <HiddenMark size={26} className="transition-transform group-hover:rotate-[8deg]" />
+          <span className="text-lg font-black font-mono tracking-tight uppercase glitch" data-text="Hidden//Mod">
+            Hidden<span className="text-neon-green">//</span>Mod
           </span>
         </Link>
 
