@@ -17,6 +17,8 @@ import { Card } from "@/components/ui/card";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { UserBadges } from "@/components/UserBadges";
 import { RoleBadge } from "@/components/RoleBadge";
+import { TerminalTypewriter } from "@/components/TerminalTypewriter";
+import { MarqueeTicker } from "@/components/MarqueeTicker";
 import { useState } from "react";
 
 export default function Index() {
@@ -102,7 +104,7 @@ export default function Index() {
   return (
     <Layout>
       {/* ══════════════ TERMINAL HERO ══════════════ */}
-      <section className="relative min-h-[85vh] sm:min-h-[92vh] flex items-center justify-center overflow-hidden bg-[#030304]">
+      <section className="relative min-h-[85vh] sm:min-h-[92vh] flex items-center justify-center overflow-hidden bg-[#030304] scanlines noise">
         {/* Animated Grid & Glows Background */}
         <div className="absolute inset-0 z-0">
           <div className="absolute inset-0 bg-[#030304] z-0" />
