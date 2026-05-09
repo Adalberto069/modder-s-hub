@@ -1059,14 +1059,15 @@ end
       {showPaymentMethodModal && (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
           <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.2 }}>
-            <Card className="w-full max-w-sm bg-card border-primary/20">
-               <CardHeader className="text-center pb-2">
-                <CardTitle className="text-lg">Método de Pagamento</CardTitle>
-                <p className="text-xs text-muted-foreground">
-                  {pendingRenewal ? "Renovação" : ""}
+            <Card className="w-full max-w-sm bg-[#050505] border border-white/10 rounded-none font-mono">
+              <div className="h-1 w-full bg-gradient-to-r from-neon-purple via-neon-pink to-neon-cyan" />
+              <CardHeader className="text-center pb-2 border-b border-white/10">
+                <CardTitle className="text-xs uppercase tracking-[0.3em] font-black text-foreground">// método de pagamento</CardTitle>
+                <p className="text-[10px] text-muted-foreground uppercase tracking-widest">
+                  {pendingRenewal ? "renovação" : "selecione um trilho"}
                 </p>
               </CardHeader>
-              <CardContent className="space-y-3">
+              <CardContent className="space-y-3 pt-4">
                 {(() => {
                   const basePrice = Number(script?.price ?? 0);
                   const pixFee = Math.round(basePrice * 0.01 * 100) / 100;
@@ -1076,37 +1077,37 @@ end
                   return (
                     <>
                       <Button
-                        className="w-full h-auto py-3 justify-start gap-3 bg-accent/10 border border-accent/20 hover:bg-accent/15 text-foreground"
+                        className="w-full h-auto py-3 justify-start gap-3 bg-[#030304] border border-neon-green/30 hover:bg-neon-green/10 hover:border-neon-green/50 text-foreground rounded-none transition-colors"
                         variant="outline"
                         onClick={() => handlePurchase(pendingRenewal, "pix")}
                         disabled={purchasing}
                       >
-                        <QrCode className="h-5 w-5 text-accent shrink-0" />
+                        <QrCode className="h-5 w-5 text-neon-green shrink-0" />
                         <div className="text-left flex-1">
-                          <p className="font-semibold text-sm">PIX</p>
-                          <p className="text-[10px] text-muted-foreground">Pagamento instantâneo</p>
-                          <div className="mt-1 text-[10px] text-muted-foreground space-y-0.5">
+                          <p className="font-black text-xs uppercase tracking-widest text-neon-green">// PIX</p>
+                          <p className="text-[10px] text-muted-foreground uppercase tracking-widest">instantâneo</p>
+                          <div className="mt-1 text-[10px] text-muted-foreground space-y-0.5 normal-case tracking-normal">
                             <p>Subtotal: R$ {basePrice.toFixed(2)}</p>
-                            <p>Taxa de pagamento (Pix 1%): R$ {pixFee.toFixed(2)}</p>
-                            <p className="text-foreground font-semibold">Total: R$ {pixTotal.toFixed(2)}</p>
+                            <p>Taxa Pix (1%): R$ {pixFee.toFixed(2)}</p>
+                            <p className="text-neon-green font-black">Total: R$ {pixTotal.toFixed(2)}</p>
                           </div>
                         </div>
                       </Button>
 
                       <Button
-                        className="w-full h-auto py-3 justify-start gap-3 bg-primary/10 border border-primary/20 hover:bg-primary/15 text-foreground"
+                        className="w-full h-auto py-3 justify-start gap-3 bg-[#030304] border border-neon-purple/30 hover:bg-neon-purple/10 hover:border-neon-purple/50 text-foreground rounded-none transition-colors"
                         variant="outline"
                         onClick={() => handlePurchase(pendingRenewal, "card")}
                         disabled={purchasing}
                       >
-                        <CreditCard className="h-5 w-5 text-primary shrink-0" />
+                        <CreditCard className="h-5 w-5 text-neon-purple shrink-0" />
                         <div className="text-left flex-1">
-                          <p className="font-semibold text-sm">Cartão de Crédito</p>
-                          <p className="text-[10px] text-muted-foreground">Parcele em até 12x</p>
-                          <div className="mt-1 text-[10px] text-muted-foreground space-y-0.5">
+                          <p className="font-black text-xs uppercase tracking-widest text-neon-purple">// cartão</p>
+                          <p className="text-[10px] text-muted-foreground uppercase tracking-widest">parcele em até 12x</p>
+                          <div className="mt-1 text-[10px] text-muted-foreground space-y-0.5 normal-case tracking-normal">
                             <p>Subtotal: R$ {basePrice.toFixed(2)}</p>
-                            <p>Taxa de pagamento (Cartão 4.99%): R$ {cardFee.toFixed(2)}</p>
-                            <p className="text-foreground font-semibold">Total: R$ {cardTotal.toFixed(2)}</p>
+                            <p>Taxa Cartão (4.99%): R$ {cardFee.toFixed(2)}</p>
+                            <p className="text-neon-purple font-black">Total: R$ {cardTotal.toFixed(2)}</p>
                           </div>
                         </div>
                       </Button>
@@ -1116,10 +1117,10 @@ end
 
                 <Button
                   variant="ghost"
-                  className="w-full text-muted-foreground"
+                  className="w-full text-muted-foreground hover:text-foreground rounded-none uppercase tracking-widest text-[10px] font-black"
                   onClick={() => { setShowPaymentMethodModal(false); setPendingRenewal(false); }}
                 >
-                  Cancelar
+                  // cancelar
                 </Button>
               </CardContent>
             </Card>
