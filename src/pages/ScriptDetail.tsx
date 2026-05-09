@@ -877,55 +877,58 @@ end
           {/* Sidebar */}
           <div className="space-y-5 lg:sticky lg:top-24 lg:self-start">
             {/* Checkout Card */}
-            <Card className="relative overflow-hidden border-primary/15 bg-card/50 backdrop-blur-xl shadow-2xl">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-primary/8 blur-[40px] -z-10" />
+            <Card className="relative overflow-hidden border-white/10 bg-[#050505] rounded-none shadow-[0_0_30px_rgba(168,85,247,0.06)]">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-neon-purple/8 blur-[40px] -z-10" />
+              <div className="h-1 w-full bg-gradient-to-r from-neon-purple via-neon-pink to-neon-cyan" />
 
-              <CardHeader className="pb-3 border-b border-white/5">
-                <CardTitle className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Checkout</CardTitle>
+              <CardHeader className="pb-3 border-b border-white/10 font-mono">
+                <CardTitle className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground flex items-center gap-2">
+                  <span className="live-dot" /> // checkout · secure_link
+                </CardTitle>
               </CardHeader>
 
-              <CardContent className="p-5 sm:p-6 space-y-5">
-                <div className="flex flex-col items-center gap-2 py-3">
+              <CardContent className="p-5 sm:p-6 space-y-5 font-mono">
+                <div className="flex flex-col items-center gap-2 py-3 ascii-frame">
                   {script.is_paid ? (
                     <>
                       <div className="flex items-baseline gap-1">
-                        <span className="text-sm font-bold text-muted-foreground">R$</span>
-                        <span className="text-4xl sm:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-br from-foreground to-foreground/50">{Number(script.price).toFixed(2)}</span>
+                        <span className="text-xs font-black uppercase tracking-widest text-muted-foreground">R$</span>
+                        <span className="text-4xl sm:text-5xl font-black text-white tabular-nums">{Number(script.price).toFixed(2)}</span>
                       </div>
-                      <Badge variant="outline" className="border-[hsl(var(--neon-pink)/0.3)] text-[hsl(var(--neon-pink))] bg-[hsl(var(--neon-pink)/0.05)] px-3 py-1 text-[10px]">
-                        <Key className="h-3 w-3 mr-1.5" /> {(script as any).license_duration_days ? `${(script as any).license_duration_days} dias` : "Vitalício"}
+                      <Badge variant="outline" className="rounded-none border-neon-pink/30 text-neon-pink bg-neon-pink/5 px-3 py-1 text-[9px] uppercase tracking-widest font-black">
+                        <Key className="h-3 w-3 mr-1.5" /> {(script as any).license_duration_days ? `${(script as any).license_duration_days} DIAS` : "VITALÍCIO"}
                       </Badge>
                     </>
                   ) : (
                     <>
-                      <span className="text-3xl sm:text-4xl font-black text-accent">Grátis</span>
-                      <Badge variant="outline" className="border-accent/30 text-accent bg-accent/5 px-3 py-1 text-[10px]">Acesso Livre</Badge>
+                      <span className="text-3xl sm:text-4xl font-black uppercase text-neon-green tracking-tight">FREE//OPEN</span>
+                      <Badge variant="outline" className="rounded-none border-neon-green/30 text-neon-green bg-neon-green/5 px-3 py-1 text-[9px] uppercase tracking-widest font-black">ACESSO LIVRE</Badge>
                     </>
                   )}
                 </div>
 
                 <div className="space-y-3">
                   {isOwner ? (
-                    <div className="bg-primary/10 border border-primary/20 rounded-xl p-4 text-center">
-                      <Badge className="bg-primary text-primary-foreground mb-2">Seu script</Badge>
-                      <p className="text-sm font-bold text-primary">Você é o criador deste script.</p>
+                    <div className="bg-neon-purple/5 border border-neon-purple/20 rounded-none p-4 text-center">
+                      <Badge className="bg-neon-purple text-white rounded-none mb-2 text-[9px] uppercase tracking-widest font-black">// owner</Badge>
+                      <p className="text-xs font-black uppercase tracking-widest text-neon-purple">Você é o autor deste payload</p>
                     </div>
                   ) : script.is_paid && !isAdmin && !hasPurchased ? (
                     <>
                       {purchaseSuccess || (existingLicense && !isLicenseExpired) ? (
                         <div className="space-y-4">
-                          <div className="bg-accent/5 border border-accent/20 rounded-xl p-4 space-y-3">
-                            <div className="flex items-center gap-2 text-accent text-sm font-bold">
-                              <CheckCircle className="h-4 w-4" /> Licença Ativa
+                          <div className="bg-neon-green/5 border border-neon-green/20 rounded-none p-4 space-y-3">
+                            <div className="flex items-center gap-2 text-neon-green text-[11px] font-black uppercase tracking-widest">
+                              <CheckCircle className="h-4 w-4" /> LICENÇA ATIVA
                             </div>
-                            <div className="bg-black/40 rounded-lg p-2.5 border border-white/5 flex items-center justify-between">
-                              <code className="text-[10px] sm:text-xs font-mono text-primary truncate flex-1 mr-2">
+                            <div className="bg-[#030304] rounded-none p-2.5 border border-white/10 flex items-center justify-between">
+                              <code className="text-[10px] sm:text-xs font-mono text-neon-green truncate flex-1 mr-2">
                                 {purchaseSuccess || (existingLicense as any).license_key}
                               </code>
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                className="h-7 w-7 p-0 hover:bg-primary/20 shrink-0"
+                                className="h-7 w-7 p-0 hover:bg-neon-green/10 shrink-0 rounded-none"
                                 onClick={() => {
                                   navigator.clipboard.writeText(purchaseSuccess || (existingLicense as any).license_key);
                                   toast.success("Chave copiada!");
@@ -934,15 +937,15 @@ end
                                 <Copy className="h-3 w-3" />
                               </Button>
                             </div>
-                            <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold h-11 rounded-xl" onClick={handleDownloadLoader}>
-                              <Download className="mr-2 h-4 w-4" /> Baixar Loader
+                            <Button className="w-full h-12 rounded-none bg-neon-green hover:bg-neon-green/90 text-black font-black uppercase tracking-widest text-xs border border-neon-green shadow-[0_0_20px_rgba(57,255,20,0.2)]" onClick={handleDownloadLoader}>
+                              <Download className="mr-2 h-4 w-4" /> // baixar loader
                             </Button>
                           </div>
 
                           {existingLicense?.expires_at && (
                             <div className="text-center">
-                              <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest mb-1">Expira em</p>
-                              <Badge variant="outline" className="font-mono text-[10px] border-white/10 px-3">
+                              <p className="text-[9px] text-muted-foreground uppercase font-black tracking-[0.25em] mb-1">// expira em</p>
+                              <Badge variant="outline" className="font-mono text-[10px] border-white/10 px-3 rounded-none bg-[#030304] text-foreground">
                                 {new Date(existingLicense.expires_at).toLocaleDateString("pt-BR", { day: '2-digit', month: 'long', year: 'numeric' })}
                               </Badge>
                             </div>
@@ -950,63 +953,63 @@ end
                         </div>
                       ) : isLicenseExpired ? (
                         <div className="space-y-3">
-                          <div className="bg-destructive/5 border border-destructive/20 rounded-xl p-3 text-center">
-                            <p className="text-sm font-bold text-destructive mb-0.5">Licença Expirada</p>
-                            <p className="text-[10px] text-muted-foreground">Renove para continuar usando.</p>
+                          <div className="bg-destructive/5 border border-destructive/30 rounded-none p-3 text-center">
+                            <p className="text-[11px] font-black uppercase tracking-widest text-destructive mb-0.5">// LICENÇA EXPIRADA</p>
+                            <p className="text-[10px] text-muted-foreground uppercase tracking-widest">Renove para continuar.</p>
                           </div>
-                          <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold h-11 rounded-xl overflow-hidden relative group" onClick={handleRenew} disabled={purchasing}>
+                          <Button className="w-full h-12 rounded-none bg-neon-purple hover:bg-neon-purple/90 text-white font-black uppercase tracking-widest text-xs border border-neon-purple shadow-[0_0_20px_rgba(168,85,247,0.25)] overflow-hidden relative group" onClick={handleRenew} disabled={purchasing}>
                             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-                            <Clock className="mr-2 h-4 w-4" /> {purchasing ? "Iniciando..." : "Renovar Acesso"}
+                            <Clock className="mr-2 h-4 w-4" /> {purchasing ? "INICIANDO..." : "// renovar acesso"}
                           </Button>
                         </div>
                       ) : (
                         <div className="space-y-2">
-                          <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold h-11 rounded-xl overflow-hidden relative group" onClick={openPaymentMethodModal} disabled={purchasing}>
+                          <Button className="w-full h-12 rounded-none bg-neon-purple hover:bg-neon-purple/90 text-white font-black uppercase tracking-widest text-xs border border-neon-purple shadow-[0_0_20px_rgba(168,85,247,0.25)] overflow-hidden relative group" onClick={openPaymentMethodModal} disabled={purchasing}>
                             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-                            <CreditCard className="mr-2 h-4 w-4" /> {purchasing ? "Processando..." : "Comprar Agora"}
+                            <CreditCard className="mr-2 h-4 w-4" /> {purchasing ? "PROCESSANDO..." : "// adquirir agora"}
                           </Button>
                           <Button
                             variant="outline"
-                            className="w-full h-9 rounded-xl border-accent/30 text-accent hover:bg-accent/10 text-xs font-bold"
+                            className="w-full h-10 rounded-none border-neon-cyan/30 bg-transparent text-neon-cyan hover:bg-neon-cyan/10 hover:text-neon-cyan text-[10px] font-black uppercase tracking-widest"
                             onClick={handleTestScript}
                             disabled={testingScript || !!hasTestedScript}
                           >
                             <Play className="mr-2 h-3.5 w-3.5" />
-                            {hasTestedScript ? "Teste já utilizado" : testingScript ? "Gerando teste..." : "Testar 3min antes de comprar"}
+                            {hasTestedScript ? "// teste já consumido" : testingScript ? "// gerando teste..." : "// test_drive 3min"}
                           </Button>
                         </div>
                       )}
                     </>
                   ) : (
-                    <Button className="w-full bg-accent hover:bg-accent/90 text-accent-foreground font-bold h-11 rounded-xl group" onClick={handleDownloadFree}>
-                      <Download className="mr-2 h-4 w-4 group-hover:translate-y-0.5 transition-transform" /> Baixar Agora
+                    <Button className="w-full h-12 rounded-none bg-neon-green hover:bg-neon-green/90 text-black font-black uppercase tracking-widest text-xs border border-neon-green shadow-[0_0_20px_rgba(57,255,20,0.2)] group" onClick={handleDownloadFree}>
+                      <Download className="mr-2 h-4 w-4 group-hover:translate-y-0.5 transition-transform" /> // baixar agora
                     </Button>
                   )}
 
                   {!hasAccess && (
-                    <p className="text-[9px] text-center text-muted-foreground/60 px-2">
-                      Ao adquirir, você concorda com nossos termos de uso.
+                    <p className="text-[9px] text-center text-muted-foreground/60 px-2 uppercase tracking-widest">
+                      ao adquirir, você concorda com nossos termos.
                     </p>
                   )}
                 </div>
 
-                {/* Checkout trust info */}
-                <div className="p-3 rounded-xl bg-accent/5 border border-accent/10 space-y-1.5 mt-1">
-                  <p className="text-[9px] text-muted-foreground leading-relaxed flex items-start gap-1.5">
-                    <ShieldCheck className="h-3 w-3 text-accent shrink-0 mt-0.5" />
-                    Pagamento processado com segurança pelo Mercado Pago
+                {/* Trust info */}
+                <div className="p-3 rounded-none bg-[#030304] border border-white/10 space-y-1.5">
+                  <p className="text-[9px] text-muted-foreground leading-relaxed flex items-start gap-1.5 uppercase tracking-widest">
+                    <ShieldCheck className="h-3 w-3 text-neon-green shrink-0 mt-0.5" />
+                    pagamento seguro · mercado pago
                   </p>
-                  <p className="text-[9px] text-muted-foreground leading-relaxed flex items-start gap-1.5">
-                    <CreditCard className="h-3 w-3 text-primary shrink-0 mt-0.5" />
+                  <p className="text-[9px] text-muted-foreground leading-relaxed flex items-start gap-1.5 uppercase tracking-widest">
+                    <CreditCard className="h-3 w-3 text-neon-purple shrink-0 mt-0.5" />
                     Aceitamos Pix e Cartão de crédito
                   </p>
-                  <p className="text-[9px] text-muted-foreground leading-relaxed flex items-start gap-1.5">
+                  <p className="text-[9px] text-muted-foreground leading-relaxed flex items-start gap-1.5 uppercase tracking-widest">
                     <Info className="h-3 w-3 text-muted-foreground shrink-0 mt-0.5" />
-                    No Pix, aparecerá o nome do vendedor cadastrado no banco
+                    no pix, aparece o nome do vendedor no banco
                   </p>
-                  <p className="text-[9px] text-muted-foreground leading-relaxed flex items-start gap-1.5">
-                    <CheckCircle className="h-3 w-3 text-accent shrink-0 mt-0.5" />
-                    Compra protegida — entrega automática após confirmação
+                  <p className="text-[9px] text-muted-foreground leading-relaxed flex items-start gap-1.5 uppercase tracking-widest">
+                    <CheckCircle className="h-3 w-3 text-neon-green shrink-0 mt-0.5" />
+                    entrega automática após confirmação
                   </p>
                 </div>
 
@@ -1056,14 +1059,15 @@ end
       {showPaymentMethodModal && (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
           <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.2 }}>
-            <Card className="w-full max-w-sm bg-card border-primary/20">
-               <CardHeader className="text-center pb-2">
-                <CardTitle className="text-lg">Método de Pagamento</CardTitle>
-                <p className="text-xs text-muted-foreground">
-                  {pendingRenewal ? "Renovação" : ""}
+            <Card className="w-full max-w-sm bg-[#050505] border border-white/10 rounded-none font-mono">
+              <div className="h-1 w-full bg-gradient-to-r from-neon-purple via-neon-pink to-neon-cyan" />
+              <CardHeader className="text-center pb-2 border-b border-white/10">
+                <CardTitle className="text-xs uppercase tracking-[0.3em] font-black text-foreground">// método de pagamento</CardTitle>
+                <p className="text-[10px] text-muted-foreground uppercase tracking-widest">
+                  {pendingRenewal ? "renovação" : "selecione um trilho"}
                 </p>
               </CardHeader>
-              <CardContent className="space-y-3">
+              <CardContent className="space-y-3 pt-4">
                 {(() => {
                   const basePrice = Number(script?.price ?? 0);
                   const pixFee = Math.round(basePrice * 0.01 * 100) / 100;
@@ -1073,37 +1077,37 @@ end
                   return (
                     <>
                       <Button
-                        className="w-full h-auto py-3 justify-start gap-3 bg-accent/10 border border-accent/20 hover:bg-accent/15 text-foreground"
+                        className="w-full h-auto py-3 justify-start gap-3 bg-[#030304] border border-neon-green/30 hover:bg-neon-green/10 hover:border-neon-green/50 text-foreground rounded-none transition-colors"
                         variant="outline"
                         onClick={() => handlePurchase(pendingRenewal, "pix")}
                         disabled={purchasing}
                       >
-                        <QrCode className="h-5 w-5 text-accent shrink-0" />
+                        <QrCode className="h-5 w-5 text-neon-green shrink-0" />
                         <div className="text-left flex-1">
-                          <p className="font-semibold text-sm">PIX</p>
-                          <p className="text-[10px] text-muted-foreground">Pagamento instantâneo</p>
-                          <div className="mt-1 text-[10px] text-muted-foreground space-y-0.5">
+                          <p className="font-black text-xs uppercase tracking-widest text-neon-green">// PIX</p>
+                          <p className="text-[10px] text-muted-foreground uppercase tracking-widest">instantâneo</p>
+                          <div className="mt-1 text-[10px] text-muted-foreground space-y-0.5 normal-case tracking-normal">
                             <p>Subtotal: R$ {basePrice.toFixed(2)}</p>
-                            <p>Taxa de pagamento (Pix 1%): R$ {pixFee.toFixed(2)}</p>
-                            <p className="text-foreground font-semibold">Total: R$ {pixTotal.toFixed(2)}</p>
+                            <p>Taxa Pix (1%): R$ {pixFee.toFixed(2)}</p>
+                            <p className="text-neon-green font-black">Total: R$ {pixTotal.toFixed(2)}</p>
                           </div>
                         </div>
                       </Button>
 
                       <Button
-                        className="w-full h-auto py-3 justify-start gap-3 bg-primary/10 border border-primary/20 hover:bg-primary/15 text-foreground"
+                        className="w-full h-auto py-3 justify-start gap-3 bg-[#030304] border border-neon-purple/30 hover:bg-neon-purple/10 hover:border-neon-purple/50 text-foreground rounded-none transition-colors"
                         variant="outline"
                         onClick={() => handlePurchase(pendingRenewal, "card")}
                         disabled={purchasing}
                       >
-                        <CreditCard className="h-5 w-5 text-primary shrink-0" />
+                        <CreditCard className="h-5 w-5 text-neon-purple shrink-0" />
                         <div className="text-left flex-1">
-                          <p className="font-semibold text-sm">Cartão de Crédito</p>
-                          <p className="text-[10px] text-muted-foreground">Parcele em até 12x</p>
-                          <div className="mt-1 text-[10px] text-muted-foreground space-y-0.5">
+                          <p className="font-black text-xs uppercase tracking-widest text-neon-purple">// cartão</p>
+                          <p className="text-[10px] text-muted-foreground uppercase tracking-widest">parcele em até 12x</p>
+                          <div className="mt-1 text-[10px] text-muted-foreground space-y-0.5 normal-case tracking-normal">
                             <p>Subtotal: R$ {basePrice.toFixed(2)}</p>
-                            <p>Taxa de pagamento (Cartão 4.99%): R$ {cardFee.toFixed(2)}</p>
-                            <p className="text-foreground font-semibold">Total: R$ {cardTotal.toFixed(2)}</p>
+                            <p>Taxa Cartão (4.99%): R$ {cardFee.toFixed(2)}</p>
+                            <p className="text-neon-purple font-black">Total: R$ {cardTotal.toFixed(2)}</p>
                           </div>
                         </div>
                       </Button>
@@ -1113,10 +1117,10 @@ end
 
                 <Button
                   variant="ghost"
-                  className="w-full text-muted-foreground"
+                  className="w-full text-muted-foreground hover:text-foreground rounded-none uppercase tracking-widest text-[10px] font-black"
                   onClick={() => { setShowPaymentMethodModal(false); setPendingRenewal(false); }}
                 >
-                  Cancelar
+                  // cancelar
                 </Button>
               </CardContent>
             </Card>
@@ -1128,15 +1132,16 @@ end
       {pixData && (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
           <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.2 }}>
-            <Card className="w-full max-w-sm bg-card border-primary/20">
-              <CardHeader className="text-center pb-2">
-                <CardTitle className="text-lg">Pagar com PIX</CardTitle>
-                <p className="text-xs text-muted-foreground">Escaneie o QR Code ou copie o código</p>
+            <Card className="w-full max-w-sm bg-[#050505] border border-neon-green/30 rounded-none font-mono">
+              <div className="h-1 w-full bg-gradient-to-r from-neon-green via-neon-cyan to-neon-purple" />
+              <CardHeader className="text-center pb-2 border-b border-white/10">
+                <CardTitle className="text-xs uppercase tracking-[0.3em] font-black text-neon-green">// pagar com pix</CardTitle>
+                <p className="text-[10px] text-muted-foreground uppercase tracking-widest">escaneie ou copie o código</p>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-4 pt-4">
                 {pixData.qr_code_base64 && (
                   <div className="flex justify-center">
-                    <div className="p-3 bg-white rounded-xl">
+                    <div className="p-3 bg-white rounded-none border border-neon-green/40">
                       <img
                         src={`data:image/png;base64,${pixData.qr_code_base64}`}
                         alt="QR Code PIX"
@@ -1148,15 +1153,15 @@ end
 
                 {pixData.qr_code && (
                   <div className="space-y-2">
-                    <p className="text-[10px] text-muted-foreground text-center">Código PIX (Copia e Cola):</p>
-                    <div className="flex items-center gap-2 bg-secondary/30 rounded-lg p-2 border border-white/5">
+                    <p className="text-[10px] text-muted-foreground text-center uppercase tracking-widest">// copia e cola</p>
+                    <div className="flex items-center gap-2 bg-[#030304] rounded-none p-2 border border-white/10">
                       <code className="text-[10px] font-mono text-foreground flex-1 break-all line-clamp-3">
                         {pixData.qr_code}
                       </code>
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="h-7 w-7 p-0 shrink-0"
+                        className="h-7 w-7 p-0 shrink-0 rounded-none hover:bg-neon-green/10"
                         onClick={() => {
                           navigator.clipboard.writeText(pixData.qr_code!);
                           toast.success("Código PIX copiado!");
@@ -1169,15 +1174,15 @@ end
                 )}
 
                 {pixPolling && (
-                  <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
-                    <div className="h-4 w-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-                    Aguardando pagamento...
+                  <div className="flex items-center justify-center gap-2 text-[10px] uppercase tracking-widest text-neon-green">
+                    <div className="h-3 w-3 border-2 border-neon-green border-t-transparent rounded-full animate-spin" />
+                    aguardando pagamento...
                   </div>
                 )}
 
                 <Button
                   variant="outline"
-                  className="w-full"
+                  className="w-full rounded-none border-white/10 bg-transparent hover:bg-white/5 uppercase tracking-widest text-[10px] font-black"
                   onClick={() => {
                     if (pollingRef.current) clearInterval(pollingRef.current);
                     setPixPolling(false);
@@ -1185,7 +1190,7 @@ end
                     setPurchasing(false);
                   }}
                 >
-                  Cancelar
+                  // cancelar
                 </Button>
               </CardContent>
             </Card>
