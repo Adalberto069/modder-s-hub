@@ -1003,13 +1003,13 @@ end
                     <CreditCard className="h-3 w-3 text-neon-purple shrink-0 mt-0.5" />
                     Aceitamos Pix e Cartão de crédito
                   </p>
-                  <p className="text-[9px] text-muted-foreground leading-relaxed flex items-start gap-1.5">
+                  <p className="text-[9px] text-muted-foreground leading-relaxed flex items-start gap-1.5 uppercase tracking-widest">
                     <Info className="h-3 w-3 text-muted-foreground shrink-0 mt-0.5" />
-                    No Pix, aparecerá o nome do vendedor cadastrado no banco
+                    no pix, aparece o nome do vendedor no banco
                   </p>
-                  <p className="text-[9px] text-muted-foreground leading-relaxed flex items-start gap-1.5">
-                    <CheckCircle className="h-3 w-3 text-accent shrink-0 mt-0.5" />
-                    Compra protegida — entrega automática após confirmação
+                  <p className="text-[9px] text-muted-foreground leading-relaxed flex items-start gap-1.5 uppercase tracking-widest">
+                    <CheckCircle className="h-3 w-3 text-neon-green shrink-0 mt-0.5" />
+                    entrega automática após confirmação
                   </p>
                 </div>
 
