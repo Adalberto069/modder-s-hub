@@ -17,6 +17,8 @@ import { Card } from "@/components/ui/card";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { UserBadges } from "@/components/UserBadges";
 import { RoleBadge } from "@/components/RoleBadge";
+import { TerminalTypewriter } from "@/components/TerminalTypewriter";
+import { MarqueeTicker } from "@/components/MarqueeTicker";
 import { useState } from "react";
 
 export default function Index() {
@@ -102,7 +104,7 @@ export default function Index() {
   return (
     <Layout>
       {/* ══════════════ TERMINAL HERO ══════════════ */}
-      <section className="relative min-h-[85vh] sm:min-h-[92vh] flex items-center justify-center overflow-hidden bg-[#030304]">
+      <section className="relative min-h-[85vh] sm:min-h-[92vh] flex items-center justify-center overflow-hidden bg-[#030304] scanlines noise">
         {/* Animated Grid & Glows Background */}
         <div className="absolute inset-0 z-0">
           <div className="absolute inset-0 bg-[#030304] z-0" />
@@ -179,8 +181,13 @@ export default function Index() {
               )}
             </div>
 
+            {/* Terminal typewriter */}
+            <div className="w-full mt-12 sm:mt-16 flex justify-center">
+              <TerminalTypewriter />
+            </div>
+
             {/* Quick Stats Terminal */}
-            <div className="w-full mt-16 sm:mt-24 border border-white/10 bg-[#050505]/80 backdrop-blur-md flex flex-col sm:flex-row divide-y sm:divide-y-0 sm:divide-x divide-white/10 p-1 font-mono">
+            <div className="w-full mt-10 sm:mt-12 border border-white/10 bg-[#050505]/80 backdrop-blur-md flex flex-col sm:flex-row divide-y sm:divide-y-0 sm:divide-x divide-white/10 p-1 font-mono">
               {[
                 { label: "PAYLOADS", val: stats?.scripts ?? 0, color: "text-neon-purple" },
                 { label: "OPERATIVES", val: stats?.users ?? 0, color: "text-neon-cyan" },
@@ -195,6 +202,9 @@ export default function Index() {
           </motion.div>
         </div>
       </section>
+
+      {/* ══════════════ TICKER ══════════════ */}
+      <MarqueeTicker />
 
       {/* ══════════════ CORE CAPABILITIES (BENTO BOX) ══════════════ */}
       <section className="py-20 sm:py-32 bg-[#050505] relative border-t border-white/5">
