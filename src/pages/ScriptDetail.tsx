@@ -1132,15 +1132,16 @@ end
       {pixData && (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
           <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.2 }}>
-            <Card className="w-full max-w-sm bg-card border-primary/20">
-              <CardHeader className="text-center pb-2">
-                <CardTitle className="text-lg">Pagar com PIX</CardTitle>
-                <p className="text-xs text-muted-foreground">Escaneie o QR Code ou copie o código</p>
+            <Card className="w-full max-w-sm bg-[#050505] border border-neon-green/30 rounded-none font-mono">
+              <div className="h-1 w-full bg-gradient-to-r from-neon-green via-neon-cyan to-neon-purple" />
+              <CardHeader className="text-center pb-2 border-b border-white/10">
+                <CardTitle className="text-xs uppercase tracking-[0.3em] font-black text-neon-green">// pagar com pix</CardTitle>
+                <p className="text-[10px] text-muted-foreground uppercase tracking-widest">escaneie ou copie o código</p>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-4 pt-4">
                 {pixData.qr_code_base64 && (
                   <div className="flex justify-center">
-                    <div className="p-3 bg-white rounded-xl">
+                    <div className="p-3 bg-white rounded-none border border-neon-green/40">
                       <img
                         src={`data:image/png;base64,${pixData.qr_code_base64}`}
                         alt="QR Code PIX"
@@ -1152,15 +1153,15 @@ end
 
                 {pixData.qr_code && (
                   <div className="space-y-2">
-                    <p className="text-[10px] text-muted-foreground text-center">Código PIX (Copia e Cola):</p>
-                    <div className="flex items-center gap-2 bg-secondary/30 rounded-lg p-2 border border-white/5">
+                    <p className="text-[10px] text-muted-foreground text-center uppercase tracking-widest">// copia e cola</p>
+                    <div className="flex items-center gap-2 bg-[#030304] rounded-none p-2 border border-white/10">
                       <code className="text-[10px] font-mono text-foreground flex-1 break-all line-clamp-3">
                         {pixData.qr_code}
                       </code>
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="h-7 w-7 p-0 shrink-0"
+                        className="h-7 w-7 p-0 shrink-0 rounded-none hover:bg-neon-green/10"
                         onClick={() => {
                           navigator.clipboard.writeText(pixData.qr_code!);
                           toast.success("Código PIX copiado!");
@@ -1173,15 +1174,15 @@ end
                 )}
 
                 {pixPolling && (
-                  <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
-                    <div className="h-4 w-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-                    Aguardando pagamento...
+                  <div className="flex items-center justify-center gap-2 text-[10px] uppercase tracking-widest text-neon-green">
+                    <div className="h-3 w-3 border-2 border-neon-green border-t-transparent rounded-full animate-spin" />
+                    aguardando pagamento...
                   </div>
                 )}
 
                 <Button
                   variant="outline"
-                  className="w-full"
+                  className="w-full rounded-none border-white/10 bg-transparent hover:bg-white/5 uppercase tracking-widest text-[10px] font-black"
                   onClick={() => {
                     if (pollingRef.current) clearInterval(pollingRef.current);
                     setPixPolling(false);
@@ -1189,7 +1190,7 @@ end
                     setPurchasing(false);
                   }}
                 >
-                  Cancelar
+                  // cancelar
                 </Button>
               </CardContent>
             </Card>
