@@ -373,18 +373,18 @@ export default function Index() {
         <div className="container px-4 text-center max-w-3xl mx-auto relative z-10">
           <Network className="w-12 h-12 text-neon-green mx-auto mb-6 opacity-50" />
           <h2 className="text-4xl sm:text-6xl font-black uppercase tracking-tighter text-white mb-6">
-            Initialize <span className="text-neon-green">Connection</span>
+            entra na <span className="text-neon-green">rede</span>
           </h2>
           <p className="text-muted-foreground font-mono text-sm sm:text-base mb-10 border-l-2 border-r-2 border-neon-green/30 inline-block px-6">
-            Você leu o código. Viu do que somos capazes.
-            Cadastre-se hoje e entre para o lado Hidden da força.
+            cadastro grátis. compre scripts, peça encomendas
+            ou aplique como modder e comece a vender hoje.
           </p>
           <div className="flex justify-center flex-col sm:flex-row gap-4">
              <Button size="lg" onClick={() => navigate("/auth?tab=signup")} className="h-14 px-10 bg-white text-black hover:bg-white/90 font-black uppercase tracking-widest rounded-none text-xs w-full sm:w-auto">
-               Estabelecer Acesso
+               criar conta
              </Button>
              <Button size="lg" onClick={() => navigate("/marketplace")} variant="outline" className="h-14 px-10 text-white border-white/20 hover:bg-white/5 font-black uppercase tracking-widest rounded-none text-xs w-full sm:w-auto">
-               Explorar Arquivos
+               ver marketplace
              </Button>
           </div>
         </div>
