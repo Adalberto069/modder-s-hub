@@ -199,9 +199,9 @@ export default function Tutorials() {
                   <button
                     key={topic.q}
                     onClick={() => setSearch(topic.q)}
-                    className={`group text-left bg-[#050505] border border-white/10 hover:border-${topic.color}/50 hover:bg-[#080808] transition-all duration-200 p-3 rounded-none font-mono`}
+                    className={`group text-left bg-[#050505] border border-white/10 ${topic.hover} hover:bg-[#080808] transition-all duration-200 p-3 rounded-none font-mono`}
                   >
-                    <Icon className={`h-4 w-4 mb-2 text-${topic.color} group-hover:scale-110 transition-transform`} />
+                    <Icon className={`h-4 w-4 mb-2 ${topic.color} group-hover:scale-110 transition-transform`} />
                     <div className="text-[10px] sm:text-[11px] font-black text-white uppercase tracking-tight leading-tight">
                       {topic.label}
                     </div>
