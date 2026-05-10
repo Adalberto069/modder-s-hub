@@ -9,7 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
-import { BookOpen, Play, Clock, Plus, Pencil, Trash2, Loader2, Search, Star, Lock } from "lucide-react";
+import { BookOpen, Play, Clock, Plus, Pencil, Trash2, Loader2, Search, Star, Lock, Terminal, Cpu, Package, ShieldCheck, Zap, Smartphone } from "lucide-react";
 import { motion } from "framer-motion";
 import { LoginPromptDialog } from "@/components/LoginPromptDialog";
 
@@ -19,6 +19,16 @@ const CATEGORIES = [
   { value: "root", label: "Root", icon: "🔓" },
   { value: "virtualizado", label: "Virtualizado", icon: "📱" },
   { value: "iniciante", label: "Iniciante", icon: "🌱" },
+];
+
+// Tópicos sugeridos específicos do HiddenMod (atalhos para busca)
+const HIDDENMOD_TOPICS = [
+  { q: "game guardian", label: "Game Guardian", desc: "instalar, configurar, anexar processo", icon: Cpu, color: "neon-purple" },
+  { q: "lua", label: "Scripts Lua", desc: "gg.* api, hooks, menus interativos", icon: Terminal, color: "neon-green" },
+  { q: "apk", label: "APKs & Loaders", desc: "hidden_loader, virtualizadores, splits", icon: Package, color: "neon-cyan" },
+  { q: "watermark", label: "Watermark & Licença", desc: "como funciona o lacre por comprador", icon: ShieldCheck, color: "neon-pink" },
+  { q: "root", label: "Root vs No-Root", desc: "magisk, exposed, virtual space", icon: Zap, color: "neon-purple" },
+  { q: "virtualizado", label: "Virtualizado", desc: "vmos, f1vm, parallel space", icon: Smartphone, color: "neon-cyan" },
 ];
 
 const categoryLabels: Record<string, string> = Object.fromEntries(CATEGORIES.map(c => [c.value, c.label]));
