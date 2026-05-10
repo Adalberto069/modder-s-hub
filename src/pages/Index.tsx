@@ -133,14 +133,14 @@ export default function Index() {
             {/* Top Badge */}
             <Badge variant="outline" className="mb-8 bg-[#0a0f0d] border-neon-green/30 text-neon-green font-mono tracking-widest uppercase py-1.5 px-4 text-[10px] sm:text-xs">
               <Terminal className="h-3.5 w-3.5 mr-2 animate-pulse" />
-              Hidden Protocol Active
+              ./hiddenmod --status=online
             </Badge>
 
             {/* Main Title */}
             <h1 className="text-center font-black tracking-tighter uppercase leading-[0.85] text-white drop-shadow-2xl mb-6">
-              <span className="block text-4xl sm:text-6xl md:text-8xl">Uncover The</span>
+              <span className="block text-4xl sm:text-6xl md:text-8xl">Scripts que</span>
               <span className="block text-5xl sm:text-7xl md:text-9xl text-transparent bg-clip-text bg-gradient-to-br from-white via-white to-white/40 italic flex items-center justify-center gap-2 sm:gap-4 mt-2">
-                 Hidden
+                 ninguém vê
                  <motion.span
                     initial={{ scale: 0.8, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
@@ -154,8 +154,8 @@ export default function Index() {
 
             {/* Subtitle */}
             <p className="text-center text-sm sm:text-lg md:text-xl text-muted-foreground font-mono max-w-2xl lowercase tracking-wider leading-relaxed mb-10 border-l-2 border-white/10 pl-4">
-              [ o cofre underground da elite. scripts lua ofuscados, 
-              APKs modded e o mercado negro seguro que você procurava. ]
+              &gt; marketplace br de scripts lua para game guardian.
+              ofuscação por watermark, licenças por dispositivo, pagamento via pix com split automático.
             </p>
 
             {/* CTA Buttons */}
@@ -166,7 +166,7 @@ export default function Index() {
                 onClick={() => navigate("/marketplace")}
               >
                 <SearchCode className="mr-3 h-5 w-5 group-hover:scale-110 transition-transform" />
-                Acessar o Vault
+                // explorar scripts
               </Button>
               {!user && (
                 <Button
@@ -175,7 +175,7 @@ export default function Index() {
                   className="h-14 sm:h-16 px-8 sm:px-10 border-white/20 bg-transparent hover:bg-white/5 text-white font-black uppercase tracking-widest text-xs sm:text-sm rounded-none transition-all flex group"
                   onClick={() => navigate("/auth")}
                 >
-                  Desbloquear Acesso
+                  // criar acesso
                   <ChevronRight className="ml-3 h-5 w-5 opacity-50 group-hover:translate-x-1 group-hover:opacity-100 transition-all" />
                 </Button>
               )}
