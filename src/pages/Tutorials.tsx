@@ -23,12 +23,12 @@ const CATEGORIES = [
 
 // Tópicos sugeridos específicos do HiddenMod (atalhos para busca)
 const HIDDENMOD_TOPICS = [
-  { q: "game guardian", label: "Game Guardian", desc: "instalar, configurar, anexar processo", icon: Cpu, color: "neon-purple" },
-  { q: "lua", label: "Scripts Lua", desc: "gg.* api, hooks, menus interativos", icon: Terminal, color: "neon-green" },
-  { q: "apk", label: "APKs & Loaders", desc: "hidden_loader, virtualizadores, splits", icon: Package, color: "neon-cyan" },
-  { q: "watermark", label: "Watermark & Licença", desc: "como funciona o lacre por comprador", icon: ShieldCheck, color: "neon-pink" },
-  { q: "root", label: "Root vs No-Root", desc: "magisk, exposed, virtual space", icon: Zap, color: "neon-purple" },
-  { q: "virtualizado", label: "Virtualizado", desc: "vmos, f1vm, parallel space", icon: Smartphone, color: "neon-cyan" },
+  { q: "game guardian", label: "Game Guardian", desc: "instalar, configurar, anexar processo", icon: Cpu, hover: "hover:border-neon-purple/50", color: "text-neon-purple" },
+  { q: "lua", label: "Scripts Lua", desc: "gg.* api, hooks, menus interativos", icon: Terminal, hover: "hover:border-neon-green/50", color: "text-neon-green" },
+  { q: "apk", label: "APKs & Loaders", desc: "hidden_loader, virtualizadores, splits", icon: Package, hover: "hover:border-neon-cyan/50", color: "text-neon-cyan" },
+  { q: "watermark", label: "Watermark & Licença", desc: "como funciona o lacre por comprador", icon: ShieldCheck, hover: "hover:border-neon-pink/50", color: "text-neon-pink" },
+  { q: "root", label: "Root vs No-Root", desc: "magisk, exposed, virtual space", icon: Zap, hover: "hover:border-neon-purple/50", color: "text-neon-purple" },
+  { q: "virtualizado", label: "Virtualizado", desc: "vmos, f1vm, parallel space", icon: Smartphone, hover: "hover:border-neon-cyan/50", color: "text-neon-cyan" },
 ];
 
 const categoryLabels: Record<string, string> = Object.fromEntries(CATEGORIES.map(c => [c.value, c.label]));
