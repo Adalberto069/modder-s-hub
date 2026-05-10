@@ -276,12 +276,12 @@ export default function Index() {
           <div className="flex flex-col md:flex-row items-end justify-between mb-10 sm:mb-16 gap-4">
             <div>
               <h2 className="text-3xl sm:text-4xl font-black uppercase tracking-tight text-white">
-                Transmissões <span className="text-neon-cyan/80">Recentes</span>
+                Últimos <span className="text-neon-cyan/80">drops</span>
               </h2>
-              <p className="text-muted-foreground font-mono text-sm mt-2">Últimos payloads e scripts homologados no cofre.</p>
+              <p className="text-muted-foreground font-mono text-sm mt-2">&gt; scripts publicados e verificados nas últimas semanas.</p>
             </div>
             <Button variant="ghost" onClick={() => navigate("/marketplace")} className="text-muted-foreground hover:text-white uppercase font-bold text-xs">
-              Ver todos os logs <ChevronRight className="ml-2 w-4 h-4" />
+              ver tudo <ChevronRight className="ml-2 w-4 h-4" />
             </Button>
           </div>
 
