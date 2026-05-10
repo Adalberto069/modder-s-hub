@@ -9,7 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
-import { BookOpen, Play, Clock, Plus, Pencil, Trash2, Loader2, Search, Star, Lock } from "lucide-react";
+import { BookOpen, Play, Clock, Plus, Pencil, Trash2, Loader2, Search, Star, Lock, Terminal, Cpu, Package, ShieldCheck, Zap, Smartphone } from "lucide-react";
 import { motion } from "framer-motion";
 import { LoginPromptDialog } from "@/components/LoginPromptDialog";
 
@@ -19,6 +19,16 @@ const CATEGORIES = [
   { value: "root", label: "Root", icon: "🔓" },
   { value: "virtualizado", label: "Virtualizado", icon: "📱" },
   { value: "iniciante", label: "Iniciante", icon: "🌱" },
+];
+
+// Tópicos sugeridos específicos do HiddenMod (atalhos para busca)
+const HIDDENMOD_TOPICS = [
+  { q: "game guardian", label: "Game Guardian", desc: "instalar, configurar, anexar processo", icon: Cpu, hover: "hover:border-neon-purple/50", color: "text-neon-purple" },
+  { q: "lua", label: "Scripts Lua", desc: "gg.* api, hooks, menus interativos", icon: Terminal, hover: "hover:border-neon-green/50", color: "text-neon-green" },
+  { q: "apk", label: "APKs & Loaders", desc: "hidden_loader, virtualizadores, splits", icon: Package, hover: "hover:border-neon-cyan/50", color: "text-neon-cyan" },
+  { q: "watermark", label: "Watermark & Licença", desc: "como funciona o lacre por comprador", icon: ShieldCheck, hover: "hover:border-neon-pink/50", color: "text-neon-pink" },
+  { q: "root", label: "Root vs No-Root", desc: "magisk, exposed, virtual space", icon: Zap, hover: "hover:border-neon-purple/50", color: "text-neon-purple" },
+  { q: "virtualizado", label: "Virtualizado", desc: "vmos, f1vm, parallel space", icon: Smartphone, hover: "hover:border-neon-cyan/50", color: "text-neon-cyan" },
 ];
 
 const categoryLabels: Record<string, string> = Object.fromEntries(CATEGORIES.map(c => [c.value, c.label]));
@@ -174,6 +184,36 @@ export default function Tutorials() {
             </div>
           </div>
         </div>
+
+        {/* Tópicos rápidos do HiddenMod */}
+        {!search && activeCategory === "all" && (
+          <div className="mb-8">
+            <div className="flex items-center gap-2 mb-3 font-mono">
+              <span className="text-[10px] uppercase tracking-widest text-muted-foreground">// quick_topics ·</span>
+              <span className="text-[10px] uppercase tracking-widest text-neon-green">hiddenmod_stack</span>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3">
+              {HIDDENMOD_TOPICS.map((topic) => {
+                const Icon = topic.icon;
+                return (
+                  <button
+                    key={topic.q}
+                    onClick={() => setSearch(topic.q)}
+                    className={`group text-left bg-[#050505] border border-white/10 ${topic.hover} hover:bg-[#080808] transition-all duration-200 p-3 rounded-none font-mono`}
+                  >
+                    <Icon className={`h-4 w-4 mb-2 ${topic.color} group-hover:scale-110 transition-transform`} />
+                    <div className="text-[10px] sm:text-[11px] font-black text-white uppercase tracking-tight leading-tight">
+                      {topic.label}
+                    </div>
+                    <div className="text-[8px] sm:text-[9px] text-muted-foreground uppercase tracking-widest mt-1 leading-tight line-clamp-2">
+                      {topic.desc}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {/* Results count */}
         {!isLoading && (
