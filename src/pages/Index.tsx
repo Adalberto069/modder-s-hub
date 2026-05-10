@@ -318,9 +318,9 @@ export default function Index() {
         <div className="container px-4 sm:px-6 relative z-10">
           <div className="text-center mb-16">
             <h2 className="text-3xl sm:text-5xl font-black uppercase tracking-tighter text-white">
-              Syndicate <span className="text-neon-purple/80">Operators</span>
+              Top <span className="text-neon-purple/80">modders</span>
             </h2>
-            <p className="text-muted-foreground font-mono text-sm mt-2 uppercase tracking-widest">Os cérebros por trás do cofre.</p>
+            <p className="text-muted-foreground font-mono text-sm mt-2 uppercase tracking-widest">&gt; reputação medida em downloads e reviews positivos.</p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
