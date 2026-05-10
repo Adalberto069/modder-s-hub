@@ -185,6 +185,36 @@ export default function Tutorials() {
           </div>
         </div>
 
+        {/* Tópicos rápidos do HiddenMod */}
+        {!search && activeCategory === "all" && (
+          <div className="mb-8">
+            <div className="flex items-center gap-2 mb-3 font-mono">
+              <span className="text-[10px] uppercase tracking-widest text-muted-foreground">// quick_topics ·</span>
+              <span className="text-[10px] uppercase tracking-widest text-neon-green">hiddenmod_stack</span>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3">
+              {HIDDENMOD_TOPICS.map((topic) => {
+                const Icon = topic.icon;
+                return (
+                  <button
+                    key={topic.q}
+                    onClick={() => setSearch(topic.q)}
+                    className={`group text-left bg-[#050505] border border-white/10 hover:border-${topic.color}/50 hover:bg-[#080808] transition-all duration-200 p-3 rounded-none font-mono`}
+                  >
+                    <Icon className={`h-4 w-4 mb-2 text-${topic.color} group-hover:scale-110 transition-transform`} />
+                    <div className="text-[10px] sm:text-[11px] font-black text-white uppercase tracking-tight leading-tight">
+                      {topic.label}
+                    </div>
+                    <div className="text-[8px] sm:text-[9px] text-muted-foreground uppercase tracking-widest mt-1 leading-tight line-clamp-2">
+                      {topic.desc}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
         {/* Results count */}
         {!isLoading && (
           <p className="text-[10px] sm:text-[10px] font-mono uppercase tracking-widest text-muted-foreground mb-4 sm:mb-6">
