@@ -189,9 +189,9 @@ export default function Index() {
             {/* Quick Stats Terminal */}
             <div className="w-full mt-10 sm:mt-12 border border-white/10 bg-[#050505]/80 backdrop-blur-md flex flex-col sm:flex-row divide-y sm:divide-y-0 sm:divide-x divide-white/10 p-1 font-mono">
               {[
-                { label: "PAYLOADS", val: stats?.scripts ?? 0, color: "text-neon-purple" },
-                { label: "OPERATIVES", val: stats?.users ?? 0, color: "text-neon-cyan" },
-                { label: "EXFILTRATIONS", val: stats?.downloads ?? 0, color: "text-neon-green" }
+                { label: "SCRIPTS", val: stats?.scripts ?? 0, color: "text-neon-purple" },
+                { label: "MEMBROS", val: stats?.users ?? 0, color: "text-neon-cyan" },
+                { label: "DOWNLOADS", val: stats?.downloads ?? 0, color: "text-neon-green" }
               ].map((st) => (
                 <div key={st.label} className="flex-1 flex items-center justify-between sm:justify-center gap-4 px-6 py-4 hover:bg-white/[0.02] transition-colors">
                    <span className="text-[10px] text-muted-foreground uppercase tracking-widest">{st.label}</span>
@@ -211,9 +211,10 @@ export default function Index() {
         <div className="container px-4 sm:px-6">
           <div className="mb-12 sm:mb-20">
             <h2 className="text-3xl sm:text-5xl font-black uppercase tracking-tighter text-white">
-              System <br className="hidden sm:block" />
-              <span className="text-muted-foreground">Capabilities</span>
+              Como a plataforma <br className="hidden sm:block" />
+              <span className="text-muted-foreground">funciona</span>
             </h2>
+            <p className="text-muted-foreground font-mono text-xs sm:text-sm mt-4 max-w-xl">&gt; quatro pilares que separam o HiddenMod dos grupos de telegram.</p>
           </div>
 
           {/* Bento Box Grid */}
@@ -222,9 +223,9 @@ export default function Index() {
              <div className="md:col-span-2 relative rounded-xl border border-white/10 bg-gradient-to-br from-[#0a0a0c] to-[#050505] p-6 sm:p-10 overflow-hidden group">
                <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-neon-purple/5 blur-[80px] rounded-full group-hover:bg-neon-purple/10 transition-colors" />
                <ShieldCheck className="w-10 h-10 text-neon-purple mb-6" />
-               <h3 className="text-2xl sm:text-4xl font-black uppercase tracking-tight text-white mb-2 leading-none">Military Grade<br/>Obfuscation</h3>
+               <h3 className="text-2xl sm:text-4xl font-black uppercase tracking-tight text-white mb-2 leading-none">Watermark<br/>por comprador</h3>
                <p className="text-muted-foreground font-mono text-sm max-w-sm mt-4">
-                 Sistemas impenetráveis. Transformamos código legível em ruído completo para proteger sua propriedade intelectual contra engenharia reversa.
+                 Cada download recebe uma assinatura hexadecimal única amarrada ao ID do comprador. Se vazar, a gente identifica a fonte.
                </p>
              </div>
 
@@ -232,9 +233,9 @@ export default function Index() {
              <div className="md:col-span-1 relative rounded-xl border border-white/10 bg-gradient-to-br from-[#0a0a0c] to-[#050505] p-6 overflow-hidden group">
                <div className="absolute top-0 right-0 w-[200px] h-[200px] bg-neon-green/5 blur-[60px] rounded-full group-hover:bg-neon-green/10 transition-colors" />
                <Key className="w-8 h-8 text-neon-green mb-4" />
-               <h3 className="text-xl sm:text-2xl font-black uppercase tracking-tight text-white mb-2 leading-none">Quantum Licenses</h3>
+               <h3 className="text-xl sm:text-2xl font-black uppercase tracking-tight text-white mb-2 leading-none">Licenças por dispositivo</h3>
                <p className="text-muted-foreground font-mono text-xs mt-3">
-                 Autenticação em milissegundos. Servidor blindado para gerenciar acessos ativos, banimentos e assinaturas dos seus usuários.
+                 7 dias, 30 dias ou permanente. Cada licença trava no device do comprador, sem brecha pra revenda.
                </p>
                <div className="absolute bottom-6 right-6 opacity-20">
                  <ShieldCheck className="w-24 h-24" />
@@ -245,9 +246,9 @@ export default function Index() {
              <div className="md:col-span-1 relative rounded-xl border border-white/10 bg-gradient-to-br from-[#0a0a0c] to-[#050505] p-6 overflow-hidden group">
                <div className="absolute -bottom-10 -left-10 w-[150px] h-[150px] bg-neon-cyan/5 blur-[50px] rounded-full group-hover:bg-neon-cyan/10 transition-colors" />
                <Activity className="w-8 h-8 text-neon-cyan mb-4" />
-               <h3 className="text-xl sm:text-2xl font-black uppercase tracking-tight text-white mb-2 leading-none">Zero Downtime</h3>
+               <h3 className="text-xl sm:text-2xl font-black uppercase tracking-tight text-white mb-2 leading-none">Pix com split</h3>
                <p className="text-muted-foreground font-mono text-xs mt-3">
-                 Infraestrutura global robusta. Seus scripts e mods sempre disponíveis na velocidade da luz.
+                 Mercado Pago Marketplace divide 80/20 na hora do pagamento. Modder recebe direto, sem espera.
                </p>
              </div>
 
@@ -257,11 +258,11 @@ export default function Index() {
                <div className="relative z-10 flex flex-col sm:flex-row sm:items-end justify-between gap-6">
                  <div>
                     <Store className="w-10 h-10 text-white mb-6" />
-                    <h3 className="text-2xl sm:text-3xl font-black uppercase tracking-tight text-white mb-2 leading-none">Hidden Mod Marketplace</h3>
-                    <p className="text-muted-foreground font-mono text-sm max-w-sm">Compre e venda seguro. O ponto de encontro oficial para modders sérios monetizarem sua arte.</p>
+                    <h3 className="text-2xl sm:text-3xl font-black uppercase tracking-tight text-white mb-2 leading-none">Encomendas (bounties)</h3>
+                    <p className="text-muted-foreground font-mono text-sm max-w-sm">Não achou o script? Posta uma encomenda, modders aplicam, escolhe um e o pagamento fica em custódia até a entrega.</p>
                  </div>
-                 <Button onClick={() => navigate("/marketplace")} variant="outline" className="shrink-0 bg-transparent border-white/20 hover:bg-white hover:text-black hover:border-white uppercase font-black text-xs h-12 px-6 rounded-none">
-                   Explorar Loja
+                 <Button onClick={() => navigate("/bounties")} variant="outline" className="shrink-0 bg-transparent border-white/20 hover:bg-white hover:text-black hover:border-white uppercase font-black text-xs h-12 px-6 rounded-none">
+                   Ver encomendas
                  </Button>
                </div>
              </div>
