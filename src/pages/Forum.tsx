@@ -58,6 +58,9 @@ export default function Forum() {
   const [replyCode, setReplyCode] = useState("");
   const [showReplyCode, setShowReplyCode] = useState(false);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
+  const PAGE_SIZE = 10;
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
 
   const requireAuth = (action: () => void) => {
     if (!user) { setShowLoginPrompt(true); return; }
