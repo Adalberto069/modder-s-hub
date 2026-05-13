@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
@@ -58,6 +58,9 @@ export default function Forum() {
   const [replyCode, setReplyCode] = useState("");
   const [showReplyCode, setShowReplyCode] = useState(false);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
+  const PAGE_SIZE = 10;
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
 
   const requireAuth = (action: () => void) => {
     if (!user) { setShowLoginPrompt(true); return; }
@@ -190,6 +193,36 @@ export default function Forum() {
   });
 
   const activePost = posts.find((p: any) => p.id === selectedPost);
+
+  // Reset pagination when filters / search / sort change
+  useEffect(() => {
+    setVisibleCount(PAGE_SIZE);
+  }, [filterCat, search, sortBy]);
+
+  const sortedPosts = [...posts].sort((a: any, b: any) =>
+    sortBy === "replies"
+      ? (replyCountMap[b.id] || 0) - (replyCountMap[a.id] || 0)
+      : new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+  );
+  const visiblePosts = sortedPosts.slice(0, visibleCount);
+  const hasMore = visibleCount < sortedPosts.length;
+
+  // Infinite scroll via IntersectionObserver
+  useEffect(() => {
+    if (!hasMore) return;
+    const node = sentinelRef.current;
+    if (!node) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setVisibleCount((c) => c + PAGE_SIZE);
+        }
+      },
+      { rootMargin: "300px" }
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [hasMore, visiblePosts.length]);
 
   // Detail view
   if (selectedPost && activePost) {
@@ -561,7 +594,7 @@ export default function Forum() {
           </div>
         ) : (
           <div className="space-y-4">
-            {[...posts].sort((a: any, b: any) => sortBy === "replies" ? (replyCountMap[b.id]||0) - (replyCountMap[a.id]||0) : new Date(b.created_at).getTime() - new Date(a.created_at).getTime()).map((post: any) => {
+            {visiblePosts.map((post: any) => {
               const author = profileMap[post.user_id];
               const count = replyCountMap[post.id] || 0;
               return (
@@ -613,6 +646,24 @@ export default function Forum() {
                 </motion.div>
               );
             })}
+
+            {hasMore && (
+              <div ref={sentinelRef} className="flex flex-col items-center justify-center py-8 gap-3">
+                <div className="w-6 h-6 border-2 border-neon-purple border-b-transparent rounded-full animate-spin" />
+                <button
+                  onClick={() => setVisibleCount((c) => c + PAGE_SIZE)}
+                  className="px-4 py-2 text-[9px] sm:text-[10px] font-black uppercase tracking-widest border border-white/10 bg-[#050505] text-muted-foreground hover:text-white hover:border-white/30 rounded-none transition-all"
+                >
+                  Carregar mais pacotes ({sortedPosts.length - visibleCount})
+                </button>
+              </div>
+            )}
+
+            {!hasMore && sortedPosts.length > PAGE_SIZE && (
+              <p className="text-center py-6 text-[9px] uppercase tracking-[0.3em] text-muted-foreground/40 font-black">
+                // Fim da transmissão — {sortedPosts.length} threads
+              </p>
+            )}
           </div>
         )}
 
