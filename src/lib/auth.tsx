@@ -102,7 +102,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const ensureProfile = async (currentUser: User) => {
     const { data: existingProfile } = await supabase
       .from("profiles")
-      .select("*")
+      .select("id, user_id, username, display_name, avatar_url, bio, reputation_score, total_downloads, total_positive_reviews, created_at, updated_at")
       .eq("user_id", currentUser.id)
       .maybeSingle();
 
@@ -165,7 +165,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const { data } = await supabase
       .from("profiles")
-      .select("*")
+      .select("id, user_id, username, display_name, avatar_url, bio, reputation_score, total_downloads, total_positive_reviews, created_at, updated_at")
       .eq("user_id", userId)
       .maybeSingle();
     setProfile(data ?? null);

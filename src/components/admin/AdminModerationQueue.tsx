@@ -64,7 +64,7 @@ export function AdminModerationQueue() {
     queryKey: ["modder-profiles-mod", modderIds],
     queryFn: async () => {
       if (modderIds.length === 0) return [];
-      const { data } = await supabase.from("profiles").select("*").in("user_id", modderIds);
+      const { data } = await supabase.from("profiles").select("id, user_id, username, display_name, avatar_url, bio, reputation_score, total_downloads, total_positive_reviews, created_at, updated_at").in("user_id", modderIds);
       return data ?? [];
     },
     enabled: modderIds.length > 0,
