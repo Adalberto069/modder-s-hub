@@ -47,6 +47,7 @@ export default function Forum() {
   const [selectedPost, setSelectedPost] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [filterCat, setFilterCat] = useState("all");
+  const [sortBy, setSortBy] = useState<"recent" | "replies">("recent");
   const [newPostOpen, setNewPostOpen] = useState(false);
   const [newTitle, setNewTitle] = useState("");
   const [newContent, setNewContent] = useState("");
