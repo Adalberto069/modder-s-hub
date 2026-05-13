@@ -491,6 +491,40 @@ export default function Forum() {
           </div>
         </div>
 
+        {/* Stats Strip */}
+        <div className="grid grid-cols-3 gap-0 mb-6 border border-white/10 bg-[#030304]">
+          {[
+            { label: "Threads", value: posts.length },
+            { label: "Packets", value: (replyCounts as any[]).length },
+            { label: "Operadores", value: new Set([...userIds, ...(replyCounts as any[]).map((r:any)=>r.user_id)].filter(Boolean)).size },
+          ].map((s, i) => (
+            <div key={s.label} className={`p-4 sm:p-5 flex flex-col items-center justify-center ${i < 2 ? "border-r border-white/10" : ""}`}>
+              <span className="text-2xl sm:text-3xl font-black tracking-tighter text-white">{s.value}</span>
+              <span className="text-[8px] sm:text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground mt-1">{s.label}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* Category Quick Chips */}
+        <div className="flex flex-wrap gap-2 mb-4">
+          {[{ value: "all", label: "Todas" }, ...CATEGORIES].map((c) => {
+            const active = filterCat === c.value;
+            return (
+              <button
+                key={c.value}
+                onClick={() => setFilterCat(c.value)}
+                className={`px-3 py-1.5 text-[9px] sm:text-[10px] font-black uppercase tracking-widest border rounded-none transition-all ${
+                  active
+                    ? "bg-neon-purple text-white border-neon-purple shadow-[0_0_12px_rgba(168,85,247,0.4)]"
+                    : "bg-[#050505] text-muted-foreground border-white/10 hover:text-white hover:border-white/30"
+                }`}
+              >
+                {c.label}
+              </button>
+            );
+          })}
+        </div>
+
         {/* Filters Bar Protocol */}
         <div className="grid sm:grid-cols-3 gap-0 mb-8 border border-white/10 bg-[#030304]">
           <div className="relative sm:col-span-2 flex items-center border-b sm:border-b-0 sm:border-r border-white/10 p-2">
@@ -502,15 +536,13 @@ export default function Forum() {
               className="pl-14 bg-transparent border-none focus-visible:ring-0 h-10 text-sm placeholder:uppercase placeholder:tracking-widest rounded-none placeholder:text-white/20" 
             />
           </div>
-          <Select value={filterCat} onValueChange={setFilterCat}>
+          <Select value={sortBy} onValueChange={(v: any) => setSortBy(v)}>
             <SelectTrigger className="sm:col-span-1 bg-transparent border-none focus:ring-0 h-14 text-sm rounded-none uppercase tracking-widest px-6 shadow-none">
               <SelectValue placeholder="SORT_BY" />
             </SelectTrigger>
             <SelectContent className="bg-[#050505] border-white/10 rounded-none font-mono">
-              <SelectItem value="all">Todas Classes</SelectItem>
-              {CATEGORIES.map((c) => (
-                <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>
-              ))}
+              <SelectItem value="recent">Mais Recentes</SelectItem>
+              <SelectItem value="replies">Mais Comentados</SelectItem>
             </SelectContent>
           </Select>
         </div>
