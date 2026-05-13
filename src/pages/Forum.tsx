@@ -561,7 +561,7 @@ export default function Forum() {
           </div>
         ) : (
           <div className="space-y-4">
-            {posts.map((post: any) => {
+            {[...posts].sort((a: any, b: any) => sortBy === "replies" ? (replyCountMap[b.id]||0) - (replyCountMap[a.id]||0) : new Date(b.created_at).getTime() - new Date(a.created_at).getTime()).map((post: any) => {
               const author = profileMap[post.user_id];
               const count = replyCountMap[post.id] || 0;
               return (
