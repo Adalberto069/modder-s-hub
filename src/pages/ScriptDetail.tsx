@@ -210,7 +210,7 @@ export default function ScriptDetail() {
   const { data: modderProfile } = useQuery({
     queryKey: ["modder-profile", script?.modder_id],
     queryFn: async () => {
-      const { data } = await supabase.from("profiles").select("*").eq("user_id", script!.modder_id).single();
+      const { data } = await supabase.from("profiles").select("id, user_id, username, display_name, avatar_url, bio, reputation_score, total_downloads, total_positive_reviews, created_at, updated_at").eq("user_id", script!.modder_id).single();
       return data;
     },
     enabled: !!script?.modder_id,
@@ -298,7 +298,7 @@ export default function ScriptDetail() {
     queryKey: ["reviewer-profiles", reviewerIds],
     queryFn: async () => {
       if (reviewerIds.length === 0) return [];
-      const { data } = await supabase.from("profiles").select("*").in("user_id", reviewerIds);
+      const { data } = await supabase.from("profiles").select("id, user_id, username, display_name, avatar_url, bio, reputation_score, total_downloads, total_positive_reviews, created_at, updated_at").in("user_id", reviewerIds);
       return data ?? [];
     },
     enabled: reviewerIds.length > 0,

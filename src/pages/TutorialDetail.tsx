@@ -468,7 +468,7 @@ export default function TutorialDetail() {
   const { data: authorProfile } = useQuery({
     queryKey: ["tutorial-author", tutorial?.author_id],
     queryFn: async () => {
-      const { data } = await supabase.from("profiles").select("*").eq("user_id", tutorial!.author_id).single();
+      const { data } = await supabase.from("profiles").select("id, user_id, username, display_name, avatar_url, bio, reputation_score, total_downloads, total_positive_reviews, created_at, updated_at").eq("user_id", tutorial!.author_id).single();
       return data;
     },
     enabled: !!tutorial?.author_id,
@@ -492,7 +492,7 @@ export default function TutorialDetail() {
     queryKey: ["comment-profiles", commentUserIds],
     queryFn: async () => {
       if (commentUserIds.length === 0) return [];
-      const { data } = await supabase.from("profiles").select("*").in("user_id", commentUserIds);
+      const { data } = await supabase.from("profiles").select("id, user_id, username, display_name, avatar_url, bio, reputation_score, total_downloads, total_positive_reviews, created_at, updated_at").in("user_id", commentUserIds);
       return data ?? [];
     },
     enabled: commentUserIds.length > 0,

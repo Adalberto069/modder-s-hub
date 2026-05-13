@@ -80,7 +80,7 @@ export default function Forum() {
     queryKey: ["forum-profiles", userIds],
     queryFn: async () => {
       if (!userIds.length) return [];
-      const { data } = await supabase.from("profiles").select("*").in("user_id", userIds);
+      const { data } = await supabase.from("profiles").select("id, user_id, username, display_name, avatar_url, bio, reputation_score, total_downloads, total_positive_reviews, created_at, updated_at").in("user_id", userIds);
       return data ?? [];
     },
     enabled: userIds.length > 0,
@@ -103,7 +103,7 @@ export default function Forum() {
     queryKey: ["forum-reply-profiles", replyUserIds],
     queryFn: async () => {
       if (!replyUserIds.length) return [];
-      const { data } = await supabase.from("profiles").select("*").in("user_id", replyUserIds);
+      const { data } = await supabase.from("profiles").select("id, user_id, username, display_name, avatar_url, bio, reputation_score, total_downloads, total_positive_reviews, created_at, updated_at").in("user_id", replyUserIds);
       return data ?? [];
     },
     enabled: replyUserIds.length > 0,
