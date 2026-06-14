@@ -127,25 +127,25 @@ export default function Marketplace() {
           transition={{ duration: 0.5 }}
           className="mb-8"
         >
-          <div className="relative overflow-hidden border border-white/10 bg-[#050505] p-6 sm:p-10 mb-8 rounded-none">
+          <div className="relative overflow-hidden border border-white/10 bg-[#050505] p-5 sm:p-10 mb-6 sm:mb-8 rounded-none">
             <div className="absolute top-0 right-0 w-72 h-72 bg-neon-purple/5 blur-[100px] -z-10" />
             <div className="absolute bottom-0 left-0 w-48 h-48 bg-neon-cyan/5 blur-[60px] -z-10" />
 
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-              <div className="space-y-4">
-                <div className="flex items-center gap-2 font-mono">
-                  <Badge variant="outline" className="border-neon-purple/30 text-neon-purple px-2 py-0.5 bg-neon-purple/5 text-[10px] uppercase tracking-widest rounded-none">
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-5 sm:gap-6">
+              <div className="space-y-3 sm:space-y-4">
+                <div className="flex items-center gap-2 font-mono flex-wrap">
+                  <Badge variant="outline" className="border-neon-purple/30 text-neon-purple px-2 py-0.5 bg-neon-purple/5 text-[9px] sm:text-[10px] uppercase tracking-widest rounded-none">
                     <Store className="h-3 w-3 mr-1" /> ROOT_MARKET
                   </Badge>
-                  <Badge variant="outline" className="border-neon-cyan/30 text-neon-cyan px-2 py-0.5 bg-neon-cyan/5 text-[10px] uppercase tracking-widest rounded-none">
+                  <Badge variant="outline" className="border-neon-cyan/30 text-neon-cyan px-2 py-0.5 bg-neon-cyan/5 text-[9px] sm:text-[10px] uppercase tracking-widest rounded-none">
                     <Sparkles className="h-3 w-3 mr-1" /> ELITE_TIER
                   </Badge>
                 </div>
                 <div>
-                  <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-white uppercase italic">
+                  <h1 className="text-2xl sm:text-4xl md:text-5xl font-black tracking-tight text-white uppercase italic">
                     Mercado <span className="text-neon-purple shadow-neon-purple">Negro</span>
                   </h1>
-                  <p className="text-muted-foreground max-w-xl text-xs sm:text-sm leading-relaxed mt-2 font-mono uppercase tracking-widest">
+                  <p className="text-muted-foreground max-w-xl text-[11px] sm:text-sm leading-relaxed mt-2 font-mono uppercase tracking-widest">
                     Acesse o repositório central de payloads, scripts e vulnerabilidades. Transmissões seguras e verificadas.
                   </p>
                 </div>
@@ -155,8 +155,8 @@ export default function Marketplace() {
               <div className="relative w-full md:w-96 group shrink-0">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground transition-colors group-focus-within:text-neon-purple" />
                 <Input
-                  placeholder={activeTab === "script" ? ">_ BUSCAR SCRIPTS LUA..." : ">_ BUSCAR APKS/MODS..."}
-                  className="pl-12 bg-[#030304] border-white/10 focus-visible:ring-neon-purple rounded-none h-14 text-neon-green font-mono uppercase tracking-widest text-xs"
+                  placeholder={activeTab === "script" ? ">_ BUSCAR SCRIPTS..." : ">_ BUSCAR APKS..."}
+                  className="pl-12 bg-[#030304] border-white/10 focus-visible:ring-neon-purple rounded-none h-11 sm:h-14 text-neon-green font-mono uppercase tracking-widest text-xs"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                 />
