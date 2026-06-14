@@ -387,10 +387,10 @@ export default function ModderProfile() {
 
 function StatItem({ icon, value, label, color }: { icon: React.ReactNode; value: string | number; label: string; color: string }) {
   return (
-    <div className="flex flex-col items-center py-6 gap-2 group hover:bg-white/5 transition-colors">
-      <div className={`${color} p-2 rounded-lg bg-white/5 border border-white/5 group-hover:scale-110 transition-transform`}>{icon}</div>
-      <p className="text-2xl font-black font-mono tracking-tighter">{value}</p>
-      <p className="text-[10px] uppercase font-black tracking-widest text-muted-foreground/70">{label}</p>
+    <div className="flex flex-col items-center py-3 sm:py-6 gap-1.5 sm:gap-2 group hover:bg-white/5 transition-colors px-2 text-center">
+      <div className={`${color} p-1.5 sm:p-2 rounded-lg bg-white/5 border border-white/5 group-hover:scale-110 transition-transform`}>{icon}</div>
+      <p className="text-base sm:text-2xl font-black font-mono tracking-tighter leading-none">{value}</p>
+      <p className="text-[8px] sm:text-[10px] uppercase font-black tracking-widest text-muted-foreground/70 leading-tight">{label}</p>
     </div>
   );
 }
