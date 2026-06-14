@@ -131,18 +131,17 @@ export default function Bounties() {
       </section>
 
       {/* Filters & List */}
-      <section className="container py-8 space-y-6">
-        <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
+      <section className="container py-5 sm:py-8 px-3 sm:px-6 space-y-5 sm:space-y-6">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           {/* Status filters */}
-          <div className="flex gap-1 p-1 bg-[#050505] border border-white/5 flex-wrap">
+          <div className="flex gap-1 p-1 bg-[#050505] border border-white/5 overflow-x-auto scrollbar-none -mx-3 px-3 sm:mx-0 sm:px-1">
             {STATUS_FILTERS.map((f) => {
-              // Only show "Minhas" if logged in
               if (f.value === "mine" && !user) return null;
               return (
                 <button
                   key={f.value}
                   onClick={() => setStatusFilter(f.value)}
-                  className={`px-3 py-1.5 text-[10px] font-black uppercase tracking-widest transition-colors flex items-center gap-1 ${
+                  className={`px-3 py-1.5 text-[10px] font-black uppercase tracking-widest transition-colors flex items-center gap-1 whitespace-nowrap shrink-0 ${
                     statusFilter === f.value
                       ? "bg-neon-purple text-white"
                       : "text-muted-foreground hover:text-white"
@@ -163,7 +162,7 @@ export default function Bounties() {
               placeholder="Buscar encomendas..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="pl-9 h-9 bg-[#050505] border-white/10 focus-visible:ring-neon-purple rounded-none text-sm font-mono"
+              className="pl-9 h-10 bg-[#050505] border-white/10 focus-visible:ring-neon-purple rounded-none text-sm font-mono"
             />
           </div>
         </div>
