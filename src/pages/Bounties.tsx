@@ -206,10 +206,10 @@ export default function Bounties() {
 
 function StatItem({ icon, value, label, color }: { icon: React.ReactNode; value: string | number; label: string; color: string }) {
   return (
-    <div className="flex flex-col items-center py-6 gap-1.5 hover:bg-white/[0.02] transition-colors">
-      <div className={`${color} mb-1`}>{icon}</div>
-      <p className="text-2xl font-black font-mono">{value}</p>
-      <p className="text-[10px] uppercase tracking-widest text-muted-foreground/70 font-bold">{label}</p>
+    <div className="flex flex-col items-center py-4 sm:py-6 gap-1 sm:gap-1.5 hover:bg-white/[0.02] transition-colors px-2">
+      <div className={`${color} mb-0.5 sm:mb-1`}>{icon}</div>
+      <p className="text-lg sm:text-2xl font-black font-mono leading-none">{value}</p>
+      <p className="text-[9px] sm:text-[10px] uppercase tracking-widest text-muted-foreground/70 font-bold text-center leading-tight">{label}</p>
     </div>
   );
 }
