@@ -140,7 +140,7 @@ export default function ModderProfile() {
 
   return (
     <Layout>
-      <div className="container py-8 max-w-5xl space-y-6">
+      <div className="container py-4 sm:py-8 px-3 sm:px-6 max-w-5xl space-y-4 sm:space-y-6">
         {/* Hero Header */}
         <div className="relative rounded-2xl overflow-hidden border border-white/5 bg-card/40 backdrop-blur-xl shadow-2xl">
           {/* Gradient backdrop with neon glow */}
@@ -148,33 +148,33 @@ export default function ModderProfile() {
           <div className="absolute -top-24 -right-24 w-64 h-64 bg-neon-purple/20 blur-[80px] rounded-full" />
           <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-neon-cyan/10 blur-[80px] rounded-full" />
 
-          <div className="relative p-8 sm:p-10">
-            <div className="flex flex-col sm:flex-row items-center gap-8 text-center sm:text-left">
+          <div className="relative p-5 sm:p-10">
+            <div className="flex flex-col sm:flex-row items-center gap-5 sm:gap-8 text-center sm:text-left">
               {/* Avatar with luxury border */}
-              <div className="relative group">
+              <div className="relative group shrink-0">
                 <div className="absolute -inset-0.5 bg-gradient-to-tr from-neon-purple to-neon-cyan rounded-full opacity-60 group-hover:opacity-100 transition duration-500 blur" />
-                <div className="relative h-32 w-32 rounded-full bg-[#0a0a0c] border border-white/10 flex items-center justify-center shrink-0 shadow-2xl overflow-hidden">
+                <div className="relative h-20 w-20 sm:h-32 sm:w-32 rounded-full bg-[#0a0a0c] border border-white/10 flex items-center justify-center shrink-0 shadow-2xl overflow-hidden">
                   {profile.avatar_url ? (
                     <img src={profile.avatar_url} alt={profile.username} className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-700" />
                   ) : (
-                    <User className="h-16 w-16 text-muted-foreground/50" />
+                    <User className="h-10 w-10 sm:h-16 sm:w-16 text-muted-foreground/50" />
                   )}
                 </div>
               </div>
 
               {/* Info section */}
-              <div className="flex-1 space-y-4">
+              <div className="flex-1 space-y-3 sm:space-y-4 min-w-0 w-full">
                 <div className="space-y-1">
-                  <div className="flex items-center gap-3 justify-center sm:justify-start flex-wrap">
-                    <h1 className="text-4xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-br from-white to-white/60">
+                  <div className="flex items-center gap-2 sm:gap-3 justify-center sm:justify-start flex-wrap">
+                    <h1 className="text-2xl sm:text-4xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-br from-white to-white/60 break-all">
                       {profile.display_name ?? profile.username}
                     </h1>
                     <RoleBadge role={displayRole} />
                     {isElite && (
-                      <Badge className="bg-neon-purple text-white border-none shadow-neon-purple/50 animate-pulse">ELITE</Badge>
+                      <Badge className="bg-neon-purple text-white border-none shadow-neon-purple/50 animate-pulse text-[10px]">ELITE</Badge>
                     )}
                   </div>
-                  <p className="text-sm font-mono text-neon-purple/80">@{profile.username}</p>
+                  <p className="text-xs sm:text-sm font-mono text-neon-purple/80 break-all">@{profile.username}</p>
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2 justify-center sm:justify-start">
@@ -182,19 +182,19 @@ export default function ModderProfile() {
                 </div>
 
                 {profile.bio && (
-                  <p className="text-base text-muted-foreground leading-relaxed max-w-2xl border-l-2 border-white/5 pl-4 py-1 italic">
+                  <p className="text-xs sm:text-base text-muted-foreground leading-relaxed max-w-2xl border-l-2 border-white/5 pl-3 sm:pl-4 py-1 italic text-left">
                     "{profile.bio}"
                   </p>
                 )}
 
-                <div className="flex items-center gap-4 justify-center sm:justify-start pt-2">
-                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground bg-white/5 px-3 py-1.5 rounded-full border border-white/5">
-                    <Calendar className="h-3.5 w-3.5 text-neon-purple" />
+                <div className="flex flex-wrap items-center gap-2 sm:gap-4 justify-center sm:justify-start pt-1 sm:pt-2">
+                  <div className="flex items-center gap-1.5 text-[10px] sm:text-xs text-muted-foreground bg-white/5 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full border border-white/5">
+                    <Calendar className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-neon-purple" />
                     Membro desde {memberSince}
                   </div>
                   {profile.reputation_score > 100 && (
-                    <div className="flex items-center gap-1.5 text-xs text-neon-green bg-neon-green/5 px-3 py-1.5 rounded-full border border-neon-green/10">
-                      <Trophy className="h-3.5 w-3.5" />
+                    <div className="flex items-center gap-1.5 text-[10px] sm:text-xs text-neon-green bg-neon-green/5 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full border border-neon-green/10">
+                      <Trophy className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
                       Modder Referência
                     </div>
                   )}
@@ -204,11 +204,11 @@ export default function ModderProfile() {
           </div>
 
           {/* Luxury Stats bar */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 border-t border-white/5 bg-white/5 backdrop-blur-md">
-            <StatItem icon={<Code className="h-5 w-5" />} value={scripts?.length ?? 0} label="Scripts Publicados" color="text-neon-purple" />
-            <StatItem icon={<Download className="h-5 w-5" />} value={totalDownloads.toLocaleString()} label="Downloads Totais" color="text-neon-pink" />
-            <StatItem icon={<Star className="h-5 w-5" />} value={avgRating.toFixed(1)} label="Avaliação Média" color="text-neon-cyan" />
-            <StatItem icon={<Trophy className="h-5 w-5" />} value={profile.reputation_score} label="Score de Reputação" color="text-neon-green" />
+          <div className="grid grid-cols-2 sm:grid-cols-4 border-t border-white/5 bg-white/5 backdrop-blur-md">
+            <StatItem icon={<Code className="h-4 w-4 sm:h-5 sm:w-5" />} value={scripts?.length ?? 0} label="Scripts" color="text-neon-purple" />
+            <StatItem icon={<Download className="h-4 w-4 sm:h-5 sm:w-5" />} value={totalDownloads.toLocaleString()} label="Downloads" color="text-neon-pink" />
+            <StatItem icon={<Star className="h-4 w-4 sm:h-5 sm:w-5" />} value={avgRating.toFixed(1)} label="Avaliação" color="text-neon-cyan" />
+            <StatItem icon={<Trophy className="h-4 w-4 sm:h-5 sm:w-5" />} value={profile.reputation_score} label="Reputação" color="text-neon-green" />
           </div>
         </div>
 
@@ -216,15 +216,15 @@ export default function ModderProfile() {
         {/* Tabs */}
         {/* Tabs */}
         <Tabs defaultValue="scripts" className="space-y-4">
-          <TabsList className="w-full grid grid-cols-3 bg-secondary/50">
-            <TabsTrigger value="scripts" className="gap-2">
-              <Code className="h-4 w-4" /> Scripts
+          <TabsList className="w-full grid grid-cols-3 bg-secondary/50 h-auto">
+            <TabsTrigger value="scripts" className="gap-1.5 sm:gap-2 text-[11px] sm:text-sm py-2">
+              <Code className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> Scripts
             </TabsTrigger>
-            <TabsTrigger value="tutorials" className="gap-2">
-              <BookOpen className="h-4 w-4" /> Tutoriais
+            <TabsTrigger value="tutorials" className="gap-1.5 sm:gap-2 text-[11px] sm:text-sm py-2">
+              <BookOpen className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> Tutoriais
             </TabsTrigger>
-            <TabsTrigger value="about" className="gap-2">
-              <Info className="h-4 w-4" /> Sobre
+            <TabsTrigger value="about" className="gap-1.5 sm:gap-2 text-[11px] sm:text-sm py-2">
+              <Info className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> Sobre
             </TabsTrigger>
           </TabsList>
 
