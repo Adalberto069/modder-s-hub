@@ -386,7 +386,7 @@ export default function BountyDetail() {
 
   return (
     <Layout>
-      <div className="container py-8 max-w-4xl space-y-6">
+      <div className="container py-4 sm:py-8 px-3 sm:px-6 max-w-4xl space-y-4 sm:space-y-6">
         {/* Back */}
         <Link to="/bounties" className="inline-flex items-center gap-2 text-xs text-muted-foreground hover:text-neon-purple transition-colors font-mono">
           <ArrowLeft className="h-3 w-3" /> Bounty Board
@@ -396,35 +396,35 @@ export default function BountyDetail() {
         <div className="relative overflow-hidden border border-white/5 bg-[#050505]">
           <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-neon-purple/50 via-neon-cyan/30 to-transparent" />
 
-          <div className="p-8 space-y-6">
+          <div className="p-4 sm:p-8 space-y-5 sm:space-y-6">
             {/* Title + Status + Reward */}
-            <div className="flex items-start justify-between gap-4 flex-wrap">
-              <div className="space-y-2 flex-1">
-                <div className="flex items-center gap-2">
-                  <Target className="h-5 w-5 text-neon-purple" />
-                  <h1 className="text-2xl font-black uppercase tracking-tighter text-white">{bounty.title}</h1>
+            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+              <div className="space-y-2 flex-1 min-w-0">
+                <div className="flex items-start gap-2">
+                  <Target className="h-4 w-4 sm:h-5 sm:w-5 text-neon-purple shrink-0 mt-1" />
+                  <h1 className="text-lg sm:text-2xl font-black uppercase tracking-tighter text-white break-words">{bounty.title}</h1>
                 </div>
-                <div className="flex flex-wrap gap-2 items-center">
-                  <Badge variant="outline" className={`text-[10px] font-black uppercase tracking-widest rounded-none ${status.color} ${status.bg} ${status.border}`}>
+                <div className="flex flex-wrap gap-1.5 sm:gap-2 items-center">
+                  <Badge variant="outline" className={`text-[9px] sm:text-[10px] font-black uppercase tracking-widest rounded-none ${status.color} ${status.bg} ${status.border}`}>
                     {status.label}
                   </Badge>
                   {bounty.game_name && (
-                    <span className="flex items-center gap-1 text-[10px] font-medium text-neon-cyan bg-neon-cyan/5 border border-neon-cyan/10 px-2 py-0.5">
+                    <span className="flex items-center gap-1 text-[9px] sm:text-[10px] font-medium text-neon-cyan bg-neon-cyan/5 border border-neon-cyan/10 px-2 py-0.5">
                       <Gamepad2 className="h-2.5 w-2.5" /> {bounty.game_name}
                     </span>
                   )}
                   {bounty.categories && (
-                    <span className="text-[10px] font-medium text-muted-foreground bg-white/5 border border-white/5 px-2 py-0.5">
+                    <span className="text-[9px] sm:text-[10px] font-medium text-muted-foreground bg-white/5 border border-white/5 px-2 py-0.5">
                       {bounty.categories.icon} {bounty.categories.name}
                     </span>
                   )}
                   {isDeadlineExpired && (
-                    <span className="text-[10px] font-medium text-destructive bg-destructive/10 border border-destructive/20 px-2 py-0.5 flex items-center gap-1">
+                    <span className="text-[9px] sm:text-[10px] font-medium text-destructive bg-destructive/10 border border-destructive/20 px-2 py-0.5 flex items-center gap-1">
                       <AlertTriangle className="h-2.5 w-2.5" /> PRAZO EXPIRADO
                     </span>
                   )}
                   {isPurchaseCompleted && (
-                    <Badge variant="outline" className="text-[10px] font-black uppercase tracking-widest rounded-none text-neon-green bg-neon-green/10 border-neon-green/30">
+                    <Badge variant="outline" className="text-[9px] sm:text-[10px] font-black uppercase tracking-widest rounded-none text-neon-green bg-neon-green/10 border-neon-green/30">
                       ✅ Pago
                     </Badge>
                   )}
@@ -432,12 +432,12 @@ export default function BountyDetail() {
               </div>
 
               {/* Reward — PUBLIC */}
-              <div className="text-right shrink-0">
+              <div className="text-left sm:text-right shrink-0 border-t sm:border-t-0 border-white/5 pt-3 sm:pt-0">
                 {isPaid ? (
                   <>
                     <p className="text-[10px] text-muted-foreground uppercase tracking-widest">Recompensa</p>
-                    <p className="text-3xl font-black text-neon-green font-mono flex items-center gap-1 justify-end">
-                      <DollarSign className="h-6 w-6" />
+                    <p className="text-2xl sm:text-3xl font-black text-neon-green font-mono flex items-center gap-1 sm:justify-end">
+                      <DollarSign className="h-5 w-5 sm:h-6 sm:w-6" />
                       R$ {rewardAmount.toFixed(2).replace('.', ',')}
                     </p>
                     <p className="text-[9px] text-muted-foreground/50 font-mono mt-0.5">
@@ -445,10 +445,10 @@ export default function BountyDetail() {
                     </p>
                   </>
                 ) : (
-                  <div className="flex flex-col items-end gap-1">
+                  <div className="flex sm:flex-col items-center sm:items-end gap-2 sm:gap-1">
                     <Heart className="h-5 w-5 text-neon-cyan" />
                     <p className="text-sm font-black text-neon-cyan uppercase tracking-widest">Voluntário</p>
-                    <p className="text-[9px] text-muted-foreground/50 font-mono">Sem recompensa</p>
+                    <p className="text-[9px] text-muted-foreground/50 font-mono hidden sm:block">Sem recompensa</p>
                   </div>
                 )}
               </div>
