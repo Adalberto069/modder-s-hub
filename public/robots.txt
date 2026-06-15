@@ -1,2 +1,9 @@
 User-agent: *
 Allow: /
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /profile/settings
+Disallow: /reset-password
+Disallow: /auth
+
+Sitemap: https://hiddenmod.com.br/sitemap.xml
