@@ -126,9 +126,38 @@ export function AdminUsersTab() {
     }
   };
 
+  const refreshUsers = () => {
+    queryClient.invalidateQueries({ queryKey: ["admin-all-users"] });
+  };
+
+  const addRole = async (userId: string, role: AppRole) => {
+    setSavingRole(`${userId}-${role}-add`);
+    const { error } = await supabase.from("user_roles").insert({ user_id: userId, role, approved: true });
+    setSavingRole(null);
+    if (error) { toast.error(error.message); return; }
+    toast.success(`Patente "${role}" adicionada`);
+    refreshUsers();
+    setRolesUser((prev: any) => prev ? { ...prev, user_roles: [...(prev.user_roles || []), { role, approved: true }] } : prev);
+  };
+
+  const removeRole = async (userId: string, role: AppRole) => {
+    if (role === "admin" && userId === currentUser?.id) {
+      toast.error("Você não pode remover sua própria patente de admin");
+      return;
+    }
+    setSavingRole(`${userId}-${role}-rm`);
+    const { error } = await supabase.from("user_roles").delete().eq("user_id", userId).eq("role", role);
+    setSavingRole(null);
+    if (error) { toast.error(error.message); return; }
+    toast.success(`Patente "${role}" removida`);
+    refreshUsers();
+    setRolesUser((prev: any) => prev ? { ...prev, user_roles: (prev.user_roles || []).filter((r: any) => r.role !== role) } : prev);
+  };
+
   return (
     <Card className="border-white/10 bg-[#050505] rounded-none">
       <CardHeader className="border-b border-white/5 bg-[#030304]">
+
         <CardTitle className="text-sm font-black uppercase tracking-widest flex items-center gap-2 text-white">
           <UserCheck className="w-4 h-4 text-neon-purple" />
           Gerenciamento de Usuários
