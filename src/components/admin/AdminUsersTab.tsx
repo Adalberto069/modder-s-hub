@@ -237,6 +237,57 @@ export function AdminUsersTab() {
           )}
         </div>
       </CardContent>
+
+      <Dialog open={!!rolesUser} onOpenChange={(o) => !o && setRolesUser(null)}>
+        <DialogContent className="max-w-md bg-[#050505] border-white/10 rounded-none">
+          <DialogHeader>
+            <DialogTitle className="font-mono text-sm uppercase tracking-widest text-white">
+              Patentes de {rolesUser?.display_name || rolesUser?.username}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-2 mt-2">
+            {ALL_ROLES.map((role) => {
+              const has = rolesUser?.user_roles?.some((r: any) => r.role === role && r.approved);
+              const Icon = role === "admin" ? Shield : role === "modder" ? Code : User;
+              const savingAdd = savingRole === `${rolesUser?.user_id}-${role}-add`;
+              const savingRm = savingRole === `${rolesUser?.user_id}-${role}-rm`;
+              return (
+                <div key={role} className="flex items-center justify-between p-3 border border-white/10 bg-[#030304]">
+                  <div className="flex items-center gap-2">
+                    <Icon className="h-4 w-4 text-neon-purple" />
+                    <span className="text-sm font-bold uppercase tracking-widest text-white">{role}</span>
+                    {has && <Badge variant="outline" className="text-[10px] border-primary/40 text-primary">Ativo</Badge>}
+                  </div>
+                  {has ? (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      disabled={savingRm}
+                      onClick={() => removeRole(rolesUser.user_id, role)}
+                      className="text-[10px] uppercase font-bold gap-1 rounded-none border-destructive/40 text-destructive hover:bg-destructive/10"
+                    >
+                      <X className="h-3 w-3" /> {savingRm ? "..." : "Remover"}
+                    </Button>
+                  ) : (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      disabled={savingAdd}
+                      onClick={() => addRole(rolesUser.user_id, role)}
+                      className="text-[10px] uppercase font-bold gap-1 rounded-none border-primary/40 text-primary hover:bg-primary/10"
+                    >
+                      <Plus className="h-3 w-3" /> {savingAdd ? "..." : "Adicionar"}
+                    </Button>
+                  )}
+                </div>
+              );
+            })}
+            <p className="text-[10px] text-muted-foreground mt-3">
+              As patentes determinam o acesso do usuário ao sistema. Use com cuidado.
+            </p>
+          </div>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 }
