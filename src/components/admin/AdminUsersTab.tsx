@@ -1,12 +1,18 @@
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { UserCheck, LogIn, Search, Shield, Code, User } from "lucide-react";
+import { UserCheck, LogIn, Search, Shield, Code, User, Plus, X, Settings2 } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useAuth } from "@/lib/auth";
+
+type AppRole = "user" | "modder" | "admin";
+const ALL_ROLES: AppRole[] = ["user", "modder", "admin"];
+
 
 export function AdminUsersTab() {
   const [search, setSearch] = useState("");
