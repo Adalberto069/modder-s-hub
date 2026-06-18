@@ -17,6 +17,11 @@ const ALL_ROLES: AppRole[] = ["user", "modder", "admin"];
 export function AdminUsersTab() {
   const [search, setSearch] = useState("");
   const [impersonating, setImpersonating] = useState<string | null>(null);
+  const [rolesUser, setRolesUser] = useState<any | null>(null);
+  const [savingRole, setSavingRole] = useState<string | null>(null);
+  const queryClient = useQueryClient();
+  const { user: currentUser } = useAuth();
+
 
   const { data: users } = useQuery({
     queryKey: ["admin-all-users"],
