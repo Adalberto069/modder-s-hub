@@ -1,16 +1,27 @@
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { UserCheck, LogIn, Search, Shield, Code, User } from "lucide-react";
+import { UserCheck, LogIn, Search, Shield, Code, User, Plus, X, Settings2 } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useAuth } from "@/lib/auth";
+
+type AppRole = "user" | "modder" | "admin";
+const ALL_ROLES: AppRole[] = ["user", "modder", "admin"];
+
 
 export function AdminUsersTab() {
   const [search, setSearch] = useState("");
   const [impersonating, setImpersonating] = useState<string | null>(null);
+  const [rolesUser, setRolesUser] = useState<any | null>(null);
+  const [savingRole, setSavingRole] = useState<string | null>(null);
+  const queryClient = useQueryClient();
+  const { user: currentUser } = useAuth();
+
 
   const { data: users } = useQuery({
     queryKey: ["admin-all-users"],
@@ -115,9 +126,38 @@ export function AdminUsersTab() {
     }
   };
 
+  const refreshUsers = () => {
+    queryClient.invalidateQueries({ queryKey: ["admin-all-users"] });
+  };
+
+  const addRole = async (userId: string, role: AppRole) => {
+    setSavingRole(`${userId}-${role}-add`);
+    const { error } = await supabase.from("user_roles").insert({ user_id: userId, role, approved: true });
+    setSavingRole(null);
+    if (error) { toast.error(error.message); return; }
+    toast.success(`Patente "${role}" adicionada`);
+    refreshUsers();
+    setRolesUser((prev: any) => prev ? { ...prev, user_roles: [...(prev.user_roles || []), { role, approved: true }] } : prev);
+  };
+
+  const removeRole = async (userId: string, role: AppRole) => {
+    if (role === "admin" && userId === currentUser?.id) {
+      toast.error("Você não pode remover sua própria patente de admin");
+      return;
+    }
+    setSavingRole(`${userId}-${role}-rm`);
+    const { error } = await supabase.from("user_roles").delete().eq("user_id", userId).eq("role", role);
+    setSavingRole(null);
+    if (error) { toast.error(error.message); return; }
+    toast.success(`Patente "${role}" removida`);
+    refreshUsers();
+    setRolesUser((prev: any) => prev ? { ...prev, user_roles: (prev.user_roles || []).filter((r: any) => r.role !== role) } : prev);
+  };
+
   return (
     <Card className="border-white/10 bg-[#050505] rounded-none">
       <CardHeader className="border-b border-white/5 bg-[#030304]">
+
         <CardTitle className="text-sm font-black uppercase tracking-widest flex items-center gap-2 text-white">
           <UserCheck className="w-4 h-4 text-neon-purple" />
           Gerenciamento de Usuários
@@ -160,17 +200,30 @@ export function AdminUsersTab() {
                       <span>Downloads: {user.total_downloads ?? 0}</span>
                     </div>
                   </div>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    disabled={isAdmin || impersonating === user.user_id}
-                    onClick={() => handleImpersonate(user.user_id, name)}
-                    className="text-[10px] uppercase tracking-widest font-bold gap-1 rounded-none border-primary/30 text-primary hover:bg-primary/10 disabled:opacity-30"
-                    title={isAdmin ? "Não é possível impersonar outro admin" : "Entrar como este usuário"}
-                  >
-                    <LogIn className="h-3 w-3" />
-                    {impersonating === user.user_id ? "Entrando..." : "Entrar como"}
-                  </Button>
+                  <div className="flex gap-1 shrink-0">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setRolesUser(user)}
+                      className="text-[10px] uppercase tracking-widest font-bold gap-1 rounded-none border-neon-purple/30 text-neon-purple hover:bg-neon-purple/10"
+                      title="Gerenciar patentes"
+                    >
+                      <Settings2 className="h-3 w-3" />
+                      <span className="hidden sm:inline">Patentes</span>
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      disabled={isAdmin || impersonating === user.user_id}
+                      onClick={() => handleImpersonate(user.user_id, name)}
+                      className="text-[10px] uppercase tracking-widest font-bold gap-1 rounded-none border-primary/30 text-primary hover:bg-primary/10 disabled:opacity-30"
+                      title={isAdmin ? "Não é possível impersonar outro admin" : "Entrar como este usuário"}
+                    >
+                      <LogIn className="h-3 w-3" />
+                      <span className="hidden sm:inline">{impersonating === user.user_id ? "Entrando..." : "Entrar como"}</span>
+                    </Button>
+                  </div>
+
                 </div>
               );
             })
@@ -184,6 +237,57 @@ export function AdminUsersTab() {
           )}
         </div>
       </CardContent>
+
+      <Dialog open={!!rolesUser} onOpenChange={(o) => !o && setRolesUser(null)}>
+        <DialogContent className="max-w-md bg-[#050505] border-white/10 rounded-none">
+          <DialogHeader>
+            <DialogTitle className="font-mono text-sm uppercase tracking-widest text-white">
+              Patentes de {rolesUser?.display_name || rolesUser?.username}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-2 mt-2">
+            {ALL_ROLES.map((role) => {
+              const has = rolesUser?.user_roles?.some((r: any) => r.role === role && r.approved);
+              const Icon = role === "admin" ? Shield : role === "modder" ? Code : User;
+              const savingAdd = savingRole === `${rolesUser?.user_id}-${role}-add`;
+              const savingRm = savingRole === `${rolesUser?.user_id}-${role}-rm`;
+              return (
+                <div key={role} className="flex items-center justify-between p-3 border border-white/10 bg-[#030304]">
+                  <div className="flex items-center gap-2">
+                    <Icon className="h-4 w-4 text-neon-purple" />
+                    <span className="text-sm font-bold uppercase tracking-widest text-white">{role}</span>
+                    {has && <Badge variant="outline" className="text-[10px] border-primary/40 text-primary">Ativo</Badge>}
+                  </div>
+                  {has ? (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      disabled={savingRm}
+                      onClick={() => removeRole(rolesUser.user_id, role)}
+                      className="text-[10px] uppercase font-bold gap-1 rounded-none border-destructive/40 text-destructive hover:bg-destructive/10"
+                    >
+                      <X className="h-3 w-3" /> {savingRm ? "..." : "Remover"}
+                    </Button>
+                  ) : (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      disabled={savingAdd}
+                      onClick={() => addRole(rolesUser.user_id, role)}
+                      className="text-[10px] uppercase font-bold gap-1 rounded-none border-primary/40 text-primary hover:bg-primary/10"
+                    >
+                      <Plus className="h-3 w-3" /> {savingAdd ? "..." : "Adicionar"}
+                    </Button>
+                  )}
+                </div>
+              );
+            })}
+            <p className="text-[10px] text-muted-foreground mt-3">
+              As patentes determinam o acesso do usuário ao sistema. Use com cuidado.
+            </p>
+          </div>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 }
