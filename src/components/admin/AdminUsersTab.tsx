@@ -200,17 +200,30 @@ export function AdminUsersTab() {
                       <span>Downloads: {user.total_downloads ?? 0}</span>
                     </div>
                   </div>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    disabled={isAdmin || impersonating === user.user_id}
-                    onClick={() => handleImpersonate(user.user_id, name)}
-                    className="text-[10px] uppercase tracking-widest font-bold gap-1 rounded-none border-primary/30 text-primary hover:bg-primary/10 disabled:opacity-30"
-                    title={isAdmin ? "Não é possível impersonar outro admin" : "Entrar como este usuário"}
-                  >
-                    <LogIn className="h-3 w-3" />
-                    {impersonating === user.user_id ? "Entrando..." : "Entrar como"}
-                  </Button>
+                  <div className="flex gap-1 shrink-0">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setRolesUser(user)}
+                      className="text-[10px] uppercase tracking-widest font-bold gap-1 rounded-none border-neon-purple/30 text-neon-purple hover:bg-neon-purple/10"
+                      title="Gerenciar patentes"
+                    >
+                      <Settings2 className="h-3 w-3" />
+                      <span className="hidden sm:inline">Patentes</span>
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      disabled={isAdmin || impersonating === user.user_id}
+                      onClick={() => handleImpersonate(user.user_id, name)}
+                      className="text-[10px] uppercase tracking-widest font-bold gap-1 rounded-none border-primary/30 text-primary hover:bg-primary/10 disabled:opacity-30"
+                      title={isAdmin ? "Não é possível impersonar outro admin" : "Entrar como este usuário"}
+                    >
+                      <LogIn className="h-3 w-3" />
+                      <span className="hidden sm:inline">{impersonating === user.user_id ? "Entrando..." : "Entrar como"}</span>
+                    </Button>
+                  </div>
+
                 </div>
               );
             })
