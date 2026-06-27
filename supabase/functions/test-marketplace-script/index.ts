@@ -279,7 +279,7 @@ Deno.serve(async (req) => {
 
     // Check if already purchased
     const { data: existingPurchase } = await adminClient
-      .from("purchases")
+      .from("script_purchases")
       .select("id")
       .eq("script_id", script_id)
       .eq("user_id", user.id)

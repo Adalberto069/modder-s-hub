@@ -29,7 +29,7 @@ Deno.serve(async (req) => {
 
     // 1. Validate the provided key and get the user_id
     const { data: initialLicense, error: licenseError } = await supabase
-      .from("licenses")
+      .from("script_licenses")
       .select("user_id, status")
       .eq("license_key", key)
       .single();
@@ -43,7 +43,7 @@ Deno.serve(async (req) => {
 
     // 2. Get all active licenses for this user to list all their scripts
     const { data: allLicenses, error: allDocsError } = await supabase
-      .from("licenses")
+      .from("script_licenses")
       .select(`
         license_key,
         scripts (

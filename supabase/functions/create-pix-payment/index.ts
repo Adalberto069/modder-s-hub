@@ -95,7 +95,7 @@ Deno.serve(async (req) => {
 
     // Create purchase record
     const { data: purchase, error: purchaseError } = await serviceClient
-      .from("purchases")
+      .from("script_purchases")
       .insert({
         user_id: userId,
         script_id: script.id,
@@ -223,7 +223,7 @@ Deno.serve(async (req) => {
     }
 
     await serviceClient
-      .from("purchases")
+      .from("script_purchases")
       .update({ payment_id: String(mpData.id) })
       .eq("id", purchase.id);
 

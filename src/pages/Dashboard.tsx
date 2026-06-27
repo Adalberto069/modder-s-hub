@@ -75,7 +75,7 @@ export default function Dashboard() {
     queryKey: ["my-licenses", user?.id],
     queryFn: async () => {
       const { data } = await supabase
-        .from("licenses")
+        .from("script_licenses")
         .select("*, scripts(id, title, description, game_name, thumbnail_url, version)")
         .eq("user_id", user!.id)
         .order("created_at", { ascending: false });
@@ -94,7 +94,7 @@ export default function Dashboard() {
       const scriptIds = myScripts?.map((s: any) => s.id) ?? [];
       if (scriptIds.length === 0) return [];
       const { data } = await supabase
-        .from("purchases")
+        .from("script_purchases")
         .select("amount, platform_commission, modder_earnings, created_at")
         .in("script_id", scriptIds);
       return data ?? [];

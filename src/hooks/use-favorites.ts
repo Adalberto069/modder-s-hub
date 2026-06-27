@@ -12,7 +12,7 @@ export function useFavorites() {
     queryFn: async () => {
       if (!user) return [];
       const { data } = await supabase
-        .from("favorites")
+        .from("script_favorites")
         .select("script_id")
         .eq("user_id", user.id);
       return data?.map((f: any) => f.script_id) ?? [];
@@ -27,13 +27,13 @@ export function useFavorites() {
       const isFav = favorites.includes(scriptId);
       if (isFav) {
         await supabase
-          .from("favorites")
+          .from("script_favorites")
           .delete()
           .eq("user_id", user.id)
           .eq("script_id", scriptId);
       } else {
         await supabase
-          .from("favorites")
+          .from("script_favorites")
           .insert({ user_id: user.id, script_id: scriptId });
       }
       return !isFav;
