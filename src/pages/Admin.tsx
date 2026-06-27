@@ -87,10 +87,10 @@ export default function Admin() {
         .eq("role", "modder" as any)
         .eq("approved", true);
       const moddersCount = modderRoles?.length ?? 0;
-      const { count: purchasesCount } = await supabase.from("purchases").select("*", { count: "exact", head: true });
-      const { count: licensesCount } = await supabase.from("licenses").select("*", { count: "exact", head: true });
+      const { count: purchasesCount } = await supabase.from("script_purchases").select("*", { count: "exact", head: true });
+      const { count: licensesCount } = await supabase.from("script_licenses").select("*", { count: "exact", head: true });
       // Fetch financial totals
-      const { data: purchaseData } = await supabase.from("purchases").select("amount, platform_commission, modder_earnings");
+      const { data: purchaseData } = await supabase.from("script_purchases").select("amount, platform_commission, modder_earnings");
       const totalSales = purchaseData?.reduce((sum: number, p: any) => sum + Number(p.amount), 0) ?? 0;
       const totalCommission = purchaseData?.reduce((sum: number, p: any) => sum + Number(p.platform_commission || 0), 0) ?? 0;
       const totalModderEarnings = purchaseData?.reduce((sum: number, p: any) => sum + Number(p.modder_earnings || 0), 0) ?? 0;
@@ -113,7 +113,7 @@ export default function Admin() {
     queryKey: ["admin-licenses"],
     queryFn: async () => {
       const { data } = await supabase
-        .from("licenses")
+        .from("script_licenses")
         .select("*, scripts(title)")
         .order("created_at", { ascending: false });
       if (!data || data.length === 0) return [];
@@ -133,7 +133,7 @@ export default function Admin() {
     queryKey: ["admin-purchases"],
     queryFn: async () => {
       const { data } = await supabase
-        .from("purchases")
+        .from("script_purchases")
         .select("*, scripts(title)")
         .order("created_at", { ascending: false });
       if (!data || data.length === 0) return [];
@@ -199,7 +199,7 @@ export default function Admin() {
 
   const deleteScript = async (scriptId: string) => {
     // Check if script has purchases - warn admin
-    const { count } = await supabase.from("purchases").select("*", { count: "exact", head: true }).eq("script_id", scriptId);
+    const { count } = await supabase.from("script_purchases").select("*", { count: "exact", head: true }).eq("script_id", scriptId);
     if ((count ?? 0) > 0) {
       if (!window.confirm(`⚠️ Este script possui ${count} compra(s). Excluir permanentemente apagará o acesso dos compradores. Deseja continuar?`)) return;
     }
@@ -270,7 +270,7 @@ export default function Admin() {
 
   const toggleLicenseBan = async (licenseId: string, currentStatus: string) => {
     const newStatus = currentStatus === "active" ? "banned" : "active";
-    const { error } = await supabase.from("licenses").update({ status: newStatus }).eq("id", licenseId);
+    const { error } = await supabase.from("script_licenses").update({ status: newStatus }).eq("id", licenseId);
     if (error) { toast.error(error.message); return; }
     toast.success(newStatus === "banned" ? "Licença banida!" : "Licença reativada!");
     queryClient.invalidateQueries({ queryKey: ["admin-licenses"] });

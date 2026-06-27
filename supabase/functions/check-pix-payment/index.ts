@@ -51,7 +51,7 @@ Deno.serve(async (req) => {
 
     // Get purchase
     const { data: purchase } = await serviceClient
-      .from("purchases")
+      .from("script_purchases")
       .select("*")
       .eq("id", purchase_id)
       .eq("user_id", userId)
@@ -67,7 +67,7 @@ Deno.serve(async (req) => {
     // Already completed
     if (purchase.status === "completed") {
       const { data: license } = await serviceClient
-        .from("licenses")
+        .from("script_licenses")
         .select("license_key")
         .eq("purchase_id", purchase_id)
         .single();
@@ -106,7 +106,7 @@ Deno.serve(async (req) => {
     if (mpData.status === "approved") {
       // Complete the purchase
       await serviceClient
-        .from("purchases")
+        .from("script_purchases")
         .update({ status: "completed" })
         .eq("id", purchase_id);
 
@@ -126,7 +126,7 @@ Deno.serve(async (req) => {
 
       // Check if renewal (existing license)
       const { data: existingLicense } = await serviceClient
-        .from("licenses")
+        .from("script_licenses")
         .select("id, expires_at")
         .eq("script_id", purchase.script_id)
         .eq("user_id", userId)
@@ -146,20 +146,20 @@ Deno.serve(async (req) => {
           : null;
 
         await serviceClient
-          .from("licenses")
+          .from("script_licenses")
           .update({ expires_at: newExpiry, status: "active" })
           .eq("id", existingLicense.id);
 
         // Get existing key
         const { data: lic } = await serviceClient
-          .from("licenses")
+          .from("script_licenses")
           .select("license_key")
           .eq("id", existingLicense.id)
           .single();
         finalLicenseKey = lic?.license_key ?? licenseKey;
       } else {
         // New license
-        await serviceClient.from("licenses").insert({
+        await serviceClient.from("script_licenses").insert({
           user_id: userId,
           script_id: purchase.script_id,
           purchase_id: purchase_id,

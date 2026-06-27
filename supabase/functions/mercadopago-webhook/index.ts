@@ -144,7 +144,7 @@ Deno.serve(async (req) => {
     const purchaseId = externalRef;
 
     const { data: purchase } = await serviceClient
-      .from("purchases")
+      .from("script_purchases")
       .select("*")
       .eq("id", purchaseId)
       .single();
@@ -166,7 +166,7 @@ Deno.serve(async (req) => {
     }
 
     await serviceClient
-      .from("purchases")
+      .from("script_purchases")
       .update({ status: "completed", payment_id: String(paymentId) })
       .eq("id", purchaseId);
 
@@ -183,7 +183,7 @@ Deno.serve(async (req) => {
       : null;
 
     const { data: existingLicense } = await serviceClient
-      .from("licenses")
+      .from("script_licenses")
       .select("id, expires_at")
       .eq("script_id", purchase.script_id)
       .eq("user_id", purchase.user_id)
@@ -201,11 +201,11 @@ Deno.serve(async (req) => {
         : null;
 
       await serviceClient
-        .from("licenses")
+        .from("script_licenses")
         .update({ expires_at: newExpiry, status: "active" })
         .eq("id", existingLicense.id);
     } else {
-      await serviceClient.from("licenses").insert({
+      await serviceClient.from("script_licenses").insert({
         user_id: purchase.user_id,
         script_id: purchase.script_id,
         purchase_id: purchaseId,

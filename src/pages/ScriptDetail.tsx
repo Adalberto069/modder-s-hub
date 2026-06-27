@@ -200,7 +200,7 @@ export default function ScriptDetail() {
   const { data: scriptPurchases } = useQuery({
     queryKey: ["script-purchases", id],
     queryFn: async () => {
-      const { data, error } = await supabase.from("purchases").select("*").eq("script_id", id!);
+      const { data, error } = await supabase.from("script_purchases").select("*").eq("script_id", id!);
       if (error) throw error;
       return data;
     },
@@ -228,7 +228,7 @@ export default function ScriptDetail() {
   const { data: reviews } = useQuery({
     queryKey: ["script-reviews", id],
     queryFn: async () => {
-      const { data } = await supabase.from("reviews").select("*").eq("script_id", id!).order("created_at", { ascending: false });
+      const { data } = await supabase.from("script_reviews").select("*").eq("script_id", id!).order("created_at", { ascending: false });
       return data ?? [];
     },
     enabled: !!id,
@@ -238,7 +238,7 @@ export default function ScriptDetail() {
     queryKey: ["script-license", id, user?.id],
     queryFn: async () => {
       const { data } = await supabase
-        .from("licenses")
+        .from("script_licenses")
         .select("*")
         .eq("script_id", id!)
         .eq("user_id", user!.id)
@@ -253,7 +253,7 @@ export default function ScriptDetail() {
     queryKey: ["script-purchase-completed", id, user?.id],
     queryFn: async () => {
       const { data } = await supabase
-        .from("purchases")
+        .from("script_purchases")
         .select("id")
         .eq("script_id", id!)
         .eq("user_id", user!.id)
@@ -494,10 +494,10 @@ end
     setSubmitting(true);
     const existing = reviews?.find((r: any) => r.user_id === user.id);
     if (existing) {
-      await supabase.from("reviews").update({ rating: newRating, comment: newComment || null }).eq("id", existing.id);
+      await supabase.from("script_reviews").update({ rating: newRating, comment: newComment || null }).eq("id", existing.id);
       toast.success("Avaliação atualizada!");
     } else {
-      const { error } = await supabase.from("reviews").insert({ script_id: script.id, user_id: user.id, rating: newRating, comment: newComment || null });
+      const { error } = await supabase.from("script_reviews").insert({ script_id: script.id, user_id: user.id, rating: newRating, comment: newComment || null });
       if (error) { toast.error(error.message); setSubmitting(false); return; }
       toast.success("Avaliação enviada!");
     }

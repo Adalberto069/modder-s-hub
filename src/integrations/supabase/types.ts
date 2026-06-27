@@ -452,35 +452,6 @@ export type Database = {
         }
         Relationships: []
       }
-      favorites: {
-        Row: {
-          created_at: string
-          id: string
-          script_id: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          script_id: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          script_id?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "favorites_script_id_fkey"
-            columns: ["script_id"]
-            isOneToOne: false
-            referencedRelation: "scripts"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       forum_posts: {
         Row: {
           category: string
@@ -574,54 +545,6 @@ export type Database = {
             columns: ["reply_id"]
             isOneToOne: false
             referencedRelation: "forum_replies"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      licenses: {
-        Row: {
-          created_at: string
-          expires_at: string | null
-          id: string
-          license_key: string
-          purchase_id: string
-          script_id: string
-          status: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          expires_at?: string | null
-          id?: string
-          license_key: string
-          purchase_id: string
-          script_id: string
-          status?: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          expires_at?: string | null
-          id?: string
-          license_key?: string
-          purchase_id?: string
-          script_id?: string
-          status?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "licenses_purchase_id_fkey"
-            columns: ["purchase_id"]
-            isOneToOne: false
-            referencedRelation: "purchases"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "licenses_script_id_fkey"
-            columns: ["script_id"]
-            isOneToOne: false
-            referencedRelation: "scripts"
             referencedColumns: ["id"]
           },
         ]
@@ -819,56 +742,6 @@ export type Database = {
         }
         Relationships: []
       }
-      purchases: {
-        Row: {
-          amount: number
-          commission_rate: number
-          created_at: string
-          id: string
-          modder_earnings: number
-          payment_id: string | null
-          payment_method: string | null
-          platform_commission: number
-          script_id: string
-          status: string
-          user_id: string
-        }
-        Insert: {
-          amount?: number
-          commission_rate?: number
-          created_at?: string
-          id?: string
-          modder_earnings?: number
-          payment_id?: string | null
-          payment_method?: string | null
-          platform_commission?: number
-          script_id: string
-          status?: string
-          user_id: string
-        }
-        Update: {
-          amount?: number
-          commission_rate?: number
-          created_at?: string
-          id?: string
-          modder_earnings?: number
-          payment_id?: string | null
-          payment_method?: string | null
-          platform_commission?: number
-          script_id?: string
-          status?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "purchases_script_id_fkey"
-            columns: ["script_id"]
-            isOneToOne: false
-            referencedRelation: "scripts"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       reports: {
         Row: {
           created_at: string
@@ -907,41 +780,6 @@ export type Database = {
           status?: string
         }
         Relationships: []
-      }
-      reviews: {
-        Row: {
-          comment: string | null
-          created_at: string
-          id: string
-          rating: number
-          script_id: string
-          user_id: string
-        }
-        Insert: {
-          comment?: string | null
-          created_at?: string
-          id?: string
-          rating: number
-          script_id: string
-          user_id: string
-        }
-        Update: {
-          comment?: string | null
-          created_at?: string
-          id?: string
-          rating?: number
-          script_id?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "reviews_script_id_fkey"
-            columns: ["script_id"]
-            isOneToOne: false
-            referencedRelation: "scripts"
-            referencedColumns: ["id"]
-          },
-        ]
       }
       script_access: {
         Row: {
@@ -1025,6 +863,35 @@ export type Database = {
           },
         ]
       }
+      script_favorites: {
+        Row: {
+          created_at: string
+          id: string
+          script_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          script_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          script_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "favorites_script_id_fkey"
+            columns: ["script_id"]
+            isOneToOne: false
+            referencedRelation: "scripts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       script_images: {
         Row: {
           created_at: string
@@ -1050,6 +917,54 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "script_images_script_id_fkey"
+            columns: ["script_id"]
+            isOneToOne: false
+            referencedRelation: "scripts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      script_licenses: {
+        Row: {
+          created_at: string
+          expires_at: string | null
+          id: string
+          license_key: string
+          purchase_id: string
+          script_id: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          license_key: string
+          purchase_id: string
+          script_id: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          license_key?: string
+          purchase_id?: string
+          script_id?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "licenses_purchase_id_fkey"
+            columns: ["purchase_id"]
+            isOneToOne: false
+            referencedRelation: "script_purchases"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "licenses_script_id_fkey"
             columns: ["script_id"]
             isOneToOne: false
             referencedRelation: "scripts"
@@ -1090,6 +1005,91 @@ export type Database = {
             foreignKeyName: "script_passwords_script_id_fkey"
             columns: ["script_id"]
             isOneToOne: true
+            referencedRelation: "scripts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      script_purchases: {
+        Row: {
+          amount: number
+          commission_rate: number
+          created_at: string
+          id: string
+          modder_earnings: number
+          payment_id: string | null
+          payment_method: string | null
+          platform_commission: number
+          script_id: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          amount?: number
+          commission_rate?: number
+          created_at?: string
+          id?: string
+          modder_earnings?: number
+          payment_id?: string | null
+          payment_method?: string | null
+          platform_commission?: number
+          script_id: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          commission_rate?: number
+          created_at?: string
+          id?: string
+          modder_earnings?: number
+          payment_id?: string | null
+          payment_method?: string | null
+          platform_commission?: number
+          script_id?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "purchases_script_id_fkey"
+            columns: ["script_id"]
+            isOneToOne: false
+            referencedRelation: "scripts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      script_reviews: {
+        Row: {
+          comment: string | null
+          created_at: string
+          id: string
+          rating: number
+          script_id: string
+          user_id: string
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          rating: number
+          script_id: string
+          user_id: string
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          rating?: number
+          script_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reviews_script_id_fkey"
+            columns: ["script_id"]
+            isOneToOne: false
             referencedRelation: "scripts"
             referencedColumns: ["id"]
           },

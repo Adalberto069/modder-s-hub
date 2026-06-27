@@ -110,7 +110,7 @@ Deno.serve(async (req) => {
 
     // Validate license
     const { data: license } = await supabase
-      .from("licenses")
+      .from("script_licenses")
       .select("id, status, script_id, user_id")
       .eq("license_key", key)
       .single();

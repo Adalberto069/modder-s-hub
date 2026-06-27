@@ -19,7 +19,7 @@ Deno.serve(async (req) => {
 
     // 1) Compras completed com amount=0 ou payment_id null
     const { data: badPurchases } = await supabase
-      .from("purchases")
+      .from("script_purchases")
       .select("id, user_id, script_id, amount, payment_id, created_at")
       .eq("status", "completed")
       .or("amount.eq.0,payment_id.is.null")
@@ -56,7 +56,7 @@ Deno.serve(async (req) => {
           if (!script || !script.is_paid || script.modder_id === acc.user_id) continue;
 
           const { data: purchase } = await supabase
-            .from("purchases")
+            .from("script_purchases")
             .select("id")
             .eq("user_id", acc.user_id)
             .eq("script_id", acc.script_id)

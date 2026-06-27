@@ -25,7 +25,7 @@ Deno.serve(async (req) => {
     );
 
     const { data: license } = await supabase
-      .from("licenses")
+      .from("script_licenses")
       .select("id, status, expires_at")
       .eq("license_key", key)
       .single();

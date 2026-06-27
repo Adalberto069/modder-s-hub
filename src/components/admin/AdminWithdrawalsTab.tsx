@@ -51,7 +51,7 @@ export function AdminWithdrawalsTab() {
     queryKey: ["admin-modder-earnings"],
     queryFn: async () => {
       const { data } = await supabase
-        .from("purchases")
+        .from("script_purchases")
         .select("script_id, modder_earnings, status, amount, platform_commission")
         .eq("status", "completed");
       return data ?? [];

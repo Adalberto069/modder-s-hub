@@ -21,7 +21,7 @@ Deno.serve(async (req) => {
     const fourDaysFromNow = new Date(now.getTime() + 4 * 24 * 60 * 60 * 1000);
 
     const { data: expiringLicenses, error } = await supabase
-      .from("licenses")
+      .from("script_licenses")
       .select("id, user_id, script_id, expires_at, license_key")
       .eq("status", "active")
       .gte("expires_at", threeDaysFromNow.toISOString())
