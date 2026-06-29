@@ -16,6 +16,7 @@ import {
   Loader2,
   PlayCircle,
   ShieldAlert,
+  Ban,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { formatDistanceToNow } from "date-fns";
