@@ -58,11 +58,21 @@ export function AdminAuditTab() {
     queryFn: async () => {
       const { data, error } = await (supabase as any)
         .from("script_upload_blocks")
-        .select("id, created_at, user_id, script_id, reason, source, metadata, profiles:user_id(username, display_name), scripts:script_id(title)")
+        .select("id, created_at, user_id, script_id, reason, source, metadata")
         .order("created_at", { ascending: false })
         .limit(50);
       if (error) throw error;
-      return (data || []) as any[];
+      const rows = (data || []) as any[];
+      const userIds = Array.from(new Set(rows.map((r) => r.user_id)));
+      let profilesMap: Record<string, { username: string; display_name: string | null }> = {};
+      if (userIds.length > 0) {
+        const { data: profs } = await supabase
+          .from("profiles")
+          .select("user_id, username, display_name")
+          .in("user_id", userIds);
+        for (const p of (profs || []) as any[]) profilesMap[p.user_id] = p;
+      }
+      return rows.map((r) => ({ ...r, profile: profilesMap[r.user_id] }));
     },
   });
 
