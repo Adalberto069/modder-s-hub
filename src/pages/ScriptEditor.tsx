@@ -211,12 +211,35 @@ export default function ScriptEditor() {
       return;
     }
 
+    // Bloqueia código já ofuscado/empacotado — HiddenMod faz a proteção no servidor
+    if (luaCode && luaCode.trim()) {
+      const check = detectLuaObfuscation(luaCode);
+      if (check.obfuscated) {
+        toast.error("🚫 Envio bloqueado: o código parece ofuscado/empacotado. " + check.reason + " Envie o código-fonte original — a HiddenMod aplica a proteção automaticamente.");
+        return;
+      }
+    }
+
     setSubmitting(true);
 
     let fileUrl = existingScript?.file_url ?? null;
     if (file) {
       const safeName = await validateFileWithToast({ file, type: "script", maxSizeMB: 20 });
       if (!safeName) { setSubmitting(false); return; }
+
+      // Lê o conteúdo do .lua e bloqueia se vier ofuscado
+      try {
+        const fileText = await file.text();
+        const fileCheck = detectLuaObfuscation(fileText);
+        if (fileCheck.obfuscated) {
+          toast.error("🚫 Arquivo .lua bloqueado: " + fileCheck.reason + " Envie a fonte original.");
+          setSubmitting(false);
+          return;
+        }
+      } catch {
+        // se não conseguir ler, segue (validateFileWithToast já checou tipo/tamanho)
+      }
+
       const path = `${user.id}/${safeName}`;
       // Upload .lua files to private bucket
       const { error: uploadError } = await supabase.storage.from("scripts-private").upload(path, file, { upsert: true });
