@@ -215,6 +215,18 @@ export default function ScriptEditor() {
     if (luaCode && luaCode.trim()) {
       const check = detectLuaObfuscation(luaCode);
       if (check.obfuscated) {
+        await (supabase as any).from("script_upload_blocks").insert({
+          user_id: user.id,
+          script_id: id ?? null,
+          reason: check.reason ?? "obfuscation detected",
+          source: "pasted_code",
+          metadata: {
+            title,
+            code_length: luaCode.length,
+            target_publish_status: targetPublishStatus,
+            user_agent: navigator.userAgent,
+          },
+        });
         toast.error("🚫 Envio bloqueado: o código parece ofuscado/empacotado. " + check.reason + " Envie o código-fonte original — a HiddenMod aplica a proteção automaticamente.");
         return;
       }
@@ -232,6 +244,19 @@ export default function ScriptEditor() {
         const fileText = await file.text();
         const fileCheck = detectLuaObfuscation(fileText);
         if (fileCheck.obfuscated) {
+          await (supabase as any).from("script_upload_blocks").insert({
+            user_id: user.id,
+            script_id: id ?? null,
+            reason: fileCheck.reason ?? "obfuscation detected",
+            source: "uploaded_file",
+            metadata: {
+              title,
+              file_name: file.name,
+              file_size: file.size,
+              target_publish_status: targetPublishStatus,
+              user_agent: navigator.userAgent,
+            },
+          });
           toast.error("🚫 Arquivo .lua bloqueado: " + fileCheck.reason + " Envie a fonte original.");
           setSubmitting(false);
           return;
