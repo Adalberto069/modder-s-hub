@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { validateFileWithToast } from "@/lib/secure-upload";
+import { detectLuaObfuscation } from "@/lib/lua-obfuscation";
 import LuaCodeEditor from "@/components/LuaCodeEditor";
 import ScriptAnalysis, { type AnalysisResult } from "@/components/ScriptAnalysis";
 import { useParams, useNavigate } from "react-router-dom";
