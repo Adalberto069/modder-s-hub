@@ -1127,6 +1127,44 @@ export type Database = {
           },
         ]
       }
+      script_upload_blocks: {
+        Row: {
+          created_at: string
+          id: string
+          metadata: Json
+          reason: string
+          script_id: string | null
+          source: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          metadata?: Json
+          reason: string
+          script_id?: string | null
+          source: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          metadata?: Json
+          reason?: string
+          script_id?: string | null
+          source?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "script_upload_blocks_script_id_fkey"
+            columns: ["script_id"]
+            isOneToOne: false
+            referencedRelation: "scripts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       scripts: {
         Row: {
           average_rating: number

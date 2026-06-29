@@ -16,6 +16,7 @@ import {
   Loader2,
   PlayCircle,
   ShieldAlert,
+  Ban,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { formatDistanceToNow } from "date-fns";
@@ -49,6 +50,29 @@ export function AdminAuditTab() {
         .limit(30);
       if (error) throw error;
       return (data || []) as unknown as AuditRun[];
+    },
+  });
+
+  const { data: uploadBlocks, isLoading: blocksLoading } = useQuery({
+    queryKey: ["admin-script-upload-blocks"],
+    queryFn: async () => {
+      const { data, error } = await (supabase as any)
+        .from("script_upload_blocks")
+        .select("id, created_at, user_id, script_id, reason, source, metadata")
+        .order("created_at", { ascending: false })
+        .limit(50);
+      if (error) throw error;
+      const rows = (data || []) as any[];
+      const userIds = Array.from(new Set(rows.map((r) => r.user_id)));
+      let profilesMap: Record<string, { username: string; display_name: string | null }> = {};
+      if (userIds.length > 0) {
+        const { data: profs } = await supabase
+          .from("profiles")
+          .select("user_id, username, display_name")
+          .in("user_id", userIds);
+        for (const p of (profs || []) as any[]) profilesMap[p.user_id] = p;
+      }
+      return rows.map((r) => ({ ...r, profile: profilesMap[r.user_id] }));
     },
   });
 
@@ -200,6 +224,73 @@ export function AdminAuditTab() {
                             {JSON.stringify(run.details, null, 2)}
                           </pre>
                         )}
+                      </div>
+                    </CollapsibleContent>
+                  </div>
+                </Collapsible>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Ban className="h-5 w-5 text-destructive" />
+            Uploads bloqueados (scripts ofuscados)
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {blocksLoading ? (
+            <div className="text-center py-8 text-muted-foreground">
+              <Loader2 className="h-6 w-6 animate-spin mx-auto" />
+            </div>
+          ) : !uploadBlocks || uploadBlocks.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground text-sm">
+              Nenhuma tentativa bloqueada ainda.
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {uploadBlocks.map((b) => (
+                <Collapsible
+                  key={b.id}
+                  open={expanded === b.id}
+                  onOpenChange={(o) => setExpanded(o ? b.id : null)}
+                >
+                  <div className="border border-white/10 rounded-md">
+                    <CollapsibleTrigger className="w-full p-3 flex items-center justify-between hover:bg-white/5 transition">
+                      <div className="flex items-center gap-3 text-left min-w-0">
+                        <Ban className="h-4 w-4 text-destructive flex-shrink-0" />
+                        <div className="min-w-0">
+                          <div className="text-sm font-mono truncate">
+                            {b.profile?.display_name || b.profile?.username || b.user_id.slice(0, 8)}
+                            {b.metadata?.title ? ` — ${b.metadata.title}` : ""}
+                          </div>
+                          <div className="text-xs text-muted-foreground truncate">{b.reason}</div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        <Badge variant="outline" className="font-mono text-[10px]">
+                          {b.source === "uploaded_file" ? "arquivo" : "código"}
+                        </Badge>
+                        <span className="text-[10px] text-muted-foreground font-mono hidden sm:inline">
+                          {formatDistanceToNow(new Date(b.created_at), { addSuffix: true, locale: ptBR })}
+                        </span>
+                        <ChevronDown
+                          className={`h-4 w-4 transition ${expanded === b.id ? "rotate-180" : ""}`}
+                        />
+                      </div>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                      <div className="p-3 border-t border-white/10 bg-black/30 space-y-2">
+                        <div className="text-xs font-mono text-muted-foreground">
+                          user_id: {b.user_id}
+                          {b.script_id && <> · script_id: {b.script_id}</>}
+                        </div>
+                        <pre className="text-xs font-mono overflow-auto max-h-64 whitespace-pre-wrap">
+                          {JSON.stringify(b.metadata, null, 2)}
+                        </pre>
                       </div>
                     </CollapsibleContent>
                   </div>
