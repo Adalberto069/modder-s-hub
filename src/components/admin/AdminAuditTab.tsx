@@ -53,6 +53,19 @@ export function AdminAuditTab() {
     },
   });
 
+  const { data: uploadBlocks, isLoading: blocksLoading } = useQuery({
+    queryKey: ["admin-script-upload-blocks"],
+    queryFn: async () => {
+      const { data, error } = await (supabase as any)
+        .from("script_upload_blocks")
+        .select("id, created_at, user_id, script_id, reason, source, metadata, profiles:user_id(username, display_name), scripts:script_id(title)")
+        .order("created_at", { ascending: false })
+        .limit(50);
+      if (error) throw error;
+      return (data || []) as any[];
+    },
+  });
+
   const runNow = async () => {
     setRunning(true);
     try {
