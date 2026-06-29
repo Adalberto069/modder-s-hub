@@ -233,6 +233,73 @@ export function AdminAuditTab() {
           )}
         </CardContent>
       </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Ban className="h-5 w-5 text-destructive" />
+            Uploads bloqueados (scripts ofuscados)
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {blocksLoading ? (
+            <div className="text-center py-8 text-muted-foreground">
+              <Loader2 className="h-6 w-6 animate-spin mx-auto" />
+            </div>
+          ) : !uploadBlocks || uploadBlocks.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground text-sm">
+              Nenhuma tentativa bloqueada ainda.
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {uploadBlocks.map((b) => (
+                <Collapsible
+                  key={b.id}
+                  open={expanded === b.id}
+                  onOpenChange={(o) => setExpanded(o ? b.id : null)}
+                >
+                  <div className="border border-white/10 rounded-md">
+                    <CollapsibleTrigger className="w-full p-3 flex items-center justify-between hover:bg-white/5 transition">
+                      <div className="flex items-center gap-3 text-left min-w-0">
+                        <Ban className="h-4 w-4 text-destructive flex-shrink-0" />
+                        <div className="min-w-0">
+                          <div className="text-sm font-mono truncate">
+                            {b.profile?.display_name || b.profile?.username || b.user_id.slice(0, 8)}
+                            {b.metadata?.title ? ` — ${b.metadata.title}` : ""}
+                          </div>
+                          <div className="text-xs text-muted-foreground truncate">{b.reason}</div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        <Badge variant="outline" className="font-mono text-[10px]">
+                          {b.source === "uploaded_file" ? "arquivo" : "código"}
+                        </Badge>
+                        <span className="text-[10px] text-muted-foreground font-mono hidden sm:inline">
+                          {formatDistanceToNow(new Date(b.created_at), { addSuffix: true, locale: ptBR })}
+                        </span>
+                        <ChevronDown
+                          className={`h-4 w-4 transition ${expanded === b.id ? "rotate-180" : ""}`}
+                        />
+                      </div>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                      <div className="p-3 border-t border-white/10 bg-black/30 space-y-2">
+                        <div className="text-xs font-mono text-muted-foreground">
+                          user_id: {b.user_id}
+                          {b.script_id && <> · script_id: {b.script_id}</>}
+                        </div>
+                        <pre className="text-xs font-mono overflow-auto max-h-64 whitespace-pre-wrap">
+                          {JSON.stringify(b.metadata, null, 2)}
+                        </pre>
+                      </div>
+                    </CollapsibleContent>
+                  </div>
+                </Collapsible>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }
