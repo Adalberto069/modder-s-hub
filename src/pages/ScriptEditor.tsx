@@ -377,462 +377,378 @@ export default function ScriptEditor() {
     setSubmitting(false);
   };
 
+  const statusBadge = () => {
+    if (publishStatus === "published") return null;
+    const map: Record<string, { label: string; cls: string }> = {
+      draft: { label: "Rascunho", cls: "bg-white/5 text-muted-foreground border-white/10" },
+      pending_review: { label: "Em revisão", cls: "bg-neon-purple/10 text-neon-purple border-neon-purple/30" },
+      archived: { label: "Arquivado", cls: "bg-destructive/10 text-destructive border-destructive/30" },
+    };
+    const m = map[publishStatus] ?? { label: publishStatus, cls: "bg-white/5 text-muted-foreground border-white/10" };
+    return <Badge variant="outline" className={`text-[10px] uppercase tracking-widest font-bold ${m.cls}`}>{m.label}</Badge>;
+  };
+
+  const SectionCard = ({ icon: Icon, title, hint, children }: any) => (
+    <Card className="border-white/5 bg-card/40 rounded-xl shadow-none">
+      <CardHeader className="pb-3 border-b border-white/5">
+        <CardTitle className="text-xs font-black uppercase tracking-[0.18em] flex items-center gap-2 text-foreground/90">
+          <Icon className="h-3.5 w-3.5 text-neon-purple" /> {title}
+        </CardTitle>
+        {hint && <p className="text-[11px] text-muted-foreground mt-1">{hint}</p>}
+      </CardHeader>
+      <CardContent className="p-5 space-y-5">{children}</CardContent>
+    </Card>
+  );
+
+  const FieldLabel = ({ children }: { children: React.ReactNode }) => (
+    <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{children}</Label>
+  );
+
+  const inputCls = "bg-white/[0.03] border-white/10 focus-visible:border-neon-purple/50 focus-visible:ring-neon-purple/20 h-10";
+
   return (
     <Layout>
-      <div className="container py-8 max-w-4xl">
-        <Button variant="ghost" onClick={() => navigate(-1)} className="mb-4">
+      <div className="container py-8 max-w-4xl pb-32">
+        <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="mb-4 -ml-2 text-muted-foreground hover:text-foreground">
           <ArrowLeft className="h-4 w-4 mr-1" /> Voltar
         </Button>
 
-        <div className="flex items-center justify-between mb-8">
-          <div className="space-y-1">
-            <h1 className="text-4xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-br from-white to-white/60 uppercase">
-              {isEditing ? "Editar Script Elite" : "Novo Script Elite"}
+        {/* Header */}
+        <div className="flex items-start justify-between gap-4 mb-8">
+          <div className="min-w-0">
+            <h1 className="text-2xl sm:text-3xl font-black tracking-tight">
+              {isEditing ? "Editar script" : "Novo script"}
             </h1>
-            <p className="text-xs text-muted-foreground font-mono tracking-widest uppercase text-neon-purple/80">Hidden Mod / Acesso Desenvolvedor</p>
+            <p className="text-xs text-muted-foreground mt-1">
+              Preencha as informações abaixo. Você pode salvar como rascunho a qualquer momento.
+            </p>
           </div>
-          {publishStatus !== "published" && (
-            <Badge className="bg-neon-purple/20 text-neon-purple border-neon-purple/30 backdrop-blur-md px-4 py-1.5 animate-pulse">
-              {publishStatus === "draft" ? "RASCUNHO" : publishStatus === "pending_review" ? "EM REVISÃO" : publishStatus === "archived" ? "ARQUIVADO" : publishStatus.toUpperCase()}
-            </Badge>
-          )}
+          {statusBadge()}
         </div>
 
-        <div className="space-y-6">
-          {/* Basic Information */}
-          <Card className="relative overflow-hidden border-neon-purple/20 bg-card/40 backdrop-blur-xl shadow-xl">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-neon-purple/5 blur-[40px] -z-10" />
-            <CardHeader className="pb-4 border-b border-white/5">
-              <CardTitle className="text-sm font-black uppercase tracking-[0.2em] flex items-center gap-2 text-muted-foreground">
-                <FileCode className="h-4 w-4 text-neon-purple" /> Informações Básicas
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-6 space-y-6">
-              <div className="space-y-3">
-                <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/70">Tipo de projeto</Label>
-                <Tabs value={scriptType} onValueChange={setScriptType} className="w-full">
-                  <TabsList className="grid w-full max-w-sm grid-cols-2 bg-white/5 border border-white/5 p-1">
-                    <TabsTrigger value="script" className="gap-2 data-[state=active]:bg-neon-purple data-[state=active]:text-white">
-                      <Code className="h-4 w-4" /> LUA SCRIPT
-                    </TabsTrigger>
-                    <TabsTrigger value="apk" className="gap-2 data-[state=active]:bg-neon-cyan data-[state=active]:text-white">
-                      <Package className="h-4 w-4" /> APK MOD
-                    </TabsTrigger>
-                  </TabsList>
-                </Tabs>
-              </div>
+        <div className="space-y-5">
+          {/* 1. Fundamentos */}
+          <SectionCard icon={FileCode} title="Fundamentos" hint="O básico para publicar o script.">
+            <div className="space-y-2">
+              <FieldLabel>Tipo de projeto</FieldLabel>
+              <Tabs value={scriptType} onValueChange={setScriptType} className="w-full">
+                <TabsList className="grid w-full max-w-xs grid-cols-2 bg-white/5 border border-white/10 p-1 h-10">
+                  <TabsTrigger value="script" className="gap-2 text-xs data-[state=active]:bg-neon-purple data-[state=active]:text-white">
+                    <Code className="h-3.5 w-3.5" /> Lua Script
+                  </TabsTrigger>
+                  <TabsTrigger value="apk" className="gap-2 text-xs data-[state=active]:bg-neon-cyan data-[state=active]:text-white">
+                    <Package className="h-3.5 w-3.5" /> APK Mod
+                  </TabsTrigger>
+                </TabsList>
+              </Tabs>
+            </div>
 
-              <div className="grid md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/70">Título do Script *</Label>
-                  <Input 
-                    value={title} 
-                    onChange={(e) => setTitle(e.target.value)} 
-                    placeholder="Ex: Hidden Mod Script v1.0" 
-                    className="bg-white/5 border-white/10 focus:border-neon-purple/50 focus:ring-neon-purple/20 h-12"
-                    required 
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/70 flex items-center gap-1">
-                    <Gamepad2 className="h-3.5 w-3.5" /> Jogo Alvo
-                  </Label>
-                  <Input 
-                    value={gameName} 
-                    onChange={(e) => setGameName(e.target.value)} 
-                    placeholder="Ex: Free Fire, Roblox" 
-                    className="bg-white/5 border-white/10 focus:border-neon-purple/50 focus:ring-neon-purple/20 h-12"
-                  />
-                </div>
+            <div className="grid sm:grid-cols-2 gap-4">
+              <div className="space-y-2 sm:col-span-2">
+                <FieldLabel>Título *</FieldLabel>
+                <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Ex: Hidden Mod Script v1.0" className={inputCls} required />
               </div>
-
-              <div className="grid md:grid-cols-3 gap-6">
-                <div className="space-y-2">
-                  <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/70">Versão</Label>
-                  <Input 
-                    value={version} 
-                    onChange={(e) => setVersion(e.target.value)} 
-                    placeholder="1.0.0" 
-                    className="bg-white/5 border-white/10 focus:border-neon-purple/50 focus:ring-neon-purple/20 h-12 font-mono"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/70">Categoria</Label>
-                  <Select value={categoryId} onValueChange={setCategoryId}>
-                    <SelectTrigger className="bg-white/5 border-white/10 h-12"><SelectValue placeholder="Selecione" /></SelectTrigger>
-                    <SelectContent className="bg-[#0a0a0c] border-white/10">
-                      {categories?.map((c: any) => (
-                        <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/70">Status Operacional</Label>
-                  <Select value={status} onValueChange={setStatus}>
-                    <SelectTrigger className="bg-white/5 border-white/10 h-12"><SelectValue /></SelectTrigger>
-                    <SelectContent className="bg-[#0a0a0c] border-white/10">
-                      <SelectItem value="working" className="text-neon-green">WORKING</SelectItem>
-                      <SelectItem value="detected" className="text-neon-pink">DETECTED</SelectItem>
-                      <SelectItem value="updating" className="text-neon-cyan">UPDATING</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
               <div className="space-y-2">
-                <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/70">Descrição Detalhada</Label>
-                <Textarea 
-                  value={description} 
-                  onChange={(e) => setDescription(e.target.value)} 
-                  rows={4} 
-                  placeholder="Explique as funcionalidades e como usar seu script..." 
-                  className="bg-white/5 border-white/10 focus:border-neon-purple/50 focus:ring-neon-purple/20 resize-none"
+                <FieldLabel><span className="inline-flex items-center gap-1"><Gamepad2 className="h-3 w-3" /> Jogo alvo</span></FieldLabel>
+                <Input value={gameName} onChange={(e) => setGameName(e.target.value)} placeholder="Ex: Free Fire" className={inputCls} />
+              </div>
+              <div className="space-y-2">
+                <FieldLabel>Versão</FieldLabel>
+                <Input value={version} onChange={(e) => setVersion(e.target.value)} placeholder="1.0.0" className={`${inputCls} font-mono`} />
+              </div>
+              <div className="space-y-2">
+                <FieldLabel>Categoria</FieldLabel>
+                <Select value={categoryId} onValueChange={setCategoryId}>
+                  <SelectTrigger className={inputCls}><SelectValue placeholder="Selecione" /></SelectTrigger>
+                  <SelectContent className="bg-[#0a0a0c] border-white/10">
+                    {categories?.map((c: any) => (<SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <FieldLabel>Status operacional</FieldLabel>
+                <Select value={status} onValueChange={setStatus}>
+                  <SelectTrigger className={inputCls}><SelectValue /></SelectTrigger>
+                  <SelectContent className="bg-[#0a0a0c] border-white/10">
+                    <SelectItem value="working" className="text-neon-green">Working</SelectItem>
+                    <SelectItem value="detected" className="text-neon-pink">Detected</SelectItem>
+                    <SelectItem value="updating" className="text-neon-cyan">Updating</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <FieldLabel>Descrição</FieldLabel>
+              <Textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                rows={4}
+                placeholder="Explique o que o script faz e como usar..."
+                className="bg-white/[0.03] border-white/10 focus-visible:border-neon-purple/50 focus-visible:ring-neon-purple/20 resize-none"
+              />
+            </div>
+          </SectionCard>
+
+          {/* 2. Código Lua */}
+          {scriptType === "script" && (
+            <SectionCard
+              icon={Code}
+              title="Código Lua"
+              hint="Cole seu código original OU envie o arquivo .lua. Nunca envie código já ofuscado — a HiddenMod aplica a proteção automaticamente."
+            >
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <FieldLabel>Enviar arquivo .lua (opcional)</FieldLabel>
+                  {file && <span className="text-[10px] font-mono text-neon-cyan truncate max-w-[200px]">{file.name}</span>}
+                </div>
+                <Input
+                  type="file"
+                  accept=".lua"
+                  onChange={async (e) => {
+                    const f = e.target.files?.[0] ?? null;
+                    if (!f) { setFile(null); return; }
+                    const safeName = await validateFileWithToast({ file: f, type: "script", maxSizeMB: 20 });
+                    if (!safeName) { e.target.value = ""; setFile(null); return; }
+                    setFile(f);
+                    const reader = new FileReader();
+                    reader.onload = (ev) => {
+                      const content = ev.target?.result as string;
+                      if (content) setLuaCode(content);
+                    };
+                    reader.readAsText(f);
+                  }}
+                  className="bg-white/[0.03] border-white/10 h-10 file:bg-neon-cyan/20 file:text-neon-cyan file:border-none file:px-3 file:mr-3 file:text-xs file:font-bold hover:file:bg-neon-cyan/30 cursor-pointer"
                 />
               </div>
 
-              <div className="grid md:grid-cols-2 gap-6 pt-2">
-                <div className="space-y-2">
-                  <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/70">Thumbnail URL</Label>
-                  <Input 
-                    value={thumbnailUrl} 
-                    onChange={(e) => setThumbnailUrl(e.target.value)} 
-                    placeholder="https://sua-imagem.com/preview.jpg" 
-                    className="bg-white/5 border-white/10 h-10"
+              <div className="space-y-2">
+                <FieldLabel>Código-fonte (editável)</FieldLabel>
+                <div className="rounded-lg overflow-hidden border border-white/10 bg-[hsl(240,15%,3%)]">
+                  <LuaCodeEditor
+                    value={luaCode}
+                    onChange={setLuaCode}
+                    minHeight="260px"
+                    placeholder="-- Cole ou escreva seu código Lua original aqui"
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/70">Upload Direto</Label>
-                  <div className="relative group">
-                    <Input 
-                      type="file" 
-                      accept=".jpg,.jpeg,.png,.webp" 
-                      onChange={async (e) => {
-                        const f = e.target.files?.[0];
-                        if (!f) return;
-                        const safeName = await validateFileWithToast({ file: f, type: "image", maxSizeMB: 1 });
-                        if (!safeName) { e.target.value = ""; return; }
-                        toast.info("Enviando miniatura...");
-                        const path = `thumbnails/${user!.id}/${safeName}`;
-                        const { error: uploadError } = await supabase.storage.from("scripts").upload(path, f);
-                        if (uploadError) { toast.error("Erro no upload: " + uploadError.message); return; }
-                        const { data: { publicUrl } } = supabase.storage.from("scripts").getPublicUrl(path);
-                        setThumbnailUrl(publicUrl);
-                        toast.success("Miniatura enviada!");
-                      }}
-                      className="bg-white/5 border-white/10 h-10 file:bg-neon-purple/20 file:text-neon-purple file:border-none file:px-3 file:mr-3 file:text-xs file:font-bold hover:file:bg-neon-purple/30 transition-all cursor-pointer"
-                    />
-                  </div>
-                  <p className="text-[10px] text-muted-foreground italic">Máx: 1MB. JPG, PNG ou WebP.</p>
-                </div>
               </div>
-            </CardContent>
-          </Card>
 
-          {/* Features */}
-          <Card className="relative overflow-hidden border-white/5 bg-card/40 backdrop-blur-xl shadow-lg">
-            <CardHeader className="pb-4 border-b border-white/5">
-              <CardTitle className="text-sm font-black uppercase tracking-[0.2em] flex items-center gap-2 text-muted-foreground">
-                <List className="h-4 w-4 text-neon-cyan" /> Funcionalidades (Features)
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-6 space-y-4">
+              {luaCode.trim().length > 10 && (
+                <div className="pt-2 border-t border-white/5">
+                  <div className="mb-3">
+                    <h4 className="text-[11px] font-black uppercase tracking-widest text-neon-green">Análise de segurança</h4>
+                    <p className="text-[11px] text-muted-foreground mt-0.5">Verificamos o código antes da publicação.</p>
+                  </div>
+                  <ScriptAnalysis code={luaCode} scriptId={id} onAnalysisComplete={setLastAnalysis} />
+                </div>
+              )}
+            </SectionCard>
+          )}
+
+          {/* 3. Mídia */}
+          <SectionCard icon={Upload} title="Mídia" hint="Capa, vídeo demonstrativo e link externo.">
+            <div className="grid sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <FieldLabel>URL da thumbnail</FieldLabel>
+                <Input value={thumbnailUrl} onChange={(e) => setThumbnailUrl(e.target.value)} placeholder="https://..." className={inputCls} />
+              </div>
+              <div className="space-y-2">
+                <FieldLabel>Upload direto (máx 1MB)</FieldLabel>
+                <Input
+                  type="file"
+                  accept=".jpg,.jpeg,.png,.webp"
+                  onChange={async (e) => {
+                    const f = e.target.files?.[0];
+                    if (!f) return;
+                    const safeName = await validateFileWithToast({ file: f, type: "image", maxSizeMB: 1 });
+                    if (!safeName) { e.target.value = ""; return; }
+                    toast.info("Enviando miniatura...");
+                    const path = `thumbnails/${user!.id}/${safeName}`;
+                    const { error: uploadError } = await supabase.storage.from("scripts").upload(path, f);
+                    if (uploadError) { toast.error("Erro no upload: " + uploadError.message); return; }
+                    const { data: { publicUrl } } = supabase.storage.from("scripts").getPublicUrl(path);
+                    setThumbnailUrl(publicUrl);
+                    toast.success("Miniatura enviada!");
+                  }}
+                  className="bg-white/[0.03] border-white/10 h-10 file:bg-neon-purple/20 file:text-neon-purple file:border-none file:px-3 file:mr-3 file:text-xs file:font-bold hover:file:bg-neon-purple/30 cursor-pointer"
+                />
+              </div>
+            </div>
+            {thumbnailUrl && (
+              <div className="rounded-lg overflow-hidden border border-white/10 w-32 h-20">
+                <img src={thumbnailUrl} alt="preview" className="w-full h-full object-cover" />
+              </div>
+            )}
+            <div className="grid sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <FieldLabel>Vídeo (YouTube/Vimeo)</FieldLabel>
+                <Input value={videoUrl} onChange={(e) => setVideoUrl(e.target.value)} placeholder="https://youtube.com/watch?v=..." className={inputCls} />
+              </div>
+              <div className="space-y-2">
+                <FieldLabel>Link externo (Discord, GitHub...)</FieldLabel>
+                <Input value={externalLink} onChange={(e) => setExternalLink(e.target.value)} placeholder="https://..." className={inputCls} />
+              </div>
+            </div>
+          </SectionCard>
+
+          {/* 4. Divulgação */}
+          <SectionCard icon={Tag} title="Divulgação" hint="Funcionalidades, tags e tutorial de apoio ajudam usuários a encontrar seu script.">
+            <div className="space-y-2">
+              <FieldLabel><span className="inline-flex items-center gap-1"><List className="h-3 w-3" /> Funcionalidades</span></FieldLabel>
               <div className="flex gap-2">
                 <Input
                   value={newFeature}
                   onChange={(e) => setNewFeature(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addFeature())}
-                  placeholder="Ex: Anti-Ban Bypass, Speed Hack..."
-                  className="bg-white/5 border-white/10 h-11"
+                  placeholder="Ex: Anti-Ban, Speed Hack..."
+                  className={inputCls}
                 />
-                <Button type="button" variant="outline" size="icon" onClick={addFeature} className="h-11 w-11 hover:bg-neon-cyan/20 border-white/10"><Plus className="h-4 w-4 text-neon-cyan" /></Button>
+                <Button type="button" variant="outline" size="icon" onClick={addFeature} className="h-10 w-10 border-white/10 hover:bg-neon-cyan/10"><Plus className="h-4 w-4 text-neon-cyan" /></Button>
               </div>
               {features.length > 0 && (
-                <div className="flex flex-wrap gap-2 pt-2">
+                <div className="flex flex-wrap gap-1.5 pt-1">
                   {features.map((f, i) => (
-                    <Badge key={i} className="bg-neon-cyan/10 text-neon-cyan border-neon-cyan/20 px-3 py-1 gap-1 group">
+                    <Badge key={i} className="bg-neon-cyan/10 text-neon-cyan border-neon-cyan/20 px-2 py-0.5 gap-1 font-normal">
                       {f}
-                      <button onClick={() => setFeatures(features.filter((_, j) => j !== i))} className="ml-1 opacity-50 group-hover:opacity-100 transition-opacity">
-                        <X className="h-3 w-3" />
-                      </button>
+                      <button onClick={() => setFeatures(features.filter((_, j) => j !== i))} className="opacity-60 hover:opacity-100"><X className="h-3 w-3" /></button>
                     </Badge>
                   ))}
                 </div>
               )}
-            </CardContent>
-          </Card>
+            </div>
 
-          {/* Tags */}
-          <Card className="relative overflow-hidden border-white/5 bg-card/40 backdrop-blur-xl shadow-lg">
-            <CardHeader className="pb-4 border-b border-white/5">
-              <CardTitle className="text-sm font-black uppercase tracking-[0.2em] flex items-center gap-2 text-muted-foreground">
-                <Tag className="h-4 w-4 text-neon-pink" /> Tags de Descoberta
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-6 space-y-4">
+            <div className="space-y-2">
+              <FieldLabel>Tags de busca</FieldLabel>
               <div className="flex gap-2">
                 <Input
                   value={newTag}
                   onChange={(e) => setNewTag(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addTag())}
-                  placeholder="Ex: roblox, farm, injector..."
-                  className="bg-white/5 border-white/10 h-11"
+                  placeholder="Ex: roblox, farm..."
+                  className={inputCls}
                 />
-                <Button type="button" variant="outline" size="icon" onClick={addTag} className="h-11 w-11 hover:bg-neon-pink/20 border-white/10"><Plus className="h-4 w-4 text-neon-pink" /></Button>
+                <Button type="button" variant="outline" size="icon" onClick={addTag} className="h-10 w-10 border-white/10 hover:bg-neon-pink/10"><Plus className="h-4 w-4 text-neon-pink" /></Button>
               </div>
               {tags.length > 0 && (
-                <div className="flex flex-wrap gap-2 pt-2">
+                <div className="flex flex-wrap gap-1.5 pt-1">
                   {tags.map((t, i) => (
-                    <Badge key={i} className="bg-neon-pink/10 text-neon-pink border-neon-pink/20 px-3 py-1 gap-1 group">
+                    <Badge key={i} className="bg-neon-pink/10 text-neon-pink border-neon-pink/20 px-2 py-0.5 gap-1 font-normal">
                       #{t}
-                      <button onClick={() => setTags(tags.filter((_, j) => j !== i))} className="ml-1 opacity-50 group-hover:opacity-100 transition-opacity">
-                        <X className="h-3 w-3" />
-                      </button>
+                      <button onClick={() => setTags(tags.filter((_, j) => j !== i))} className="opacity-60 hover:opacity-100"><X className="h-3 w-3" /></button>
                     </Badge>
                   ))}
                 </div>
               )}
-            </CardContent>
-          </Card>
+            </div>
 
-          {/* Code Preview */}
-          {luaCode && (
-            <Card className="relative overflow-hidden border-neon-green/20 bg-[#060608]/90 backdrop-blur-xl shadow-2xl">
-              <CardHeader className="pb-4 border-b border-white/5">
-                <CardTitle className="text-sm font-black uppercase tracking-[0.2em] flex items-center gap-2 text-neon-green">
-                  <Code className="h-4 w-4" /> HiddenForge Editor
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-6">
-                <div className="relative rounded-xl overflow-hidden border border-white/10 bg-[hsl(240,15%,2%)] shadow-inner">
-                  <div className="flex items-center justify-between px-4 py-3 bg-white/5 border-b border-white/5">
-                    <div className="flex gap-2">
-                      <span className="w-2.5 h-2.5 rounded-full bg-red-500/40" />
-                      <span className="w-2.5 h-2.5 rounded-full bg-yellow-500/40" />
-                      <span className="w-2.5 h-2.5 rounded-full bg-green-500/40" />
-                    </div>
-                    <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/50">RO/Preview Mode</span>
-                  </div>
-                  <LuaCodeEditor
-                    value={luaCode.split("\n").slice(0, 25).join("\n") + (luaCode.split("\n").length > 25 ? "\n\n-- [CONTEÚDO ADICIONAL OCULTO NO PREVIEW]" : "")}
-                    readOnly
-                    minHeight="300px"
-                  />
-                </div>
-                
-                {/* Script Analysis Integration */}
-                {luaCode.trim().length > 10 && (
-                  <div className="mt-8 pt-8 border-t border-white/5">
-                    <div className="mb-4 space-y-1">
-                      <h4 className="text-xs font-black uppercase tracking-widest text-neon-green">Análise de Segurança Automática</h4>
-                      <p className="text-[10px] text-muted-foreground">O HiddenMarket analisa seu código em tempo real para garantir padrões de segurança.</p>
-                    </div>
-                    <ScriptAnalysis code={luaCode} scriptId={id} onAnalysisComplete={setLastAnalysis} />
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Video & Files */}
-          <Card className="relative overflow-hidden border-white/5 bg-card/40 backdrop-blur-xl shadow-lg">
-            <CardHeader className="pb-4 border-b border-white/5">
-              <CardTitle className="text-sm font-black uppercase tracking-[0.2em] flex items-center gap-2 text-muted-foreground">
-                <Upload className="h-4 w-4 text-neon-cyan" /> Mídia & Arquivos
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-6 space-y-6">
-              <div className="space-y-2">
-                <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/70">URL Vídeo Demonstração (YouTube/Vimeo)</Label>
-                <Input 
-                  value={videoUrl} 
-                  onChange={(e) => setVideoUrl(e.target.value)} 
-                  placeholder="https://youtube.com/watch?v=..." 
-                  className="bg-white/5 border-white/10 h-11"
-                />
-              </div>
-              <div className="grid md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/70">Script Principal (.lua)</Label>
-                  <Input 
-                    type="file" 
-                    onChange={async (e) => {
-                      const f = e.target.files?.[0] ?? null;
-                      if (!f) { setFile(null); return; }
-                      const safeName = await validateFileWithToast({ file: f, type: "script", maxSizeMB: 20 });
-                      if (!safeName) { e.target.value = ""; setFile(null); return; }
-                      setFile(f);
-                      if (f.name.toLowerCase().endsWith(".lua")) {
-                        const reader = new FileReader();
-                        reader.onload = (ev) => {
-                          const content = ev.target?.result as string;
-                          if (content) setLuaCode(content);
-                        };
-                        reader.readAsText(f);
-                      }
-                    }} 
-                    accept=".lua" 
-                    className="bg-white/5 border-white/10 h-11 file:bg-neon-cyan/20 file:text-neon-cyan file:border-none file:px-3 file:mr-3 file:text-xs file:font-bold hover:file:bg-neon-cyan/30 transition-all cursor-pointer"
-                  />
-                  <p className="text-[10px] text-neon-cyan/80 font-bold uppercase tracking-widest pt-1">⚠️ Apenas .lua permitido.</p>
-                </div>
-                <div className="space-y-2">
-                  <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/70">Link Externo Adicional</Label>
-                  <Input 
-                    value={externalLink} 
-                    onChange={(e) => setExternalLink(e.target.value)} 
-                    placeholder="Discord, GitHub, etc." 
-                    className="bg-white/5 border-white/10 h-11"
-                  />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Related Tutorial */}
-          <Card className="relative overflow-hidden border-white/5 bg-card/40 backdrop-blur-xl shadow-lg">
-            <CardHeader className="pb-4 border-b border-white/5">
-              <CardTitle className="text-sm font-black uppercase tracking-[0.2em] flex items-center gap-2 text-muted-foreground">
-                <BookOpen className="h-4 w-4 text-neon-pink" /> Tutorial de Apoio
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-6">
+            <div className="space-y-2">
+              <FieldLabel><span className="inline-flex items-center gap-1"><BookOpen className="h-3 w-3" /> Tutorial de apoio</span></FieldLabel>
               <Select value={relatedTutorialId} onValueChange={setRelatedTutorialId}>
-                <SelectTrigger className="bg-white/5 border-white/10 h-11"><SelectValue placeholder="Selecione um tutorial de suporte" /></SelectTrigger>
+                <SelectTrigger className={inputCls}><SelectValue placeholder="Nenhum tutorial vinculado" /></SelectTrigger>
                 <SelectContent className="bg-[#0a0a0c] border-white/10">
                   <SelectItem value="none">Nenhum tutorial vinculado</SelectItem>
-                  {tutorials?.map((t: any) => (
-                    <SelectItem key={t.id} value={t.id}>{t.title}</SelectItem>
-                  ))}
+                  {tutorials?.map((t: any) => (<SelectItem key={t.id} value={t.id}>{t.title}</SelectItem>))}
                 </SelectContent>
               </Select>
-            </CardContent>
-          </Card>
+            </div>
+          </SectionCard>
 
-          {/* Pricing & Protection */}
-          <Card className="relative overflow-hidden border-orange-500/20 bg-card/40 backdrop-blur-xl shadow-lg">
-             <CardHeader className="pb-4 border-b border-white/5">
-              <CardTitle className="text-sm font-black uppercase tracking-[0.2em] flex items-center gap-2 text-orange-500">
-                <Lock className="h-4 w-4" /> Monetização & Segurança
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-6 space-y-6">
-              <div className="flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/5">
-                <div className="flex items-center gap-4">
-                  <Switch checked={isPaid} onCheckedChange={setIsPaid} disabled={!!licenseFieldsLocked} className="data-[state=checked]:bg-orange-500" />
-                  <div className="space-y-0.5">
-                    <Label className="text-sm font-bold">{isPaid ? "PROJETO COMERCIAL" : "PROJETO GRATUITO"}</Label>
-                    <p className="text-[10px] text-muted-foreground">Defina se seu script será vendido ou livre.</p>
-                  </div>
+          {/* 5. Monetização */}
+          <SectionCard icon={Lock} title="Monetização" hint="Defina se o script é gratuito ou pago e o modelo de licença.">
+            <div className="flex items-center justify-between p-3 rounded-lg bg-white/[0.03] border border-white/10">
+              <div className="flex items-center gap-3 min-w-0">
+                <Switch checked={isPaid} onCheckedChange={setIsPaid} disabled={!!licenseFieldsLocked} className="data-[state=checked]:bg-orange-500" />
+                <div className="space-y-0.5 min-w-0">
+                  <Label className="text-sm font-bold">{isPaid ? "Script pago" : "Script gratuito"}</Label>
+                  <p className="text-[11px] text-muted-foreground">{isPaid ? "Será vendido no marketplace." : "Livre para download."}</p>
                 </div>
-                {!isPaid && <Badge variant="outline" className="text-neon-green border-neon-green/30">LIVRE</Badge>}
               </div>
+              {!isPaid && <Badge variant="outline" className="text-neon-green border-neon-green/30 shrink-0">Free</Badge>}
+            </div>
 
-              {licenseFieldsLocked && (
-                <div className="p-4 rounded-xl bg-orange-500/10 border border-orange-500/20 flex gap-3">
-                  <Lock className="h-4 w-4 text-orange-500 shrink-0 mt-0.5" />
-                  <p className="text-[11px] text-orange-200/80 leading-relaxed font-medium">Configurações de licença bloqueadas. Este script já possui proprietários. Alterações de preço requerem autorização administrativa.</p>
-                </div>
-              )}
+            {licenseFieldsLocked && (
+              <div className="p-3 rounded-lg bg-orange-500/10 border border-orange-500/20 flex gap-2 items-start">
+                <Lock className="h-4 w-4 text-orange-500 shrink-0 mt-0.5" />
+                <p className="text-[11px] text-orange-200/80 leading-relaxed">Licença bloqueada — este script já tem compradores. Alterações requerem aprovação admin.</p>
+              </div>
+            )}
 
-              {isPaid && (
-                <div className="grid md:grid-cols-2 gap-8 animate-in fade-in slide-in-from-top-2 duration-300">
-                  <div className="space-y-2">
-                    <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/70">Preço de Venda (R$)</Label>
-                    <div className="relative">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground font-bold">R$</span>
-                      <Input 
-                        type="number" 
-                        value={price} 
-                        onChange={(e) => setPrice(e.target.value)} 
-                        placeholder="0.00" 
-                        min="0" 
-                        step="0.01" 
-                        disabled={!!licenseFieldsLocked} 
-                        className="bg-white/5 border-white/10 pl-10 h-12 font-bold text-lg"
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/70">Modelo de Licença</Label>
-                    <Select value={licenseType} onValueChange={setLicenseType} disabled={!!licenseFieldsLocked}>
-                      <SelectTrigger className="bg-white/5 border-white/10 h-12">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent className="bg-[#0a0a0c] border-white/10">
-                        <SelectItem value="permanent">💎 Permanente (Vitalício)</SelectItem>
-                        <SelectItem value="monthly">📅 Mensal (Subscrição)</SelectItem>
-                        <SelectItem value="weekly">⏳ Semanal (Trial/Plus)</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <p className="text-[10px] text-muted-foreground italic pt-1">
-                      {licenseType === "permanent" && "O comprador terá acesso vitalício a todas as atualizações."}
-                      {licenseType === "monthly" && "Assinatura recorrente disponível por 30 dias."}
-                      {licenseType === "weekly" && "Acesso rápido por 7 dias."}
-                    </p>
+            {isPaid && (
+              <div className="grid sm:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <FieldLabel>Preço (R$)</FieldLabel>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm font-bold">R$</span>
+                    <Input type="number" value={price} onChange={(e) => setPrice(e.target.value)} placeholder="0.00" min="0" step="0.01" disabled={!!licenseFieldsLocked} className={`${inputCls} pl-10 font-bold`} />
                   </div>
                 </div>
-              )}
-            </CardContent>
-          </Card>
+                <div className="space-y-2">
+                  <FieldLabel>Duração da licença</FieldLabel>
+                  <Select value={licenseType} onValueChange={setLicenseType} disabled={!!licenseFieldsLocked}>
+                    <SelectTrigger className={inputCls}><SelectValue /></SelectTrigger>
+                    <SelectContent className="bg-[#0a0a0c] border-white/10">
+                      <SelectItem value="permanent">Permanente (vitalício)</SelectItem>
+                      <SelectItem value="monthly">Mensal (30 dias)</SelectItem>
+                      <SelectItem value="weekly">Semanal (7 dias)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            )}
+          </SectionCard>
+        </div>
+      </div>
 
-          {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 pb-12">
+      {/* Sticky action bar */}
+      <div className="fixed bottom-0 left-0 right-0 border-t border-white/10 bg-[#050505]/95 backdrop-blur-xl z-40">
+        <div className="container max-w-4xl py-3 flex flex-col sm:flex-row gap-2">
+          <Button
+            variant="outline"
+            onClick={() => handleSave("draft")}
+            disabled={submitting}
+            className="flex-1 h-11 border-white/10 bg-white/5 hover:bg-white/10 font-bold uppercase tracking-widest text-[11px]"
+          >
+            {submitting ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
+            Salvar rascunho
+          </Button>
+
+          {!isAdmin && (
+            <Button
+              onClick={() => handleSave("pending_review")}
+              disabled={submitting}
+              className="flex-1 h-11 bg-neon-purple hover:bg-neon-purple/90 text-white font-bold uppercase tracking-widest text-[11px]"
+            >
+              {submitting ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Send className="h-4 w-4 mr-2" />}
+              Enviar para aprovação
+            </Button>
+          )}
+
+          {isAdmin && (
+            <Button
+              onClick={() => handleSave("published")}
+              disabled={submitting || lastAnalysis?.classification === "malicious"}
+              className={`flex-1 h-11 font-bold uppercase tracking-widest text-[11px] ${
+                lastAnalysis?.classification === "malicious"
+                  ? "bg-destructive/20 text-destructive border border-destructive/30 cursor-not-allowed"
+                  : "bg-neon-green hover:bg-neon-green/90 text-black"
+              }`}
+            >
+              {submitting ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : lastAnalysis?.classification === "malicious" ? <ShieldX className="h-4 w-4 mr-2" /> : <Eye className="h-4 w-4 mr-2" />}
+              {lastAnalysis?.classification === "malicious" ? "Publicação bloqueada" : "Publicar"}
+            </Button>
+          )}
+
+          {isAdmin && isEditing && (
             <Button
               variant="outline"
-              onClick={() => handleSave("draft")}
+              onClick={() => handleSave("archived")}
               disabled={submitting}
-              className="flex-1 h-14 rounded-xl border-white/10 bg-white/5 hover:bg-white/10 font-bold uppercase tracking-widest text-xs transition-all"
+              className="h-11 sm:w-32 border-destructive/20 text-destructive hover:bg-destructive/5 font-bold uppercase tracking-widest text-[11px]"
             >
-              {submitting ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
-              Salvar como Rascunho
+              Arquivar
             </Button>
-
-            {!isAdmin && (
-              <Button
-                variant="outline"
-                onClick={() => handleSave("pending_review")}
-                disabled={submitting}
-                className="flex-1 h-14 rounded-xl border-neon-purple/20 bg-neon-purple/5 text-neon-purple hover:bg-neon-purple/10 font-bold uppercase tracking-widest text-xs shadow-lg shadow-neon-purple/5 transition-all"
-              >
-                {submitting ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Send className="h-4 w-4 mr-2" />}
-                Enviar para Aprovação
-              </Button>
-            )}
-
-            {isAdmin && (
-              <Button
-                onClick={() => handleSave("published")}
-                disabled={submitting || lastAnalysis?.classification === "malicious"}
-                className={`flex-1 h-14 rounded-xl font-bold uppercase tracking-widest text-xs transition-all shadow-xl ${
-                  lastAnalysis?.classification === "malicious"
-                    ? "bg-destructive/20 text-destructive border-destructive/30 cursor-not-allowed"
-                    : "bg-neon-green hover:bg-neon-green/90 text-black shadow-neon-green/20"
-                }`}
-                title={lastAnalysis?.classification === "malicious" ? "Bloqueado: script malicioso detectado" : undefined}
-              >
-                {submitting ? (
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                ) : lastAnalysis?.classification === "malicious" ? (
-                  <ShieldX className="h-4 w-4 mr-2" />
-                ) : (
-                  <Eye className="h-4 w-4 mr-2" />
-                )}
-                {lastAnalysis?.classification === "malicious" ? "Publicação Bloqueada" : "Lançar no Marketplace"}
-              </Button>
-            )}
-
-            {isAdmin && isEditing && (
-              <Button
-                variant="outline"
-                onClick={() => handleSave("archived")}
-                disabled={submitting}
-                className="h-14 px-8 rounded-xl border-destructive/20 text-destructive hover:bg-destructive/5 font-bold uppercase tracking-widest text-xs transition-all"
-              >
-                Arquivar
-              </Button>
-            )}
-          </div>
+          )}
         </div>
       </div>
     </Layout>
