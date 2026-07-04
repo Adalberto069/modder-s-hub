@@ -122,7 +122,7 @@ Responda APENAS chamando a tool generate_tutorial.`;
                     },
                   },
                 },
-                required: ["description", "blocks", "tips", "troubleshooting"],
+                required: ["title", "description", "blocks", "tips", "troubleshooting"],
                 additionalProperties: false,
               },
             },
