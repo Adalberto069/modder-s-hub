@@ -24,8 +24,10 @@ const SYSTEM_PROMPT = `Você é um especialista em modding mobile, scripts Lua, 
 10. Linguagem simples e amigável
 11. NUNCA use blocos do tipo "image" (você não tem imagens reais para referenciar — URLs inventadas quebram o tutorial).
 12. Para vídeos, use blocos "video" APENAS com URLs REAIS e conhecidas do YouTube (ex: canais oficiais do Game Guardian). Se não tiver certeza, NÃO inclua vídeo.
-13. Use blocos "link" para recursos externos reais e verificáveis (fórum oficial GG, docs Lua). Se não tiver certeza da URL, NÃO inclua link.
-14. Prefira blocos "tip", "warning", "bullet_list", "step" e "code" para deixar o tutorial interativo — nunca invente mídia.`;
+13. Use blocos "link" apenas para CTAs grandes (botão de download destacado). Se não tiver certeza da URL, NÃO inclua.
+14. **HYPERLINKS INLINE (PREFERIDO):** sempre que citar uma ferramenta, app, emulador, site ou recurso externo dentro de um parágrafo/step/tip, transforme o nome em link Markdown: \`[NoxPlayer](https://www.bignox.com)\`, \`[Game Guardian](https://gameguardian.net)\`, \`[LDPlayer](https://www.ldplayer.net)\`, \`[MEmu](https://www.memuplay.com)\`, \`[BlueStacks](https://www.bluestacks.com)\`, \`[VirtualXposed](https://vxposed.com)\`, \`[Parallel Space](https://parallelspace-app.com)\`, \`[docs Lua 5.1](https://www.lua.org/manual/5.1/)\`, \`[fórum oficial GG](https://gameguardian.net/forum)\`. Isso deixa o texto navegável estilo Medium.
+15. URLs SEMPRE reais e verificáveis. Nunca invente domínios. Se não souber a URL oficial, escreva o nome sem link.
+16. Prefira blocos "tip", "warning", "bullet_list", "step" e "code" com hyperlinks inline para deixar o tutorial interativo — nunca invente mídia.`;
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
