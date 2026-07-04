@@ -21,7 +21,11 @@ const SYSTEM_PROMPT = `Você é um especialista em modding mobile, scripts Lua, 
 7. Blocos de código: 8-25 linhas
 8. Se o título não for de modding, adapte para Game Guardian
 9. Gere apenas UM ÚNICO tutorial
-10. Linguagem simples e amigável`;
+10. Linguagem simples e amigável
+11. NUNCA use blocos do tipo "image" (você não tem imagens reais para referenciar — URLs inventadas quebram o tutorial).
+12. Para vídeos, use blocos "video" APENAS com URLs REAIS e conhecidas do YouTube (ex: canais oficiais do Game Guardian). Se não tiver certeza, NÃO inclua vídeo.
+13. Use blocos "link" para recursos externos reais e verificáveis (fórum oficial GG, docs Lua). Se não tiver certeza da URL, NÃO inclua link.
+14. Prefira blocos "tip", "warning", "bullet_list", "step" e "code" para deixar o tutorial interativo — nunca invente mídia.`;
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -96,7 +100,7 @@ Responda APENAS chamando a tool generate_tutorial.`;
                       properties: {
                         type: {
                           type: "string",
-                          enum: ["text", "step", "code", "tip", "warning", "video", "image", "link", "bullet_list", "divider"],
+                          enum: ["text", "step", "code", "tip", "warning", "video", "link", "bullet_list", "divider"],
                         },
                         content: { type: "string" },
                         url: { type: "string" },
