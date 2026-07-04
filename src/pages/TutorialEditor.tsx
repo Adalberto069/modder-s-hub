@@ -810,11 +810,10 @@ export default function TutorialEditor() {
             <Button
               variant="outline"
               size="sm"
-              className="h-9 text-xs gap-1.5 border-primary/20 text-primary hover:text-primary hover:bg-primary/10"
-              onClick={handleGenerateWithAI}
-              disabled={isGenerating || !form.title.trim()}
+              className="h-9 text-xs gap-1.5 border-primary/30 text-primary hover:text-primary hover:bg-primary/10"
+              onClick={() => setAiOpen(true)}
             >
-              {isGenerating ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />}
+              <Sparkles className="h-3.5 w-3.5" />
               Gerar com IA
             </Button>
 
