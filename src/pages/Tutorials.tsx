@@ -320,6 +320,19 @@ export default function Tutorials() {
           </div>
         )}
       </div>
+      <ConfirmDeleteDialog
+        open={!!tutorialToDelete}
+        onOpenChange={(o) => { if (!o) setTutorialToDelete(null); }}
+        title="Excluir tutorial?"
+        description="Esta ação é permanente. O tutorial será removido para todos os usuários."
+        itemName={tutorialToDelete?.title}
+        onConfirm={() => {
+          if (tutorialToDelete) {
+            deleteTutorial.mutate(tutorialToDelete.id);
+            setTutorialToDelete(null);
+          }
+        }}
+      />
     </Layout>
   );
 }
