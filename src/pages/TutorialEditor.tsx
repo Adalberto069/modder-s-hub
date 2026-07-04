@@ -1066,6 +1066,44 @@ export default function TutorialEditor() {
           </div>
         )}
       </div>
+
+      <Dialog open={aiOpen} onOpenChange={(o) => { if (!isGenerating) setAiOpen(o); }}>
+        <DialogContent className="sm:max-w-2xl bg-card/95 backdrop-blur border-primary/20">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 font-mono">
+              <Sparkles className="h-4 w-4 text-primary" />
+              Gerar tutorial com IA
+            </DialogTitle>
+            <DialogDescription className="text-xs">
+              Descreva livremente o que o tutorial deve ensinar. A IA vai criar o título, categoria, blocos, dicas e soluções automaticamente.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3">
+            <Label className="text-xs uppercase tracking-wider text-muted-foreground">Briefing / Prompt</Label>
+            <Textarea
+              value={aiPrompt}
+              onChange={(e) => setAiPrompt(e.target.value)}
+              placeholder={`Ex: Ensine iniciantes a criar o primeiro script Lua no Game Guardian para modificar dinheiro em jogos offline. Foque em passos práticos, cite o uso de gg.searchNumber e gg.editAll, e mostre um exemplo curto de código.`}
+              rows={9}
+              className="text-sm resize-none font-mono bg-background/60 border-border/30 focus:border-primary/50"
+              disabled={isGenerating}
+            />
+            <p className="text-[10px] text-muted-foreground/70">
+              Dica: quanto mais contexto (público-alvo, nível, exemplos que quer), melhor o resultado.
+            </p>
+          </div>
+          <DialogFooter className="gap-2">
+            <Button variant="outline" size="sm" onClick={() => setAiOpen(false)} disabled={isGenerating}>
+              Cancelar
+            </Button>
+            <Button size="sm" onClick={handleGenerateWithAI} disabled={isGenerating || !aiPrompt.trim()} className="gap-1.5">
+              {isGenerating ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Wand2 className="h-3.5 w-3.5" />}
+              {isGenerating ? "Gerando..." : "Gerar tutorial"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
     </Layout>
   );
 }
