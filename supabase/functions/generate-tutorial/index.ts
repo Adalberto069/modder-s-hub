@@ -29,7 +29,14 @@ serve(async (req) => {
   }
 
   try {
-    const { title } = await req.json();
+    const { prompt, title } = await req.json();
+    const userInput = (prompt && String(prompt).trim()) || (title && String(title).trim());
+    if (!userInput) {
+      return new Response(JSON.stringify({ error: "Prompt é obrigatório" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
     const apiKey = Deno.env.get("LOVABLE_API_KEY");
 
     if (!apiKey) {
@@ -39,10 +46,17 @@ serve(async (req) => {
       });
     }
 
-    const userPrompt = `Gere UM ÚNICO tutorial sobre: "${title}"
+    const userPrompt = `Crie UM ÚNICO tutorial com base neste briefing do usuário:
+
+"""
+${userInput}
+"""
+
+Gere um TÍTULO curto e atraente (máx 70 caracteres), uma descrição, categoria adequada e os blocos de conteúdo.
+Categorias válidas: geral, scripts-lua, root, virtualizado, iniciante.
 
 Adapte o tamanho à complexidade (iniciante=curto, avançado=detalhado).
-- Pelo menos 1 bloco de código Lua funcional
+- Pelo menos 1 bloco de código Lua funcional quando fizer sentido
 - Pelo menos 1 step prático
 - 2-3 dicas curtas
 - 2-3 problemas comuns com soluções
@@ -71,6 +85,8 @@ Responda APENAS chamando a tool generate_tutorial.`;
               parameters: {
                 type: "object",
                 properties: {
+                  title: { type: "string", description: "Título curto e atraente (máx 70 chars)" },
+                  category: { type: "string", enum: ["geral", "scripts-lua", "root", "virtualizado", "iniciante"] },
                   description: { type: "string", description: "Descrição atraente (2-3 frases)" },
                   blocks: {
                     type: "array",
@@ -106,7 +122,7 @@ Responda APENAS chamando a tool generate_tutorial.`;
                     },
                   },
                 },
-                required: ["description", "blocks", "tips", "troubleshooting"],
+                required: ["title", "description", "blocks", "tips", "troubleshooting"],
                 additionalProperties: false,
               },
             },

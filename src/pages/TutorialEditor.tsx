@@ -11,6 +11,7 @@ import { Separator } from "@/components/ui/separator";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth";
@@ -624,6 +625,8 @@ export default function TutorialEditor() {
   const [activeTab, setActiveTab] = useState("edit");
   const [tagInput, setTagInput] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
+  const [aiOpen, setAiOpen] = useState(false);
+  const [aiPrompt, setAiPrompt] = useState("");
 
   const [form, setForm] = useState<TutorialFormData>(emptyForm);
 
@@ -665,19 +668,22 @@ export default function TutorialEditor() {
   if (!isAdmin) return <Navigate to="/tutorials" />;
 
   const handleGenerateWithAI = async () => {
-    if (!form.title.trim()) { toast.error("Digite um título primeiro!"); return; }
+    if (!aiPrompt.trim()) { toast.error("Descreva o que você quer no tutorial"); return; }
     setIsGenerating(true);
     toast.info("A IA está escrevendo seu tutorial...");
     try {
-      const { data, error } = await supabase.functions.invoke('generate-tutorial', { body: { title: form.title } });
+      const { data, error } = await supabase.functions.invoke('generate-tutorial', { body: { prompt: aiPrompt } });
       if (error) throw error;
       if (data) {
+        const validCats = ["geral", "scripts-lua", "root", "virtualizado", "iniciante"];
         setForm(f => ({
           ...f,
+          title: data.title || f.title,
+          category: validCats.includes(data.category) ? data.category : f.category,
           description: data.description || f.description,
-          contentBlocks: data.blocks.map((b: any) => ({
-            id: crypto.randomUUID(), 
-            type: b.type, 
+          contentBlocks: (data.blocks || []).map((b: any) => ({
+            id: crypto.randomUUID(),
+            type: b.type,
             content: b.content || "",
             language: b.language || (b.type === "code" ? "lua" : undefined),
             url: b.url,
@@ -689,6 +695,7 @@ export default function TutorialEditor() {
           troubleshooting: data.troubleshooting?.length > 0 ? data.troubleshooting : f.troubleshooting
         }));
         toast.success("Tutorial gerado com sucesso!");
+        setAiOpen(false);
         setActiveTab("preview");
       }
     } catch (e: any) {
@@ -803,11 +810,10 @@ export default function TutorialEditor() {
             <Button
               variant="outline"
               size="sm"
-              className="h-9 text-xs gap-1.5 border-primary/20 text-primary hover:text-primary hover:bg-primary/10"
-              onClick={handleGenerateWithAI}
-              disabled={isGenerating || !form.title.trim()}
+              className="h-9 text-xs gap-1.5 border-primary/30 text-primary hover:text-primary hover:bg-primary/10"
+              onClick={() => setAiOpen(true)}
             >
-              {isGenerating ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />}
+              <Sparkles className="h-3.5 w-3.5" />
               Gerar com IA
             </Button>
 
@@ -1060,6 +1066,44 @@ export default function TutorialEditor() {
           </div>
         )}
       </div>
+
+      <Dialog open={aiOpen} onOpenChange={(o) => { if (!isGenerating) setAiOpen(o); }}>
+        <DialogContent className="sm:max-w-2xl bg-card/95 backdrop-blur border-primary/20">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 font-mono">
+              <Sparkles className="h-4 w-4 text-primary" />
+              Gerar tutorial com IA
+            </DialogTitle>
+            <DialogDescription className="text-xs">
+              Descreva livremente o que o tutorial deve ensinar. A IA vai criar o título, categoria, blocos, dicas e soluções automaticamente.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3">
+            <Label className="text-xs uppercase tracking-wider text-muted-foreground">Briefing / Prompt</Label>
+            <Textarea
+              value={aiPrompt}
+              onChange={(e) => setAiPrompt(e.target.value)}
+              placeholder={`Ex: Ensine iniciantes a criar o primeiro script Lua no Game Guardian para modificar dinheiro em jogos offline. Foque em passos práticos, cite o uso de gg.searchNumber e gg.editAll, e mostre um exemplo curto de código.`}
+              rows={9}
+              className="text-sm resize-none font-mono bg-background/60 border-border/30 focus:border-primary/50"
+              disabled={isGenerating}
+            />
+            <p className="text-[10px] text-muted-foreground/70">
+              Dica: quanto mais contexto (público-alvo, nível, exemplos que quer), melhor o resultado.
+            </p>
+          </div>
+          <DialogFooter className="gap-2">
+            <Button variant="outline" size="sm" onClick={() => setAiOpen(false)} disabled={isGenerating}>
+              Cancelar
+            </Button>
+            <Button size="sm" onClick={handleGenerateWithAI} disabled={isGenerating || !aiPrompt.trim()} className="gap-1.5">
+              {isGenerating ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Wand2 className="h-3.5 w-3.5" />}
+              {isGenerating ? "Gerando..." : "Gerar tutorial"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
     </Layout>
   );
 }
