@@ -645,7 +645,7 @@ export default function TutorialDetail() {
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold font-mono leading-tight mb-3">{tutorial.title}</h1>
 
               {tutorial.description && (
-                <p className="text-muted-foreground max-w-2xl leading-relaxed">{tutorial.description}</p>
+                <p className="text-muted-foreground max-w-2xl leading-relaxed">{renderInline(tutorial.description)}</p>
               )}
 
               {/* Author info */}

@@ -426,9 +426,19 @@ function LivePreview({ form }: { form: TutorialFormData }) {
   }
 
   const renderInline = (text: string) => {
-    const parts = text.split(/(\*\*[^*]+\*\*)/g);
+    const parts = text.split(/(\*\*[^*]+\*\*|\[[^\]]+\]\([^)]+\))/g);
     return parts.map((part, i) => {
-      if (part.startsWith("**") && part.endsWith("**")) return <strong key={i} className="text-foreground font-semibold">{part.slice(2, -2)}</strong>;
+      if (part.startsWith("**") && part.endsWith("**")) {
+        return <strong key={i} className="text-foreground font-semibold">{part.slice(2, -2)}</strong>;
+      }
+      const linkMatch = part.match(/\[([^\]]+)\]\(([^)]+)\)/);
+      if (linkMatch) {
+        return (
+          <a key={i} href={linkMatch[2]} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline font-medium">
+            {linkMatch[1]}
+          </a>
+        );
+      }
       return part;
     });
   };
@@ -443,7 +453,7 @@ function LivePreview({ form }: { form: TutorialFormData }) {
           {CATEGORIES.find((c) => c.value === form.category)?.label ?? form.category}
         </Badge>
         <h1 className="text-2xl sm:text-3xl font-bold font-mono">{form.title || "Sem título"}</h1>
-        {form.description && <p className="text-muted-foreground leading-relaxed">{form.description}</p>}
+        {form.description && <p className="text-muted-foreground leading-relaxed">{renderInline(form.description)}</p>}
         {form.tags.length > 0 && (
           <div className="flex flex-wrap gap-1.5 mt-2">
             {form.tags.map((tag) => (
