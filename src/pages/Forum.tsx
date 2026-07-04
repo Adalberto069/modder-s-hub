@@ -231,6 +231,7 @@ export default function Forum() {
       <Layout>
         <div className="container py-6 sm:py-10 px-4 max-w-5xl space-y-6 sm:space-y-8">
           <Button 
+            aria-label="Voltar"
             variant="ghost" size="sm" 
             className="group gap-2 hover:bg-white/5 transition-all text-muted-foreground hover:text-white uppercase font-black tracking-widest text-[10px] sm:text-xs rounded-none" 
             onClick={() => setSelectedPost(null)}
@@ -400,7 +401,7 @@ export default function Forum() {
                     <div className="border border-white/10 bg-[#030304]">
                       <div className="flex items-center justify-between px-4 py-2 border-b border-white/10 bg-[#050505]">
                         <span className="text-[9px] font-black uppercase tracking-widest text-neon-purple">Terminal File</span>
-                        <Button variant="ghost" className="h-5 px-2 text-[9px] uppercase font-black text-white/50 hover:text-white hover:bg-white/5 rounded-none" onClick={() => setReplyCode("")}>WIPE</Button>
+                        <Button aria-label="Limpar código" variant="ghost" className="h-5 px-2 text-[9px] uppercase font-black text-white/50 hover:text-white hover:bg-white/5 rounded-none" onClick={() => setReplyCode("")}>WIPE</Button>
                       </div>
                       <LuaCodeEditor 
                         value={replyCode} 

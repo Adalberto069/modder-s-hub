@@ -196,10 +196,10 @@ export default function Ferramentas() {
                       </Badge>
                       {isAdmin && (
                         <div className="flex gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
-                          <Button size="icon" variant="ghost" className="h-8 w-8 hover:bg-white/10 rounded-none" onClick={() => openEdit(tool)}>
+                          <Button aria-label="Editar ferramenta" size="icon" variant="ghost" className="h-8 w-8 hover:bg-white/10 rounded-none" onClick={() => openEdit(tool)}>
                             <Pencil className="h-3.5 w-3.5 text-white/70" />
                           </Button>
-                          <Button size="icon" variant="ghost" className="h-8 w-8 text-destructive/60 hover:text-destructive hover:bg-destructive/10 rounded-none" onClick={() => deleteTool.mutate(tool.id)}>
+                          <Button aria-label="Excluir ferramenta" size="icon" variant="ghost" className="h-8 w-8 text-destructive/60 hover:text-destructive hover:bg-destructive/10 rounded-none" onClick={() => deleteTool.mutate(tool.id)}>
                             <Trash2 className="h-3.5 w-3.5" />
                           </Button>
                         </div>
