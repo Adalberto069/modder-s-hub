@@ -41,6 +41,7 @@ export default function Tutorials() {
   const [activeCategory, setActiveCategory] = useState("all");
   const [search, setSearch] = useState("");
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
+  const [tutorialToDelete, setTutorialToDelete] = useState<{ id: string; title: string } | null>(null);
 
   const { data: tutorials = [], isLoading } = useQuery({
     queryKey: ["tutorials"],
