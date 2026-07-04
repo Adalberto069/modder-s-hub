@@ -668,19 +668,22 @@ export default function TutorialEditor() {
   if (!isAdmin) return <Navigate to="/tutorials" />;
 
   const handleGenerateWithAI = async () => {
-    if (!form.title.trim()) { toast.error("Digite um título primeiro!"); return; }
+    if (!aiPrompt.trim()) { toast.error("Descreva o que você quer no tutorial"); return; }
     setIsGenerating(true);
     toast.info("A IA está escrevendo seu tutorial...");
     try {
-      const { data, error } = await supabase.functions.invoke('generate-tutorial', { body: { title: form.title } });
+      const { data, error } = await supabase.functions.invoke('generate-tutorial', { body: { prompt: aiPrompt } });
       if (error) throw error;
       if (data) {
+        const validCats = ["geral", "scripts-lua", "root", "virtualizado", "iniciante"];
         setForm(f => ({
           ...f,
+          title: data.title || f.title,
+          category: validCats.includes(data.category) ? data.category : f.category,
           description: data.description || f.description,
-          contentBlocks: data.blocks.map((b: any) => ({
-            id: crypto.randomUUID(), 
-            type: b.type, 
+          contentBlocks: (data.blocks || []).map((b: any) => ({
+            id: crypto.randomUUID(),
+            type: b.type,
             content: b.content || "",
             language: b.language || (b.type === "code" ? "lua" : undefined),
             url: b.url,
@@ -692,6 +695,7 @@ export default function TutorialEditor() {
           troubleshooting: data.troubleshooting?.length > 0 ? data.troubleshooting : f.troubleshooting
         }));
         toast.success("Tutorial gerado com sucesso!");
+        setAiOpen(false);
         setActiveTab("preview");
       }
     } catch (e: any) {
