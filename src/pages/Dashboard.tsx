@@ -28,6 +28,7 @@ import {
 } from 'recharts';
 import { format, subDays, isSameDay, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { ConfirmDeleteDialog } from "@/components/ConfirmDeleteDialog";
 
 export default function Dashboard() {
   const { user, isModder, loading, profile } = useAuth();
@@ -35,6 +36,7 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const [showForm, setShowForm] = useState(false);
   const [activeTab, setActiveTab] = useState("purchases");
+  const [scriptToDelete, setScriptToDelete] = useState<{ id: string; title: string } | null>(null);
 
   // Form state
   const [title, setTitle] = useState("");
@@ -728,7 +730,7 @@ end
                         >
                           {script.is_active ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                         </Button>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-destructive/10 rounded-none text-destructive transition-colors" onClick={() => handleDelete(script.id)}>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-destructive/10 rounded-none text-destructive transition-colors" onClick={() => setScriptToDelete({ id: script.id, title: script.title })}>
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
@@ -750,6 +752,20 @@ end
           )}
         </Tabs>
       </div>
+      <ConfirmDeleteDialog
+        open={!!scriptToDelete}
+        onOpenChange={(o) => { if (!o) setScriptToDelete(null); }}
+        title="Excluir script?"
+        description="Esta ação é permanente. Se o script já tiver vendas, considere desativá-lo em vez de excluir."
+        itemName={scriptToDelete?.title}
+        onConfirm={async () => {
+          if (scriptToDelete) {
+            const id = scriptToDelete.id;
+            setScriptToDelete(null);
+            await handleDelete(id);
+          }
+        }}
+      />
     </Layout>
   );
 }
