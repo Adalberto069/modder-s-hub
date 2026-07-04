@@ -81,7 +81,7 @@ export function AdminAuditTab() {
     try {
       const { error } = await supabase.functions.invoke(
         "audit-suspicious-purchases",
-        { headers: { "x-invoke-source": "manual" } as any }
+        { body: { source: "manual" } }
       );
       if (error) throw error;
       toast({ title: "Auditoria executada com sucesso" });

@@ -71,7 +71,12 @@ Deno.serve(async (req) => {
     const totalIssues =
       (badPurchases?.length || 0) + (badBounties?.length || 0) + orphans.length;
 
-    const source = req.headers.get("x-invoke-source") || "cron";
+    let bodySource: string | null = null;
+    try {
+      const b = await req.clone().json();
+      if (b && typeof b.source === "string") bodySource = b.source;
+    } catch (_) { /* no body */ }
+    const source = bodySource || req.headers.get("x-invoke-source") || "cron";
 
     if (totalIssues === 0) {
       await supabase.from("audit_runs").insert({
