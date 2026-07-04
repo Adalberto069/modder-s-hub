@@ -752,6 +752,20 @@ end
           )}
         </Tabs>
       </div>
+      <ConfirmDeleteDialog
+        open={!!scriptToDelete}
+        onOpenChange={(o) => { if (!o) setScriptToDelete(null); }}
+        title="Excluir script?"
+        description="Esta ação é permanente. Se o script já tiver vendas, considere desativá-lo em vez de excluir."
+        itemName={scriptToDelete?.title}
+        onConfirm={async () => {
+          if (scriptToDelete) {
+            const id = scriptToDelete.id;
+            setScriptToDelete(null);
+            await handleDelete(id);
+          }
+        }}
+      />
     </Layout>
   );
 }
