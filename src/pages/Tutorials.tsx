@@ -263,10 +263,10 @@ export default function Tutorials() {
                         )}
                         {isAdmin && (
                           <div className="absolute top-0 right-0 p-1 flex gap-1 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity z-20 bg-[#050505] border-b border-l border-white/10">
-                            <Button size="icon" variant="ghost" className="h-6 w-6 rounded-none hover:bg-white/10 text-muted-foreground hover:text-white" onClick={(e) => { e.preventDefault(); e.stopPropagation(); navigate(`/tutorial/${tutorial.id}/edit`); }}>
+                            <Button aria-label="Editar tutorial" size="icon" variant="ghost" className="h-6 w-6 rounded-none hover:bg-white/10 text-muted-foreground hover:text-white" onClick={(e) => { e.preventDefault(); e.stopPropagation(); navigate(`/tutorial/${tutorial.id}/edit`); }}>
                               <Pencil className="h-3 w-3" />
                             </Button>
-                            <Button size="icon" variant="ghost" className="h-6 w-6 rounded-none hover:bg-destructive/20 text-destructive" onClick={(e) => { e.preventDefault(); e.stopPropagation(); deleteTutorial.mutate(tutorial.id); }}>
+                            <Button aria-label="Excluir tutorial" size="icon" variant="ghost" className="h-6 w-6 rounded-none hover:bg-destructive/20 text-destructive" onClick={(e) => { e.preventDefault(); e.stopPropagation(); deleteTutorial.mutate(tutorial.id); }}>
                               <Trash2 className="h-3 w-3" />
                             </Button>
                           </div>
