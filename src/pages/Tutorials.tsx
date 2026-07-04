@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { BookOpen, Play, Clock, Plus, Pencil, Trash2, Loader2, Search, Star, Lock, Terminal, Cpu, Package, ShieldCheck, Zap, Smartphone } from "lucide-react";
 import { motion } from "framer-motion";
 import { LoginPromptDialog } from "@/components/LoginPromptDialog";
+import { ConfirmDeleteDialog } from "@/components/ConfirmDeleteDialog";
 
 const CATEGORIES = [
   { value: "geral", label: "Geral", icon: "📖" },
