@@ -681,16 +681,24 @@ export default function TutorialEditor() {
           title: data.title || f.title,
           category: validCats.includes(data.category) ? data.category : f.category,
           description: data.description || f.description,
-          contentBlocks: (data.blocks || []).map((b: any) => ({
-            id: crypto.randomUUID(),
-            type: b.type,
-            content: b.content || "",
-            language: b.language || (b.type === "code" ? "lua" : undefined),
-            url: b.url,
-            label: b.label,
-            items: b.items,
-            imageUrl: b.imageUrl || (b.type === "image" ? b.url : undefined)
-          })),
+          contentBlocks: (data.blocks || [])
+            .filter((b: any) => {
+              // A IA não tem imagens reais — descarta blocos de imagem para evitar "foto quebrada"
+              if (b.type === "image") return false;
+              // Descarta vídeo/link sem URL
+              if ((b.type === "video" || b.type === "link") && !b.url) return false;
+              return true;
+            })
+            .map((b: any) => ({
+              id: crypto.randomUUID(),
+              type: b.type,
+              content: b.content || "",
+              language: b.language || (b.type === "code" ? "lua" : undefined),
+              url: b.url,
+              label: b.label,
+              items: b.items,
+              imageUrl: b.imageUrl,
+            })),
           tips: data.tips?.length > 0 ? data.tips : f.tips,
           troubleshooting: data.troubleshooting?.length > 0 ? data.troubleshooting : f.troubleshooting
         }));
