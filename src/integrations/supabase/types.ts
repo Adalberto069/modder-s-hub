@@ -863,6 +863,39 @@ export type Database = {
           },
         ]
       }
+      script_deletion_audit: {
+        Row: {
+          created_at: string
+          deleted_by: string | null
+          deleted_by_admin: boolean
+          id: string
+          modder_id: string | null
+          reason: string | null
+          script_id: string
+          script_title: string | null
+        }
+        Insert: {
+          created_at?: string
+          deleted_by?: string | null
+          deleted_by_admin?: boolean
+          id?: string
+          modder_id?: string | null
+          reason?: string | null
+          script_id: string
+          script_title?: string | null
+        }
+        Update: {
+          created_at?: string
+          deleted_by?: string | null
+          deleted_by_admin?: boolean
+          id?: string
+          modder_id?: string | null
+          reason?: string | null
+          script_id?: string
+          script_title?: string | null
+        }
+        Relationships: []
+      }
       script_favorites: {
         Row: {
           created_at: string
