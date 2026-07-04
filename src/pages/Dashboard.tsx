@@ -180,13 +180,20 @@ export default function Dashboard() {
     // Check if script has purchases using SECURITY DEFINER function
     const { data: scriptHasPurchases } = await supabase.rpc("script_has_purchases", { _script_id: scriptId });
     if (scriptHasPurchases) {
-      toast.error("Este script possui compras e não pode ser excluído. Você pode desativá-lo.");
+      toast.error("Não é possível excluir este script", {
+        description: "Ele já possui vendas registradas. Para proteger os compradores, desative-o em vez de excluí-lo — assim quem já pagou mantém o acesso.",
+        duration: 8000,
+      });
       return;
     }
     const { error } = await supabase.from("scripts").delete().eq("id", scriptId);
-    if (error) toast.error(error.message);
-    else {
-      toast.success("Removido com sucesso!");
+    if (error) {
+      const msg = /row-level security|permission/i.test(error.message)
+        ? "Você não tem permissão para excluir este script."
+        : error.message;
+      toast.error("Falha ao excluir", { description: msg });
+    } else {
+      toast.success("Script removido com sucesso!");
       queryClient.invalidateQueries({ queryKey: ["my-scripts"] });
     }
   };
