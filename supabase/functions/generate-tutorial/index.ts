@@ -85,6 +85,8 @@ Responda APENAS chamando a tool generate_tutorial.`;
               parameters: {
                 type: "object",
                 properties: {
+                  title: { type: "string", description: "Título curto e atraente (máx 70 chars)" },
+                  category: { type: "string", enum: ["geral", "scripts-lua", "root", "virtualizado", "iniciante"] },
                   description: { type: "string", description: "Descrição atraente (2-3 frases)" },
                   blocks: {
                     type: "array",
