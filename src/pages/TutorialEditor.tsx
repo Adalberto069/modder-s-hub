@@ -625,6 +625,8 @@ export default function TutorialEditor() {
   const [activeTab, setActiveTab] = useState("edit");
   const [tagInput, setTagInput] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
+  const [aiOpen, setAiOpen] = useState(false);
+  const [aiPrompt, setAiPrompt] = useState("");
 
   const [form, setForm] = useState<TutorialFormData>(emptyForm);
 
