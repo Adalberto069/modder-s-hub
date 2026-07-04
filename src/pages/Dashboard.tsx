@@ -730,7 +730,7 @@ end
                         >
                           {script.is_active ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                         </Button>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-destructive/10 rounded-none text-destructive transition-colors" onClick={() => handleDelete(script.id)}>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-destructive/10 rounded-none text-destructive transition-colors" onClick={() => setScriptToDelete({ id: script.id, title: script.title })}>
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
