@@ -100,7 +100,7 @@ Responda APENAS chamando a tool generate_tutorial.`;
                       properties: {
                         type: {
                           type: "string",
-                          enum: ["text", "step", "code", "tip", "warning", "video", "image", "link", "bullet_list", "divider"],
+                          enum: ["text", "step", "code", "tip", "warning", "video", "link", "bullet_list", "divider"],
                         },
                         content: { type: "string" },
                         url: { type: "string" },
