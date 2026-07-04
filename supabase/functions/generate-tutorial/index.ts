@@ -67,6 +67,7 @@ Adapte o tamanho à complexidade (iniciante=curto, avançado=detalhado).
 - 2-3 dicas curtas
 - 2-3 problemas comuns com soluções
 - Parágrafos CURTOS. Vá direto ao ponto.
+- SEMPRE que citar apps/emuladores/sites (NoxPlayer, LDPlayer, Game Guardian, VirtualXposed, etc.), use hyperlink Markdown inline no nome: \`[Nome](https://url-oficial)\`. Isso é obrigatório para deixar o tutorial navegável.
 
 Responda APENAS chamando a tool generate_tutorial.`;
 
