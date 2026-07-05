@@ -6,8 +6,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { UserCheck, LogIn, Search, Shield, Code, User, Plus, X, Settings2 } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { UserCheck, LogIn, Search, Shield, Code, User, Plus, X, Settings2, Ban, ShieldOff } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/lib/auth";
 
 type AppRole = "user" | "modder" | "admin";
@@ -19,6 +20,9 @@ export function AdminUsersTab() {
   const [impersonating, setImpersonating] = useState<string | null>(null);
   const [rolesUser, setRolesUser] = useState<any | null>(null);
   const [savingRole, setSavingRole] = useState<string | null>(null);
+  const [banTarget, setBanTarget] = useState<any | null>(null);
+  const [banReason, setBanReason] = useState("");
+  const [banning, setBanning] = useState(false);
   const queryClient = useQueryClient();
   const { user: currentUser } = useAuth();
 
@@ -154,6 +158,38 @@ export function AdminUsersTab() {
     setRolesUser((prev: any) => prev ? { ...prev, user_roles: (prev.user_roles || []).filter((r: any) => r.role !== role) } : prev);
   };
 
+  const handleBanToggle = async () => {
+    if (!banTarget) return;
+    const isBanned = !!banTarget.is_banned;
+    setBanning(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("admin-ban-user", {
+        body: {
+          target_user_id: banTarget.user_id,
+          action: isBanned ? "unban" : "ban",
+          reason: isBanned ? null : banReason.trim() || null,
+        },
+      });
+      if (error || data?.error) {
+        toast.error(data?.error || error?.message || "Erro ao processar");
+        return;
+      }
+      toast.success(isBanned ? "Conta desbanida" : "Conta banida");
+      setBanTarget(null);
+      setBanReason("");
+      refreshUsers();
+    } catch (e: any) {
+      toast.error(e?.message || "Erro inesperado");
+    } finally {
+      setBanning(false);
+    }
+  };
+
+  const totalUsers = users?.length ?? 0;
+  const totalModders = users?.filter((u: any) => u.user_roles?.some((r: any) => r.role === "modder" && r.approved)).length ?? 0;
+  const totalAdmins = users?.filter((u: any) => u.user_roles?.some((r: any) => r.role === "admin" && r.approved)).length ?? 0;
+  const totalBanned = users?.filter((u: any) => u.is_banned).length ?? 0;
+
   return (
     <Card className="border-white/10 bg-[#050505] rounded-none">
       <CardHeader className="border-b border-white/5 bg-[#030304]">
@@ -164,6 +200,22 @@ export function AdminUsersTab() {
         </CardTitle>
       </CardHeader>
       <CardContent className="pt-4">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
+          {[
+            { label: "Total", value: totalUsers, icon: User, color: "text-white border-white/10" },
+            { label: "Modders", value: totalModders, icon: Code, color: "text-accent border-accent/30" },
+            { label: "Admins", value: totalAdmins, icon: Shield, color: "text-destructive border-destructive/30" },
+            { label: "Banidos", value: totalBanned, icon: Ban, color: "text-orange-500 border-orange-500/30" },
+          ].map((s) => (
+            <div key={s.label} className={`border ${s.color} bg-[#030304] p-2 flex items-center gap-2`}>
+              <s.icon className="h-4 w-4" />
+              <div className="flex flex-col leading-tight">
+                <span className="text-lg font-black">{s.value}</span>
+                <span className="text-[9px] uppercase tracking-widest text-muted-foreground">{s.label}</span>
+              </div>
+            </div>
+          ))}
+        </div>
         <div className="relative mb-4">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
@@ -190,17 +242,23 @@ export function AdminUsersTab() {
                 >
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap mb-1">
-                      <span className="font-bold text-sm text-white truncate">{name}</span>
+                      <span className={`font-bold text-sm truncate ${user.is_banned ? "text-orange-500 line-through" : "text-white"}`}>{name}</span>
                       {getRoleBadges(user.user_roles)}
+                      {user.is_banned && (
+                        <Badge variant="outline" className="text-[10px] border-orange-500/40 text-orange-500">
+                          <Ban className="h-3 w-3 mr-1" /> BANIDO
+                        </Badge>
+                      )}
                     </div>
-                    <div className="flex gap-3 text-[10px] text-muted-foreground">
+                    <div className="flex gap-3 text-[10px] text-muted-foreground flex-wrap">
                       <span>@{user.username}</span>
                       {user.email && <span className="text-secondary-foreground/60">{user.email}</span>}
                       <span>Rep: {user.reputation_score ?? 0}</span>
                       <span>Downloads: {user.total_downloads ?? 0}</span>
+                      {user.banned_reason && <span className="text-orange-500/80">Motivo: {user.banned_reason}</span>}
                     </div>
                   </div>
-                  <div className="flex gap-1 shrink-0">
+                  <div className="flex gap-1 shrink-0 flex-wrap justify-end">
                     <Button
                       size="sm"
                       variant="outline"
@@ -214,7 +272,18 @@ export function AdminUsersTab() {
                     <Button
                       size="sm"
                       variant="outline"
-                      disabled={isAdmin || impersonating === user.user_id}
+                      disabled={isAdmin || user.user_id === currentUser?.id}
+                      onClick={() => { setBanReason(""); setBanTarget(user); }}
+                      className={`text-[10px] uppercase tracking-widest font-bold gap-1 rounded-none disabled:opacity-30 ${user.is_banned ? "border-green-500/40 text-green-500 hover:bg-green-500/10" : "border-orange-500/40 text-orange-500 hover:bg-orange-500/10"}`}
+                      title={isAdmin ? "Não é possível banir outro admin" : user.is_banned ? "Desbanir" : "Banir"}
+                    >
+                      {user.is_banned ? <ShieldOff className="h-3 w-3" /> : <Ban className="h-3 w-3" />}
+                      <span className="hidden sm:inline">{user.is_banned ? "Desbanir" : "Banir"}</span>
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      disabled={isAdmin || impersonating === user.user_id || user.is_banned}
                       onClick={() => handleImpersonate(user.user_id, name)}
                       className="text-[10px] uppercase tracking-widest font-bold gap-1 rounded-none border-primary/30 text-primary hover:bg-primary/10 disabled:opacity-30"
                       title={isAdmin ? "Não é possível impersonar outro admin" : "Entrar como este usuário"}
@@ -286,6 +355,49 @@ export function AdminUsersTab() {
               As patentes determinam o acesso do usuário ao sistema. Use com cuidado.
             </p>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!banTarget} onOpenChange={(o) => { if (!o) { setBanTarget(null); setBanReason(""); } }}>
+        <DialogContent className="max-w-md bg-[#050505] border-white/10 rounded-none">
+          <DialogHeader>
+            <DialogTitle className="font-mono text-sm uppercase tracking-widest text-white flex items-center gap-2">
+              {banTarget?.is_banned ? <ShieldOff className="h-4 w-4 text-green-500" /> : <Ban className="h-4 w-4 text-orange-500" />}
+              {banTarget?.is_banned ? "Desbanir Conta" : "Banir Conta"}
+            </DialogTitle>
+            <DialogDescription className="text-xs text-muted-foreground">
+              {banTarget?.is_banned
+                ? `Restaurar acesso de "${banTarget?.display_name || banTarget?.username}"?`
+                : `Bloquear login de "${banTarget?.display_name || banTarget?.username}"? O usuário será deslogado imediatamente.`}
+            </DialogDescription>
+          </DialogHeader>
+          {!banTarget?.is_banned && (
+            <div className="space-y-2">
+              <label className="text-[10px] uppercase tracking-widest text-muted-foreground">Motivo (opcional)</label>
+              <Textarea
+                value={banReason}
+                onChange={(e) => setBanReason(e.target.value)}
+                placeholder="Ex: spam, comportamento abusivo, fraude..."
+                className="bg-[#030304] border-white/10 rounded-none text-sm min-h-[80px]"
+              />
+            </div>
+          )}
+          <DialogFooter className="gap-2">
+            <Button
+              variant="outline"
+              onClick={() => { setBanTarget(null); setBanReason(""); }}
+              className="rounded-none border-white/10 text-xs uppercase tracking-widest"
+            >
+              Cancelar
+            </Button>
+            <Button
+              disabled={banning}
+              onClick={handleBanToggle}
+              className={`rounded-none text-xs uppercase tracking-widest font-bold ${banTarget?.is_banned ? "bg-green-500/20 border border-green-500/40 text-green-500 hover:bg-green-500/30" : "bg-orange-500/20 border border-orange-500/40 text-orange-500 hover:bg-orange-500/30"}`}
+            >
+              {banning ? "..." : banTarget?.is_banned ? "Confirmar Desban" : "Confirmar Ban"}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </Card>
