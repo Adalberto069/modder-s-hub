@@ -357,6 +357,49 @@ export function AdminUsersTab() {
           </div>
         </DialogContent>
       </Dialog>
+
+      <Dialog open={!!banTarget} onOpenChange={(o) => { if (!o) { setBanTarget(null); setBanReason(""); } }}>
+        <DialogContent className="max-w-md bg-[#050505] border-white/10 rounded-none">
+          <DialogHeader>
+            <DialogTitle className="font-mono text-sm uppercase tracking-widest text-white flex items-center gap-2">
+              {banTarget?.is_banned ? <ShieldOff className="h-4 w-4 text-green-500" /> : <Ban className="h-4 w-4 text-orange-500" />}
+              {banTarget?.is_banned ? "Desbanir Conta" : "Banir Conta"}
+            </DialogTitle>
+            <DialogDescription className="text-xs text-muted-foreground">
+              {banTarget?.is_banned
+                ? `Restaurar acesso de "${banTarget?.display_name || banTarget?.username}"?`
+                : `Bloquear login de "${banTarget?.display_name || banTarget?.username}"? O usuário será deslogado imediatamente.`}
+            </DialogDescription>
+          </DialogHeader>
+          {!banTarget?.is_banned && (
+            <div className="space-y-2">
+              <label className="text-[10px] uppercase tracking-widest text-muted-foreground">Motivo (opcional)</label>
+              <Textarea
+                value={banReason}
+                onChange={(e) => setBanReason(e.target.value)}
+                placeholder="Ex: spam, comportamento abusivo, fraude..."
+                className="bg-[#030304] border-white/10 rounded-none text-sm min-h-[80px]"
+              />
+            </div>
+          )}
+          <DialogFooter className="gap-2">
+            <Button
+              variant="outline"
+              onClick={() => { setBanTarget(null); setBanReason(""); }}
+              className="rounded-none border-white/10 text-xs uppercase tracking-widest"
+            >
+              Cancelar
+            </Button>
+            <Button
+              disabled={banning}
+              onClick={handleBanToggle}
+              className={`rounded-none text-xs uppercase tracking-widest font-bold ${banTarget?.is_banned ? "bg-green-500/20 border border-green-500/40 text-green-500 hover:bg-green-500/30" : "bg-orange-500/20 border border-orange-500/40 text-orange-500 hover:bg-orange-500/30"}`}
+            >
+              {banning ? "..." : banTarget?.is_banned ? "Confirmar Desban" : "Confirmar Ban"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 }
