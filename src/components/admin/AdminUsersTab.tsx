@@ -158,6 +158,38 @@ export function AdminUsersTab() {
     setRolesUser((prev: any) => prev ? { ...prev, user_roles: (prev.user_roles || []).filter((r: any) => r.role !== role) } : prev);
   };
 
+  const handleBanToggle = async () => {
+    if (!banTarget) return;
+    const isBanned = !!banTarget.is_banned;
+    setBanning(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("admin-ban-user", {
+        body: {
+          target_user_id: banTarget.user_id,
+          action: isBanned ? "unban" : "ban",
+          reason: isBanned ? null : banReason.trim() || null,
+        },
+      });
+      if (error || data?.error) {
+        toast.error(data?.error || error?.message || "Erro ao processar");
+        return;
+      }
+      toast.success(isBanned ? "Conta desbanida" : "Conta banida");
+      setBanTarget(null);
+      setBanReason("");
+      refreshUsers();
+    } catch (e: any) {
+      toast.error(e?.message || "Erro inesperado");
+    } finally {
+      setBanning(false);
+    }
+  };
+
+  const totalUsers = users?.length ?? 0;
+  const totalModders = users?.filter((u: any) => u.user_roles?.some((r: any) => r.role === "modder" && r.approved)).length ?? 0;
+  const totalAdmins = users?.filter((u: any) => u.user_roles?.some((r: any) => r.role === "admin" && r.approved)).length ?? 0;
+  const totalBanned = users?.filter((u: any) => u.is_banned).length ?? 0;
+
   return (
     <Card className="border-white/10 bg-[#050505] rounded-none">
       <CardHeader className="border-b border-white/5 bg-[#030304]">
