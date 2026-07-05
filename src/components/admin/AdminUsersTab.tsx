@@ -242,17 +242,23 @@ export function AdminUsersTab() {
                 >
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap mb-1">
-                      <span className="font-bold text-sm text-white truncate">{name}</span>
+                      <span className={`font-bold text-sm truncate ${user.is_banned ? "text-orange-500 line-through" : "text-white"}`}>{name}</span>
                       {getRoleBadges(user.user_roles)}
+                      {user.is_banned && (
+                        <Badge variant="outline" className="text-[10px] border-orange-500/40 text-orange-500">
+                          <Ban className="h-3 w-3 mr-1" /> BANIDO
+                        </Badge>
+                      )}
                     </div>
-                    <div className="flex gap-3 text-[10px] text-muted-foreground">
+                    <div className="flex gap-3 text-[10px] text-muted-foreground flex-wrap">
                       <span>@{user.username}</span>
                       {user.email && <span className="text-secondary-foreground/60">{user.email}</span>}
                       <span>Rep: {user.reputation_score ?? 0}</span>
                       <span>Downloads: {user.total_downloads ?? 0}</span>
+                      {user.banned_reason && <span className="text-orange-500/80">Motivo: {user.banned_reason}</span>}
                     </div>
                   </div>
-                  <div className="flex gap-1 shrink-0">
+                  <div className="flex gap-1 shrink-0 flex-wrap justify-end">
                     <Button
                       size="sm"
                       variant="outline"
@@ -266,7 +272,18 @@ export function AdminUsersTab() {
                     <Button
                       size="sm"
                       variant="outline"
-                      disabled={isAdmin || impersonating === user.user_id}
+                      disabled={isAdmin || user.user_id === currentUser?.id}
+                      onClick={() => { setBanReason(""); setBanTarget(user); }}
+                      className={`text-[10px] uppercase tracking-widest font-bold gap-1 rounded-none disabled:opacity-30 ${user.is_banned ? "border-green-500/40 text-green-500 hover:bg-green-500/10" : "border-orange-500/40 text-orange-500 hover:bg-orange-500/10"}`}
+                      title={isAdmin ? "Não é possível banir outro admin" : user.is_banned ? "Desbanir" : "Banir"}
+                    >
+                      {user.is_banned ? <ShieldOff className="h-3 w-3" /> : <Ban className="h-3 w-3" />}
+                      <span className="hidden sm:inline">{user.is_banned ? "Desbanir" : "Banir"}</span>
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      disabled={isAdmin || impersonating === user.user_id || user.is_banned}
                       onClick={() => handleImpersonate(user.user_id, name)}
                       className="text-[10px] uppercase tracking-widest font-bold gap-1 rounded-none border-primary/30 text-primary hover:bg-primary/10 disabled:opacity-30"
                       title={isAdmin ? "Não é possível impersonar outro admin" : "Entrar como este usuário"}
