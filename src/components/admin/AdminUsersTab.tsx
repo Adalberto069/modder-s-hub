@@ -20,6 +20,9 @@ export function AdminUsersTab() {
   const [impersonating, setImpersonating] = useState<string | null>(null);
   const [rolesUser, setRolesUser] = useState<any | null>(null);
   const [savingRole, setSavingRole] = useState<string | null>(null);
+  const [banTarget, setBanTarget] = useState<any | null>(null);
+  const [banReason, setBanReason] = useState("");
+  const [banning, setBanning] = useState(false);
   const queryClient = useQueryClient();
   const { user: currentUser } = useAuth();
 
