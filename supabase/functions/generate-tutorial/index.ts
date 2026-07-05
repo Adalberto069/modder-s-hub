@@ -25,9 +25,23 @@ const SYSTEM_PROMPT = `Você é um especialista em modding mobile, scripts Lua, 
 11. NUNCA use blocos do tipo "image" (você não tem imagens reais para referenciar — URLs inventadas quebram o tutorial).
 12. Para vídeos, use blocos "video" APENAS com URLs REAIS e conhecidas do YouTube (ex: canais oficiais do Game Guardian). Se não tiver certeza, NÃO inclua vídeo.
 13. Use blocos "link" apenas para CTAs grandes (botão de download destacado). Se não tiver certeza da URL, NÃO inclua.
-14. **HYPERLINKS INLINE (PREFERIDO):** sempre que citar uma ferramenta, app, emulador, site ou recurso externo dentro de um parágrafo/step/tip, transforme o nome em link Markdown: \`[NoxPlayer](https://www.bignox.com)\`, \`[Game Guardian](https://gameguardian.net)\`, \`[LDPlayer](https://www.ldplayer.net)\`, \`[MEmu](https://www.memuplay.com)\`, \`[BlueStacks](https://www.bluestacks.com)\`, \`[VirtualXposed](https://vxposed.com)\`, \`[Parallel Space](https://parallelspace-app.com)\`, \`[docs Lua 5.1](https://www.lua.org/manual/5.1/)\`, \`[fórum oficial GG](https://gameguardian.net/forum)\`. Isso deixa o texto navegável estilo Medium.
-15. URLs SEMPRE reais e verificáveis. Nunca invente domínios. Se não souber a URL oficial, escreva o nome sem link.
-16. Prefira blocos "tip", "warning", "bullet_list", "step" e "code" com hyperlinks inline para deixar o tutorial interativo — nunca invente mídia.`;
+14. **HYPERLINKS — USE COM PARCIMÔNIA (NÃO ESPALHE):**
+    - Cada ferramenta/site pode ser linkado NO MÁXIMO UMA VEZ no tutorial inteiro, na PRIMEIRA menção. Depois, escreva o nome como texto puro.
+    - Concentre os links em UM único bloco "bullet_list" chamado "Links úteis" (ou dentro do step de instalação). Não pulverize links em toda seção/tip/warning.
+    - NUNCA linke termos genéricos ("emulador", "root", "script", "jogo").
+    - Máximo TOTAL de hyperlinks no tutorial inteiro: 4.
+15. **URLs OFICIAIS APROVADAS — use APENAS estas (não invente, não varie o domínio):**
+    - NoxPlayer: https://www.bignox.com
+    - LDPlayer: https://www.ldplayer.net
+    - MEmu: https://www.memuplay.com
+    - BlueStacks: https://www.bluestacks.com
+    - Game Guardian (download oficial): https://gameguardian.net/download
+    - Fórum Game Guardian: https://gameguardian.net/forum
+    - VirtualXposed: https://github.com/android-hacker/VirtualXposed (repo oficial — NUNCA use vxposed.com, o domínio foi sequestrado)
+    - Parallel Space: https://play.google.com/store/apps/details?id=com.lbe.parallel.intl
+    - Docs Lua 5.1: https://www.lua.org/manual/5.1/
+    Se a ferramenta NÃO está nessa lista, escreva o nome SEM link. Nunca invente URL.
+16. Prefira blocos "tip", "warning", "bullet_list", "step" e "code". Concentre downloads numa única seção — não repita links.`;
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
