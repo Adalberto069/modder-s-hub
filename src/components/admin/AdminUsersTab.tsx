@@ -200,6 +200,22 @@ export function AdminUsersTab() {
         </CardTitle>
       </CardHeader>
       <CardContent className="pt-4">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
+          {[
+            { label: "Total", value: totalUsers, icon: User, color: "text-white border-white/10" },
+            { label: "Modders", value: totalModders, icon: Code, color: "text-accent border-accent/30" },
+            { label: "Admins", value: totalAdmins, icon: Shield, color: "text-destructive border-destructive/30" },
+            { label: "Banidos", value: totalBanned, icon: Ban, color: "text-orange-500 border-orange-500/30" },
+          ].map((s) => (
+            <div key={s.label} className={`border ${s.color} bg-[#030304] p-2 flex items-center gap-2`}>
+              <s.icon className="h-4 w-4" />
+              <div className="flex flex-col leading-tight">
+                <span className="text-lg font-black">{s.value}</span>
+                <span className="text-[9px] uppercase tracking-widest text-muted-foreground">{s.label}</span>
+              </div>
+            </div>
+          ))}
+        </div>
         <div className="relative mb-4">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
