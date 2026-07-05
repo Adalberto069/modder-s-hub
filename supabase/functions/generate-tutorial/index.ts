@@ -77,12 +77,12 @@ Gere um TÍTULO curto e atraente (máx 70 caracteres), uma descrição, categori
 Categorias válidas: geral, scripts-lua, root, virtualizado, iniciante.
 
 Adapte o tamanho à complexidade (iniciante=curto, avançado=detalhado).
-- Pelo menos 1 bloco de código Lua funcional quando fizer sentido
+- Inclua bloco "code" APENAS se o tema for realmente sobre scripting/Lua/API do GG. Se o tema for instalação/configuração/root/emulador/dicas, NÃO inclua bloco de código de exemplo.
 - Pelo menos 1 step prático
 - 2-3 dicas curtas
 - 2-3 problemas comuns com soluções
-- Parágrafos CURTOS. Vá direto ao ponto.
-- LINKS: máximo 4 hyperlinks no tutorial inteiro, concentrados num bloco "bullet_list" de "Links úteis" OU no step de instalação. NUNCA linke o mesmo nome duas vezes. NUNCA espalhe links por tips/warnings/parágrafos aleatórios. Use APENAS as URLs oficiais aprovadas nas regras — se não estiver na lista, escreva o nome sem link.
+- Parágrafos CURTOS. FOQUE no tema pedido — não desvie para "aqui vai um script de exemplo" se o usuário não pediu.
+- LINKS: máximo 4 no tutorial inteiro. Escreva SEMPRE como Markdown \`[Nome](https://url)\` — NUNCA cole a URL crua no texto (ex: NÃO faça "Baixe em https://ldplayer.net"; faça "Baixe o [LDPlayer](https://www.ldplayer.net)"). Concentre-os num bloco "bullet_list" chamado "Links úteis" OU no step de instalação. Nunca linke o mesmo nome duas vezes. Use APENAS as URLs oficiais aprovadas nas regras.
 
 Responda APENAS chamando a tool generate_tutorial.`;
 
