@@ -155,12 +155,13 @@ export async function validateFile({
     };
   }
 
-  // 1. Size check
-  const maxSize = (maxSizeMB ?? (type === "image" ? 1 : 20)) * 1024 * 1024;
+  // 1. Size check (defaults: image 1MB, script 20MB, apk 200MB)
+  const defaultMax = type === "image" ? 1 : type === "apk" ? 200 : 20;
+  const maxSize = (maxSizeMB ?? defaultMax) * 1024 * 1024;
   if (file.size > maxSize) {
     return {
       valid: false,
-      error: `Arquivo muito grande. Máximo: ${maxSizeMB ?? (type === "image" ? 1 : 20)}MB`,
+      error: `Arquivo muito grande. Máximo: ${maxSizeMB ?? defaultMax}MB`,
       sanitizedName: safeName,
       extension,
     };
@@ -176,7 +177,8 @@ export async function validateFile({
   }
 
   // 2. Extension check
-  const allowedExts = type === "image" ? IMAGE_EXTENSIONS : SCRIPT_EXTENSIONS;
+  const allowedExts =
+    type === "image" ? IMAGE_EXTENSIONS : type === "apk" ? APK_EXTENSIONS : SCRIPT_EXTENSIONS;
   if (!extension || !allowedExts.has(extension)) {
     return {
       valid: false,
@@ -187,25 +189,47 @@ export async function validateFile({
   }
 
   // 3. MIME type check
-  const allowedMimes = type === "image" ? IMAGE_MIMES : SCRIPT_MIMES;
-  if (type === "image" && !allowedMimes.has(file.type)) {
+  if (type === "image" && !IMAGE_MIMES.has(file.type)) {
     return {
       valid: false,
-      error: `Tipo de arquivo inválido: ${file.type}. Aceitos: JPEG, PNG, GIF, WebP`,
+      error: `Tipo de arquivo inválido: ${file.type}. Aceitos: JPEG, PNG, WebP`,
+      sanitizedName: safeName,
+      extension,
+    };
+  }
+  if (type === "apk" && file.type && !APK_MIMES.has(file.type)) {
+    // some browsers report empty MIME for .apk — accept when empty, reject unknown values
+    return {
+      valid: false,
+      error: `Tipo de arquivo inválido para APK: ${file.type}`,
       sanitizedName: safeName,
       extension,
     };
   }
 
-  // 4. Malware signature scan
-  const isDangerous = await scanForMalware(file);
-  if (isDangerous) {
-    return {
-      valid: false,
-      error: "Arquivo rejeitado: assinatura suspeita detectada",
-      sanitizedName: safeName,
-      extension,
-    };
+  // 4. Content signature check
+  if (type === "apk") {
+    // APKs must be valid ZIP containers (start with "PK\x03\x04")
+    const head = new Uint8Array(await file.slice(0, 4).arrayBuffer());
+    const ok = head.length === 4 && head.every((b, i) => b === APK_ZIP_SIGNATURE[i]);
+    if (!ok) {
+      return {
+        valid: false,
+        error: "APK inválido: arquivo não é um pacote Android válido (assinatura ZIP ausente).",
+        sanitizedName: safeName,
+        extension,
+      };
+    }
+  } else {
+    const isDangerous = await scanForMalware(file);
+    if (isDangerous) {
+      return {
+        valid: false,
+        error: "Arquivo rejeitado: assinatura suspeita detectada",
+        sanitizedName: safeName,
+        extension,
+      };
+    }
   }
 
   // 5. Image content validation (ensure it's actually an image)
@@ -220,6 +244,7 @@ export async function validateFile({
       };
     }
   }
+
 
   return { valid: true, sanitizedName: safeName, extension };
 }
