@@ -52,8 +52,11 @@ export default function ScriptEditor() {
   const [newTag, setNewTag] = useState("");
   const [relatedTutorialId, setRelatedTutorialId] = useState("");
   const [file, setFile] = useState<File | null>(null);
+  const [apkFile, setApkFile] = useState<File | null>(null);
+  const [apkUploading, setApkUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [lastAnalysis, setLastAnalysis] = useState<AnalysisResult | null>(null);
+
 
   // License type: "permanent" | "monthly" | "weekly"
   const [licenseType, setLicenseType] = useState<string>("permanent");
@@ -545,6 +548,74 @@ export default function ScriptEditor() {
               )}
             </SectionCard>
           )}
+
+          {/* 2b. APK Mod */}
+          {scriptType === "apk" && (
+            <SectionCard
+              icon={Package}
+              title="Arquivo do APK Mod"
+              hint="Envie o .apk modificado (máx. 200MB). O arquivo é hospedado direto — nada de código Lua aqui. Assine o APK antes de enviar para evitar bloqueios de instalação no Android."
+            >
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <FieldLabel>Arquivo .apk *</FieldLabel>
+                  {apkFile && (
+                    <span className="text-[10px] font-mono text-neon-cyan truncate max-w-[220px]">
+                      {apkFile.name} · {(apkFile.size / (1024 * 1024)).toFixed(1)}MB
+                    </span>
+                  )}
+                </div>
+                <Input
+                  type="file"
+                  accept=".apk,application/vnd.android.package-archive"
+                  disabled={apkUploading}
+                  onChange={async (e) => {
+                    const f = e.target.files?.[0] ?? null;
+                    if (!f) { setApkFile(null); return; }
+                    const safeName = await validateFileWithToast({ file: f, type: "apk", maxSizeMB: 200 });
+                    if (!safeName) { e.target.value = ""; setApkFile(null); return; }
+                    setApkUploading(true);
+                    toast.info("Enviando APK... isso pode demorar.");
+                    const path = `apks/${user!.id}/${safeName}`;
+                    const { error: uploadError } = await supabase
+                      .storage.from("scripts")
+                      .upload(path, f, { upsert: true, contentType: "application/vnd.android.package-archive" });
+                    if (uploadError) {
+                      toast.error("Erro no upload: " + uploadError.message);
+                      setApkUploading(false);
+                      return;
+                    }
+                    const { data: { publicUrl } } = supabase.storage.from("scripts").getPublicUrl(path);
+                    setExternalLink(publicUrl);
+                    setApkFile(f);
+                    setApkUploading(false);
+                    toast.success("APK enviado!");
+                  }}
+                  className="bg-white/[0.03] border-white/10 h-10 file:bg-neon-cyan/20 file:text-neon-cyan file:border-none file:px-3 file:mr-3 file:text-xs file:font-bold hover:file:bg-neon-cyan/30 cursor-pointer"
+                />
+                {apkUploading && (
+                  <div className="flex items-center gap-2 text-[11px] text-neon-cyan">
+                    <Loader2 className="h-3 w-3 animate-spin" /> Enviando APK...
+                  </div>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <FieldLabel>Link direto do APK (preenchido automaticamente)</FieldLabel>
+                <Input
+                  value={externalLink}
+                  onChange={(e) => setExternalLink(e.target.value)}
+                  placeholder="https://... (ou cole um link Mediafire/Mega se preferir hospedar fora)"
+                  className={inputCls}
+                />
+                <p className="text-[10px] text-muted-foreground">
+                  Este link é exibido no botão de download da página do APK. Pode ser o upload direto (acima) ou um mirror externo.
+                </p>
+              </div>
+            </SectionCard>
+          )}
+
+
 
           {/* 3. Mídia */}
           <SectionCard icon={Upload} title="Mídia" hint="Capa, vídeo demonstrativo e link externo.">

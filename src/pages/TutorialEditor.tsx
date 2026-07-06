@@ -990,10 +990,11 @@ export default function TutorialEditor() {
               </div>
             </div>
 
-            {/* Right sidebar */}
-            <div className="space-y-5 hidden lg:block">
+            {/* Right sidebar (stacks below main content on mobile/tablet) */}
+            <div className="space-y-5">
               {/* Thumbnail */}
-              <SectionCard title="Thumbnail" icon={Image} variant="cyan">
+              <SectionCard title="Thumbnail (Capa do tutorial)" icon={Image} variant="cyan">
+
                 <div className="space-y-3">
                   <Input
                     value={form.thumbnail_url}
