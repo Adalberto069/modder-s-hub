@@ -15,6 +15,12 @@ const SCRIPT_MIMES = new Set([
 ]);
 
 const SCRIPT_EXTENSIONS = new Set(["lua"]);
+const APK_EXTENSIONS = new Set(["apk"]);
+const APK_MIMES = new Set([
+  "application/vnd.android.package-archive",
+  "application/octet-stream", // browsers often report this for .apk
+  "application/zip", // APK is a ZIP container
+]);
 const FORBIDDEN_DOUBLE_EXTENSIONS = new Set(["apk", "exe", "zip", "rar", "jar", "bin", "sh", "bat", "cmd"]);
 
 const IMAGE_EXTENSIONS = new Set(["jpg", "jpeg", "png", "webp"]);
@@ -26,13 +32,17 @@ const DANGEROUS_SIGNATURES: Uint8Array[] = [
   new Uint8Array([0x23, 0x21]), // Shebang script (#!)
 ];
 
-type UploadType = "image" | "script";
+// APK files must start with the ZIP local-file-header signature "PK\x03\x04"
+const APK_ZIP_SIGNATURE = new Uint8Array([0x50, 0x4b, 0x03, 0x04]);
+
+type UploadType = "image" | "script" | "apk";
 
 interface ValidateOptions {
   file: File;
   type: UploadType;
   maxSizeMB?: number;
 }
+
 
 interface ValidateResult {
   valid: boolean;
