@@ -52,8 +52,11 @@ export default function ScriptEditor() {
   const [newTag, setNewTag] = useState("");
   const [relatedTutorialId, setRelatedTutorialId] = useState("");
   const [file, setFile] = useState<File | null>(null);
+  const [apkFile, setApkFile] = useState<File | null>(null);
+  const [apkUploading, setApkUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [lastAnalysis, setLastAnalysis] = useState<AnalysisResult | null>(null);
+
 
   // License type: "permanent" | "monthly" | "weekly"
   const [licenseType, setLicenseType] = useState<string>("permanent");
