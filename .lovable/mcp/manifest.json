@@ -1,0 +1,150 @@
+{
+  "version": 1,
+  "sdk_version": "0.20.0",
+  "path": "/functions/v1/mcp",
+  "auth": {
+    "type": "none"
+  },
+  "mcp": {
+    "server": {
+      "name": "hiddenmod-mcp",
+      "version": "0.1.0",
+      "title": "HiddenMod MCP"
+    },
+    "tools": [
+      {
+        "name": "search_scripts",
+        "title": "Search marketplace scripts",
+        "description": "Search published HiddenMod marketplace scripts for Game Guardian. Filter by keyword, game name, or paid/free.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "query": {
+              "type": "string",
+              "description": "Free-text search over title, description and game name."
+            },
+            "game": {
+              "type": "string",
+              "description": "Filter by game name (case-insensitive contains)."
+            },
+            "only_free": {
+              "type": "boolean",
+              "description": "If true, only return free scripts."
+            },
+            "only_paid": {
+              "type": "boolean",
+              "description": "If true, only return paid scripts."
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "description": "Max results (default 20)."
+            }
+          },
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_script",
+        "title": "Get script details",
+        "description": "Fetch full public details for a HiddenMod script by its UUID.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid",
+              "description": "The script UUID."
+            }
+          },
+          "required": [
+            "id"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_tutorials",
+        "title": "List tutorials",
+        "description": "List HiddenMod tutorials about Game Guardian, emulators, Lua scripting, etc.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "query": {
+              "type": "string",
+              "description": "Optional keyword filter (title/description)."
+            },
+            "category": {
+              "type": "string",
+              "description": "Optional category filter."
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50
+            }
+          },
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_bounties",
+        "title": "List open bounties",
+        "description": "List HiddenMod bounties (script requests) with their reward and status.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string",
+              "enum": [
+                "open",
+                "in_progress",
+                "completed",
+                "cancelled"
+              ]
+            },
+            "game": {
+              "type": "string",
+              "description": "Filter by game name (contains)."
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50
+            }
+          },
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}

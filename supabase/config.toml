@@ -27,3 +27,6 @@ verify_jwt = false
 [functions.audit-suspicious-purchases]
 verify_jwt = false
 
+
+[functions.mcp]
+verify_jwt = false
