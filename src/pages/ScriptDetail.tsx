@@ -737,15 +737,56 @@ end
               </section>
             )}
 
+            {/* APK Metadata card */}
+            {isApk && (apkMeta.version || apkMeta.sizeMb || apkMeta.minAndroid || apkMeta.packageName || apkMeta.originalApp) && (
+              <Card className="border-neon-cyan/20 bg-neon-cyan/[0.03] overflow-hidden">
+                <CardHeader className="pb-3 border-b border-neon-cyan/10 bg-neon-cyan/[0.02]">
+                  <CardTitle className="text-sm font-black uppercase tracking-widest flex items-center gap-2 text-neon-cyan">
+                    <Download className="h-4 w-4" /> Detalhes do APK
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="pt-4 grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs">
+                  {apkMeta.originalApp && (
+                    <div><p className="text-[9px] uppercase tracking-widest text-muted-foreground font-bold">App</p><p className="font-black text-white mt-0.5">{apkMeta.originalApp}</p></div>
+                  )}
+                  {apkMeta.version && (
+                    <div><p className="text-[9px] uppercase tracking-widest text-muted-foreground font-bold">Versão</p><p className="font-black text-white mt-0.5 font-mono">{apkMeta.version}</p></div>
+                  )}
+                  {apkMeta.sizeMb && (
+                    <div><p className="text-[9px] uppercase tracking-widest text-muted-foreground font-bold">Tamanho</p><p className="font-black text-white mt-0.5">{apkMeta.sizeMb} MB</p></div>
+                  )}
+                  {apkMeta.minAndroid && (
+                    <div><p className="text-[9px] uppercase tracking-widest text-muted-foreground font-bold">Android mín.</p><p className="font-black text-white mt-0.5">{apkMeta.minAndroid}+</p></div>
+                  )}
+                  {apkMeta.packageName && (
+                    <div className="col-span-2 sm:col-span-3"><p className="text-[9px] uppercase tracking-widest text-muted-foreground font-bold">Package</p><p className="font-black text-neon-cyan mt-0.5 font-mono truncate">{apkMeta.packageName}</p></div>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+
             {/* Description (mobile + full) */}
             <section className="space-y-3">
               <h3 className="text-base sm:text-lg font-bold flex items-center gap-2">
-                <FileCode className="h-4 w-4 sm:h-5 sm:w-5 text-primary" /> Sobre o Script
+                <FileCode className="h-4 w-4 sm:h-5 sm:w-5 text-primary" /> {isApk ? "Sobre o Mod" : "Sobre o Script"}
               </h3>
-              <div className="p-4 sm:p-6 rounded-xl border border-white/5 bg-white/[0.03] text-sm text-muted-foreground leading-relaxed">
+              <div className="p-4 sm:p-6 rounded-xl border border-white/5 bg-white/[0.03] text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">
                 {script.description ?? "Sem descrição fornecida pelo autor."}
               </div>
             </section>
+
+            {/* Changelog (APK only) */}
+            {isApk && apkMeta.changelog && (
+              <section className="space-y-3">
+                <h3 className="text-base sm:text-lg font-bold flex items-center gap-2">
+                  <List className="h-4 w-4 sm:h-5 sm:w-5 text-accent" /> Changelog
+                </h3>
+                <div className="p-4 sm:p-6 rounded-xl border border-white/5 bg-white/[0.03] text-xs font-mono text-muted-foreground leading-relaxed whitespace-pre-wrap">
+                  {apkMeta.changelog}
+                </div>
+              </section>
+            )}
+
 
             {/* Features & Tags */}
             {(scriptFeatures.length > 0 || scriptTags.length > 0) && (
