@@ -798,12 +798,12 @@ export default function ScriptEditor() {
           </SectionCard>
 
           {/* 5. Monetização */}
-          <SectionCard icon={Lock} title="Monetização" hint="Defina se o script é gratuito ou pago e o modelo de licença.">
+          <SectionCard icon={Lock} title="Monetização" hint={`Defina se o ${entityLabel} é gratuito ou pago${isApk ? "." : " e o modelo de licença."}`}>
             <div className="flex items-center justify-between p-3 rounded-lg bg-white/[0.03] border border-white/10">
               <div className="flex items-center gap-3 min-w-0">
                 <Switch checked={isPaid} onCheckedChange={setIsPaid} disabled={!!licenseFieldsLocked} className="data-[state=checked]:bg-orange-500" />
                 <div className="space-y-0.5 min-w-0">
-                  <Label className="text-sm font-bold">{isPaid ? "Script pago" : "Script gratuito"}</Label>
+                  <Label className="text-sm font-bold">{isPaid ? `${entityLabelCap} pago` : `${entityLabelCap} gratuito`}</Label>
                   <p className="text-[11px] text-muted-foreground">{isPaid ? "Será vendido no marketplace." : "Livre para download."}</p>
                 </div>
               </div>
@@ -813,12 +813,12 @@ export default function ScriptEditor() {
             {licenseFieldsLocked && (
               <div className="p-3 rounded-lg bg-orange-500/10 border border-orange-500/20 flex gap-2 items-start">
                 <Lock className="h-4 w-4 text-orange-500 shrink-0 mt-0.5" />
-                <p className="text-[11px] text-orange-200/80 leading-relaxed">Licença bloqueada — este script já tem compradores. Alterações requerem aprovação admin.</p>
+                <p className="text-[11px] text-orange-200/80 leading-relaxed">Bloqueado — este {entityLabel} já tem compradores. Alterações requerem aprovação admin.</p>
               </div>
             )}
 
             {isPaid && (
-              <div className="grid sm:grid-cols-2 gap-4">
+              <div className={`grid ${isApk ? "sm:grid-cols-1" : "sm:grid-cols-2"} gap-4`}>
                 <div className="space-y-2">
                   <FieldLabel>Preço (R$)</FieldLabel>
                   <div className="relative">
@@ -826,20 +826,23 @@ export default function ScriptEditor() {
                     <Input type="number" value={price} onChange={(e) => setPrice(e.target.value)} placeholder="0.00" min="0" step="0.01" disabled={!!licenseFieldsLocked} className={`${inputCls} pl-10 font-bold`} />
                   </div>
                 </div>
-                <div className="space-y-2">
-                  <FieldLabel>Duração da licença</FieldLabel>
-                  <Select value={licenseType} onValueChange={setLicenseType} disabled={!!licenseFieldsLocked}>
-                    <SelectTrigger className={inputCls}><SelectValue /></SelectTrigger>
-                    <SelectContent className="bg-[#0a0a0c] border-white/10">
-                      <SelectItem value="permanent">Permanente (vitalício)</SelectItem>
-                      <SelectItem value="monthly">Mensal (30 dias)</SelectItem>
-                      <SelectItem value="weekly">Semanal (7 dias)</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+                {!isApk && (
+                  <div className="space-y-2">
+                    <FieldLabel>Duração da licença</FieldLabel>
+                    <Select value={licenseType} onValueChange={setLicenseType} disabled={!!licenseFieldsLocked}>
+                      <SelectTrigger className={inputCls}><SelectValue /></SelectTrigger>
+                      <SelectContent className="bg-[#0a0a0c] border-white/10">
+                        <SelectItem value="permanent">Permanente (vitalício)</SelectItem>
+                        <SelectItem value="monthly">Mensal (30 dias)</SelectItem>
+                        <SelectItem value="weekly">Semanal (7 dias)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
               </div>
             )}
           </SectionCard>
+
         </div>
       </div>
 
