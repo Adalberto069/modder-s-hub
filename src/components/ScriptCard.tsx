@@ -134,19 +134,19 @@ export function ScriptCard({
                   </span>
                 </div>
                 <span className="flex items-center gap-2 bg-neon-purple hover:bg-neon-purple/90 text-white transition-all duration-300 font-black uppercase tracking-widest text-[9px] sm:text-[10px] px-3 py-1.5 group-hover:shadow-[0_0_15px_rgba(168,85,247,0.3)] border border-neon-purple">
-                  <ShoppingCart className="h-3 w-3" />
-                  Aquisição
+                  {isApk ? <Download className="h-3 w-3" /> : <ShoppingCart className="h-3 w-3" />}
+                  {isApk ? "Baixar" : "Aquisição"}
                 </span>
               </>
             ) : (
               <>
                 <div className="flex flex-col leading-none space-y-1">
-                  <span className="text-[8px] text-muted-foreground uppercase tracking-widest font-black">Acesso</span>
-                  <span className="text-sm sm:text-base font-black text-neon-green">Livre</span>
+                  <span className="text-[8px] text-muted-foreground uppercase tracking-widest font-black">{isApk ? "APK" : "Acesso"}</span>
+                  <span className="text-sm sm:text-base font-black text-neon-green">{isApk ? "Grátis" : "Livre"}</span>
                 </div>
                 <span className="flex items-center gap-2 bg-transparent hover:bg-neon-green/10 text-neon-green border border-neon-green/50 transition-all duration-300 font-black uppercase tracking-widest text-[9px] sm:text-[10px] px-3 py-1.5 group-hover:shadow-[0_0_15px_rgba(57,255,20,0.1)]">
-                  <Unlock className="h-3 w-3" />
-                  Operar
+                  {isApk ? <Download className="h-3 w-3" /> : <Unlock className="h-3 w-3" />}
+                  {isApk ? "Baixar" : "Operar"}
                 </span>
               </>
             )}
