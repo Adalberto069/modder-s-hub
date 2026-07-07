@@ -688,62 +688,99 @@ end
                 </Card>
               )}
 
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-sm font-black uppercase tracking-widest text-white flex items-center gap-2">
-                  <Code className="h-4 w-4 text-neon-green" /> Payload Submissions
-                </h2>
-                <Badge variant="outline" className="text-[10px] uppercase font-mono tracking-widest border-white/10 bg-[#030304] text-muted-foreground">
-                  TOTAL: {myScripts?.length ?? 0}
-                </Badge>
-              </div>
-              <div className="space-y-4">
-                {myScripts?.map((script: any) => (
-                  <Card key={script.id} className={`bg-[#050505] border border-white/5 rounded-none hover:bg-[#08080a] transition-colors p-0 shadow-none ${!script.is_active ? 'opacity-50 grayscale' : ''}`}>
-                    <CardContent className="p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 font-mono">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-2 flex-wrap">
-                          {script.script_type === "apk" ? (
-                            <Package className="h-4 w-4 text-neon-green" />
-                          ) : (
-                            <Code className="h-4 w-4 text-neon-cyan" />
-                          )}
-                          <p className="font-black text-sm uppercase tracking-tight text-white truncate italic">{script.title}</p>
-                          {script.is_paid && <Badge variant="secondary" className="text-[9px] uppercase tracking-widest bg-neon-purple/20 text-neon-purple hover:bg-neon-purple/30 rounded-none border-t border-neon-purple/50">R$ {Number(script.price).toFixed(2)}</Badge>}
-                          {!script.is_active && <Badge variant="destructive" className="text-[9px] uppercase tracking-widest rounded-none">INATIVO</Badge>}
-                        </div>
-                         <div className="flex flex-wrap gap-3 text-[10px] text-muted-foreground uppercase tracking-widest">
-                           <span className="flex items-center gap-1"><FolderOpen className="h-3 w-3" /> {script.categories?.name}</span>
-                           <span className="flex items-center gap-1"><Download className="h-3 w-3" /> {script.download_count}</span>
-                           <Badge variant="outline" className="text-[9px] border-white/10 bg-[#030304] rounded-none">{script.status}</Badge>
-                           <Badge variant="secondary" className="text-[9px] border-white/10 bg-[#030304] rounded-none">{script.script_type === "apk" ? "MOD" : "LUA"}</Badge>
-                         </div>
+              {(() => {
+                const scriptCount = myScripts?.filter((s: any) => s.script_type !== "apk").length ?? 0;
+                const apkCount = myScripts?.filter((s: any) => s.script_type === "apk").length ?? 0;
+                const filtered = myScripts?.filter((s: any) => {
+                  if (pubFilter === "all") return true;
+                  if (pubFilter === "apk") return s.script_type === "apk";
+                  return s.script_type !== "apk";
+                }) ?? [];
+                return (
+                  <>
+                    <div className="flex items-center justify-between mb-4 gap-3 flex-wrap">
+                      <h2 className="text-sm font-black uppercase tracking-widest text-white flex items-center gap-2">
+                        <Code className="h-4 w-4 text-neon-green" /> Minhas publicações
+                      </h2>
+                      <div className="flex gap-1 border border-white/10 bg-[#030304] p-1 rounded-none font-mono">
+                        {([
+                          { key: "all", label: `Tudo (${myScripts?.length ?? 0})`, color: "text-white" },
+                          { key: "script", label: `Scripts (${scriptCount})`, color: "text-neon-cyan" },
+                          { key: "apk", label: `APKs (${apkCount})`, color: "text-neon-green" },
+                        ] as const).map((f) => (
+                          <button
+                            key={f.key}
+                            onClick={() => setPubFilter(f.key)}
+                            className={`px-3 py-1.5 text-[9px] uppercase tracking-widest font-black transition-all rounded-none ${
+                              pubFilter === f.key ? `bg-[#050505] ${f.color} border border-white/10` : "text-muted-foreground hover:text-white"
+                            }`}
+                          >
+                            {f.label}
+                          </button>
+                        ))}
                       </div>
-                      <div className="flex gap-2 shrink-0">
-                        <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-white/5 rounded-none text-muted-foreground hover:text-white transition-colors" onClick={() => navigate(`/script/${script.id}/edit`)}>
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className={`h-8 w-8 hover:bg-white/5 rounded-none transition-colors ${script.is_active ? "text-neon-cyan hover:text-neon-cyan" : "text-muted-foreground hover:text-white"}`}
-                          onClick={() => handleToggleActive(script.id, script.is_active)}
-                          title={script.is_active ? "Desativar script" : "Reativar script"}
-                        >
-                          {script.is_active ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                        </Button>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-destructive/10 rounded-none text-destructive transition-colors" onClick={() => setScriptToDelete({ id: script.id, title: script.title })}>
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
+                    </div>
+                    <div className="space-y-4">
+                      {filtered.map((script: any) => (
+                        <Card key={script.id} className={`bg-[#050505] border border-white/5 rounded-none hover:bg-[#08080a] transition-colors p-0 shadow-none ${!script.is_active ? 'opacity-50 grayscale' : ''}`}>
+                          <CardContent className="p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 font-mono">
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 mb-2 flex-wrap">
+                                {script.script_type === "apk" ? (
+                                  <Package className="h-4 w-4 text-neon-green" />
+                                ) : (
+                                  <Code className="h-4 w-4 text-neon-cyan" />
+                                )}
+                                <p className="font-black text-sm uppercase tracking-tight text-white truncate italic">{script.title}</p>
+                                {script.is_paid && <Badge variant="secondary" className="text-[9px] uppercase tracking-widest bg-neon-purple/20 text-neon-purple hover:bg-neon-purple/30 rounded-none border-t border-neon-purple/50">R$ {Number(script.price).toFixed(2)}</Badge>}
+                                {!script.is_active && <Badge variant="destructive" className="text-[9px] uppercase tracking-widest rounded-none">INATIVO</Badge>}
+                              </div>
+                              <div className="flex flex-wrap gap-3 text-[10px] text-muted-foreground uppercase tracking-widest">
+                                <span className="flex items-center gap-1"><FolderOpen className="h-3 w-3" /> {script.categories?.name}</span>
+                                <span className="flex items-center gap-1"><Download className="h-3 w-3" /> {script.download_count}</span>
+                                <Badge variant="outline" className="text-[9px] border-white/10 bg-[#030304] rounded-none">{script.status}</Badge>
+                                <Badge variant="secondary" className={`text-[9px] border-white/10 bg-[#030304] rounded-none ${script.script_type === "apk" ? "text-neon-green" : "text-neon-cyan"}`}>
+                                  {script.script_type === "apk" ? "APK MOD" : "LUA"}
+                                </Badge>
+                                {script.script_type === "apk" && script.apk_version && (
+                                  <Badge variant="outline" className="text-[9px] border-neon-green/20 text-neon-green bg-[#030304] rounded-none font-mono">v{script.apk_version}</Badge>
+                                )}
+                              </div>
+                            </div>
+                            <div className="flex gap-2 shrink-0">
+                              <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-white/5 rounded-none text-muted-foreground hover:text-white transition-colors" onClick={() => navigate(`/script/${script.id}/edit`)}>
+                                <Pencil className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className={`h-8 w-8 hover:bg-white/5 rounded-none transition-colors ${script.is_active ? "text-neon-cyan hover:text-neon-cyan" : "text-muted-foreground hover:text-white"}`}
+                                onClick={() => handleToggleActive(script.id, script.is_active)}
+                                title={script.is_active ? "Desativar" : "Reativar"}
+                              >
+                                {script.is_active ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                              </Button>
+                              <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-destructive/10 rounded-none text-destructive transition-colors" onClick={() => setScriptToDelete({ id: script.id, title: script.title })}>
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                      <div className="flex border-t border-white/5 mt-4 pt-4 justify-center">
+                        {filtered.length === 0 && (
+                          <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+                            {pubFilter === "apk" ? "Nenhum APK Mod publicado ainda." : pubFilter === "script" ? "Nenhum script Lua publicado ainda." : "Nenhuma transmissão encontrada no terminal."}
+                          </p>
+                        )}
                       </div>
-                    </CardContent>
-                  </Card>
-                ))}
-                <div className="flex border-t border-white/5 mt-4 pt-4 justify-center">
-                  {myScripts?.length === 0 && <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">Nenhuma transmissão encontrada no terminal.</p>}
-                </div>
-              </div>
+                    </div>
+                  </>
+                );
+              })()}
             </TabsContent>
           )}
+
 
           {/* Finance Tab */}
           {isModder && (
