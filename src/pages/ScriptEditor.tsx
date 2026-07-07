@@ -138,6 +138,13 @@ export default function ScriptEditor() {
       if (days == null) setLicenseType("permanent");
       else if (days === 7) setLicenseType("weekly");
       else setLicenseType("monthly");
+      // APK metadata
+      setApkVersion((existingScript as any).apk_version ?? "");
+      setApkMinAndroid((existingScript as any).apk_min_android ?? "");
+      setApkPackageName((existingScript as any).apk_package_name ?? "");
+      setApkSizeMb((existingScript as any).apk_size_mb?.toString() ?? "");
+      setApkChangelog((existingScript as any).apk_changelog ?? "");
+      setApkOriginalApp((existingScript as any).apk_original_app ?? "");
     }
   }, [existingScript]);
 
