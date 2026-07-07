@@ -1,70 +1,77 @@
+# Plano: APK Mod dedicado + Dashboards unificados
 
-# Reorganização Estrutural do Banco — HiddenMod
+## Parte 1 — Sistema de APK Mod (separar de Script)
 
-## ⚠️ Aviso importante antes de começar
+### 1.1 Schema (migração)
+Adicionar colunas em `scripts` (o tipo `apk` já existe):
+- `apk_version` text — versão do mod (ex: "2.14.0-MOD")
+- `apk_min_android` text — versão mínima (ex: "8.0")
+- `apk_package_name` text — com.exemplo.app
+- `apk_size_mb` numeric — tamanho
+- `apk_changelog` text — o que mudou
+- `apk_original_app` text — nome do app base
 
-A API do Supabase (PostgREST) usada pelo frontend só expõe o schema `public` por padrão. Mover tabelas para outros schemas (ex: `forum`, `bounty`) quebraria **todo** o app e exigiria reconfiguração da Data API. Por isso, em vez de criar schemas Postgres separados, vou organizar por **prefixo de domínio** nos nomes das tabelas + agrupamento lógico documentado. É o padrão usado em projetos Supabase em produção e mantém zero downtime.
+### 1.2 Editor (`ScriptEditor.tsx`)
+Quando `scriptType === "apk"`:
+- Título da página: "Novo APK Mod" / "Editar APK Mod"
+- Substituir seção "Código Lua" por card "Detalhes do APK Mod" com os campos novos
+- Renomear labels: "Nome do script" → "Nome do APK Mod", "Descrição do script" → "Descrição do mod"
+- Botão: "Publicar APK Mod"
+- Esconder campos irrelevantes (licenciamento por dias, senha de script, análise de código Lua)
 
-## Diagnóstico atual
+### 1.3 Página de detalhes dedicada
+Novo arquivo `src/pages/ApkDetail.tsx` + rota `/apk/:id`:
+- Header com ícone Android, badge "APK MOD", versão
+- Grid de screenshots (usa `script_images`)
+- Sidebar com: versão, tamanho, min Android, package, downloads, autor
+- Aba Descrição / Changelog / Reviews
+- Botão "Baixar APK" (usa mesmo `download-script` edge function)
+- Roteador: em `ScriptCard` e listas, se `script_type === "apk"` → link `/apk/:id`
 
-Temos 35 tabelas misturadas. Agrupando por domínio:
+### 1.4 Marketplace
+- `ScriptCard` detecta `apk` → ícone Smartphone, badge verde "APK", mostra versão em vez de "Lua"
+- Filtro/aba "APK Mods" no Marketplace
 
-```text
-AUTH/USERS    profiles, user_roles, user_badges, badge_definitions
-SCRIPTS       scripts, script_access, script_analyses, script_images,
-              script_passwords, script_test_logs, categories, favorites, reviews
-LICENSES      licenses, purchases
-BOUNTY        bounties, bounty_applications, bounty_deliveries,
-              bounty_messages, bounty_purchases, bounty_test_logs
-FORUM         forum_posts, forum_replies, forum_reply_likes
-TUTORIALS     tutorials, tutorial_comments, tutorial_ratings
-PAYMENTS      modder_mp_accounts
-MODERATION    moderation_logs, moderation_messages, reports, audit_runs
-PLATFORM      notifications, tools
-```
+## Parte 2 — Dashboards unificados (mesma estrutura)
 
-Problemas observados:
-- Nomes inconsistentes (`bounty_*` ok, mas `script_*` vs `scripts`, `forum_*` vs `tutorials`).
-- `purchases` e `bounty_purchases` quase duplicadas — poderiam compartilhar estrutura.
-- `script_access` (4 colunas) parece redundante com `licenses` + `purchases`.
-- Faltam índices em FKs muito consultadas (a confirmar via `pg_stat_statements`).
-- Algumas tabelas sem trigger `updated_at` apesar de terem a coluna.
+Padrão visual compartilhado: **KPI strip no topo (4 cards) + Tabs abaixo**.
 
-## Plano de execução (3 fases, incrementais e reversíveis)
+### 2.1 Componente compartilhado
+Criar `src/components/dashboard/KpiCard.tsx` e `DashboardShell.tsx`:
+- KpiCard: ícone + label + valor grande + delta opcional
+- DashboardShell: header (título+subtítulo+ação), grid de KPIs, TabsList sticky, TabsContent
 
-### Fase 1 — Auditoria + ganhos imediatos (sem renomear nada)
-1. Rodar `supabase--read_query` listando: FKs sem índice, colunas órfãs, policies duplicadas, triggers faltantes.
-2. Rodar `supabase--slow_queries` para identificar top 10 queries lentas.
-3. Migração única adicionando:
-   - Índices faltantes em FKs (`user_id`, `script_id`, `bounty_id`, etc).
-   - Trigger `update_updated_at_column` nas tabelas que têm `updated_at` mas não o trigger.
-   - Comentários SQL (`COMMENT ON TABLE`) documentando o domínio de cada tabela — aparece no dashboard.
+### 2.2 Dashboard do Modder (`src/pages/Dashboard.tsx`)
+KPIs: Vendas totais (R$) · Downloads · Scripts ativos · Avaliação média
+Abas: **Visão Geral** · **Meus Scripts** · **Meus APKs** · **Vendas** · **Financeiro** · **Encomendas**
+- Separar tab "Meus APKs" dos scripts Lua
+- Visão Geral: gráfico de vendas + últimas atividades
 
-### Fase 2 — Consolidação semântica
-1. Avaliar fundir `script_access` em `licenses` (verificar se há código dependente).
-2. Padronizar colunas de status com enums Postgres em vez de `text` livre (`bounty_status`, `purchase_status`).
-3. Adicionar constraints `CHECK` / `NOT NULL` faltantes em colunas críticas (preços, IDs).
-4. Normalizar timestamps: garantir `timestamptz` em todas, com default `now()`.
-
-### Fase 3 — Renomes opcionais (só se você topar refator de código)
-Renomear para prefixo consistente por domínio:
-- `reviews` → `script_reviews`
-- `favorites` → `script_favorites`
-- `purchases` → `script_purchases`
-- `licenses` → `script_licenses`
-- `categories` → `script_categories`
-
-Cada rename é feito com `ALTER TABLE … RENAME` + atualização de todas as referências no frontend e edge functions. Faço um arquivo por vez para minimizar risco.
-
-## O que vou entregar nesta rodada
-
-Se você aprovar, começo pela **Fase 1 completa** (auditoria + migração de índices + triggers + comentários). É 100% seguro, não quebra nada e já deixa o banco visivelmente mais organizado no dashboard. Depois confirmo com você antes de seguir para Fase 2 e 3.
+### 2.3 Dashboard do Admin (`src/pages/Admin.tsx`)
+KPIs: Usuários · Modders ativos · Vendas 30d · Pendências (moderação+saques+disputas)
+Abas mantidas mas com o mesmo shell/estilo do modder para consistência.
 
 ## Detalhes técnicos
 
-- Migrações via tool `supabase--migration` (cada fase = 1 migração revisável).
-- Validação após cada fase: `supabase--linter` + smoke test das principais queries.
-- Renomes na Fase 3 usam `ALTER TABLE … RENAME TO …`; o tipo `Database` em `src/integrations/supabase/types.ts` é regenerado automaticamente.
-- Nenhuma mudança em `auth`, `storage`, `realtime` ou buckets.
+- Rota nova: adicionar `<Route path="/apk/:id" element={<ApkDetail />} />` em `App.tsx`
+- Migration: `ALTER TABLE public.scripts ADD COLUMN apk_version text, ...` (nullable, sem default)
+- Types regenerados automaticamente após migration
+- Reutilizar `download-script` edge function (já entrega arquivo do bucket)
+- `ScriptCard`: prop já tem `script_type`; adicionar branch de UI e link condicional
+- `Marketplace.tsx`: adicionar tab "APK Mods" filtrando `script_type='apk'`
 
-Posso iniciar pela Fase 1?
+## Arquivos afetados
+- migração SQL (novas colunas)
+- `src/pages/ScriptEditor.tsx` (branch APK completo)
+- `src/pages/ApkDetail.tsx` (novo)
+- `src/App.tsx` (rota)
+- `src/components/ScriptCard.tsx` (UI condicional)
+- `src/pages/Marketplace.tsx` (aba APK)
+- `src/components/dashboard/KpiCard.tsx` + `DashboardShell.tsx` (novos)
+- `src/pages/Dashboard.tsx` (reestrutura + aba APKs)
+- `src/pages/Admin.tsx` (aplica shell + KPIs)
+
+## Fora do escopo
+- Novos métodos de pagamento
+- Assinatura/verificação APK server-side além da já existente
+- Refatorar edge functions

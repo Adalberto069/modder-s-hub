@@ -21,6 +21,7 @@ import { toast } from "sonner";
 import {
   Save, Eye, Send, ArrowLeft, Plus, X, Code, Package,
   Upload, Lock, EyeOff, Gamepad2, Tag, List, FileCode, BookOpen, ShieldX, Loader2,
+  Smartphone, HardDrive, FileText,
 } from "lucide-react";
 import { Navigate } from "react-router-dom";
 
@@ -56,6 +57,18 @@ export default function ScriptEditor() {
   const [apkUploading, setApkUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [lastAnalysis, setLastAnalysis] = useState<AnalysisResult | null>(null);
+
+  // APK-specific metadata
+  const [apkVersion, setApkVersion] = useState("");
+  const [apkMinAndroid, setApkMinAndroid] = useState("");
+  const [apkPackageName, setApkPackageName] = useState("");
+  const [apkSizeMb, setApkSizeMb] = useState("");
+  const [apkChangelog, setApkChangelog] = useState("");
+  const [apkOriginalApp, setApkOriginalApp] = useState("");
+
+  const isApk = scriptType === "apk";
+  const entityLabel = isApk ? "APK Mod" : "script";
+  const entityLabelCap = isApk ? "APK Mod" : "Script";
 
 
   // License type: "permanent" | "monthly" | "weekly"
@@ -125,6 +138,13 @@ export default function ScriptEditor() {
       if (days == null) setLicenseType("permanent");
       else if (days === 7) setLicenseType("weekly");
       else setLicenseType("monthly");
+      // APK metadata
+      setApkVersion((existingScript as any).apk_version ?? "");
+      setApkMinAndroid((existingScript as any).apk_min_android ?? "");
+      setApkPackageName((existingScript as any).apk_package_name ?? "");
+      setApkSizeMb((existingScript as any).apk_size_mb?.toString() ?? "");
+      setApkChangelog((existingScript as any).apk_changelog ?? "");
+      setApkOriginalApp((existingScript as any).apk_original_app ?? "");
     }
   }, [existingScript]);
 
@@ -299,6 +319,12 @@ export default function ScriptEditor() {
       tags,
       related_tutorial_id: relatedTutorialId && relatedTutorialId !== "none" ? relatedTutorialId : null,
       license_duration_days: isPaid && licenseType !== "permanent" ? (licenseType === "weekly" ? 7 : 30) : null,
+      apk_version: isApk ? (apkVersion || null) : null,
+      apk_min_android: isApk ? (apkMinAndroid || null) : null,
+      apk_package_name: isApk ? (apkPackageName || null) : null,
+      apk_size_mb: isApk && apkSizeMb ? parseFloat(apkSizeMb) : null,
+      apk_changelog: isApk ? (apkChangelog || null) : null,
+      apk_original_app: isApk ? (apkOriginalApp || null) : null,
     };
 
     // Block license changes if script has purchases (unless admin)
@@ -419,11 +445,14 @@ export default function ScriptEditor() {
         {/* Header */}
         <div className="flex items-start justify-between gap-4 mb-8">
           <div className="min-w-0">
-            <h1 className="text-2xl sm:text-3xl font-black tracking-tight">
-              {isEditing ? "Editar script" : "Novo script"}
+            <h1 className="text-2xl sm:text-3xl font-black tracking-tight flex items-center gap-2">
+              {isApk && <Smartphone className="h-6 w-6 text-neon-cyan" />}
+              {isEditing ? `Editar ${entityLabel}` : `Novo ${entityLabel}`}
             </h1>
             <p className="text-xs text-muted-foreground mt-1">
-              Preencha as informações abaixo. Você pode salvar como rascunho a qualquer momento.
+              {isApk
+                ? "Publique um APK modificado. Preencha versão, tamanho e changelog para os usuários."
+                : "Preencha as informações abaixo. Você pode salvar como rascunho a qualquer momento."}
             </p>
           </div>
           {statusBadge()}
@@ -431,7 +460,7 @@ export default function ScriptEditor() {
 
         <div className="space-y-5">
           {/* 1. Fundamentos */}
-          <SectionCard icon={FileCode} title="Fundamentos" hint="O básico para publicar o script.">
+          <SectionCard icon={FileCode} title="Fundamentos" hint={isApk ? "O básico para publicar o APK Mod." : "O básico para publicar o script."}>
             <div className="space-y-2">
               <FieldLabel>Tipo de projeto</FieldLabel>
               <Tabs value={scriptType} onValueChange={setScriptType} className="w-full">
@@ -440,7 +469,7 @@ export default function ScriptEditor() {
                     <Code className="h-3.5 w-3.5" /> Lua Script
                   </TabsTrigger>
                   <TabsTrigger value="apk" className="gap-2 text-xs data-[state=active]:bg-neon-cyan data-[state=active]:text-white">
-                    <Package className="h-3.5 w-3.5" /> APK Mod
+                    <Smartphone className="h-3.5 w-3.5" /> APK Mod
                   </TabsTrigger>
                 </TabsList>
               </Tabs>
@@ -448,12 +477,12 @@ export default function ScriptEditor() {
 
             <div className="grid sm:grid-cols-2 gap-4">
               <div className="space-y-2 sm:col-span-2">
-                <FieldLabel>Título *</FieldLabel>
-                <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Ex: Hidden Mod Script v1.0" className={inputCls} required />
+                <FieldLabel>Nome do {entityLabel} *</FieldLabel>
+                <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder={isApk ? "Ex: Instagram Mod Premium v320" : "Ex: Hidden Mod Script v1.0"} className={inputCls} required />
               </div>
               <div className="space-y-2">
-                <FieldLabel><span className="inline-flex items-center gap-1"><Gamepad2 className="h-3 w-3" /> Jogo alvo</span></FieldLabel>
-                <Input value={gameName} onChange={(e) => setGameName(e.target.value)} placeholder="Ex: Free Fire" className={inputCls} />
+                <FieldLabel><span className="inline-flex items-center gap-1"><Gamepad2 className="h-3 w-3" /> {isApk ? "App/Jogo alvo" : "Jogo alvo"}</span></FieldLabel>
+                <Input value={gameName} onChange={(e) => setGameName(e.target.value)} placeholder={isApk ? "Ex: Instagram" : "Ex: Free Fire"} className={inputCls} />
               </div>
               <div className="space-y-2">
                 <FieldLabel>Versão</FieldLabel>
@@ -482,16 +511,59 @@ export default function ScriptEditor() {
             </div>
 
             <div className="space-y-2">
-              <FieldLabel>Descrição</FieldLabel>
+              <FieldLabel>Descrição do {entityLabel}</FieldLabel>
               <Textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 rows={4}
-                placeholder="Explique o que o script faz e como usar..."
+                placeholder={isApk ? "Explique quais recursos foram desbloqueados/modificados neste APK..." : "Explique o que o script faz e como usar..."}
                 className="bg-white/[0.03] border-white/10 focus-visible:border-neon-purple/50 focus-visible:ring-neon-purple/20 resize-none"
               />
             </div>
           </SectionCard>
+
+          {/* APK Metadata card */}
+          {isApk && (
+            <SectionCard
+              icon={Smartphone}
+              title="Detalhes do APK Mod"
+              hint="Informações técnicas que aparecem para o usuário decidir baixar."
+            >
+              <div className="grid sm:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <FieldLabel>Versão do mod</FieldLabel>
+                  <Input value={apkVersion} onChange={(e) => setApkVersion(e.target.value)} placeholder="Ex: 320.0.0-MOD" className={`${inputCls} font-mono`} />
+                </div>
+                <div className="space-y-2">
+                  <FieldLabel>App original</FieldLabel>
+                  <Input value={apkOriginalApp} onChange={(e) => setApkOriginalApp(e.target.value)} placeholder="Ex: Instagram" className={inputCls} />
+                </div>
+                <div className="space-y-2">
+                  <FieldLabel><span className="inline-flex items-center gap-1"><Smartphone className="h-3 w-3" /> Android mínimo</span></FieldLabel>
+                  <Input value={apkMinAndroid} onChange={(e) => setApkMinAndroid(e.target.value)} placeholder="Ex: 8.0" className={inputCls} />
+                </div>
+                <div className="space-y-2">
+                  <FieldLabel><span className="inline-flex items-center gap-1"><HardDrive className="h-3 w-3" /> Tamanho (MB)</span></FieldLabel>
+                  <Input type="number" value={apkSizeMb} onChange={(e) => setApkSizeMb(e.target.value)} placeholder="Ex: 85" min="0" step="0.1" className={inputCls} />
+                </div>
+                <div className="space-y-2 sm:col-span-2">
+                  <FieldLabel>Package name</FieldLabel>
+                  <Input value={apkPackageName} onChange={(e) => setApkPackageName(e.target.value)} placeholder="com.instagram.android" className={`${inputCls} font-mono`} />
+                </div>
+                <div className="space-y-2 sm:col-span-2">
+                  <FieldLabel><span className="inline-flex items-center gap-1"><FileText className="h-3 w-3" /> Changelog / O que mudou</span></FieldLabel>
+                  <Textarea
+                    value={apkChangelog}
+                    onChange={(e) => setApkChangelog(e.target.value)}
+                    rows={4}
+                    placeholder="- Instagram Premium desbloqueado&#10;- Sem anúncios&#10;- Download de stories/reels..."
+                    className="bg-white/[0.03] border-white/10 focus-visible:border-neon-cyan/50 focus-visible:ring-neon-cyan/20 resize-none font-mono text-xs"
+                  />
+                </div>
+              </div>
+            </SectionCard>
+          )}
+
 
           {/* 2. Código Lua */}
           {scriptType === "script" && (
@@ -726,12 +798,12 @@ export default function ScriptEditor() {
           </SectionCard>
 
           {/* 5. Monetização */}
-          <SectionCard icon={Lock} title="Monetização" hint="Defina se o script é gratuito ou pago e o modelo de licença.">
+          <SectionCard icon={Lock} title="Monetização" hint={`Defina se o ${entityLabel} é gratuito ou pago${isApk ? "." : " e o modelo de licença."}`}>
             <div className="flex items-center justify-between p-3 rounded-lg bg-white/[0.03] border border-white/10">
               <div className="flex items-center gap-3 min-w-0">
                 <Switch checked={isPaid} onCheckedChange={setIsPaid} disabled={!!licenseFieldsLocked} className="data-[state=checked]:bg-orange-500" />
                 <div className="space-y-0.5 min-w-0">
-                  <Label className="text-sm font-bold">{isPaid ? "Script pago" : "Script gratuito"}</Label>
+                  <Label className="text-sm font-bold">{isPaid ? `${entityLabelCap} pago` : `${entityLabelCap} gratuito`}</Label>
                   <p className="text-[11px] text-muted-foreground">{isPaid ? "Será vendido no marketplace." : "Livre para download."}</p>
                 </div>
               </div>
@@ -741,12 +813,12 @@ export default function ScriptEditor() {
             {licenseFieldsLocked && (
               <div className="p-3 rounded-lg bg-orange-500/10 border border-orange-500/20 flex gap-2 items-start">
                 <Lock className="h-4 w-4 text-orange-500 shrink-0 mt-0.5" />
-                <p className="text-[11px] text-orange-200/80 leading-relaxed">Licença bloqueada — este script já tem compradores. Alterações requerem aprovação admin.</p>
+                <p className="text-[11px] text-orange-200/80 leading-relaxed">Bloqueado — este {entityLabel} já tem compradores. Alterações requerem aprovação admin.</p>
               </div>
             )}
 
             {isPaid && (
-              <div className="grid sm:grid-cols-2 gap-4">
+              <div className={`grid ${isApk ? "sm:grid-cols-1" : "sm:grid-cols-2"} gap-4`}>
                 <div className="space-y-2">
                   <FieldLabel>Preço (R$)</FieldLabel>
                   <div className="relative">
@@ -754,20 +826,23 @@ export default function ScriptEditor() {
                     <Input type="number" value={price} onChange={(e) => setPrice(e.target.value)} placeholder="0.00" min="0" step="0.01" disabled={!!licenseFieldsLocked} className={`${inputCls} pl-10 font-bold`} />
                   </div>
                 </div>
-                <div className="space-y-2">
-                  <FieldLabel>Duração da licença</FieldLabel>
-                  <Select value={licenseType} onValueChange={setLicenseType} disabled={!!licenseFieldsLocked}>
-                    <SelectTrigger className={inputCls}><SelectValue /></SelectTrigger>
-                    <SelectContent className="bg-[#0a0a0c] border-white/10">
-                      <SelectItem value="permanent">Permanente (vitalício)</SelectItem>
-                      <SelectItem value="monthly">Mensal (30 dias)</SelectItem>
-                      <SelectItem value="weekly">Semanal (7 dias)</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+                {!isApk && (
+                  <div className="space-y-2">
+                    <FieldLabel>Duração da licença</FieldLabel>
+                    <Select value={licenseType} onValueChange={setLicenseType} disabled={!!licenseFieldsLocked}>
+                      <SelectTrigger className={inputCls}><SelectValue /></SelectTrigger>
+                      <SelectContent className="bg-[#0a0a0c] border-white/10">
+                        <SelectItem value="permanent">Permanente (vitalício)</SelectItem>
+                        <SelectItem value="monthly">Mensal (30 dias)</SelectItem>
+                        <SelectItem value="weekly">Semanal (7 dias)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
               </div>
             )}
           </SectionCard>
+
         </div>
       </div>
 
@@ -806,7 +881,7 @@ export default function ScriptEditor() {
               }`}
             >
               {submitting ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : lastAnalysis?.classification === "malicious" ? <ShieldX className="h-4 w-4 mr-2" /> : <Eye className="h-4 w-4 mr-2" />}
-              {lastAnalysis?.classification === "malicious" ? "Publicação bloqueada" : "Publicar"}
+              {lastAnalysis?.classification === "malicious" ? "Publicação bloqueada" : `Publicar ${entityLabel}`}
             </Button>
           )}
 

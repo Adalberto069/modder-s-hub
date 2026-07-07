@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { Download, Star, Code, ShoppingCart, Unlock, Heart } from "lucide-react";
+import { Download, Star, Code, ShoppingCart, Unlock, Heart, Smartphone } from "lucide-react";
 import { UserRoleBadge } from "@/components/UserRoleBadge";
 import { UserBadges } from "@/components/UserBadges";
 import { useFavorites } from "@/hooks/use-favorites";
@@ -18,6 +18,8 @@ interface ScriptCardProps {
   price?: number;
   thumbnailUrl?: string | null;
   categorySlug?: string;
+  scriptType?: string;
+  apkVersion?: string | null;
 }
 
 const statusConfig = {
@@ -27,11 +29,12 @@ const statusConfig = {
 };
 
 export function ScriptCard({
-  id, title, modderName, modderId, status, downloadCount, averageRating, isPaid, price, thumbnailUrl, categorySlug,
+  id, title, modderName, modderId, status, downloadCount, averageRating, isPaid, price, thumbnailUrl, categorySlug, scriptType, apkVersion,
 }: ScriptCardProps) {
   const st = statusConfig[status];
   const { isFavorite, toggleFavorite } = useFavorites();
   const fav = isFavorite(id);
+  const isApk = scriptType === "apk";
 
   return (
     <Link to={`/script/${id}`} className="block h-full">
@@ -46,7 +49,9 @@ export function ScriptCard({
               loading="lazy"
             />
           ) : (
-            <Code className="h-6 w-6 sm:h-10 sm:w-10 text-white/5 shadow-neon-cyan" />
+            isApk
+              ? <Smartphone className="h-6 w-6 sm:h-10 sm:w-10 text-neon-cyan/20" />
+              : <Code className="h-6 w-6 sm:h-10 sm:w-10 text-white/5 shadow-neon-cyan" />
           )}
 
           {/* Favorite button */}
@@ -61,11 +66,23 @@ export function ScriptCard({
             <Heart className={`h-3.5 w-3.5 transition-colors ${fav ? "text-neon-pink fill-neon-pink" : "text-muted-foreground hover:text-neon-pink"}`} />
           </button>
 
+          {isApk && (
+            <div className="absolute top-2 left-2 z-10">
+              <Badge variant="outline" className="bg-neon-cyan text-[#050505] border-neon-cyan text-[8px] sm:text-[9px] rounded-none font-mono uppercase tracking-widest gap-1 font-black">
+                <Smartphone className="h-2.5 w-2.5" /> APK MOD
+              </Badge>
+            </div>
+          )}
+
           <div className="absolute bottom-2 left-2 z-10 flex flex-wrap gap-1">
             <Badge variant="outline" className={`${st.className} text-[8px] sm:text-[9px] rounded-none font-mono uppercase tracking-widest`}>
               {st.label}
             </Badge>
-            {categorySlug && (
+            {isApk && apkVersion ? (
+              <Badge variant="outline" className="bg-[#030304] text-neon-cyan border-neon-cyan/30 text-[8px] sm:text-[9px] rounded-none uppercase tracking-widest font-mono hidden sm:inline-flex">
+                v{apkVersion}
+              </Badge>
+            ) : categorySlug && (
               <Badge variant="outline" className="bg-[#030304] text-white/70 border-white/10 text-[8px] sm:text-[9px] rounded-none uppercase tracking-widest font-mono hidden sm:inline-flex">
                 {categorySlug === "scripts-lua" ? "LUA" : categorySlug}
               </Badge>
@@ -117,19 +134,19 @@ export function ScriptCard({
                   </span>
                 </div>
                 <span className="flex items-center gap-2 bg-neon-purple hover:bg-neon-purple/90 text-white transition-all duration-300 font-black uppercase tracking-widest text-[9px] sm:text-[10px] px-3 py-1.5 group-hover:shadow-[0_0_15px_rgba(168,85,247,0.3)] border border-neon-purple">
-                  <ShoppingCart className="h-3 w-3" />
-                  Aquisição
+                  {isApk ? <Download className="h-3 w-3" /> : <ShoppingCart className="h-3 w-3" />}
+                  {isApk ? "Baixar" : "Aquisição"}
                 </span>
               </>
             ) : (
               <>
                 <div className="flex flex-col leading-none space-y-1">
-                  <span className="text-[8px] text-muted-foreground uppercase tracking-widest font-black">Acesso</span>
-                  <span className="text-sm sm:text-base font-black text-neon-green">Livre</span>
+                  <span className="text-[8px] text-muted-foreground uppercase tracking-widest font-black">{isApk ? "APK" : "Acesso"}</span>
+                  <span className="text-sm sm:text-base font-black text-neon-green">{isApk ? "Grátis" : "Livre"}</span>
                 </div>
                 <span className="flex items-center gap-2 bg-transparent hover:bg-neon-green/10 text-neon-green border border-neon-green/50 transition-all duration-300 font-black uppercase tracking-widest text-[9px] sm:text-[10px] px-3 py-1.5 group-hover:shadow-[0_0_15px_rgba(57,255,20,0.1)]">
-                  <Unlock className="h-3 w-3" />
-                  Operar
+                  {isApk ? <Download className="h-3 w-3" /> : <Unlock className="h-3 w-3" />}
+                  {isApk ? "Baixar" : "Operar"}
                 </span>
               </>
             )}

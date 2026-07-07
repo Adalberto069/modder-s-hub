@@ -305,7 +305,10 @@ export default function Marketplace() {
                   price={Number(script.price)}
                   thumbnailUrl={script.thumbnail_url}
                   categorySlug={script.categories?.slug}
+                  scriptType={script.script_type}
+                  apkVersion={script.apk_version}
                 />
+
               </motion.div>
             ))}
           </motion.div>
