@@ -1209,6 +1209,12 @@ export type Database = {
       }
       scripts: {
         Row: {
+          apk_changelog: string | null
+          apk_min_android: string | null
+          apk_original_app: string | null
+          apk_package_name: string | null
+          apk_size_mb: number | null
+          apk_version: string | null
           average_rating: number
           category_id: string | null
           code_hash: string | null
@@ -1240,6 +1246,12 @@ export type Database = {
           video_url: string | null
         }
         Insert: {
+          apk_changelog?: string | null
+          apk_min_android?: string | null
+          apk_original_app?: string | null
+          apk_package_name?: string | null
+          apk_size_mb?: number | null
+          apk_version?: string | null
           average_rating?: number
           category_id?: string | null
           code_hash?: string | null
@@ -1271,6 +1283,12 @@ export type Database = {
           video_url?: string | null
         }
         Update: {
+          apk_changelog?: string | null
+          apk_min_android?: string | null
+          apk_original_app?: string | null
+          apk_package_name?: string | null
+          apk_size_mb?: number | null
+          apk_version?: string | null
           average_rating?: number
           category_id?: string | null
           code_hash?: string | null
