@@ -544,6 +544,15 @@ end
   const luaCode = scriptCode?.lua_code ?? null;
   const gameName = (script as any).game_name;
   const scriptVersion = (script as any).version;
+  const isApk = (script as any).script_type === "apk";
+  const apkMeta = {
+    version: (script as any).apk_version,
+    minAndroid: (script as any).apk_min_android,
+    packageName: (script as any).apk_package_name,
+    sizeMb: (script as any).apk_size_mb,
+    changelog: (script as any).apk_changelog,
+    originalApp: (script as any).apk_original_app,
+  };
 
   return (
     <Layout>
