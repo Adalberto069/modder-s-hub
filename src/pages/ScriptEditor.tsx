@@ -460,7 +460,7 @@ export default function ScriptEditor() {
 
         <div className="space-y-5">
           {/* 1. Fundamentos */}
-          <SectionCard icon={FileCode} title="Fundamentos" hint="O básico para publicar o script.">
+          <SectionCard icon={FileCode} title="Fundamentos" hint={isApk ? "O básico para publicar o APK Mod." : "O básico para publicar o script."}>
             <div className="space-y-2">
               <FieldLabel>Tipo de projeto</FieldLabel>
               <Tabs value={scriptType} onValueChange={setScriptType} className="w-full">
@@ -469,7 +469,7 @@ export default function ScriptEditor() {
                     <Code className="h-3.5 w-3.5" /> Lua Script
                   </TabsTrigger>
                   <TabsTrigger value="apk" className="gap-2 text-xs data-[state=active]:bg-neon-cyan data-[state=active]:text-white">
-                    <Package className="h-3.5 w-3.5" /> APK Mod
+                    <Smartphone className="h-3.5 w-3.5" /> APK Mod
                   </TabsTrigger>
                 </TabsList>
               </Tabs>
@@ -477,12 +477,12 @@ export default function ScriptEditor() {
 
             <div className="grid sm:grid-cols-2 gap-4">
               <div className="space-y-2 sm:col-span-2">
-                <FieldLabel>Título *</FieldLabel>
-                <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Ex: Hidden Mod Script v1.0" className={inputCls} required />
+                <FieldLabel>Nome do {entityLabel} *</FieldLabel>
+                <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder={isApk ? "Ex: Instagram Mod Premium v320" : "Ex: Hidden Mod Script v1.0"} className={inputCls} required />
               </div>
               <div className="space-y-2">
-                <FieldLabel><span className="inline-flex items-center gap-1"><Gamepad2 className="h-3 w-3" /> Jogo alvo</span></FieldLabel>
-                <Input value={gameName} onChange={(e) => setGameName(e.target.value)} placeholder="Ex: Free Fire" className={inputCls} />
+                <FieldLabel><span className="inline-flex items-center gap-1"><Gamepad2 className="h-3 w-3" /> {isApk ? "App/Jogo alvo" : "Jogo alvo"}</span></FieldLabel>
+                <Input value={gameName} onChange={(e) => setGameName(e.target.value)} placeholder={isApk ? "Ex: Instagram" : "Ex: Free Fire"} className={inputCls} />
               </div>
               <div className="space-y-2">
                 <FieldLabel>Versão</FieldLabel>
