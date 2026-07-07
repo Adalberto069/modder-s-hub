@@ -661,6 +661,11 @@ end
                   {!scriptIsActive && (
                     <Badge variant="destructive" className="text-[9px] sm:text-[10px] uppercase font-bold px-2">Inativo</Badge>
                   )}
+                  {isApk && (
+                    <Badge variant="outline" className="bg-neon-cyan text-[#050505] border-neon-cyan text-[9px] sm:text-[10px] uppercase font-black tracking-widest px-2 gap-1">
+                      <Download className="h-3 w-3" /> APK MOD
+                    </Badge>
+                  )}
                   {script.is_paid && (
                     <Badge variant="secondary" className="bg-[hsl(var(--neon-pink)/0.1)] text-[hsl(var(--neon-pink))] border-[hsl(var(--neon-pink)/0.2)] text-[9px] sm:text-[10px] font-bold">
                       <ShoppingCart className="h-3 w-3 mr-1" /> Premium
