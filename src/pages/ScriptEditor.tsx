@@ -58,6 +58,18 @@ export default function ScriptEditor() {
   const [submitting, setSubmitting] = useState(false);
   const [lastAnalysis, setLastAnalysis] = useState<AnalysisResult | null>(null);
 
+  // APK-specific metadata
+  const [apkVersion, setApkVersion] = useState("");
+  const [apkMinAndroid, setApkMinAndroid] = useState("");
+  const [apkPackageName, setApkPackageName] = useState("");
+  const [apkSizeMb, setApkSizeMb] = useState("");
+  const [apkChangelog, setApkChangelog] = useState("");
+  const [apkOriginalApp, setApkOriginalApp] = useState("");
+
+  const isApk = scriptType === "apk";
+  const entityLabel = isApk ? "APK Mod" : "script";
+  const entityLabelCap = isApk ? "APK Mod" : "Script";
+
 
   // License type: "permanent" | "monthly" | "weekly"
   const [licenseType, setLicenseType] = useState<string>("permanent");
