@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { Download, Star, Code, ShoppingCart, Unlock, Heart } from "lucide-react";
+import { Download, Star, Code, ShoppingCart, Unlock, Heart, Smartphone } from "lucide-react";
 import { UserRoleBadge } from "@/components/UserRoleBadge";
 import { UserBadges } from "@/components/UserBadges";
 import { useFavorites } from "@/hooks/use-favorites";
@@ -18,6 +18,8 @@ interface ScriptCardProps {
   price?: number;
   thumbnailUrl?: string | null;
   categorySlug?: string;
+  scriptType?: string;
+  apkVersion?: string | null;
 }
 
 const statusConfig = {
@@ -27,11 +29,12 @@ const statusConfig = {
 };
 
 export function ScriptCard({
-  id, title, modderName, modderId, status, downloadCount, averageRating, isPaid, price, thumbnailUrl, categorySlug,
+  id, title, modderName, modderId, status, downloadCount, averageRating, isPaid, price, thumbnailUrl, categorySlug, scriptType, apkVersion,
 }: ScriptCardProps) {
   const st = statusConfig[status];
   const { isFavorite, toggleFavorite } = useFavorites();
   const fav = isFavorite(id);
+  const isApk = scriptType === "apk";
 
   return (
     <Link to={`/script/${id}`} className="block h-full">
