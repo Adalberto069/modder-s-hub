@@ -49,7 +49,9 @@ export function ScriptCard({
               loading="lazy"
             />
           ) : (
-            <Code className="h-6 w-6 sm:h-10 sm:w-10 text-white/5 shadow-neon-cyan" />
+            isApk
+              ? <Smartphone className="h-6 w-6 sm:h-10 sm:w-10 text-neon-cyan/20" />
+              : <Code className="h-6 w-6 sm:h-10 sm:w-10 text-white/5 shadow-neon-cyan" />
           )}
 
           {/* Favorite button */}
@@ -64,11 +66,23 @@ export function ScriptCard({
             <Heart className={`h-3.5 w-3.5 transition-colors ${fav ? "text-neon-pink fill-neon-pink" : "text-muted-foreground hover:text-neon-pink"}`} />
           </button>
 
+          {isApk && (
+            <div className="absolute top-2 left-2 z-10">
+              <Badge variant="outline" className="bg-neon-cyan text-[#050505] border-neon-cyan text-[8px] sm:text-[9px] rounded-none font-mono uppercase tracking-widest gap-1 font-black">
+                <Smartphone className="h-2.5 w-2.5" /> APK MOD
+              </Badge>
+            </div>
+          )}
+
           <div className="absolute bottom-2 left-2 z-10 flex flex-wrap gap-1">
             <Badge variant="outline" className={`${st.className} text-[8px] sm:text-[9px] rounded-none font-mono uppercase tracking-widest`}>
               {st.label}
             </Badge>
-            {categorySlug && (
+            {isApk && apkVersion ? (
+              <Badge variant="outline" className="bg-[#030304] text-neon-cyan border-neon-cyan/30 text-[8px] sm:text-[9px] rounded-none uppercase tracking-widest font-mono hidden sm:inline-flex">
+                v{apkVersion}
+              </Badge>
+            ) : categorySlug && (
               <Badge variant="outline" className="bg-[#030304] text-white/70 border-white/10 text-[8px] sm:text-[9px] rounded-none uppercase tracking-widest font-mono hidden sm:inline-flex">
                 {categorySlug === "scripts-lua" ? "LUA" : categorySlug}
               </Badge>
