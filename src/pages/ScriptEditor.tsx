@@ -21,6 +21,7 @@ import { toast } from "sonner";
 import {
   Save, Eye, Send, ArrowLeft, Plus, X, Code, Package,
   Upload, Lock, EyeOff, Gamepad2, Tag, List, FileCode, BookOpen, ShieldX, Loader2,
+  Smartphone, HardDrive, FileText,
 } from "lucide-react";
 import { Navigate } from "react-router-dom";
 
