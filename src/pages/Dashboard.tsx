@@ -36,6 +36,7 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const [showForm, setShowForm] = useState(false);
   const [activeTab, setActiveTab] = useState("purchases");
+  const [pubFilter, setPubFilter] = useState<"all" | "script" | "apk">("all");
   const [scriptToDelete, setScriptToDelete] = useState<{ id: string; title: string } | null>(null);
 
   // Form state
