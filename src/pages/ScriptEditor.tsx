@@ -511,16 +511,59 @@ export default function ScriptEditor() {
             </div>
 
             <div className="space-y-2">
-              <FieldLabel>Descrição</FieldLabel>
+              <FieldLabel>Descrição do {entityLabel}</FieldLabel>
               <Textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 rows={4}
-                placeholder="Explique o que o script faz e como usar..."
+                placeholder={isApk ? "Explique quais recursos foram desbloqueados/modificados neste APK..." : "Explique o que o script faz e como usar..."}
                 className="bg-white/[0.03] border-white/10 focus-visible:border-neon-purple/50 focus-visible:ring-neon-purple/20 resize-none"
               />
             </div>
           </SectionCard>
+
+          {/* APK Metadata card */}
+          {isApk && (
+            <SectionCard
+              icon={Smartphone}
+              title="Detalhes do APK Mod"
+              hint="Informações técnicas que aparecem para o usuário decidir baixar."
+            >
+              <div className="grid sm:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <FieldLabel>Versão do mod</FieldLabel>
+                  <Input value={apkVersion} onChange={(e) => setApkVersion(e.target.value)} placeholder="Ex: 320.0.0-MOD" className={`${inputCls} font-mono`} />
+                </div>
+                <div className="space-y-2">
+                  <FieldLabel>App original</FieldLabel>
+                  <Input value={apkOriginalApp} onChange={(e) => setApkOriginalApp(e.target.value)} placeholder="Ex: Instagram" className={inputCls} />
+                </div>
+                <div className="space-y-2">
+                  <FieldLabel><span className="inline-flex items-center gap-1"><Smartphone className="h-3 w-3" /> Android mínimo</span></FieldLabel>
+                  <Input value={apkMinAndroid} onChange={(e) => setApkMinAndroid(e.target.value)} placeholder="Ex: 8.0" className={inputCls} />
+                </div>
+                <div className="space-y-2">
+                  <FieldLabel><span className="inline-flex items-center gap-1"><HardDrive className="h-3 w-3" /> Tamanho (MB)</span></FieldLabel>
+                  <Input type="number" value={apkSizeMb} onChange={(e) => setApkSizeMb(e.target.value)} placeholder="Ex: 85" min="0" step="0.1" className={inputCls} />
+                </div>
+                <div className="space-y-2 sm:col-span-2">
+                  <FieldLabel>Package name</FieldLabel>
+                  <Input value={apkPackageName} onChange={(e) => setApkPackageName(e.target.value)} placeholder="com.instagram.android" className={`${inputCls} font-mono`} />
+                </div>
+                <div className="space-y-2 sm:col-span-2">
+                  <FieldLabel><span className="inline-flex items-center gap-1"><FileText className="h-3 w-3" /> Changelog / O que mudou</span></FieldLabel>
+                  <Textarea
+                    value={apkChangelog}
+                    onChange={(e) => setApkChangelog(e.target.value)}
+                    rows={4}
+                    placeholder="- Instagram Premium desbloqueado&#10;- Sem anúncios&#10;- Download de stories/reels..."
+                    className="bg-white/[0.03] border-white/10 focus-visible:border-neon-cyan/50 focus-visible:ring-neon-cyan/20 resize-none font-mono text-xs"
+                  />
+                </div>
+              </div>
+            </SectionCard>
+          )}
+
 
           {/* 2. Código Lua */}
           {scriptType === "script" && (
