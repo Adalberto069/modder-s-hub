@@ -445,11 +445,14 @@ export default function ScriptEditor() {
         {/* Header */}
         <div className="flex items-start justify-between gap-4 mb-8">
           <div className="min-w-0">
-            <h1 className="text-2xl sm:text-3xl font-black tracking-tight">
-              {isEditing ? "Editar script" : "Novo script"}
+            <h1 className="text-2xl sm:text-3xl font-black tracking-tight flex items-center gap-2">
+              {isApk && <Smartphone className="h-6 w-6 text-neon-cyan" />}
+              {isEditing ? `Editar ${entityLabel}` : `Novo ${entityLabel}`}
             </h1>
             <p className="text-xs text-muted-foreground mt-1">
-              Preencha as informações abaixo. Você pode salvar como rascunho a qualquer momento.
+              {isApk
+                ? "Publique um APK modificado. Preencha versão, tamanho e changelog para os usuários."
+                : "Preencha as informações abaixo. Você pode salvar como rascunho a qualquer momento."}
             </p>
           </div>
           {statusBadge()}
