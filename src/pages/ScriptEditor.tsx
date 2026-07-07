@@ -319,6 +319,12 @@ export default function ScriptEditor() {
       tags,
       related_tutorial_id: relatedTutorialId && relatedTutorialId !== "none" ? relatedTutorialId : null,
       license_duration_days: isPaid && licenseType !== "permanent" ? (licenseType === "weekly" ? 7 : 30) : null,
+      apk_version: isApk ? (apkVersion || null) : null,
+      apk_min_android: isApk ? (apkMinAndroid || null) : null,
+      apk_package_name: isApk ? (apkPackageName || null) : null,
+      apk_size_mb: isApk && apkSizeMb ? parseFloat(apkSizeMb) : null,
+      apk_changelog: isApk ? (apkChangelog || null) : null,
+      apk_original_app: isApk ? (apkOriginalApp || null) : null,
     };
 
     // Block license changes if script has purchases (unless admin)
