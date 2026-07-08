@@ -616,7 +616,7 @@ export function BountyChat({ bountyId, bountyStatus, requesterId, assignedModder
         <div className="p-4 border-t border-white/5 bg-[#030304] space-y-3">
           {isModderUser && bountyStatus === "in_progress" && (
             <div className="flex items-center gap-2">
-              <input ref={fileRef} type="file" accept=".lua" onChange={handleFileUpload} className="hidden" />
+              <input ref={fileRef} type="file" accept=".lua,.apk" onChange={handleFileUpload} className="hidden" />
               <Button
                 size="sm" variant="outline"
                 onClick={() => fileRef.current?.click()}
@@ -624,7 +624,7 @@ export function BountyChat({ bountyId, bountyStatus, requesterId, assignedModder
                 className="rounded-none text-[10px] font-black uppercase tracking-widest border-neon-green/30 text-neon-green hover:bg-neon-green/10"
               >
                 {uploading ? <Loader2 className="h-3 w-3 mr-1.5 animate-spin" /> : <Upload className="h-3 w-3 mr-1.5" />}
-                {uploading ? "Enviando..." : "Entregar Script (.lua)"}
+                {uploading ? "Enviando..." : "Entregar (.lua / .apk)"}
               </Button>
               <span className="text-[9px] text-muted-foreground/40 font-mono">
                 O cliente testa por 5 min antes de pagar
