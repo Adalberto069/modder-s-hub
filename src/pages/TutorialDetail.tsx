@@ -685,8 +685,8 @@ export default function TutorialDetail() {
 
         {/* Thumbnail if no video */}
         {tutorial.thumbnail_url && !tutorial.video_url && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mb-8">
-            <img src={tutorial.thumbnail_url} alt={tutorial.title} className="w-full rounded-xl border border-border/20 shadow-lg" loading="lazy" />
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mb-8 mx-auto max-w-lg">
+            <img src={tutorial.thumbnail_url} alt={tutorial.title} className="w-full max-h-[360px] object-contain rounded-xl border border-border/20 shadow-lg" loading="lazy" />
           </motion.div>
         )}
 
