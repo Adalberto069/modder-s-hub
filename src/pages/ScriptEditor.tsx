@@ -516,7 +516,7 @@ export default function ScriptEditor() {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 rows={4}
-                placeholder={isApk ? "Explique quais recursos foram desbloqueados/modificados neste APK..." : "Explique o que o script faz e como usar..."}
+                placeholder={isApk ? "Explique quais recursos foram desbloqueados/modificados neste mod do jogo (ex: aimbot, wallhack, skins, moedas ilimitadas)..." : "Explique o que o script faz e como usar..."}
                 className="bg-white/[0.03] border-white/10 focus-visible:border-neon-purple/50 focus-visible:ring-neon-purple/20 resize-none"
               />
             </div>
