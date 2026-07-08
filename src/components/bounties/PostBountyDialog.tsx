@@ -59,9 +59,13 @@ export function PostBountyDialog({ children }: PostBountyDialogProps) {
     }
 
     setLoading(true);
+    const typeTag = deliveryType === "apk" ? "[APK MOD] " : "[SCRIPT] ";
+    const descPrefix = deliveryType === "apk"
+      ? "🎯 Tipo de entrega esperada: APK MOD (.apk instalável)\n\n"
+      : "🎯 Tipo de entrega esperada: SCRIPT (.lua para GameGuardian)\n\n";
     const { error } = await (supabase as any).from("bounties").insert({
-      title: form.title.trim(),
-      description: form.description.trim(),
+      title: typeTag + form.title.trim(),
+      description: descPrefix + form.description.trim(),
       game_name: form.game_name.trim() || null,
       category_id: form.category_id || null,
       reward_amount: Number(form.reward_amount) || 0,
@@ -76,6 +80,7 @@ export function PostBountyDialog({ children }: PostBountyDialogProps) {
     toast.success("Encomenda criada com sucesso! 🎯");
     queryClient.invalidateQueries({ queryKey: ["bounties"] });
     setOpen(false);
+    setDeliveryType("script");
     setForm({ title: "", description: "", game_name: "", category_id: "", reward_amount: "", deadline: "" });
   };
 
