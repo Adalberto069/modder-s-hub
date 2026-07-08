@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
-import { Plus, Target, DollarSign, Gamepad2, Calendar } from "lucide-react";
+import { Plus, Target, DollarSign, Gamepad2, Calendar, Smartphone, Code2 } from "lucide-react";
 
 interface PostBountyDialogProps {
   children?: React.ReactNode;
@@ -32,6 +32,7 @@ export function PostBountyDialog({ children }: PostBountyDialogProps) {
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [deliveryType, setDeliveryType] = useState<"script" | "apk">("script");
   const [form, setForm] = useState({
     title: "",
     description: "",
@@ -58,9 +59,13 @@ export function PostBountyDialog({ children }: PostBountyDialogProps) {
     }
 
     setLoading(true);
+    const typeTag = deliveryType === "apk" ? "[APK MOD] " : "[SCRIPT] ";
+    const descPrefix = deliveryType === "apk"
+      ? "🎯 Tipo de entrega esperada: APK MOD (.apk instalável)\n\n"
+      : "🎯 Tipo de entrega esperada: SCRIPT (.lua para GameGuardian)\n\n";
     const { error } = await (supabase as any).from("bounties").insert({
-      title: form.title.trim(),
-      description: form.description.trim(),
+      title: typeTag + form.title.trim(),
+      description: descPrefix + form.description.trim(),
       game_name: form.game_name.trim() || null,
       category_id: form.category_id || null,
       reward_amount: Number(form.reward_amount) || 0,
@@ -75,6 +80,7 @@ export function PostBountyDialog({ children }: PostBountyDialogProps) {
     toast.success("Encomenda criada com sucesso! 🎯");
     queryClient.invalidateQueries({ queryKey: ["bounties"] });
     setOpen(false);
+    setDeliveryType("script");
     setForm({ title: "", description: "", game_name: "", category_id: "", reward_amount: "", deadline: "" });
   };
 
@@ -98,6 +104,36 @@ export function PostBountyDialog({ children }: PostBountyDialogProps) {
           </p>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="p-6 space-y-4 font-mono">
+          <div className="space-y-2">
+            <Label className="text-[10px] uppercase tracking-widest text-muted-foreground">
+              Tipo de entrega *
+            </Label>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => setDeliveryType("script")}
+                className={`flex items-center justify-center gap-2 p-3 border rounded-none text-xs font-black uppercase tracking-widest transition-all ${
+                  deliveryType === "script"
+                    ? "border-neon-purple bg-neon-purple/10 text-neon-purple"
+                    : "border-white/10 bg-[#030304] text-muted-foreground hover:border-white/20"
+                }`}
+              >
+                <Code2 className="h-4 w-4" /> Script (.lua)
+              </button>
+              <button
+                type="button"
+                onClick={() => setDeliveryType("apk")}
+                className={`flex items-center justify-center gap-2 p-3 border rounded-none text-xs font-black uppercase tracking-widest transition-all ${
+                  deliveryType === "apk"
+                    ? "border-neon-green bg-neon-green/10 text-neon-green"
+                    : "border-white/10 bg-[#030304] text-muted-foreground hover:border-white/20"
+                }`}
+              >
+                <Smartphone className="h-4 w-4" /> APK Mod
+              </button>
+            </div>
+          </div>
+
           <div className="space-y-2">
             <Label className="text-[10px] uppercase tracking-widest text-muted-foreground">
               Título da Encomenda *

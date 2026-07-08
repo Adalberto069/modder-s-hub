@@ -130,38 +130,51 @@ export function BountyChat({ bountyId, bountyStatus, requesterId, assignedModder
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !user || !isModderUser) return;
-    if (!file.name.endsWith(".lua")) { toast.error("Apenas arquivos .lua são aceitos."); return; }
-    if (file.size > 5 * 1024 * 1024) { toast.error("Arquivo muito grande (máx 5MB)."); return; }
+    const lowerName = file.name.toLowerCase();
+    const isLua = lowerName.endsWith(".lua");
+    const isApk = lowerName.endsWith(".apk");
+    if (!isLua && !isApk) { toast.error("Apenas arquivos .lua ou .apk são aceitos."); return; }
+    const maxMb = isApk ? 200 : 5;
+    if (file.size > maxMb * 1024 * 1024) { toast.error(`Arquivo muito grande (máx ${maxMb}MB).`); return; }
 
     setUploading(true);
     try {
-      // 1) Read file content for security analysis
-      const code = await file.text();
+      let analysis: any = null;
 
-      // 2) Run heuristic security analysis BEFORE upload
-      toast.info("🔍 Analisando segurança do script...");
-      const { data: analysis, error: analysisError } = await supabase.functions.invoke("analyze-script", {
-        body: { code },
-      });
-      if (analysisError) {
-        console.warn("Falha na análise:", analysisError);
-      }
+      if (isLua) {
+        // 1) Read + heuristic security analysis (only for Lua)
+        const code = await file.text();
+        toast.info("🔍 Analisando segurança do script...");
+        const { data, error: analysisError } = await supabase.functions.invoke("analyze-script", {
+          body: { code },
+        });
+        if (analysisError) console.warn("Falha na análise:", analysisError);
+        analysis = data;
 
-      // 3) Block if classified as malicious
-      if (analysis?.classification === "malicious") {
-        const reasons = (analysis.threats ?? []).slice(0, 3).map((t: any) => t.description || t.type).join(" • ");
-        toast.error(
-          `🔴 Entrega bloqueada — Alto Risco detectado.\n${reasons || "Padrões suspeitos críticos encontrados."}`,
-          { duration: 8000 }
-        );
-        setUploading(false);
-        if (fileRef.current) fileRef.current.value = "";
-        return;
-      }
-
-      // 4) Warn if suspicious but allow
-      if (analysis?.classification === "suspicious") {
-        toast.warning("🟡 Script suspeito — entrega permitida, mas o solicitante será avisado.", { duration: 6000 });
+        if (analysis?.classification === "malicious") {
+          const reasons = (analysis.threats ?? []).slice(0, 3).map((t: any) => t.description || t.type).join(" • ");
+          toast.error(
+            `🔴 Entrega bloqueada — Alto Risco detectado.\n${reasons || "Padrões suspeitos críticos encontrados."}`,
+            { duration: 8000 }
+          );
+          setUploading(false);
+          if (fileRef.current) fileRef.current.value = "";
+          return;
+        }
+        if (analysis?.classification === "suspicious") {
+          toast.warning("🟡 Script suspeito — entrega permitida, mas o solicitante será avisado.", { duration: 6000 });
+        }
+      } else {
+        // APK: validar assinatura ZIP mínima
+        const head = new Uint8Array(await file.slice(0, 4).arrayBuffer());
+        const zipSig = [0x50, 0x4b, 0x03, 0x04];
+        const ok = head.length === 4 && head.every((b, i) => b === zipSig[i]);
+        if (!ok) {
+          toast.error("APK inválido: assinatura de pacote Android ausente.");
+          setUploading(false);
+          if (fileRef.current) fileRef.current.value = "";
+          return;
+        }
       }
 
       const filePath = `${user.id}/${bountyId}/${Date.now()}_${file.name}`;
@@ -173,7 +186,9 @@ export function BountyChat({ bountyId, bountyStatus, requesterId, assignedModder
       });
       if (dbError) throw dbError;
 
-      const securityNote = analysis?.classification === "suspicious" ? " ⚠️ (análise: suspeito)" : " ✅ (análise: seguro)";
+      const securityNote = isApk
+        ? " 📱 (APK Mod)"
+        : analysis?.classification === "suspicious" ? " ⚠️ (análise: suspeito)" : " ✅ (análise: seguro)";
       await (supabase as any).from("bounty_messages").insert({
         bounty_id: bountyId, sender_id: user.id,
         content: `📦 Script entregue: "${file.name}"${securityNote} — o solicitante deve testar e aprovar antes do pagamento.`,
@@ -601,7 +616,7 @@ export function BountyChat({ bountyId, bountyStatus, requesterId, assignedModder
         <div className="p-4 border-t border-white/5 bg-[#030304] space-y-3">
           {isModderUser && bountyStatus === "in_progress" && (
             <div className="flex items-center gap-2">
-              <input ref={fileRef} type="file" accept=".lua" onChange={handleFileUpload} className="hidden" />
+              <input ref={fileRef} type="file" accept=".lua,.apk" onChange={handleFileUpload} className="hidden" />
               <Button
                 size="sm" variant="outline"
                 onClick={() => fileRef.current?.click()}
@@ -609,7 +624,7 @@ export function BountyChat({ bountyId, bountyStatus, requesterId, assignedModder
                 className="rounded-none text-[10px] font-black uppercase tracking-widest border-neon-green/30 text-neon-green hover:bg-neon-green/10"
               >
                 {uploading ? <Loader2 className="h-3 w-3 mr-1.5 animate-spin" /> : <Upload className="h-3 w-3 mr-1.5" />}
-                {uploading ? "Enviando..." : "Entregar Script (.lua)"}
+                {uploading ? "Enviando..." : "Entregar (.lua / .apk)"}
               </Button>
               <span className="text-[9px] text-muted-foreground/40 font-mono">
                 O cliente testa por 5 min antes de pagar

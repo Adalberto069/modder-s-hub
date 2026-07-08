@@ -478,11 +478,11 @@ export default function ScriptEditor() {
             <div className="grid sm:grid-cols-2 gap-4">
               <div className="space-y-2 sm:col-span-2">
                 <FieldLabel>Nome do {entityLabel} *</FieldLabel>
-                <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder={isApk ? "Ex: Instagram Mod Premium v320" : "Ex: Hidden Mod Script v1.0"} className={inputCls} required />
+                <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder={isApk ? "Ex: Free Fire Mod Menu v1.108" : "Ex: Hidden Mod Script v1.0"} className={inputCls} required />
               </div>
               <div className="space-y-2">
-                <FieldLabel><span className="inline-flex items-center gap-1"><Gamepad2 className="h-3 w-3" /> {isApk ? "App/Jogo alvo" : "Jogo alvo"}</span></FieldLabel>
-                <Input value={gameName} onChange={(e) => setGameName(e.target.value)} placeholder={isApk ? "Ex: Instagram" : "Ex: Free Fire"} className={inputCls} />
+                <FieldLabel><span className="inline-flex items-center gap-1"><Gamepad2 className="h-3 w-3" /> Jogo alvo</span></FieldLabel>
+                <Input value={gameName} onChange={(e) => setGameName(e.target.value)} placeholder={isApk ? "Ex: Free Fire, PUBG Mobile, COD Mobile" : "Ex: Free Fire"} className={inputCls} />
               </div>
               <div className="space-y-2">
                 <FieldLabel>Versão</FieldLabel>
@@ -516,7 +516,7 @@ export default function ScriptEditor() {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 rows={4}
-                placeholder={isApk ? "Explique quais recursos foram desbloqueados/modificados neste APK..." : "Explique o que o script faz e como usar..."}
+                placeholder={isApk ? "Explique quais recursos foram desbloqueados/modificados neste mod do jogo (ex: aimbot, wallhack, skins, moedas ilimitadas)..." : "Explique o que o script faz e como usar..."}
                 className="bg-white/[0.03] border-white/10 focus-visible:border-neon-purple/50 focus-visible:ring-neon-purple/20 resize-none"
               />
             </div>
@@ -532,11 +532,11 @@ export default function ScriptEditor() {
               <div className="grid sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <FieldLabel>Versão do mod</FieldLabel>
-                  <Input value={apkVersion} onChange={(e) => setApkVersion(e.target.value)} placeholder="Ex: 320.0.0-MOD" className={`${inputCls} font-mono`} />
+                  <Input value={apkVersion} onChange={(e) => setApkVersion(e.target.value)} placeholder="Ex: 1.108.1-MOD" className={`${inputCls} font-mono`} />
                 </div>
                 <div className="space-y-2">
-                  <FieldLabel>App original</FieldLabel>
-                  <Input value={apkOriginalApp} onChange={(e) => setApkOriginalApp(e.target.value)} placeholder="Ex: Instagram" className={inputCls} />
+                  <FieldLabel>Jogo original</FieldLabel>
+                  <Input value={apkOriginalApp} onChange={(e) => setApkOriginalApp(e.target.value)} placeholder="Ex: Free Fire" className={inputCls} />
                 </div>
                 <div className="space-y-2">
                   <FieldLabel><span className="inline-flex items-center gap-1"><Smartphone className="h-3 w-3" /> Android mínimo</span></FieldLabel>
@@ -544,11 +544,11 @@ export default function ScriptEditor() {
                 </div>
                 <div className="space-y-2">
                   <FieldLabel><span className="inline-flex items-center gap-1"><HardDrive className="h-3 w-3" /> Tamanho (MB)</span></FieldLabel>
-                  <Input type="number" value={apkSizeMb} onChange={(e) => setApkSizeMb(e.target.value)} placeholder="Ex: 85" min="0" step="0.1" className={inputCls} />
+                  <Input type="number" value={apkSizeMb} onChange={(e) => setApkSizeMb(e.target.value)} placeholder="Ex: 350" min="0" step="0.1" className={inputCls} />
                 </div>
                 <div className="space-y-2 sm:col-span-2">
                   <FieldLabel>Package name</FieldLabel>
-                  <Input value={apkPackageName} onChange={(e) => setApkPackageName(e.target.value)} placeholder="com.instagram.android" className={`${inputCls} font-mono`} />
+                  <Input value={apkPackageName} onChange={(e) => setApkPackageName(e.target.value)} placeholder="com.dts.freefireth" className={`${inputCls} font-mono`} />
                 </div>
                 <div className="space-y-2 sm:col-span-2">
                   <FieldLabel><span className="inline-flex items-center gap-1"><FileText className="h-3 w-3" /> Changelog / O que mudou</span></FieldLabel>
@@ -556,7 +556,7 @@ export default function ScriptEditor() {
                     value={apkChangelog}
                     onChange={(e) => setApkChangelog(e.target.value)}
                     rows={4}
-                    placeholder="- Instagram Premium desbloqueado&#10;- Sem anúncios&#10;- Download de stories/reels..."
+                    placeholder="- Aimbot ativado&#10;- Wallhack / ESP&#10;- Skins desbloqueadas&#10;- Anti-ban integrado..."
                     className="bg-white/[0.03] border-white/10 focus-visible:border-neon-cyan/50 focus-visible:ring-neon-cyan/20 resize-none font-mono text-xs"
                   />
                 </div>

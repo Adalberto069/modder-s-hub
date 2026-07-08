@@ -332,8 +332,8 @@ function ContentRenderer({ content, onSectionIds }: { content: string; onSection
           case 'image':
             return (
               <motion.div key={idx} initial={{ opacity: 0, scale: 0.98 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }}
-                className="my-4 rounded-2xl overflow-hidden border border-border/20 shadow-2xl bg-black/20 group">
-                <img src={block.url} alt={block.content} className="w-full object-contain max-h-[500px] group-hover:scale-[1.01] transition-transform duration-700" loading="lazy" />
+                className="my-4 rounded-2xl overflow-hidden border border-border/20 shadow-2xl bg-black/20 group mx-auto max-w-md">
+                <img src={block.url} alt={block.content} className="w-full object-contain max-h-[320px] group-hover:scale-[1.01] transition-transform duration-700" loading="lazy" />
                 {block.content && (
                   <div className="px-4 py-2 bg-secondary/30 border-t border-border/10">
                     <p className="text-[11px] text-muted-foreground italic text-center">{block.content}</p>
@@ -685,8 +685,8 @@ export default function TutorialDetail() {
 
         {/* Thumbnail if no video */}
         {tutorial.thumbnail_url && !tutorial.video_url && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mb-8">
-            <img src={tutorial.thumbnail_url} alt={tutorial.title} className="w-full rounded-xl border border-border/20 shadow-lg" loading="lazy" />
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mb-8 mx-auto max-w-lg">
+            <img src={tutorial.thumbnail_url} alt={tutorial.title} className="w-full max-h-[360px] object-contain rounded-xl border border-border/20 shadow-lg" loading="lazy" />
           </motion.div>
         )}
 

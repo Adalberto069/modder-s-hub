@@ -30,11 +30,22 @@ export function AdminUsersTab() {
   const { data: users } = useQuery({
     queryKey: ["admin-all-users"],
     queryFn: async () => {
-      const { data } = await supabase
+      const { data: profiles, error: pErr } = await supabase
         .from("profiles")
-        .select("*, user_roles(role, approved)")
+        .select("*")
         .order("created_at", { ascending: false });
-      return data ?? [];
+      if (pErr) console.error("[AdminUsersTab] profiles error:", pErr);
+      const list = profiles ?? [];
+      if (list.length === 0) return [];
+      const { data: rolesData, error: rErr } = await supabase
+        .from("user_roles")
+        .select("user_id, role, approved");
+      if (rErr) console.error("[AdminUsersTab] roles error:", rErr);
+      const rolesByUser: Record<string, any[]> = {};
+      (rolesData ?? []).forEach((r: any) => {
+        (rolesByUser[r.user_id] ??= []).push({ role: r.role, approved: r.approved });
+      });
+      return list.map((p: any) => ({ ...p, user_roles: rolesByUser[p.user_id] ?? [] }));
     },
   });
 
