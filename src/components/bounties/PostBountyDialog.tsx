@@ -106,6 +106,36 @@ export function PostBountyDialog({ children }: PostBountyDialogProps) {
         <form onSubmit={handleSubmit} className="p-6 space-y-4 font-mono">
           <div className="space-y-2">
             <Label className="text-[10px] uppercase tracking-widest text-muted-foreground">
+              Tipo de entrega *
+            </Label>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => setDeliveryType("script")}
+                className={`flex items-center justify-center gap-2 p-3 border rounded-none text-xs font-black uppercase tracking-widest transition-all ${
+                  deliveryType === "script"
+                    ? "border-neon-purple bg-neon-purple/10 text-neon-purple"
+                    : "border-white/10 bg-[#030304] text-muted-foreground hover:border-white/20"
+                }`}
+              >
+                <Code2 className="h-4 w-4" /> Script (.lua)
+              </button>
+              <button
+                type="button"
+                onClick={() => setDeliveryType("apk")}
+                className={`flex items-center justify-center gap-2 p-3 border rounded-none text-xs font-black uppercase tracking-widest transition-all ${
+                  deliveryType === "apk"
+                    ? "border-neon-green bg-neon-green/10 text-neon-green"
+                    : "border-white/10 bg-[#030304] text-muted-foreground hover:border-white/20"
+                }`}
+              >
+                <Smartphone className="h-4 w-4" /> APK Mod
+              </button>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label className="text-[10px] uppercase tracking-widest text-muted-foreground">
               Título da Encomenda *
             </Label>
             <Input
