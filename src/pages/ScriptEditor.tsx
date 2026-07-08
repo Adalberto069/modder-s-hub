@@ -478,11 +478,11 @@ export default function ScriptEditor() {
             <div className="grid sm:grid-cols-2 gap-4">
               <div className="space-y-2 sm:col-span-2">
                 <FieldLabel>Nome do {entityLabel} *</FieldLabel>
-                <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder={isApk ? "Ex: Instagram Mod Premium v320" : "Ex: Hidden Mod Script v1.0"} className={inputCls} required />
+                <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder={isApk ? "Ex: Free Fire Mod Menu v1.108" : "Ex: Hidden Mod Script v1.0"} className={inputCls} required />
               </div>
               <div className="space-y-2">
-                <FieldLabel><span className="inline-flex items-center gap-1"><Gamepad2 className="h-3 w-3" /> {isApk ? "App/Jogo alvo" : "Jogo alvo"}</span></FieldLabel>
-                <Input value={gameName} onChange={(e) => setGameName(e.target.value)} placeholder={isApk ? "Ex: Instagram" : "Ex: Free Fire"} className={inputCls} />
+                <FieldLabel><span className="inline-flex items-center gap-1"><Gamepad2 className="h-3 w-3" /> Jogo alvo</span></FieldLabel>
+                <Input value={gameName} onChange={(e) => setGameName(e.target.value)} placeholder={isApk ? "Ex: Free Fire, PUBG Mobile, COD Mobile" : "Ex: Free Fire"} className={inputCls} />
               </div>
               <div className="space-y-2">
                 <FieldLabel>Versão</FieldLabel>
