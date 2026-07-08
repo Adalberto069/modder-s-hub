@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
-import { Plus, Target, DollarSign, Gamepad2, Calendar } from "lucide-react";
+import { Plus, Target, DollarSign, Gamepad2, Calendar, Smartphone, Code2 } from "lucide-react";
 
 interface PostBountyDialogProps {
   children?: React.ReactNode;
@@ -32,6 +32,7 @@ export function PostBountyDialog({ children }: PostBountyDialogProps) {
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [deliveryType, setDeliveryType] = useState<"script" | "apk">("script");
   const [form, setForm] = useState({
     title: "",
     description: "",
