@@ -21,6 +21,7 @@ export default function Bounties() {
   const { user, isModder } = useAuth();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("open");
+  const [typeFilter, setTypeFilter] = useState<"all" | "script" | "apk">("all");
 
   const { data: bounties, isLoading } = useQuery({
     queryKey: ["bounties", statusFilter, user?.id],
@@ -42,10 +43,15 @@ export default function Bounties() {
       }
 
       const { data } = await query;
-      return (data ?? []).map((b: any) => ({
-        ...b,
-        application_count: b.bounty_applications?.length ?? 0,
-      }));
+      return (data ?? []).map((b: any) => {
+        const t = (b.title ?? "").toUpperCase();
+        const delivery_type: "apk" | "script" = t.startsWith("[APK") ? "apk" : "script";
+        return {
+          ...b,
+          application_count: b.bounty_applications?.length ?? 0,
+          delivery_type,
+        };
+      });
     },
   });
 
@@ -59,9 +65,16 @@ export default function Bounties() {
     },
   });
 
-  const filtered = bounties?.filter((b: any) =>
-    !search || b.title.toLowerCase().includes(search.toLowerCase()) || b.description?.toLowerCase().includes(search.toLowerCase()) || b.game_name?.toLowerCase().includes(search.toLowerCase())
-  ) ?? [];
+  const filtered = bounties?.filter((b: any) => {
+    if (typeFilter !== "all" && b.delivery_type !== typeFilter) return false;
+    if (!search) return true;
+    const q = search.toLowerCase();
+    return b.title.toLowerCase().includes(q) || b.description?.toLowerCase().includes(q) || b.game_name?.toLowerCase().includes(q);
+  }) ?? [];
+
+  const scriptCount = bounties?.filter((b: any) => b.delivery_type === "script").length ?? 0;
+  const apkCount = bounties?.filter((b: any) => b.delivery_type === "apk").length ?? 0;
+
 
   return (
     <Layout>
