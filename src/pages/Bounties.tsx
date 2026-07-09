@@ -21,6 +21,7 @@ export default function Bounties() {
   const { user, isModder } = useAuth();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("open");
+  const [typeFilter, setTypeFilter] = useState<"all" | "script" | "apk">("all");
 
   const { data: bounties, isLoading } = useQuery({
     queryKey: ["bounties", statusFilter, user?.id],
@@ -42,10 +43,15 @@ export default function Bounties() {
       }
 
       const { data } = await query;
-      return (data ?? []).map((b: any) => ({
-        ...b,
-        application_count: b.bounty_applications?.length ?? 0,
-      }));
+      return (data ?? []).map((b: any) => {
+        const t = (b.title ?? "").toUpperCase();
+        const delivery_type: "apk" | "script" = t.startsWith("[APK") ? "apk" : "script";
+        return {
+          ...b,
+          application_count: b.bounty_applications?.length ?? 0,
+          delivery_type,
+        };
+      });
     },
   });
 
@@ -59,9 +65,16 @@ export default function Bounties() {
     },
   });
 
-  const filtered = bounties?.filter((b: any) =>
-    !search || b.title.toLowerCase().includes(search.toLowerCase()) || b.description?.toLowerCase().includes(search.toLowerCase()) || b.game_name?.toLowerCase().includes(search.toLowerCase())
-  ) ?? [];
+  const filtered = bounties?.filter((b: any) => {
+    if (typeFilter !== "all" && b.delivery_type !== typeFilter) return false;
+    if (!search) return true;
+    const q = search.toLowerCase();
+    return b.title.toLowerCase().includes(q) || b.description?.toLowerCase().includes(q) || b.game_name?.toLowerCase().includes(q);
+  }) ?? [];
+
+  const scriptCount = bounties?.filter((b: any) => b.delivery_type === "script").length ?? 0;
+  const apkCount = bounties?.filter((b: any) => b.delivery_type === "apk").length ?? 0;
+
 
   return (
     <Layout>
@@ -132,6 +145,31 @@ export default function Bounties() {
 
       {/* Filters & List */}
       <section className="container py-5 sm:py-8 px-3 sm:px-6 space-y-5 sm:space-y-6">
+        {/* Type chips (Script vs APK) */}
+        <div className="flex gap-1 p-1 bg-[#050505] border border-white/5 overflow-x-auto scrollbar-none">
+          {[
+            { v: "all", label: `Tudo (${(scriptCount + apkCount) || 0})` },
+            { v: "script", label: `Scripts .lua (${scriptCount})` },
+            { v: "apk", label: `APK Mods (${apkCount})` },
+          ].map((f) => (
+            <button
+              key={f.v}
+              onClick={() => setTypeFilter(f.v as any)}
+              className={`px-3 py-1.5 text-[10px] font-black uppercase tracking-widest transition-colors whitespace-nowrap ${
+                typeFilter === f.v
+                  ? f.v === "apk"
+                    ? "bg-neon-green text-black"
+                    : f.v === "script"
+                      ? "bg-neon-cyan text-black"
+                      : "bg-neon-purple text-white"
+                  : "text-muted-foreground hover:text-white"
+              }`}
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
+
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           {/* Status filters */}
           <div className="flex gap-1 p-1 bg-[#050505] border border-white/5 overflow-x-auto scrollbar-none -mx-3 px-3 sm:mx-0 sm:px-1">
@@ -153,6 +191,7 @@ export default function Bounties() {
               );
             })}
           </div>
+
 
           {/* Search */}
           <div className="relative w-full sm:w-72">

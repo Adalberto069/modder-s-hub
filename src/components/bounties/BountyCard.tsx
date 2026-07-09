@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
-import { Target, Gamepad2, Clock, User, Users } from "lucide-react";
+import { Target, Gamepad2, Clock, User, Users, Smartphone, FileCode2 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
@@ -14,6 +14,7 @@ interface BountyCardProps {
     status: string;
     deadline?: string | null;
     created_at: string;
+    delivery_type?: "apk" | "script";
     profiles?: { username?: string; display_name?: string } | null;
     categories?: { name?: string; icon?: string } | null;
     application_count?: number;
@@ -32,22 +33,32 @@ export function BountyCard({ bounty }: BountyCardProps) {
   const isExpired = bounty.deadline && new Date(bounty.deadline) < new Date();
   const timeAgo = formatDistanceToNow(new Date(bounty.created_at), { locale: ptBR, addSuffix: true });
   const appCount = bounty.application_count ?? 0;
+  const isApk = bounty.delivery_type === "apk";
+  // Remove prefix from displayed title
+  const cleanTitle = bounty.title.replace(/^\[(APK MOD|APK|SCRIPT)\]\s*/i, "");
 
   return (
     <Link to={`/bounties/${bounty.id}`} className="group block">
-      <div className="relative overflow-hidden border border-white/5 bg-[#050505] hover:border-neon-purple/30 hover:bg-[#07070a] transition-all duration-300 hover:shadow-[0_0_20px_rgba(168,85,247,0.08)] h-full flex flex-col">
-        <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-neon-purple/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+      <div className={`relative overflow-hidden border bg-[#050505] hover:bg-[#07070a] transition-all duration-300 h-full flex flex-col ${isApk ? "border-neon-green/20 hover:border-neon-green/40 hover:shadow-[0_0_20px_rgba(57,255,20,0.08)]" : "border-white/5 hover:border-neon-purple/30 hover:shadow-[0_0_20px_rgba(168,85,247,0.08)]"}`}>
+        <div className={`absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 ${isApk ? "via-neon-green/50" : "via-neon-purple/50"}`} />
 
         <div className="p-5 space-y-3 flex-1 flex flex-col">
           {/* Header row */}
           <div className="flex items-start justify-between gap-3">
             <div className="flex items-center gap-2 min-w-0">
-              <div className="shrink-0 h-8 w-8 rounded-none bg-neon-purple/10 border border-neon-purple/20 flex items-center justify-center group-hover:bg-neon-purple/20 transition-colors">
-                <Target className="h-4 w-4 text-neon-purple" />
+              <div className={`shrink-0 h-8 w-8 rounded-none border flex items-center justify-center transition-colors ${isApk ? "bg-neon-green/10 border-neon-green/20 group-hover:bg-neon-green/20" : "bg-neon-purple/10 border-neon-purple/20 group-hover:bg-neon-purple/20"}`}>
+                {isApk ? <Smartphone className="h-4 w-4 text-neon-green" /> : <Target className="h-4 w-4 text-neon-purple" />}
               </div>
-              <h3 className="font-black text-sm uppercase tracking-tight text-white truncate group-hover:text-neon-purple transition-colors line-clamp-1">
-                {bounty.title}
-              </h3>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-1.5 mb-0.5">
+                  <span className={`text-[8px] font-black uppercase tracking-widest px-1 py-[1px] border ${isApk ? "text-neon-green border-neon-green/40 bg-neon-green/5" : "text-neon-cyan border-neon-cyan/40 bg-neon-cyan/5"}`}>
+                    {isApk ? "APK MOD" : "SCRIPT .LUA"}
+                  </span>
+                </div>
+                <h3 className={`font-black text-sm uppercase tracking-tight text-white truncate transition-colors line-clamp-1 ${isApk ? "group-hover:text-neon-green" : "group-hover:text-neon-purple"}`}>
+                  {cleanTitle}
+                </h3>
+              </div>
             </div>
             <Badge
               variant="outline"
@@ -56,6 +67,7 @@ export function BountyCard({ bounty }: BountyCardProps) {
               {status.label}
             </Badge>
           </div>
+
 
           {/* Description */}
           <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2 flex-1">

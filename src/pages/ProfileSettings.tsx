@@ -86,7 +86,7 @@ export default function ProfileSettings() {
   const [sendingResetEmail, setSendingResetEmail] = useState(false);
 
   // Preferences (local state for now)
-  const [theme, setTheme] = useState<"dark" | "light">("dark");
+  
   const [language, setLanguage] = useState("pt-BR");
   const [notifyEmail, setNotifyEmail] = useState(true);
   const [notifyUpdates, setNotifyUpdates] = useState(true);
@@ -614,23 +614,7 @@ export default function ProfileSettings() {
 
           {/* ======================== PREFERENCES TAB ======================== */}
           <TabsContent value="preferences" className="space-y-6">
-            <Card className="neon-border bg-card/80">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-base flex items-center gap-2">
-                  <Palette className="h-4 w-4 text-primary" /> Aparência
-                </CardTitle>
-                <CardDescription>Personalize a aparência da plataforma</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center justify-between py-2">
-                  <div>
-                    <p className="text-sm font-medium">Tema escuro</p>
-                    <p className="text-xs text-muted-foreground">A plataforma usa tema escuro por padrão</p>
-                  </div>
-                  <Switch checked={theme === "dark"} onCheckedChange={(c) => setTheme(c ? "dark" : "light")} />
-                </div>
-              </CardContent>
-            </Card>
+
 
             <Card className="neon-border bg-card/80">
               <CardHeader className="pb-3">
