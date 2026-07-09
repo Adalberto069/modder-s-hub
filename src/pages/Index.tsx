@@ -313,60 +313,61 @@ export default function Index() {
         </div>
       </section>
 
-      {/* ══════════════ SYNDICATE OPERATORS (HALL OF FAME) ══════════════ */}
-      <section className="py-20 sm:py-32 bg-[#050505] relative border-t border-white/5 overflow-hidden">
-        <div className="container px-4 sm:px-6 relative z-10">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-5xl font-black uppercase tracking-tighter text-white">
-              Top <span className="text-neon-purple/80">modders</span>
-            </h2>
-            <p className="text-muted-foreground font-mono text-sm mt-2 uppercase tracking-widest">&gt; reputação medida em downloads e reviews positivos.</p>
+      {/* ══════════════ TOP MODDERS (COMPACT ROW) ══════════════ */}
+      <section className="py-12 sm:py-16 bg-[#050505] border-t border-white/5">
+        <div className="container px-4 sm:px-6">
+          <div className="flex items-end justify-between mb-6 flex-wrap gap-3">
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <div className="h-[1px] w-6 bg-neon-purple/60" />
+                <span className="text-[9px] font-mono uppercase tracking-[0.25em] text-neon-purple/80">Ranking</span>
+              </div>
+              <h2 className="text-xl sm:text-2xl font-black uppercase tracking-tighter text-white">
+                Top <span className="text-neon-purple/80">modders</span>
+              </h2>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate("/marketplace?tab=modders")}
+              className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground hover:text-neon-purple"
+            >
+              ver todos →
+            </Button>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {hallOfFameModders.slice(0, 4).map((profile: any, i: number) => {
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+            {hallOfFameModders.slice(0, 3).map((profile: any, i: number) => {
               const roleKey = hallRolesMap[profile.user_id] || hallRolesMap[profile.id];
               const displayRole: "admin" | "modder" | "member" = roleKey === "admin" ? "admin" : "modder";
-              
               return (
-                <div 
-                  key={profile.id} 
-                  className="bg-[#08080a] border border-white/10 flex flex-col items-center p-6 sm:p-8 cursor-pointer hover:bg-[#0c0c0f] hover:border-white/20 transition-all font-mono group"
+                <button
+                  key={profile.id}
                   onClick={() => setSelectedModder(profile)}
+                  className="flex items-center gap-3 p-3 bg-[#08080a] border border-white/10 hover:border-neon-purple/40 hover:bg-[#0c0c0f] transition-all text-left group"
                 >
-                  <div className="w-full flex justify-between items-center mb-6 opacity-50">
-                     <span className="text-[9px] uppercase tracking-widest text-muted-foreground">ID_TAG</span>
-                     <Fingerprint className="w-4 h-4 text-neon-purple" />
-                  </div>
-                  
-                  <Avatar className="h-24 w-24 rounded-none border border-white/20 bg-black mb-6 grayscale group-hover:grayscale-0 transition-all">
+                  <span className="text-[10px] font-mono text-neon-purple/60 font-black w-4 shrink-0">#{i + 1}</span>
+                  <Avatar className="h-10 w-10 rounded-none border border-white/10 bg-black shrink-0">
                     <AvatarImage src={profile.avatar_url} />
-                    <AvatarFallback className="bg-transparent text-white text-3xl font-black">
+                    <AvatarFallback className="bg-transparent text-white text-sm font-black">
                       {(profile.display_name || profile.username || "?")[0].toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
-
-                  <h3 className="font-black text-lg uppercase tracking-wider text-white mb-1">
-                    {profile.display_name || profile.username || "Anonymous"}
-                  </h3>
-                  <p className="text-[10px] text-muted-foreground tracking-widest mb-4">
-                     {profile.id.substring(0, 8).toUpperCase()}
-                  </p>
-                  
-                  <div className="w-full h-[1px] bg-white/10 mb-4" />
-                  
-                  <div className="flex justify-between w-full items-center">
-                    <RoleBadge role={displayRole} />
-                    <div className="flex gap-1">
-                       <UserBadges userId={profile.user_id} compact />
+                  <div className="min-w-0 flex-1">
+                    <p className="font-bold text-sm uppercase tracking-tight text-white truncate group-hover:text-neon-purple transition-colors">
+                      {profile.display_name || profile.username || "Anonymous"}
+                    </p>
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <RoleBadge role={displayRole} />
                     </div>
                   </div>
-                </div>
+                </button>
               );
             })}
           </div>
         </div>
       </section>
+
 
       {/* ══════════════ FINAL CTA ══════════════ */}
       <section className="py-24 sm:py-32 bg-[#0a0f0d] border-t border-neon-green/20 relative">
