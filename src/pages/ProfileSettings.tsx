@@ -86,7 +86,7 @@ export default function ProfileSettings() {
   const [sendingResetEmail, setSendingResetEmail] = useState(false);
 
   // Preferences (local state for now)
-  const [theme, setTheme] = useState<"dark" | "light">("dark");
+  
   const [language, setLanguage] = useState("pt-BR");
   const [notifyEmail, setNotifyEmail] = useState(true);
   const [notifyUpdates, setNotifyUpdates] = useState(true);
