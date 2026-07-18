@@ -328,6 +328,11 @@ export type Database = {
           bounty_id: string
           commission_rate: number
           created_at: string
+          escrow_dispute_reason: string | null
+          escrow_disputed_at: string | null
+          escrow_release_at: string | null
+          escrow_released_at: string | null
+          escrow_status: string
           fee: number
           id: string
           modder_earnings: number
@@ -345,6 +350,11 @@ export type Database = {
           bounty_id: string
           commission_rate?: number
           created_at?: string
+          escrow_dispute_reason?: string | null
+          escrow_disputed_at?: string | null
+          escrow_release_at?: string | null
+          escrow_released_at?: string | null
+          escrow_status?: string
           fee?: number
           id?: string
           modder_earnings?: number
@@ -362,6 +372,11 @@ export type Database = {
           bounty_id?: string
           commission_rate?: number
           created_at?: string
+          escrow_dispute_reason?: string | null
+          escrow_disputed_at?: string | null
+          escrow_release_at?: string | null
+          escrow_released_at?: string | null
+          escrow_status?: string
           fee?: number
           id?: string
           modder_earnings?: number
@@ -751,6 +766,51 @@ export type Database = {
         }
         Relationships: []
       }
+      purchase_disputes: {
+        Row: {
+          admin_notes: string | null
+          created_at: string
+          id: string
+          modder_id: string
+          opener_id: string
+          purchase_id: string
+          purchase_type: string
+          reason: string
+          resolved_at: string | null
+          resolved_by: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          created_at?: string
+          id?: string
+          modder_id: string
+          opener_id: string
+          purchase_id: string
+          purchase_type: string
+          reason: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          admin_notes?: string | null
+          created_at?: string
+          id?: string
+          modder_id?: string
+          opener_id?: string
+          purchase_id?: string
+          purchase_type?: string
+          reason?: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       reports: {
         Row: {
           created_at: string
@@ -1057,6 +1117,11 @@ export type Database = {
           amount: number
           commission_rate: number
           created_at: string
+          escrow_dispute_reason: string | null
+          escrow_disputed_at: string | null
+          escrow_release_at: string | null
+          escrow_released_at: string | null
+          escrow_status: string
           id: string
           modder_earnings: number
           payment_id: string | null
@@ -1070,6 +1135,11 @@ export type Database = {
           amount?: number
           commission_rate?: number
           created_at?: string
+          escrow_dispute_reason?: string | null
+          escrow_disputed_at?: string | null
+          escrow_release_at?: string | null
+          escrow_released_at?: string | null
+          escrow_status?: string
           id?: string
           modder_earnings?: number
           payment_id?: string | null
@@ -1083,6 +1153,11 @@ export type Database = {
           amount?: number
           commission_rate?: number
           created_at?: string
+          escrow_dispute_reason?: string | null
+          escrow_disputed_at?: string | null
+          escrow_release_at?: string | null
+          escrow_released_at?: string | null
+          escrow_status?: string
           id?: string
           modder_earnings?: number
           payment_id?: string | null
@@ -1629,6 +1704,13 @@ export type Database = {
       is_admin: { Args: { _user_id: string }; Returns: boolean }
       is_modder: { Args: { _user_id: string }; Returns: boolean }
       purge_old_read_moderation_messages: { Args: never; Returns: number }
+      release_expired_escrows: {
+        Args: never
+        Returns: {
+          released_bounties: number
+          released_scripts: number
+        }[]
+      }
       script_has_purchases: { Args: { _script_id: string }; Returns: boolean }
       validate_script_password: {
         Args: { _password: string; _script_id: string }
