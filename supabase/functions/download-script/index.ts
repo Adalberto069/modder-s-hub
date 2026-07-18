@@ -93,6 +93,25 @@ Deno.serve(async (req) => {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
+
+      // Start escrow window on first download (12h)
+      const { data: pendingPurchase } = await supabase
+        .from("script_purchases")
+        .select("id, escrow_status, escrow_release_at")
+        .eq("script_id", script_id)
+        .eq("user_id", user.id)
+        .eq("status", "completed")
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (pendingPurchase && pendingPurchase.escrow_status === "held" && !pendingPurchase.escrow_release_at) {
+        const releaseAt = new Date(Date.now() + 12 * 60 * 60 * 1000).toISOString();
+        await supabase
+          .from("script_purchases")
+          .update({ escrow_release_at: releaseAt })
+          .eq("id", pendingPurchase.id);
+      }
     }
 
     // If file_url is a private bucket path, generate signed URL

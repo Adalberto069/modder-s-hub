@@ -187,6 +187,22 @@ Deno.serve(async (req) => {
         });
       }
 
+      // Start escrow window on first requester download (12h)
+      const { data: bp } = await adminClient
+        .from("bounty_purchases")
+        .select("id, escrow_status, escrow_release_at")
+        .eq("bounty_id", delivery.bounty_id)
+        .eq("payer_id", user.id)
+        .eq("status", "completed")
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (bp && bp.escrow_status === "held" && !bp.escrow_release_at) {
+        const releaseAt = new Date(Date.now() + 12 * 60 * 60 * 1000).toISOString();
+        await adminClient.from("bounty_purchases").update({ escrow_release_at: releaseAt }).eq("id", bp.id);
+      }
+
       // Return obfuscated code with requester watermark
       return downloadAndObfuscate(user.id);
     }

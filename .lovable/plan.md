@@ -1,77 +1,95 @@
-# Plano: APK Mod dedicado + Dashboards unificados
+# Sistema de Custódia (Escrow) para Compras
 
-## Parte 1 — Sistema de APK Mod (separar de Script)
+Segurar o pagamento do modder por **12 horas** após o download. Se o cliente não reclamar nesse prazo, libera automaticamente. Aplica-se a **scripts Lua e APK Mods**.
 
-### 1.1 Schema (migração)
-Adicionar colunas em `scripts` (o tipo `apk` já existe):
-- `apk_version` text — versão do mod (ex: "2.14.0-MOD")
-- `apk_min_android` text — versão mínima (ex: "8.0")
-- `apk_package_name` text — com.exemplo.app
-- `apk_size_mb` numeric — tamanho
-- `apk_changelog` text — o que mudou
-- `apk_original_app` text — nome do app base
+## Fluxo
 
-### 1.2 Editor (`ScriptEditor.tsx`)
-Quando `scriptType === "apk"`:
-- Título da página: "Novo APK Mod" / "Editar APK Mod"
-- Substituir seção "Código Lua" por card "Detalhes do APK Mod" com os campos novos
-- Renomear labels: "Nome do script" → "Nome do APK Mod", "Descrição do script" → "Descrição do mod"
-- Botão: "Publicar APK Mod"
-- Esconder campos irrelevantes (licenciamento por dias, senha de script, análise de código Lua)
+```text
+Compra aprovada (MP)
+        │
+        ▼
+  escrow_status = 'held'
+        │
+        ▼
+Cliente baixa ─────► inicia contador 12h
+        │
+        ├──► Cliente clica "Confirmar recebimento" ──► released
+        ├──► 12h expiram sem ação ──► released (cron)
+        └──► Cliente clica "Abrir disputa" ──► disputed (admin arbitra)
+```
 
-### 1.3 Página de detalhes dedicada
-Novo arquivo `src/pages/ApkDetail.tsx` + rota `/apk/:id`:
-- Header com ícone Android, badge "APK MOD", versão
-- Grid de screenshots (usa `script_images`)
-- Sidebar com: versão, tamanho, min Android, package, downloads, autor
-- Aba Descrição / Changelog / Reviews
-- Botão "Baixar APK" (usa mesmo `download-script` edge function)
-- Roteador: em `ScriptCard` e listas, se `script_type === "apk"` → link `/apk/:id`
+## Mudanças no banco
 
-### 1.4 Marketplace
-- `ScriptCard` detecta `apk` → ícone Smartphone, badge verde "APK", mostra versão em vez de "Lua"
-- Filtro/aba "APK Mods" no Marketplace
+Adicionar em `script_purchases` e `bounty_purchases`:
+- `escrow_status` (`held` | `released` | `disputed` | `refunded`) — default `held`
+- `escrow_release_at` (timestamptz) — preenchido no primeiro download (+12h)
+- `escrow_released_at` (timestamptz)
+- `escrow_dispute_reason` (text)
+- `escrow_disputed_at` (timestamptz)
 
-## Parte 2 — Dashboards unificados (mesma estrutura)
+Nova tabela `purchase_disputes`:
+- purchase_id, purchase_type (`script` | `bounty`), opener_id, reason, status (`open`|`resolved_buyer`|`resolved_seller`), admin_notes, resolved_by, resolved_at
 
-Padrão visual compartilhado: **KPI strip no topo (4 cards) + Tabs abaixo**.
+## Backend
 
-### 2.1 Componente compartilhado
-Criar `src/components/dashboard/KpiCard.tsx` e `DashboardShell.tsx`:
-- KpiCard: ícone + label + valor grande + delta opcional
-- DashboardShell: header (título+subtítulo+ação), grid de KPIs, TabsList sticky, TabsContent
+**Trigger no download** (`download-script` / `download-bounty-delivery`):
+- Se `escrow_release_at` for null → seta `now() + 12h`.
 
-### 2.2 Dashboard do Modder (`src/pages/Dashboard.tsx`)
-KPIs: Vendas totais (R$) · Downloads · Scripts ativos · Avaliação média
-Abas: **Visão Geral** · **Meus Scripts** · **Meus APKs** · **Vendas** · **Financeiro** · **Encomendas**
-- Separar tab "Meus APKs" dos scripts Lua
-- Visão Geral: gráfico de vendas + últimas atividades
+**Edge Function `confirm-purchase`** — cliente confirma manualmente (libera na hora).
 
-### 2.3 Dashboard do Admin (`src/pages/Admin.tsx`)
-KPIs: Usuários · Modders ativos · Vendas 30d · Pendências (moderação+saques+disputas)
-Abas mantidas mas com o mesmo shell/estilo do modder para consistência.
+**Edge Function `open-dispute`** — cliente abre disputa dentro da janela de 12h. Bloqueia liberação automática.
 
-## Detalhes técnicos
+**Edge Function `release-escrow-cron`** — roda de hora em hora via pg_cron:
+- Marca como `released` todas as compras com `escrow_status='held'` E `escrow_release_at < now()` E sem disputa aberta.
+- Envia notificação ao modder ("💰 Pagamento liberado").
 
-- Rota nova: adicionar `<Route path="/apk/:id" element={<ApkDetail />} />` em `App.tsx`
-- Migration: `ALTER TABLE public.scripts ADD COLUMN apk_version text, ...` (nullable, sem default)
-- Types regenerados automaticamente após migration
-- Reutilizar `download-script` edge function (já entrega arquivo do bucket)
-- `ScriptCard`: prop já tem `script_type`; adicionar branch de UI e link condicional
-- `Marketplace.tsx`: adicionar tab "APK Mods" filtrando `script_type='apk'`
+**Financeiro do modder** (`ModderFinanceTab`):
+- Saldo dividido em **"Pendente (custódia)"** e **"Disponível"**.
+- Só o disponível conta pra saque.
+
+## Frontend
+
+**Dashboard do cliente** — nova coluna "Status" nas compras:
+- `Em custódia · libera em 8h 42m` + botões [Confirmar recebimento] [Abrir disputa]
+- `✓ Liberado` (verde)
+- `⚠ Em disputa` (amarelo)
+
+**Dashboard do modder** — badge de "custódia" em cada venda + card "Pendente de liberação: R$ X,XX".
+
+**Admin** — nova aba `Disputas de Compra` (reaproveita padrão do `AdminDisputesTab`): lista disputas abertas, botões [Liberar pro modder] [Reembolsar cliente].
+
+## Reembolso em disputa
+
+Quando admin decide a favor do cliente:
+- Chama API do MP `POST /v1/payments/{id}/refunds` (via token OAuth do modder).
+- Marca `escrow_status='refunded'`, revoga `script_access` / `script_licenses`.
+
+## Cron
+
+```sql
+select cron.schedule(
+  'release-escrow-hourly',
+  '0 * * * *',
+  $$ select net.http_post(url:='.../release-escrow-cron', ...) $$
+);
+```
 
 ## Arquivos afetados
-- migração SQL (novas colunas)
-- `src/pages/ScriptEditor.tsx` (branch APK completo)
-- `src/pages/ApkDetail.tsx` (novo)
-- `src/App.tsx` (rota)
-- `src/components/ScriptCard.tsx` (UI condicional)
-- `src/pages/Marketplace.tsx` (aba APK)
-- `src/components/dashboard/KpiCard.tsx` + `DashboardShell.tsx` (novos)
-- `src/pages/Dashboard.tsx` (reestrutura + aba APKs)
-- `src/pages/Admin.tsx` (aplica shell + KPIs)
+
+- Migração: colunas novas + tabela `purchase_disputes` + grants + RLS.
+- `supabase/functions/confirm-purchase/index.ts` (novo)
+- `supabase/functions/open-dispute/index.ts` (novo)
+- `supabase/functions/release-escrow-cron/index.ts` (novo)
+- `supabase/functions/download-script/index.ts` (setar `escrow_release_at`)
+- `supabase/functions/download-bounty-delivery/index.ts` (idem)
+- `supabase/functions/mercadopago-webhook/index.ts` (setar `escrow_status='held'` ao aprovar)
+- `src/pages/Dashboard.tsx` (aba "Compras" com status escrow + ações)
+- `src/components/modder/ModderFinanceTab.tsx` (split pendente/disponível)
+- `src/components/admin/AdminPurchaseDisputesTab.tsx` (novo)
+- `src/pages/Admin.tsx` (adicionar aba)
 
 ## Fora do escopo
-- Novos métodos de pagamento
-- Assinatura/verificação APK server-side além da já existente
-- Refatorar edge functions
+
+- Alterar taxas ou split do MP.
+- Sistema de reputação por disputas (fica pra depois).
+- Notificação por email (usa só notificações in-app existentes).

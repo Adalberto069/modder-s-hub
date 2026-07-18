@@ -26,6 +26,7 @@ import { AdminModerationQueue } from "@/components/admin/AdminModerationQueue";
 import { AdminWithdrawalsTab } from "@/components/admin/AdminWithdrawalsTab";
 import { AdminUsersTab } from "@/components/admin/AdminUsersTab";
 import { AdminDisputesTab } from "@/components/admin/AdminDisputesTab";
+import { AdminPurchaseDisputesTab } from "@/components/admin/AdminPurchaseDisputesTab";
 import { AdminAuditTab } from "@/components/admin/AdminAuditTab";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -686,7 +687,18 @@ export default function Admin() {
 
           {/* Disputes Tab */}
           <TabsContent value="disputes">
-            <AdminDisputesTab />
+            <Tabs defaultValue="escrow">
+              <TabsList className="mb-4 grid w-full grid-cols-2 p-1 bg-[#030304] border border-white/5 rounded-none h-12">
+                <TabsTrigger value="escrow" className="text-[10px] tracking-widest uppercase font-black data-[state=active]:bg-[#0a0a0c] data-[state=active]:text-yellow-400 rounded-none h-full">
+                  Custódia (Compras)
+                </TabsTrigger>
+                <TabsTrigger value="bounty" className="text-[10px] tracking-widest uppercase font-black data-[state=active]:bg-[#0a0a0c] data-[state=active]:text-orange-400 rounded-none h-full">
+                  Encomendas
+                </TabsTrigger>
+              </TabsList>
+              <TabsContent value="escrow"><AdminPurchaseDisputesTab /></TabsContent>
+              <TabsContent value="bounty"><AdminDisputesTab /></TabsContent>
+            </Tabs>
           </TabsContent>
 
           {/* Licenses Tab */}
