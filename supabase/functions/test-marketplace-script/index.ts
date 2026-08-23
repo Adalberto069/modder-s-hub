@@ -95,6 +95,46 @@ local function ${v.selfCheck}()
 end
 ${v.selfCheck}()
 
+local function _bxor2(a,b)
+  local r,p=0,1
+  for j=0,7 do
+    local ba=a%2 local bb=b%2
+    if ba+bb==1 then r=r+p end
+    a=math.floor(a/2) b=math.floor(b/2) p=p*2
+  end
+  return r
+end
+
+local _ak=${codeKey}
+local _ac={${codeBytes.join(",")}}
+local _tries=0
+while true do
+  local _r=_origPrompt({"Digite o CODIGO DE ACESSO do seu teste (veja no Dashboard do HiddenMod)"},{""},{"text"})
+  local _in=""
+  if _r then _in=tostring(_r[1] or "") end
+  _in=string.upper(_in)
+  local _okc=(string.len(_in)==${accessCode.length})
+  if _okc then
+    for i=1,${accessCode.length} do
+      if _bxor2(string.byte(_in,i) or 0,(_ak+i-1)%256)~=_ac[i] then _okc=false break end
+    end
+  end
+  if _okc then break end
+  _tries=_tries+1
+  if _tries>=3 then
+    ${v.origAlert}("CODIGO INVALIDO\\n\\nO codigo expirou ou esta incorreto.\\nGere um novo teste no marketplace.\\n\\nHiddenMod","HIDDENMOD")
+    os.exit()
+    return
+  end
+  ${v.origAlert}("Codigo invalido. Tentativas restantes: ".. (3-_tries),"HIDDENMOD")
+end
+
+if os.time()>=_absExp then
+  ${v.origAlert}("TESTE EXPIRADO\\n\\nEste codigo ja expirou.\\nGere um novo teste no marketplace.\\n\\nHiddenMod","HIDDENMOD")
+  os.exit()
+  return
+end
+
 local function ${v.check}()
   if ${v.expired} then return true end
   local _now=os.time()
