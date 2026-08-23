@@ -1244,6 +1244,44 @@ export type Database = {
           },
         ]
       }
+      script_test_sessions: {
+        Row: {
+          access_code: string
+          created_at: string
+          duration_minutes: number
+          expires_at: string
+          id: string
+          script_id: string
+          user_id: string
+        }
+        Insert: {
+          access_code: string
+          created_at?: string
+          duration_minutes?: number
+          expires_at: string
+          id?: string
+          script_id: string
+          user_id: string
+        }
+        Update: {
+          access_code?: string
+          created_at?: string
+          duration_minutes?: number
+          expires_at?: string
+          id?: string
+          script_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "script_test_sessions_script_id_fkey"
+            columns: ["script_id"]
+            isOneToOne: false
+            referencedRelation: "scripts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       script_upload_blocks: {
         Row: {
           created_at: string

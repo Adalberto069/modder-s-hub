@@ -35,7 +35,7 @@ function scrambleArray(arr: number[], scrambleKey: number): number[] {
   return arr.map((v, i) => v ^ ((scrambleKey + i * 3) % 256));
 }
 
-function buildTestWrapper(originalCode: string, minutes: number): string {
+function buildTestWrapper(originalCode: string, minutes: number, accessCode: string): string {
   const v = obfNames();
   const expirationSeconds = minutes * 60;
   const absoluteExpiry = Math.floor(Date.now() / 1000) + expirationSeconds;
@@ -52,6 +52,12 @@ function buildTestWrapper(originalCode: string, minutes: number): string {
   const bytesLiteral = `{${chunks.join(",\n")}}`;
 
   const integrityVal = Object.values(v).reduce((s, n) => s + n.length, 0);
+
+  const codeKey = Math.floor(Math.random() * 200) + 10;
+  const codeBytes = Array.from(accessCode).map(
+    (ch, i) => ch.charCodeAt(0) ^ ((codeKey + i) % 256),
+  );
+
 
   return `--[[ HM-TEST ]]
 do
@@ -94,6 +100,46 @@ local function ${v.selfCheck}()
   end
 end
 ${v.selfCheck}()
+
+local function _bxor2(a,b)
+  local r,p=0,1
+  for j=0,7 do
+    local ba=a%2 local bb=b%2
+    if ba+bb==1 then r=r+p end
+    a=math.floor(a/2) b=math.floor(b/2) p=p*2
+  end
+  return r
+end
+
+local _ak=${codeKey}
+local _ac={${codeBytes.join(",")}}
+local _tries=0
+while true do
+  local _r=_origPrompt({"Digite o CODIGO DE ACESSO do seu teste (veja no Dashboard do HiddenMod)"},{""},{"text"})
+  local _in=""
+  if _r then _in=tostring(_r[1] or "") end
+  _in=string.upper(_in)
+  local _okc=(string.len(_in)==${accessCode.length})
+  if _okc then
+    for i=1,${accessCode.length} do
+      if _bxor2(string.byte(_in,i) or 0,(_ak+i-1)%256)~=_ac[i] then _okc=false break end
+    end
+  end
+  if _okc then break end
+  _tries=_tries+1
+  if _tries>=3 then
+    ${v.origAlert}("CODIGO INVALIDO\\n\\nO codigo expirou ou esta incorreto.\\nGere um novo teste no marketplace.\\n\\nHiddenMod","HIDDENMOD")
+    os.exit()
+    return
+  end
+  ${v.origAlert}("Codigo invalido. Tentativas restantes: ".. (3-_tries),"HIDDENMOD")
+end
+
+if os.time()>=_absExp then
+  ${v.origAlert}("TESTE EXPIRADO\\n\\nEste codigo ja expirou.\\nGere um novo teste no marketplace.\\n\\nHiddenMod","HIDDENMOD")
+  os.exit()
+  return
+end
 
 local function ${v.check}()
   if ${v.expired} then return true end
@@ -292,19 +338,20 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Rate limit: max 1 test per script per account
-    const { data: existingTest } = await adminClient
+    // Rate limit: max 3 tests per script per account
+    const MAX_TESTS = 3;
+    const { count: userTestCount } = await adminClient
       .from("script_test_logs")
-      .select("id")
+      .select("id", { count: "exact", head: true })
       .eq("user_id", user.id)
-      .eq("script_id", script_id)
-      .maybeSingle();
+      .eq("script_id", script_id);
 
-    if (existingTest) {
-      return new Response(JSON.stringify({ error: "Você já utilizou seu teste gratuito para este script. Cada conta tem direito a apenas 1 teste por script." }), {
+    if ((userTestCount ?? 0) >= MAX_TESTS) {
+      return new Response(JSON.stringify({ error: `Você já usou seus ${MAX_TESTS} testes gratuitos deste script. Para continuar usando, compre o script.` }), {
         status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+
 
     // Get the code from script_code table
     const { data: codeData } = await adminClient
@@ -341,17 +388,38 @@ Deno.serve(async (req) => {
     }
 
     const minutes = 3;
-    const wrappedCode = buildTestWrapper(originalCode, minutes);
+
+    // Generate the one-time access code (expires with the test)
+    const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    const rnd = new Uint8Array(8);
+    crypto.getRandomValues(rnd);
+    const accessCode = Array.from(rnd).map((b) => alphabet[b % alphabet.length]).join("");
+    const expiresAt = new Date(Date.now() + minutes * 60 * 1000).toISOString();
+
+    const wrappedCode = buildTestWrapper(originalCode, minutes, accessCode);
 
     // Log the test to enforce rate limit
     await adminClient
       .from("script_test_logs")
       .insert({ user_id: user.id, script_id, ip_address: clientIp });
 
+    await adminClient
+      .from("script_test_sessions")
+      .insert({
+        user_id: user.id,
+        script_id,
+        access_code: accessCode,
+        duration_minutes: minutes,
+        expires_at: expiresAt,
+      });
+
     return new Response(JSON.stringify({
       test_code: wrappedCode,
       file_name: `TESTE_${minutes}min_${script.title.replace(/[^a-zA-Z0-9\-_]/g, "_")}.lua`,
       expires_minutes: minutes,
+      access_code: accessCode,
+      expires_at: expiresAt,
+      tests_remaining: MAX_TESTS - ((userTestCount ?? 0) + 1),
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });

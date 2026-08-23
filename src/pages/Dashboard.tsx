@@ -30,6 +30,7 @@ import { format, subDays, isSameDay, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { ConfirmDeleteDialog } from "@/components/ConfirmDeleteDialog";
 import { PurchaseEscrowList } from "@/components/PurchaseEscrowList";
+import { TestSessionsList } from "@/components/TestSessionsList";
 
 export default function Dashboard() {
   const { user, isModder, loading, profile } = useAuth();
@@ -446,6 +447,7 @@ end
 
           {/* Purchased Scripts Tab */}
           <TabsContent value="purchases">
+            <TestSessionsList />
             <PurchaseEscrowList />
             <h2 className="text-sm font-black uppercase tracking-widest mb-6 flex items-center gap-2 text-white bg-[#030304] border border-white/5 p-4 rounded-none">
               <Key className="h-4 w-4 text-neon-purple" /> Scripts Adquiridos
