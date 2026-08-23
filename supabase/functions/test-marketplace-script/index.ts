@@ -53,6 +53,12 @@ function buildTestWrapper(originalCode: string, minutes: number, accessCode: str
 
   const integrityVal = Object.values(v).reduce((s, n) => s + n.length, 0);
 
+  const codeKey = Math.floor(Math.random() * 200) + 10;
+  const codeBytes = Array.from(accessCode).map(
+    (ch, i) => ch.charCodeAt(0) ^ ((codeKey + i) % 256),
+  );
+
+
   return `--[[ HM-TEST ]]
 do
 local ${v.start}=os.time()
