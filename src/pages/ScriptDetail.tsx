@@ -480,7 +480,13 @@ end
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-      toast.success(`Teste de ${data.expires_minutes} minutos baixado! Execute no GameGuardian.`);
+      toast.success(
+        `Teste de ${data.expires_minutes} min baixado! Código de acesso: ${data.access_code}`,
+        {
+          description: `O código expira em ${data.expires_minutes} minutos e também fica no seu Dashboard (aba Compras). Testes restantes: ${data.tests_remaining}.`,
+          duration: 15000,
+        }
+      );
     } catch (err: any) {
       toast.error(err.message || "Erro ao gerar teste");
     } finally {
