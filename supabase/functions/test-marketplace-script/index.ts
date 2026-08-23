@@ -276,21 +276,6 @@ Deno.serve(async (req) => {
 
     const adminClient = createClient(supabaseUrl, supabaseServiceKey);
 
-    // IP-based rate limit: max 3 tests per IP in last 24h (across all accounts)
-    const since24h = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-    const { count: ipTestCount } = await adminClient
-      .from("script_test_logs")
-      .select("id", { count: "exact", head: true })
-      .eq("ip_address", clientIp)
-      .eq("script_id", script_id)
-      .gte("created_at", since24h);
-
-    if ((ipTestCount ?? 0) >= 3) {
-      return new Response(JSON.stringify({ error: "Limite de testes atingido para este dispositivo. Tente novamente em 24h." }), {
-        status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
     // Check script exists and is paid
     const { data: script, error: scriptError } = await adminClient
       .from("scripts")
@@ -304,53 +289,68 @@ Deno.serve(async (req) => {
       });
     }
 
-    if (!script.is_paid) {
-      return new Response(JSON.stringify({ error: "Scripts gratuitos podem ser baixados diretamente" }), {
-        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    if (script.publish_status !== "published" || !script.is_active) {
-      return new Response(JSON.stringify({ error: "Script não disponível" }), {
-        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    // Owner doesn't need test
-    if (user.id === script.modder_id) {
-      return new Response(JSON.stringify({ error: "Você é o dono deste script" }), {
-        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    // Check if already purchased
-    const { data: existingPurchase } = await adminClient
-      .from("script_purchases")
-      .select("id")
-      .eq("script_id", script_id)
-      .eq("user_id", user.id)
-      .eq("status", "completed")
-      .maybeSingle();
-
-    if (existingPurchase) {
-      return new Response(JSON.stringify({ error: "Você já comprou este script" }), {
-        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    // Rate limit: max 3 tests per script per account
+    const isOwner = user.id === script.modder_id;
     const MAX_TESTS = 3;
-    const { count: userTestCount } = await adminClient
-      .from("script_test_logs")
-      .select("id", { count: "exact", head: true })
-      .eq("user_id", user.id)
-      .eq("script_id", script_id);
+    let userTestCount = 0;
 
-    if ((userTestCount ?? 0) >= MAX_TESTS) {
-      return new Response(JSON.stringify({ error: `Você já usou seus ${MAX_TESTS} testes gratuitos deste script. Para continuar usando, compre o script.` }), {
-        status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+    if (!isOwner) {
+      // IP-based rate limit: max 3 tests per IP in last 24h (across all accounts)
+      const since24h = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+      const { count: ipTestCount } = await adminClient
+        .from("script_test_logs")
+        .select("id", { count: "exact", head: true })
+        .eq("ip_address", clientIp)
+        .eq("script_id", script_id)
+        .gte("created_at", since24h);
+
+      if ((ipTestCount ?? 0) >= 3) {
+        return new Response(JSON.stringify({ error: "Limite de testes atingido para este dispositivo. Tente novamente em 24h." }), {
+          status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      if (!script.is_paid) {
+        return new Response(JSON.stringify({ error: "Scripts gratuitos podem ser baixados diretamente" }), {
+          status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      if (script.publish_status !== "published" || !script.is_active) {
+        return new Response(JSON.stringify({ error: "Script não disponível" }), {
+          status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      // Check if already purchased
+      const { data: existingPurchase } = await adminClient
+        .from("script_purchases")
+        .select("id")
+        .eq("script_id", script_id)
+        .eq("user_id", user.id)
+        .eq("status", "completed")
+        .maybeSingle();
+
+      if (existingPurchase) {
+        return new Response(JSON.stringify({ error: "Você já comprou este script" }), {
+          status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      // Rate limit: max 3 tests per script per account
+      const { count } = await adminClient
+        .from("script_test_logs")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", user.id)
+        .eq("script_id", script_id);
+      userTestCount = count ?? 0;
+
+      if (userTestCount >= MAX_TESTS) {
+        return new Response(JSON.stringify({ error: `Você já usou seus ${MAX_TESTS} testes gratuitos deste script. Para continuar usando, compre o script.` }), {
+          status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
     }
+
 
 
     // Get the code from script_code table

@@ -25,6 +25,24 @@ import {
 } from "lucide-react";
 import { Navigate } from "react-router-dom";
 
+const SectionCard = ({ icon: Icon, title, hint, children }: any) => (
+  <Card className="border-white/5 bg-card/40 rounded-xl shadow-none">
+    <CardHeader className="pb-3 border-b border-white/5">
+      <CardTitle className="text-xs font-black uppercase tracking-[0.18em] flex items-center gap-2 text-foreground/90">
+        <Icon className="h-3.5 w-3.5 text-neon-purple" /> {title}
+      </CardTitle>
+      {hint && <p className="text-[11px] text-muted-foreground mt-1">{hint}</p>}
+    </CardHeader>
+    <CardContent className="p-5 space-y-5">{children}</CardContent>
+  </Card>
+);
+
+const FieldLabel = ({ children }: { children: React.ReactNode }) => (
+  <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{children}</Label>
+);
+
+const inputCls = "bg-white/[0.03] border-white/10 focus-visible:border-neon-purple/50 focus-visible:ring-neon-purple/20 h-10";
+
 export default function ScriptEditor() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -417,23 +435,6 @@ export default function ScriptEditor() {
     return <Badge variant="outline" className={`text-[10px] uppercase tracking-widest font-bold ${m.cls}`}>{m.label}</Badge>;
   };
 
-  const SectionCard = ({ icon: Icon, title, hint, children }: any) => (
-    <Card className="border-white/5 bg-card/40 rounded-xl shadow-none">
-      <CardHeader className="pb-3 border-b border-white/5">
-        <CardTitle className="text-xs font-black uppercase tracking-[0.18em] flex items-center gap-2 text-foreground/90">
-          <Icon className="h-3.5 w-3.5 text-neon-purple" /> {title}
-        </CardTitle>
-        {hint && <p className="text-[11px] text-muted-foreground mt-1">{hint}</p>}
-      </CardHeader>
-      <CardContent className="p-5 space-y-5">{children}</CardContent>
-    </Card>
-  );
-
-  const FieldLabel = ({ children }: { children: React.ReactNode }) => (
-    <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{children}</Label>
-  );
-
-  const inputCls = "bg-white/[0.03] border-white/10 focus-visible:border-neon-purple/50 focus-visible:ring-neon-purple/20 h-10";
 
   return (
     <Layout>
