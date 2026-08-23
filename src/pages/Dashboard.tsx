@@ -30,6 +30,7 @@ import { format, subDays, isSameDay, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { ConfirmDeleteDialog } from "@/components/ConfirmDeleteDialog";
 import { PurchaseEscrowList } from "@/components/PurchaseEscrowList";
+import { TestSessionsList } from "@/components/TestSessionsList";
 
 export default function Dashboard() {
   const { user, isModder, loading, profile } = useAuth();
