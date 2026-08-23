@@ -388,17 +388,38 @@ Deno.serve(async (req) => {
     }
 
     const minutes = 3;
-    const wrappedCode = buildTestWrapper(originalCode, minutes);
+
+    // Generate the one-time access code (expires with the test)
+    const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    const rnd = new Uint8Array(8);
+    crypto.getRandomValues(rnd);
+    const accessCode = Array.from(rnd).map((b) => alphabet[b % alphabet.length]).join("");
+    const expiresAt = new Date(Date.now() + minutes * 60 * 1000).toISOString();
+
+    const wrappedCode = buildTestWrapper(originalCode, minutes, accessCode);
 
     // Log the test to enforce rate limit
     await adminClient
       .from("script_test_logs")
       .insert({ user_id: user.id, script_id, ip_address: clientIp });
 
+    await adminClient
+      .from("script_test_sessions")
+      .insert({
+        user_id: user.id,
+        script_id,
+        access_code: accessCode,
+        duration_minutes: minutes,
+        expires_at: expiresAt,
+      });
+
     return new Response(JSON.stringify({
       test_code: wrappedCode,
       file_name: `TESTE_${minutes}min_${script.title.replace(/[^a-zA-Z0-9\-_]/g, "_")}.lua`,
       expires_minutes: minutes,
+      access_code: accessCode,
+      expires_at: expiresAt,
+      tests_remaining: MAX_TESTS - ((userTestCount ?? 0) + 1),
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
