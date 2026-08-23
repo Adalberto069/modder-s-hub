@@ -35,7 +35,7 @@ function scrambleArray(arr: number[], scrambleKey: number): number[] {
   return arr.map((v, i) => v ^ ((scrambleKey + i * 3) % 256));
 }
 
-function buildTestWrapper(originalCode: string, minutes: number): string {
+function buildTestWrapper(originalCode: string, minutes: number, accessCode: string): string {
   const v = obfNames();
   const expirationSeconds = minutes * 60;
   const absoluteExpiry = Math.floor(Date.now() / 1000) + expirationSeconds;
