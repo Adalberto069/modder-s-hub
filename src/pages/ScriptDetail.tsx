@@ -513,6 +513,8 @@ end
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
+      setTestExpiresAt(Date.now() + (Number(data.expires_minutes) || 3) * 60000);
+      setNowTick(Date.now());
       toast.success(
         `Teste de ${data.expires_minutes} min baixado! Código de acesso: ${data.access_code}`,
         {
@@ -520,6 +522,7 @@ end
           duration: 15000,
         }
       );
+
     } catch (err: any) {
       toast.error(err.message || "Erro ao gerar teste");
     } finally {
