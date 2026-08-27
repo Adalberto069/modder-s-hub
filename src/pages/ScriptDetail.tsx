@@ -278,7 +278,40 @@ export default function ScriptDetail() {
     enabled: !!id && !!user && !!script?.is_paid,
   });
 
+  // Sessão de teste ativa (contagem regressiva ao vivo)
+  const [testExpiresAt, setTestExpiresAt] = useState<number | null>(null);
+  const [nowTick, setNowTick] = useState(() => Date.now());
+  const testMsLeft = testExpiresAt ? testExpiresAt - nowTick : 0;
+  const testActive = testMsLeft > 0;
+  const testJustExpired = !!testExpiresAt && testMsLeft <= 0;
+
+  useEffect(() => {
+    if (!testExpiresAt) return;
+    const i = setInterval(() => setNowTick(Date.now()), 1000);
+    return () => clearInterval(i);
+  }, [testExpiresAt]);
+
+  useEffect(() => {
+    if (!id || !user) return;
+    (async () => {
+      const { data } = await supabase
+        .from("script_test_sessions")
+        .select("expires_at")
+        .eq("script_id", id)
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (data?.expires_at) setTestExpiresAt(new Date(data.expires_at).getTime());
+    })();
+  }, [id, user?.id]);
+
+  const testCountdown = `${Math.max(0, Math.floor(testMsLeft / 60000))}:${String(
+    Math.max(0, Math.floor((testMsLeft % 60000) / 1000))
+  ).padStart(2, "0")}`;
+
   const isLicenseExpired = existingLicense?.expires_at && new Date(existingLicense.expires_at) < new Date();
+
 
   const relatedTutorialId = (script as any)?.related_tutorial_id;
   const { data: relatedTutorial } = useQuery({
