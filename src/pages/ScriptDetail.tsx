@@ -1094,11 +1094,22 @@ end
                             variant="outline"
                             className="w-full h-10 rounded-none border-neon-cyan/30 bg-transparent text-neon-cyan hover:bg-neon-cyan/10 hover:text-neon-cyan text-[10px] font-black uppercase tracking-widest"
                             onClick={handleTestScript}
-                            disabled={testingScript || !!hasTestedScript}
+                            disabled={testingScript || testActive || !!hasTestedScript}
                           >
                             <Play className="mr-2 h-3.5 w-3.5" />
-                            {hasTestedScript ? "// teste já consumido" : testingScript ? "// gerando teste..." : "// test_drive 3min"}
+                            {testActive
+                              ? `// teste ativo ${testCountdown}`
+                              : testingScript
+                                ? "// gerando teste..."
+                                : hasTestedScript
+                                  ? "// teste já consumido"
+                                  : "// test_drive 3min"}
                           </Button>
+                          {testJustExpired && (
+                            <p className="text-[10px] uppercase tracking-widest text-destructive font-black text-center">
+                              // tempo de teste encerrado — adquira para continuar
+                            </p>
+                          )}
                         </div>
                       )}
                     </>
