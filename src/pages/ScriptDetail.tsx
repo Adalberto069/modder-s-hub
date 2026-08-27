@@ -310,6 +310,17 @@ export default function ScriptDetail() {
     Math.max(0, Math.floor((testMsLeft % 60000) / 1000))
   ).padStart(2, "0")}`;
 
+  const expiredNotified = useRef(false);
+  useEffect(() => {
+    if (testActive) expiredNotified.current = false;
+    if (testJustExpired && !expiredNotified.current) {
+      expiredNotified.current = true;
+      toast.info("Tempo de teste encerrado. O código de acesso expirou.");
+    }
+  }, [testActive, testJustExpired]);
+
+
+
   const isLicenseExpired = existingLicense?.expires_at && new Date(existingLicense.expires_at) < new Date();
 
 
