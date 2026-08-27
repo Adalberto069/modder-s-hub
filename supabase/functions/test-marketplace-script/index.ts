@@ -398,10 +398,12 @@ Deno.serve(async (req) => {
 
     const wrappedCode = buildTestWrapper(originalCode, minutes, accessCode);
 
-    // Log the test to enforce rate limit
-    await adminClient
-      .from("script_test_logs")
-      .insert({ user_id: user.id, script_id, ip_address: clientIp });
+    // Log the test to enforce rate limit (owner tests are unlimited, skip log)
+    if (!isOwner) {
+      await adminClient
+        .from("script_test_logs")
+        .insert({ user_id: user.id, script_id, ip_address: clientIp });
+    }
 
     await adminClient
       .from("script_test_sessions")
@@ -419,7 +421,8 @@ Deno.serve(async (req) => {
       expires_minutes: minutes,
       access_code: accessCode,
       expires_at: expiresAt,
-      tests_remaining: MAX_TESTS - ((userTestCount ?? 0) + 1),
+      tests_remaining: isOwner ? null : MAX_TESTS - (userTestCount + 1),
+      is_owner_test: isOwner,
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
