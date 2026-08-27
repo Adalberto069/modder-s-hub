@@ -278,7 +278,51 @@ export default function ScriptDetail() {
     enabled: !!id && !!user && !!script?.is_paid,
   });
 
+  // Sessão de teste ativa (contagem regressiva ao vivo)
+  const [testExpiresAt, setTestExpiresAt] = useState<number | null>(null);
+  const [nowTick, setNowTick] = useState(() => Date.now());
+  const testMsLeft = testExpiresAt ? testExpiresAt - nowTick : 0;
+  const testActive = testMsLeft > 0;
+  const testJustExpired = !!testExpiresAt && testMsLeft <= 0;
+
+  useEffect(() => {
+    if (!testExpiresAt) return;
+    const i = setInterval(() => setNowTick(Date.now()), 1000);
+    return () => clearInterval(i);
+  }, [testExpiresAt]);
+
+  useEffect(() => {
+    if (!id || !user) return;
+    (async () => {
+      const { data } = await supabase
+        .from("script_test_sessions")
+        .select("expires_at")
+        .eq("script_id", id)
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (data?.expires_at) setTestExpiresAt(new Date(data.expires_at).getTime());
+    })();
+  }, [id, user?.id]);
+
+  const testCountdown = `${Math.max(0, Math.floor(testMsLeft / 60000))}:${String(
+    Math.max(0, Math.floor((testMsLeft % 60000) / 1000))
+  ).padStart(2, "0")}`;
+
+  const expiredNotified = useRef(false);
+  useEffect(() => {
+    if (testActive) expiredNotified.current = false;
+    if (testJustExpired && !expiredNotified.current) {
+      expiredNotified.current = true;
+      toast.info("Tempo de teste encerrado. O código de acesso expirou.");
+    }
+  }, [testActive, testJustExpired]);
+
+
+
   const isLicenseExpired = existingLicense?.expires_at && new Date(existingLicense.expires_at) < new Date();
+
 
   const relatedTutorialId = (script as any)?.related_tutorial_id;
   const { data: relatedTutorial } = useQuery({
@@ -480,6 +524,8 @@ end
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
+      setTestExpiresAt(Date.now() + (Number(data.expires_minutes) || 3) * 60000);
+      setNowTick(Date.now());
       toast.success(
         `Teste de ${data.expires_minutes} min baixado! Código de acesso: ${data.access_code}`,
         {
@@ -487,6 +533,7 @@ end
           duration: 15000,
         }
       );
+
     } catch (err: any) {
       toast.error(err.message || "Erro ao gerar teste");
     } finally {
@@ -974,16 +1021,30 @@ end
                       <Badge className="bg-neon-purple text-white rounded-none text-[9px] uppercase tracking-widest font-black">// owner</Badge>
                       <p className="text-xs font-black uppercase tracking-widest text-neon-purple">Você é o autor deste payload</p>
                       {script.is_paid && (
-                        <Button
-                          variant="outline"
-                          className="w-full h-10 rounded-none border-neon-cyan/30 bg-transparent text-neon-cyan hover:bg-neon-cyan/10 hover:text-neon-cyan text-[10px] font-black uppercase tracking-widest"
-                          onClick={handleTestScript}
-                          disabled={testingScript}
-                        >
-                          <Play className="mr-2 h-3.5 w-3.5" />
-                          {testingScript ? "// gerando teste..." : "// testar meu script (3min)"}
-                        </Button>
+                        <>
+                          <Button
+                            variant="outline"
+                            className="w-full h-10 rounded-none border-neon-cyan/30 bg-transparent text-neon-cyan hover:bg-neon-cyan/10 hover:text-neon-cyan text-[10px] font-black uppercase tracking-widest"
+                            onClick={handleTestScript}
+                            disabled={testingScript || testActive}
+                          >
+                            <Play className="mr-2 h-3.5 w-3.5" />
+                            {testActive
+                              ? `// teste ativo ${testCountdown}`
+                              : testingScript
+                                ? "// gerando teste..."
+                                : testJustExpired
+                                  ? "// testar novamente (3min)"
+                                  : "// testar meu script (3min)"}
+                          </Button>
+                          {testJustExpired && (
+                            <p className="text-[10px] uppercase tracking-widest text-destructive font-black">
+                              // tempo de teste encerrado — código expirado
+                            </p>
+                          )}
+                        </>
                       )}
+
                     </div>
                   ) : script.is_paid && !isAdmin && !hasPurchased ? (
                     <>
@@ -1044,11 +1105,22 @@ end
                             variant="outline"
                             className="w-full h-10 rounded-none border-neon-cyan/30 bg-transparent text-neon-cyan hover:bg-neon-cyan/10 hover:text-neon-cyan text-[10px] font-black uppercase tracking-widest"
                             onClick={handleTestScript}
-                            disabled={testingScript || !!hasTestedScript}
+                            disabled={testingScript || testActive || !!hasTestedScript}
                           >
                             <Play className="mr-2 h-3.5 w-3.5" />
-                            {hasTestedScript ? "// teste já consumido" : testingScript ? "// gerando teste..." : "// test_drive 3min"}
+                            {testActive
+                              ? `// teste ativo ${testCountdown}`
+                              : testingScript
+                                ? "// gerando teste..."
+                                : hasTestedScript
+                                  ? "// teste já consumido"
+                                  : "// test_drive 3min"}
                           </Button>
+                          {testJustExpired && (
+                            <p className="text-[10px] uppercase tracking-widest text-destructive font-black text-center">
+                              // tempo de teste encerrado — adquira para continuar
+                            </p>
+                          )}
                         </div>
                       )}
                     </>
