@@ -1010,16 +1010,30 @@ end
                       <Badge className="bg-neon-purple text-white rounded-none text-[9px] uppercase tracking-widest font-black">// owner</Badge>
                       <p className="text-xs font-black uppercase tracking-widest text-neon-purple">Você é o autor deste payload</p>
                       {script.is_paid && (
-                        <Button
-                          variant="outline"
-                          className="w-full h-10 rounded-none border-neon-cyan/30 bg-transparent text-neon-cyan hover:bg-neon-cyan/10 hover:text-neon-cyan text-[10px] font-black uppercase tracking-widest"
-                          onClick={handleTestScript}
-                          disabled={testingScript}
-                        >
-                          <Play className="mr-2 h-3.5 w-3.5" />
-                          {testingScript ? "// gerando teste..." : "// testar meu script (3min)"}
-                        </Button>
+                        <>
+                          <Button
+                            variant="outline"
+                            className="w-full h-10 rounded-none border-neon-cyan/30 bg-transparent text-neon-cyan hover:bg-neon-cyan/10 hover:text-neon-cyan text-[10px] font-black uppercase tracking-widest"
+                            onClick={handleTestScript}
+                            disabled={testingScript || testActive}
+                          >
+                            <Play className="mr-2 h-3.5 w-3.5" />
+                            {testActive
+                              ? `// teste ativo ${testCountdown}`
+                              : testingScript
+                                ? "// gerando teste..."
+                                : testJustExpired
+                                  ? "// testar novamente (3min)"
+                                  : "// testar meu script (3min)"}
+                          </Button>
+                          {testJustExpired && (
+                            <p className="text-[10px] uppercase tracking-widest text-destructive font-black">
+                              // tempo de teste encerrado — código expirado
+                            </p>
+                          )}
+                        </>
                       )}
+
                     </div>
                   ) : script.is_paid && !isAdmin && !hasPurchased ? (
                     <>
