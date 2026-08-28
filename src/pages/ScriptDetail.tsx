@@ -530,13 +530,26 @@ end
       setTestExpiresAt(Date.now() + (Number(data.expires_minutes) || 3) * 60000);
       setNowTick(Date.now());
       queryClient.invalidateQueries({ queryKey: ["script-test-log", id, user?.id] });
+      setLastAccessCode(data.access_code);
       toast.success(
         `Teste de ${data.expires_minutes} min baixado! Código de acesso: ${data.access_code}`,
         {
           description: `O código expira em ${data.expires_minutes} minutos e também fica no seu Dashboard (aba Compras).${data.tests_remaining != null ? ` Testes restantes: ${data.tests_remaining}.` : " Testes de autor ilimitados."}`,
-          duration: 15000,
+          duration: 20000,
+          action: {
+            label: "Copiar código",
+            onClick: () => {
+              navigator.clipboard.writeText(data.access_code);
+              toast.success("Código copiado!");
+            },
+          },
+          cancel: {
+            label: "Ver no Dashboard",
+            onClick: () => window.location.assign("/dashboard?tab=purchases"),
+          },
         }
       );
+
 
     } catch (err: any) {
       toast.error(err.message || "Erro ao gerar teste");
