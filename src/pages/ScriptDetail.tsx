@@ -264,19 +264,22 @@ export default function ScriptDetail() {
     enabled: !!id && !!user && !!script?.is_paid,
   });
 
-  const { data: hasTestedScript } = useQuery({
+  const MAX_TESTS = 3;
+  const { data: testCount = 0 } = useQuery({
     queryKey: ["script-test-log", id, user?.id],
     queryFn: async () => {
-      const { data } = await supabase
+      const { count } = await supabase
         .from("script_test_logs")
-        .select("id")
+        .select("id", { count: "exact", head: true })
         .eq("script_id", id!)
-        .eq("user_id", user!.id)
-        .maybeSingle();
-      return !!data;
+        .eq("user_id", user!.id);
+      return count ?? 0;
     },
     enabled: !!id && !!user && !!script?.is_paid,
   });
+  const testsRemaining = Math.max(0, MAX_TESTS - testCount);
+  const hasTestedScript = testCount > 0;
+
 
   // Sessão de teste ativa (contagem regressiva ao vivo)
   const [testExpiresAt, setTestExpiresAt] = useState<number | null>(null);
