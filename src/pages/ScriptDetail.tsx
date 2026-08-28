@@ -283,6 +283,8 @@ export default function ScriptDetail() {
 
   // Sessão de teste ativa (contagem regressiva ao vivo)
   const [testExpiresAt, setTestExpiresAt] = useState<number | null>(null);
+  const [lastAccessCode, setLastAccessCode] = useState<string | null>(null);
+
   const [nowTick, setNowTick] = useState(() => Date.now());
   const testMsLeft = testExpiresAt ? testExpiresAt - nowTick : 0;
   const testActive = testMsLeft > 0;
@@ -530,13 +532,26 @@ end
       setTestExpiresAt(Date.now() + (Number(data.expires_minutes) || 3) * 60000);
       setNowTick(Date.now());
       queryClient.invalidateQueries({ queryKey: ["script-test-log", id, user?.id] });
+      setLastAccessCode(data.access_code);
       toast.success(
         `Teste de ${data.expires_minutes} min baixado! Código de acesso: ${data.access_code}`,
         {
           description: `O código expira em ${data.expires_minutes} minutos e também fica no seu Dashboard (aba Compras).${data.tests_remaining != null ? ` Testes restantes: ${data.tests_remaining}.` : " Testes de autor ilimitados."}`,
-          duration: 15000,
+          duration: 20000,
+          action: {
+            label: "Copiar código",
+            onClick: () => {
+              navigator.clipboard.writeText(data.access_code);
+              toast.success("Código copiado!");
+            },
+          },
+          cancel: {
+            label: "Ver no Dashboard",
+            onClick: () => window.location.assign("/dashboard?tab=purchases"),
+          },
         }
       );
+
 
     } catch (err: any) {
       toast.error(err.message || "Erro ao gerar teste");
@@ -1041,11 +1056,27 @@ end
                                   ? "// testar novamente (3min)"
                                   : "// testar meu script (3min)"}
                           </Button>
+                          {testActive && lastAccessCode && (
+                            <div className="border border-neon-cyan/30 bg-neon-cyan/5 p-2 space-y-2">
+                              <p className="text-[9px] uppercase tracking-widest text-muted-foreground">// seu código de teste</p>
+                              <div className="flex items-center gap-2">
+                                <code className="flex-1 font-mono text-sm tracking-widest text-neon-cyan">{lastAccessCode}</code>
+                                <Button size="icon" variant="ghost" className="h-7 w-7" aria-label="Copiar código de teste"
+                                  onClick={() => { navigator.clipboard.writeText(lastAccessCode); toast.success("Código copiado!"); }}>
+                                  <Copy className="h-3.5 w-3.5" />
+                                </Button>
+                              </div>
+                              <a href="/dashboard?tab=purchases" className="block text-[9px] uppercase tracking-widest text-neon-cyan hover:underline">
+                                // ver no dashboard
+                              </a>
+                            </div>
+                          )}
                           {testJustExpired && (
                             <p className="text-[10px] uppercase tracking-widest text-destructive font-black">
                               // tempo de teste encerrado — código expirado
                             </p>
                           )}
+
                         </>
                       )}
 
@@ -1122,6 +1153,21 @@ end
                                     ? `// novo código de acesso (${testsRemaining} restantes)`
                                     : "// test_drive 3min"}
                           </Button>
+                          {testActive && lastAccessCode && (
+                            <div className="border border-neon-cyan/30 bg-neon-cyan/5 p-2 space-y-2">
+                              <p className="text-[9px] uppercase tracking-widest text-muted-foreground">// seu código de teste</p>
+                              <div className="flex items-center gap-2">
+                                <code className="flex-1 font-mono text-sm tracking-widest text-neon-cyan">{lastAccessCode}</code>
+                                <Button size="icon" variant="ghost" className="h-7 w-7" aria-label="Copiar código de teste"
+                                  onClick={() => { navigator.clipboard.writeText(lastAccessCode); toast.success("Código copiado!"); }}>
+                                  <Copy className="h-3.5 w-3.5" />
+                                </Button>
+                              </div>
+                              <a href="/dashboard?tab=purchases" className="block text-[9px] uppercase tracking-widest text-neon-cyan hover:underline">
+                                // ver no dashboard
+                              </a>
+                            </div>
+                          )}
                           {testJustExpired && (
                             <p className="text-[10px] uppercase tracking-widest text-destructive font-black text-center">
                               {testsRemaining > 0
