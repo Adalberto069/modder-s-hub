@@ -135,9 +135,20 @@ export function TestSessionsList() {
               </div>
               <div className="flex items-center gap-2">
                 {expired ? (
-                  <Badge variant="outline" className="border-destructive/40 text-destructive text-[10px]">
-                    EXPIRADO
-                  </Badge>
+                  <>
+                    <Badge variant="outline" className="border-destructive/40 text-destructive text-[10px]">
+                      EXPIRADO
+                    </Badge>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      aria-label="Apagar teste expirado"
+                      className="text-muted-foreground hover:text-destructive"
+                      onClick={() => removeSession(s.id)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </>
                 ) : (
                   <>
                     <code className="rounded bg-secondary/40 px-2 py-1 font-mono text-sm tracking-widest text-neon-cyan">
