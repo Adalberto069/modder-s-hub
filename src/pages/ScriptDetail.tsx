@@ -283,6 +283,8 @@ export default function ScriptDetail() {
 
   // Sessão de teste ativa (contagem regressiva ao vivo)
   const [testExpiresAt, setTestExpiresAt] = useState<number | null>(null);
+  const [lastAccessCode, setLastAccessCode] = useState<string | null>(null);
+
   const [nowTick, setNowTick] = useState(() => Date.now());
   const testMsLeft = testExpiresAt ? testExpiresAt - nowTick : 0;
   const testActive = testMsLeft > 0;
