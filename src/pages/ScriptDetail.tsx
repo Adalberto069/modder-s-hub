@@ -1056,11 +1056,27 @@ end
                                   ? "// testar novamente (3min)"
                                   : "// testar meu script (3min)"}
                           </Button>
+                          {testActive && lastAccessCode && (
+                            <div className="border border-neon-cyan/30 bg-neon-cyan/5 p-2 space-y-2">
+                              <p className="text-[9px] uppercase tracking-widest text-muted-foreground">// seu código de teste</p>
+                              <div className="flex items-center gap-2">
+                                <code className="flex-1 font-mono text-sm tracking-widest text-neon-cyan">{lastAccessCode}</code>
+                                <Button size="icon" variant="ghost" className="h-7 w-7" aria-label="Copiar código de teste"
+                                  onClick={() => { navigator.clipboard.writeText(lastAccessCode); toast.success("Código copiado!"); }}>
+                                  <Copy className="h-3.5 w-3.5" />
+                                </Button>
+                              </div>
+                              <a href="/dashboard?tab=purchases" className="block text-[9px] uppercase tracking-widest text-neon-cyan hover:underline">
+                                // ver no dashboard
+                              </a>
+                            </div>
+                          )}
                           {testJustExpired && (
                             <p className="text-[10px] uppercase tracking-widest text-destructive font-black">
                               // tempo de teste encerrado — código expirado
                             </p>
                           )}
+
                         </>
                       )}
 
