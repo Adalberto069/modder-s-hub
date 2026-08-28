@@ -529,6 +529,7 @@ end
       URL.revokeObjectURL(url);
       setTestExpiresAt(Date.now() + (Number(data.expires_minutes) || 3) * 60000);
       setNowTick(Date.now());
+      queryClient.invalidateQueries({ queryKey: ["script-test-log", id, user?.id] });
       toast.success(
         `Teste de ${data.expires_minutes} min baixado! Código de acesso: ${data.access_code}`,
         {
