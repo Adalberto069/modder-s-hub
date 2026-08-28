@@ -1109,23 +1109,33 @@ end
                             variant="outline"
                             className="w-full h-10 rounded-none border-neon-cyan/30 bg-transparent text-neon-cyan hover:bg-neon-cyan/10 hover:text-neon-cyan text-[10px] font-black uppercase tracking-widest"
                             onClick={handleTestScript}
-                            disabled={testingScript || testActive || !!hasTestedScript}
+                            disabled={testingScript || testActive || testsRemaining === 0}
                           >
                             <Play className="mr-2 h-3.5 w-3.5" />
                             {testActive
                               ? `// teste ativo ${testCountdown}`
                               : testingScript
                                 ? "// gerando teste..."
-                                : hasTestedScript
-                                  ? "// teste já consumido"
-                                  : "// test_drive 3min"}
+                                : testsRemaining === 0
+                                  ? "// testes esgotados"
+                                  : hasTestedScript
+                                    ? `// novo código de acesso (${testsRemaining} restantes)`
+                                    : "// test_drive 3min"}
                           </Button>
                           {testJustExpired && (
                             <p className="text-[10px] uppercase tracking-widest text-destructive font-black text-center">
-                              // tempo de teste encerrado — adquira para continuar
+                              {testsRemaining > 0
+                                ? "// código expirado — solicite um novo acima"
+                                : "// tempo de teste encerrado — adquira para continuar"}
+                            </p>
+                          )}
+                          {!testActive && testsRemaining > 0 && (
+                            <p className="text-[9px] uppercase tracking-widest text-muted-foreground/60 text-center">
+                              // {testsRemaining} de {MAX_TESTS} testes disponíveis
                             </p>
                           )}
                         </div>
+
                       )}
                     </>
                   ) : (
