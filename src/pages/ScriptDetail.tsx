@@ -264,19 +264,22 @@ export default function ScriptDetail() {
     enabled: !!id && !!user && !!script?.is_paid,
   });
 
-  const { data: hasTestedScript } = useQuery({
+  const MAX_TESTS = 3;
+  const { data: testCount = 0 } = useQuery({
     queryKey: ["script-test-log", id, user?.id],
     queryFn: async () => {
-      const { data } = await supabase
+      const { count } = await supabase
         .from("script_test_logs")
-        .select("id")
+        .select("id", { count: "exact", head: true })
         .eq("script_id", id!)
-        .eq("user_id", user!.id)
-        .maybeSingle();
-      return !!data;
+        .eq("user_id", user!.id);
+      return count ?? 0;
     },
     enabled: !!id && !!user && !!script?.is_paid,
   });
+  const testsRemaining = Math.max(0, MAX_TESTS - testCount);
+  const hasTestedScript = testCount > 0;
+
 
   // Sessão de teste ativa (contagem regressiva ao vivo)
   const [testExpiresAt, setTestExpiresAt] = useState<number | null>(null);
@@ -526,6 +529,7 @@ end
       URL.revokeObjectURL(url);
       setTestExpiresAt(Date.now() + (Number(data.expires_minutes) || 3) * 60000);
       setNowTick(Date.now());
+      queryClient.invalidateQueries({ queryKey: ["script-test-log", id, user?.id] });
       toast.success(
         `Teste de ${data.expires_minutes} min baixado! Código de acesso: ${data.access_code}`,
         {
@@ -1105,23 +1109,33 @@ end
                             variant="outline"
                             className="w-full h-10 rounded-none border-neon-cyan/30 bg-transparent text-neon-cyan hover:bg-neon-cyan/10 hover:text-neon-cyan text-[10px] font-black uppercase tracking-widest"
                             onClick={handleTestScript}
-                            disabled={testingScript || testActive || !!hasTestedScript}
+                            disabled={testingScript || testActive || testsRemaining === 0}
                           >
                             <Play className="mr-2 h-3.5 w-3.5" />
                             {testActive
                               ? `// teste ativo ${testCountdown}`
                               : testingScript
                                 ? "// gerando teste..."
-                                : hasTestedScript
-                                  ? "// teste já consumido"
-                                  : "// test_drive 3min"}
+                                : testsRemaining === 0
+                                  ? "// testes esgotados"
+                                  : hasTestedScript
+                                    ? `// novo código de acesso (${testsRemaining} restantes)`
+                                    : "// test_drive 3min"}
                           </Button>
                           {testJustExpired && (
                             <p className="text-[10px] uppercase tracking-widest text-destructive font-black text-center">
-                              // tempo de teste encerrado — adquira para continuar
+                              {testsRemaining > 0
+                                ? "// código expirado — solicite um novo acima"
+                                : "// tempo de teste encerrado — adquira para continuar"}
+                            </p>
+                          )}
+                          {!testActive && testsRemaining > 0 && (
+                            <p className="text-[9px] uppercase tracking-widest text-muted-foreground/60 text-center">
+                              // {testsRemaining} de {MAX_TESTS} testes disponíveis
                             </p>
                           )}
                         </div>
+
                       )}
                     </>
                   ) : (
