@@ -298,6 +298,7 @@
   .catalog-bento > :nth-child(6n + 1) .script-thumbnail, .catalog-bento > :nth-child(6n + 6) .script-thumbnail { aspect-ratio: 2.5; }
   @media (max-width: 1023px) { .catalog-bento { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
   @media (max-width: 639px) {
+    .glitch.text-5xl { font-size: 2rem; }
     .catalog-bento { grid-template-columns: minmax(0, 1fr); }
     .catalog-bento > :nth-child(n) { grid-column: auto; }
     .catalog-bento > :nth-child(n) .script-thumbnail { aspect-ratio: 16 / 9; }

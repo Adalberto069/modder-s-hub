@@ -4,6 +4,6 @@
 - [x] Verificar navegação, apresentação e ausência de erros.
 
 # Camadas cyberpunk
-- [ ] Adicionar código decorativo e anotações manuscritas no início.
-- [ ] Aplicar glitch, divisórias interrompidas e identificadores na vitrine.
-- [ ] Verificar leitura, navegação e ausência de erros.
+- [x] Adicionar código decorativo e anotações manuscritas no início.
+- [x] Aplicar glitch, divisórias interrompidas e identificadores na vitrine.
+- [x] Verificar leitura, navegação e ausência de erros.
