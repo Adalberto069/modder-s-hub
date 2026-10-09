@@ -17,6 +17,7 @@ export default {
         sans: ["JetBrains Mono", "monospace"],
         display: ["Syne", "sans-serif"],
         mono: ["JetBrains Mono", "monospace"],
+        handwritten: ["Permanent Marker", "cursive"],
       },
       colors: {
         surface: "hsl(var(--surface))",
