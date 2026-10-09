@@ -271,10 +271,10 @@ export function AdminAuditTab() {
                         </div>
                       </div>
                       <div className="flex items-center gap-2 flex-shrink-0">
-                        <Badge variant="outline" className="font-mono text-[10px]">
+                        <Badge variant="outline" className="font-mono text-xs">
                           {b.source === "uploaded_file" ? "arquivo" : "código"}
                         </Badge>
-                        <span className="text-[10px] text-muted-foreground font-mono hidden sm:inline">
+                        <span className="text-xs text-muted-foreground font-mono hidden sm:inline">
                           {formatDistanceToNow(new Date(b.created_at), { addSuffix: true, locale: ptBR })}
                         </span>
                         <ChevronDown

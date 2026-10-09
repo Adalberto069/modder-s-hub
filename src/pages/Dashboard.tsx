@@ -288,7 +288,7 @@ end
                   <p className="text-2xl font-bold text-foreground leading-none">
                     {myScripts?.length ?? 0}
                   </p>
-                  <p className="text-xs text-muted-foreground mt-2 uppercase tracking-widest font-bold">Publicações</p>
+                  <p className="text-xs text-muted-foreground mt-2   font-bold">Publicações</p>
                 </CardContent>
               </Card>
 
@@ -303,7 +303,7 @@ end
                   <p className="text-2xl font-bold text-foreground leading-none">
                     {totalDownloads}
                   </p>
-                  <p className="text-xs text-muted-foreground mt-2 uppercase tracking-widest font-bold">Downloads</p>
+                  <p className="text-xs text-muted-foreground mt-2   font-bold">Downloads</p>
                 </CardContent>
               </Card>
 
@@ -318,7 +318,7 @@ end
                   <p className="text-2xl font-bold text-foreground leading-none">
                     {totalSales}
                   </p>
-                  <p className="text-xs text-muted-foreground mt-2 uppercase tracking-widest font-bold">Vendas</p>
+                  <p className="text-xs text-muted-foreground mt-2   font-bold">Vendas</p>
                 </CardContent>
               </Card>
 
@@ -330,13 +330,13 @@ end
                     </div>
                     <div className="flex items-center gap-1">
                       <ArrowUpRight className={`h-3 w-3 ${dailyGrowth ? 'text-neon-green' : 'text-muted-foreground'}`} />
-                      <span className="text-xs font-bold uppercase text-neon-green">Lucro</span>
+                      <span className="text-xs font-bold  text-neon-green">Lucro</span>
                     </div>
                   </div>
                   <p className="text-2xl font-bold text-neon-green leading-none">
                     R$ {totalEarnings.toFixed(2)}
                   </p>
-                  <p className="text-xs text-muted-foreground mt-2 uppercase tracking-widest font-bold">Ganhos (80%)</p>
+                  <p className="text-xs text-muted-foreground mt-2   font-bold">Ganhos (80%)</p>
                 </CardContent>
               </Card>
             </div>
@@ -346,14 +346,14 @@ end
                 <CardHeader className="pb-4 border-b border-border/60 bg-background">
                   <div className="flex items-center justify-between">
                     <div>
-                      <CardTitle className="text-sm font-bold uppercase tracking-widest flex items-center gap-2 text-foreground">
+                      <CardTitle className="text-sm font-bold   flex items-center gap-2 text-foreground">
                         <TrendingUp className="h-4 w-4 text-primary" />
                         Desempenho de Vendas
                       </CardTitle>
-                      <CardDescription className="text-xs uppercase tracking-widest mt-1">Ganhos líquidos nos últimos 7 dias</CardDescription>
+                      <CardDescription className="text-xs   mt-1">Ganhos líquidos nos últimos 7 dias</CardDescription>
                     </div>
                     <div className="flex items-center gap-2">
-                       <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 border border-border bg-background text-xs font-bold uppercase tracking-widest">
+                       <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 border border-border bg-background text-xs font-bold  ">
                         <Calendar className="h-3 w-3" /> 
                         Última semana
                       </div>
@@ -418,15 +418,15 @@ end
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="font-sans">
           <TabsList className={`mb-8 grid w-full ${isModder ? "grid-cols-3" : "grid-cols-1"} p-1 bg-card border border-border rounded-md h-14`}>
-            <TabsTrigger value="purchases" className="text-xs sm:text-xs tracking-widest uppercase font-bold gap-2 data-[state=active]:bg-background data-[state=active]:text-neon-purple rounded-md h-full">
+            <TabsTrigger value="purchases" className="text-xs sm:text-xs   font-bold gap-2 data-[state=active]:bg-background data-[state=active]:text-neon-purple rounded-md h-full">
               <Key className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> <span className="hidden sm:inline">Meus </span>Arquivos Comprados
             </TabsTrigger>
             {isModder && (
               <>
-                <TabsTrigger value="my-scripts" className="text-xs sm:text-xs tracking-widest uppercase font-bold gap-2 data-[state=active]:bg-background data-[state=active]:text-neon-green rounded-md h-full">
+                <TabsTrigger value="my-scripts" className="text-xs sm:text-xs   font-bold gap-2 data-[state=active]:bg-background data-[state=active]:text-neon-green rounded-md h-full">
                   <Code className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> Minhas Publicações
                 </TabsTrigger>
-                <TabsTrigger value="finance" className="text-xs sm:text-xs tracking-widest uppercase font-bold gap-2 data-[state=active]:bg-background data-[state=active]:text-accent rounded-md h-full">
+                <TabsTrigger value="finance" className="text-xs sm:text-xs   font-bold gap-2 data-[state=active]:bg-background data-[state=active]:text-accent rounded-md h-full">
                   <DollarSign className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> <span className="hidden sm:inline">Meu </span>Financeiro
                 </TabsTrigger>
               </>
@@ -437,7 +437,7 @@ end
           <TabsContent value="purchases">
             <TestSessionsList />
             <PurchaseEscrowList />
-            <h2 className="text-sm font-bold uppercase tracking-widest mb-6 flex items-center gap-2 text-foreground bg-background border border-border/60 p-4 rounded-md">
+            <h2 className="text-sm font-bold   mb-6 flex items-center gap-2 text-foreground bg-background border border-border/60 p-4 rounded-md">
               <Key className="h-4 w-4 text-neon-purple" /> Scripts Adquiridos
             </h2>
             <div className="space-y-4">
@@ -557,21 +557,21 @@ end
               {showForm && (
                 <Card className="border-border bg-card rounded-md p-2 mb-8 relative font-sans">
                   <div className="absolute top-0 right-0 p-1 bg-neon-purple/20 border-b border-l border-neon-purple/50">
-                    <span className="text-xs uppercase font-bold tracking-widest text-neon-purple">MODDER_AUTH_OK</span>
+                    <span className="text-xs  font-bold  text-neon-purple">MODDER_AUTH_OK</span>
                   </div>
                   <CardHeader className="border-b border-border/60 bg-background pb-4">
-                    <CardTitle className="text-sm font-bold uppercase tracking-widest text-foreground">Init Payload Config</CardTitle>
+                    <CardTitle className="text-sm font-bold   text-foreground">Init Payload Config</CardTitle>
                   </CardHeader>
                   <CardContent className="pt-6">
                     <form onSubmit={handleSubmit} className="space-y-4">
                       <div>
-                        <Label className="mb-2 block text-xs font-bold uppercase tracking-widest text-muted-foreground">Classificação do Payload</Label>
+                        <Label className="mb-2 block text-xs font-bold   text-muted-foreground">Classificação do Payload</Label>
                         <Tabs value={scriptType} onValueChange={setScriptType}>
                           <TabsList className="grid w-full max-w-xs grid-cols-2 p-1 bg-background border border-border rounded-md h-12">
-                            <TabsTrigger value="script" className="text-xs tracking-widest uppercase font-bold gap-2 data-[state=active]:bg-secondary data-[state=active]:text-neon-cyan rounded-md h-full">
+                            <TabsTrigger value="script" className="text-xs   font-bold gap-2 data-[state=active]:bg-secondary data-[state=active]:text-neon-cyan rounded-md h-full">
                               <Code className="h-4 w-4" /> Script LUA
                             </TabsTrigger>
-                            <TabsTrigger value="apk" className="text-xs tracking-widest uppercase font-bold gap-2 data-[state=active]:bg-secondary data-[state=active]:text-neon-green rounded-md h-full">
+                            <TabsTrigger value="apk" className="text-xs   font-bold gap-2 data-[state=active]:bg-secondary data-[state=active]:text-neon-green rounded-md h-full">
                               <Package className="h-4 w-4" /> Mod Menu
                             </TabsTrigger>
                           </TabsList>
@@ -580,11 +580,11 @@ end
 
                       <div className="grid md:grid-cols-2 gap-4">
                         <div className="space-y-2">
-                          <Label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Nome Operacional</Label>
+                          <Label className="text-xs font-bold   text-muted-foreground">Nome Operacional</Label>
                           <Input value={title} onChange={(e) => setTitle(e.target.value)} required className="bg-background border-border focus-visible:ring-neon-purple rounded-md h-12" />
                         </div>
                         <div className="space-y-2">
-                          <Label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Classificação Global</Label>
+                          <Label className="text-xs font-bold   text-muted-foreground">Classificação Global</Label>
                           <Select value={categoryId} onValueChange={setCategoryId}>
                             <SelectTrigger className="bg-background border-border focus-visible:ring-neon-purple rounded-md h-12"><SelectValue placeholder="SORT_BY" /></SelectTrigger>
                             <SelectContent className="bg-card border-border rounded-md">
@@ -596,12 +596,12 @@ end
                         </div>
                       </div>
                       <div className="space-y-2">
-                        <Label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Documentação (TXT)</Label>
+                        <Label className="text-xs font-bold   text-muted-foreground">Documentação (TXT)</Label>
                         <Textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={4} className="bg-background border-border focus-visible:ring-neon-purple rounded-md resize-none p-4" />
                       </div>
                       <div className="grid md:grid-cols-2 gap-4">
                         <div className="space-y-2">
-                          <Label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Estado Operacional</Label>
+                          <Label className="text-xs font-bold   text-muted-foreground">Estado Operacional</Label>
                           <Select value={status} onValueChange={setStatus}>
                             <SelectTrigger className="bg-background border-border focus-visible:ring-neon-purple rounded-md h-12 text-xs"><SelectValue /></SelectTrigger>
                             <SelectContent className="bg-card border-border rounded-md text-xs">
@@ -613,14 +613,14 @@ end
                         </div>
                         <div className="flex items-center gap-4 pt-8">
                           <Switch checked={isPaid} onCheckedChange={setIsPaid} className="data-[state=checked]:bg-neon-purple" />
-                          <Label className="uppercase text-xs font-bold tracking-widest text-foreground">Monetização</Label>
+                          <Label className=" text-xs font-bold  text-foreground">Monetização</Label>
                           {isPaid && <Input type="number" placeholder="Value (R$)" value={price} onChange={(e) => setPrice(e.target.value)} className="w-32 bg-background border-border focus-visible:ring-neon-purple rounded-md text-neon-green font-sans" step="0.01" />}
                         </div>
                       </div>
 
                       <div className="grid md:grid-cols-2 gap-4">
                         <div className="space-y-2">
-                          <Label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Upload Raw File</Label>
+                          <Label className="text-xs font-bold   text-muted-foreground">Upload Raw File</Label>
                           <Input type="file" className="bg-background border-border focus-visible:ring-neon-purple rounded-md h-12 file:bg-card file:text-foreground file:border-0 file:mr-4 file:h-full cursor-pointer text-xs" onChange={async (e) => {
                             const f = e.target.files?.[0] ?? null;
                             if (!f) {
@@ -637,7 +637,7 @@ end
                           }} />
                         </div>
                         <div className="space-y-2">
-                          <Label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">URL da Miniatura / Link Externo</Label>
+                          <Label className="text-xs font-bold   text-muted-foreground">URL da Miniatura / Link Externo</Label>
                           <div className="flex gap-2 h-12">
                              <Input 
                               type="file" 
@@ -664,15 +664,15 @@ end
                               }}
                             />
                           </div>
-                          <p className="text-xs text-muted-foreground mt-1 uppercase tracking-widest font-sans">JPG/PNG/WebP, 1MB Max.</p>
+                          <p className="text-xs text-muted-foreground mt-1   font-sans">JPG/PNG/WebP, 1MB Max.</p>
                         </div>
                       </div>
 
                       <div className="space-y-2 pt-2">
-                        <Label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Endpoint / Thumbnail URL</Label>
+                        <Label className="text-xs font-bold   text-muted-foreground">Endpoint / Thumbnail URL</Label>
                         <Input value={externalLink} onChange={(e) => setExternalLink(e.target.value)} placeholder="https://..." className="bg-background border-border focus-visible:ring-neon-purple rounded-md h-12 font-sans text-xs" />
                       </div>
-                      <Button type="submit" disabled={submitting} className="w-full bg-primary hover:bg-primary/90 text-primary-foreground shadow-neon rounded-md font-bold uppercase tracking-widest text-xs sm:text-xs h-12 mt-4">
+                      <Button type="submit" disabled={submitting} className="w-full bg-primary hover:bg-primary/90 text-primary-foreground shadow-neon rounded-md font-bold   text-xs sm:text-xs h-12 mt-4">
                         {submitting ? "Executando..." : `Deploy ${scriptType === "script" ? "LUA" : "MOD"}`}
                       </Button>
                     </form>
@@ -691,7 +691,7 @@ end
                 return (
                   <>
                     <div className="flex items-center justify-between mb-4 gap-3 flex-wrap">
-                      <h2 className="text-sm font-bold uppercase tracking-widest text-foreground flex items-center gap-2">
+                      <h2 className="text-sm font-bold   text-foreground flex items-center gap-2">
                         <Code className="h-4 w-4 text-neon-green" /> Minhas publicações
                       </h2>
                       <div className="flex gap-1 border border-border bg-background p-1 rounded-md font-sans">
@@ -703,7 +703,7 @@ end
                           <Button variant="ghost"
                             key={f.key}
                             onClick={() => setPubFilter(f.key)}
-                            className={`px-3 py-1.5 text-xs uppercase tracking-widest font-bold transition-all rounded-md ${
+                            className={`px-3 py-1.5 text-xs   font-bold transition-all rounded-md ${
                               pubFilter === f.key ? `bg-card ${f.color} border border-border` : "text-muted-foreground hover:text-foreground"
                             }`}
                           >
@@ -723,11 +723,11 @@ end
                                 ) : (
                                   <Code className="h-4 w-4 text-neon-cyan" />
                                 )}
-                                <p className="font-bold text-sm uppercase tracking-tight text-foreground truncate">{script.title}</p>
-                                {script.is_paid && <Badge variant="secondary" className="text-xs uppercase tracking-widest bg-neon-purple/20 text-neon-purple hover:bg-neon-purple/30 rounded-md border-t border-neon-purple/50">R$ {Number(script.price).toFixed(2)}</Badge>}
-                                {!script.is_active && <Badge variant="destructive" className="text-xs uppercase tracking-widest rounded-md">INATIVO</Badge>}
+                                <p className="font-bold text-sm  tracking-tight text-foreground truncate">{script.title}</p>
+                                {script.is_paid && <Badge variant="secondary" className="text-xs   bg-neon-purple/20 text-neon-purple hover:bg-neon-purple/30 rounded-md border-t border-neon-purple/50">R$ {Number(script.price).toFixed(2)}</Badge>}
+                                {!script.is_active && <Badge variant="destructive" className="text-xs   rounded-md">INATIVO</Badge>}
                               </div>
-                              <div className="flex flex-wrap gap-3 text-xs text-muted-foreground uppercase tracking-widest">
+                              <div className="flex flex-wrap gap-3 text-xs text-muted-foreground  ">
                                 <span className="flex items-center gap-1"><FolderOpen className="h-3 w-3" /> {script.categories?.name}</span>
                                 <span className="flex items-center gap-1"><Download className="h-3 w-3" /> {script.download_count}</span>
                                 <Badge variant="outline" className="text-xs border-border bg-background rounded-md">{script.status}</Badge>
@@ -761,7 +761,7 @@ end
                       ))}
                       <div className="flex border-t border-border/60 mt-4 pt-4 justify-center">
                         {filtered.length === 0 && (
-                          <p className="text-xs font-sans uppercase tracking-widest text-muted-foreground">
+                          <p className="text-xs font-sans   text-muted-foreground">
                             {pubFilter === "apk" ? "Nenhum APK Mod publicado ainda." : pubFilter === "script" ? "Nenhum script Lua publicado ainda." : "Nenhuma publicação encontrada."}
                           </p>
                         )}

@@ -96,36 +96,36 @@ export function AdminPurchaseDisputesTab() {
     <div className="space-y-6 font-mono">
       <Card className="bg-card border-yellow-500/20 rounded-md">
         <CardHeader className="border-b border-yellow-500/10 bg-yellow-500/5">
-          <CardTitle className="text-sm font-bold uppercase tracking-widest text-yellow-400 flex items-center gap-2">
+          <CardTitle className="text-sm font-bold   text-yellow-400 flex items-center gap-2">
             <Gavel className="h-4 w-4" /> Disputas Abertas ({open.length})
           </CardTitle>
         </CardHeader>
         <CardContent className="pt-6 space-y-4">
           {isLoading && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
           {!isLoading && open.length === 0 && (
-            <p className="text-[10px] text-muted-foreground uppercase tracking-widest">Nenhuma disputa aberta.</p>
+            <p className="text-xs text-muted-foreground  ">Nenhuma disputa aberta.</p>
           )}
           {open.map((d: any) => (
             <div key={d.id} className="p-4 border border-border bg-surface space-y-3">
               <div className="flex items-start justify-between gap-2 flex-wrap">
                 <div>
-                  <Badge variant="outline" className="rounded-md text-[9px] mb-2">
+                  <Badge variant="outline" className="rounded-md text-[11px] mb-2">
                     {d.purchase_type === "script" ? "SCRIPT" : "ENCOMENDA"}
                   </Badge>
-                  <p className="text-[10px] text-muted-foreground uppercase tracking-widest">
+                  <p className="text-xs text-muted-foreground  ">
                     <User className="inline h-3 w-3 mr-1" /> Comprador:{" "}
                     <span className="text-foreground">{d.opener?.display_name || d.opener?.username || d.opener_id.slice(0, 8)}</span>
                   </p>
-                  <p className="text-[10px] text-muted-foreground uppercase tracking-widest">
+                  <p className="text-xs text-muted-foreground  ">
                     <User className="inline h-3 w-3 mr-1" /> Modder:{" "}
                     <span className="text-foreground">{d.modder?.display_name || d.modder?.username || d.modder_id.slice(0, 8)}</span>
                   </p>
                 </div>
-                <p className="text-[9px] text-muted-foreground">{format(new Date(d.created_at), "dd/MM HH:mm")}</p>
+                <p className="text-[11px] text-muted-foreground">{format(new Date(d.created_at), "dd/MM HH:mm")}</p>
               </div>
 
               <div className="p-3 bg-card border border-border/60">
-                <p className="text-[10px] font-bold uppercase text-muted-foreground mb-1">Motivo:</p>
+                <p className="text-xs font-bold  text-muted-foreground mb-1">Motivo:</p>
                 <p className="text-xs whitespace-pre-wrap">{d.reason}</p>
               </div>
 
@@ -142,7 +142,7 @@ export function AdminPurchaseDisputesTab() {
                   size="sm"
                   onClick={() => resolve(d, "buyer")}
                   disabled={busy === d.id}
-                  className="rounded-md bg-red-500/10 text-red-400 border border-red-500/30 hover:bg-red-500/20 text-[10px] uppercase font-bold tracking-widest flex-1"
+                  className="rounded-md bg-red-500/10 text-red-400 border border-red-500/30 hover:bg-red-500/20 text-xs  font-bold  flex-1"
                 >
                   {busy === d.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <XCircle className="h-3 w-3 mr-1" />}
                   Reembolsar comprador
@@ -151,7 +151,7 @@ export function AdminPurchaseDisputesTab() {
                   size="sm"
                   onClick={() => resolve(d, "seller")}
                   disabled={busy === d.id}
-                  className="rounded-md bg-neon-green/10 text-neon-green border border-neon-green/30 hover:bg-neon-green/20 text-[10px] uppercase font-bold tracking-widest flex-1"
+                  className="rounded-md bg-neon-green/10 text-neon-green border border-neon-green/30 hover:bg-neon-green/20 text-xs  font-bold  flex-1"
                 >
                   {busy === d.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <CheckCircle2 className="h-3 w-3 mr-1" />}
                   Liberar ao modder
@@ -165,7 +165,7 @@ export function AdminPurchaseDisputesTab() {
       {resolved.length > 0 && (
         <Card className="bg-card border-border rounded-md">
           <CardHeader className="border-b border-border/60 bg-surface">
-            <CardTitle className="text-sm font-bold uppercase tracking-widest text-muted-foreground">
+            <CardTitle className="text-sm font-bold   text-muted-foreground">
               Histórico ({resolved.length})
             </CardTitle>
           </CardHeader>
@@ -173,13 +173,13 @@ export function AdminPurchaseDisputesTab() {
             {resolved.slice(0, 20).map((d: any) => (
               <div key={d.id} className="flex items-center justify-between p-3 border border-border/60 bg-surface">
                 <div>
-                  <p className="text-[10px] uppercase tracking-widest">
+                  <p className="text-xs  ">
                     {d.purchase_type} · {d.opener?.display_name || d.opener?.username}
                   </p>
-                  {d.admin_notes && <p className="text-[9px] text-muted-foreground mt-1">"{d.admin_notes}"</p>}
+                  {d.admin_notes && <p className="text-[11px] text-muted-foreground mt-1">"{d.admin_notes}"</p>}
                 </div>
                 <Badge
-                  className={`rounded-md text-[9px] ${
+                  className={`rounded-md text-[11px] ${
                     d.status === "resolved_buyer"
                       ? "bg-red-500/10 text-red-400 border-red-500/30"
                       : "bg-neon-green/10 text-neon-green border-neon-green/30"

@@ -82,7 +82,7 @@ function CodeBlock({ code }: { code: string }) {
             <span className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-primary/60" />
             <span className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-accent/60" />
           </div>
-          <span className="text-[10px] text-muted-foreground font-mono ml-2">script.lua</span>
+          <span className="text-xs text-muted-foreground font-mono ml-2">script.lua</span>
         </div>
         <Button
           variant="ghost"
@@ -722,22 +722,22 @@ end
             <div className="flex-1 space-y-4 sm:space-y-6">
               <div className="space-y-3 sm:space-y-4">
                 <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
-                  <Badge variant="outline" className="border-primary/30 text-primary bg-primary/5 text-[9px] sm:text-[10px] uppercase font-bold tracking-widest px-2">
+                  <Badge variant="outline" className="border-primary/30 text-primary bg-primary/5 text-[11px] sm:text-xs  font-bold  px-2">
                     {script.categories && (script.categories as any).name}
                   </Badge>
-                  <Badge variant="outline" className={`${st.className} text-[9px] sm:text-[10px] uppercase font-bold tracking-widest px-2`}>
+                  <Badge variant="outline" className={`${st.className} text-[11px] sm:text-xs  font-bold  px-2`}>
                     {st.label}
                   </Badge>
                   {!scriptIsActive && (
-                    <Badge variant="destructive" className="text-[9px] sm:text-[10px] uppercase font-bold px-2">Inativo</Badge>
+                    <Badge variant="destructive" className="text-[11px] sm:text-xs  font-bold px-2">Inativo</Badge>
                   )}
                   {isApk && (
-                    <Badge variant="outline" className="bg-neon-cyan text-[#050505] border-neon-cyan text-[9px] sm:text-[10px] uppercase font-bold tracking-widest px-2 gap-1">
+                    <Badge variant="outline" className="bg-neon-cyan text-[#050505] border-neon-cyan text-[11px] sm:text-xs  font-bold  px-2 gap-1">
                       <Download className="h-3 w-3" /> APK MOD
                     </Badge>
                   )}
                   {script.is_paid && (
-                    <Badge variant="secondary" className="bg-[hsl(var(--neon-pink)/0.1)] text-[hsl(var(--neon-pink))] border-[hsl(var(--neon-pink)/0.2)] text-[9px] sm:text-[10px] font-bold">
+                    <Badge variant="secondary" className="bg-[hsl(var(--neon-pink)/0.1)] text-[hsl(var(--neon-pink))] border-[hsl(var(--neon-pink)/0.2)] text-[11px] sm:text-xs font-bold">
                       <ShoppingCart className="h-3 w-3 mr-1" /> Premium
                     </Badge>
                   )}
@@ -748,7 +748,7 @@ end
                     {script.title}
                   </h1>
 
-                  <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-[10px] sm:text-xs">
+                  <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs sm:text-xs">
                     <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-secondary/60 border border-border/60">
                       <Star className="h-3 w-3 text-amber-400 fill-amber-400" />
                       <span className="font-bold">{script.average_rating ? Number(script.average_rating).toFixed(1) : "N/A"}</span>
@@ -759,7 +759,7 @@ end
                       <span className="font-bold">{script.download_count}</span>
                     </div>
                     {scriptVersion && (
-                      <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-secondary/60 border border-border/60 font-mono text-[10px]">
+                      <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-secondary/60 border border-border/60 font-mono text-xs">
                         v{scriptVersion}
                       </div>
                     )}
@@ -776,7 +776,7 @@ end
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <p className="text-[9px] sm:text-[10px] text-muted-foreground uppercase font-bold tracking-widest">Por</p>
+                  <p className="text-[11px] sm:text-xs text-muted-foreground  font-bold ">Por</p>
                   <div className="flex items-center gap-1.5">
                     <p className="font-bold text-xs sm:text-sm">@{modderProfile?.display_name || modderProfile?.username || "Modder"}</p>
                     <ShieldCheck className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-[hsl(var(--neon-cyan))]" />
@@ -811,25 +811,25 @@ end
             {isApk && (apkMeta.version || apkMeta.sizeMb || apkMeta.minAndroid || apkMeta.packageName || apkMeta.originalApp) && (
               <Card className="border-neon-cyan/20 bg-neon-cyan/[0.03] overflow-hidden">
                 <CardHeader className="pb-3 border-b border-neon-cyan/10 bg-neon-cyan/[0.02]">
-                  <CardTitle className="text-sm font-bold uppercase tracking-widest flex items-center gap-2 text-neon-cyan">
+                  <CardTitle className="text-sm font-bold   flex items-center gap-2 text-neon-cyan">
                     <Download className="h-4 w-4" /> Detalhes do APK
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="pt-4 grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs">
                   {apkMeta.originalApp && (
-                    <div><p className="text-[9px] uppercase tracking-widest text-muted-foreground font-bold">App</p><p className="font-bold text-foreground mt-0.5">{apkMeta.originalApp}</p></div>
+                    <div><p className="text-[11px]   text-muted-foreground font-bold">App</p><p className="font-bold text-foreground mt-0.5">{apkMeta.originalApp}</p></div>
                   )}
                   {apkMeta.version && (
-                    <div><p className="text-[9px] uppercase tracking-widest text-muted-foreground font-bold">Versão</p><p className="font-bold text-foreground mt-0.5 font-mono">{apkMeta.version}</p></div>
+                    <div><p className="text-[11px]   text-muted-foreground font-bold">Versão</p><p className="font-bold text-foreground mt-0.5 font-mono">{apkMeta.version}</p></div>
                   )}
                   {apkMeta.sizeMb && (
-                    <div><p className="text-[9px] uppercase tracking-widest text-muted-foreground font-bold">Tamanho</p><p className="font-bold text-foreground mt-0.5">{apkMeta.sizeMb} MB</p></div>
+                    <div><p className="text-[11px]   text-muted-foreground font-bold">Tamanho</p><p className="font-bold text-foreground mt-0.5">{apkMeta.sizeMb} MB</p></div>
                   )}
                   {apkMeta.minAndroid && (
-                    <div><p className="text-[9px] uppercase tracking-widest text-muted-foreground font-bold">Android mín.</p><p className="font-bold text-foreground mt-0.5">{apkMeta.minAndroid}+</p></div>
+                    <div><p className="text-[11px]   text-muted-foreground font-bold">Android mín.</p><p className="font-bold text-foreground mt-0.5">{apkMeta.minAndroid}+</p></div>
                   )}
                   {apkMeta.packageName && (
-                    <div className="col-span-2 sm:col-span-3"><p className="text-[9px] uppercase tracking-widest text-muted-foreground font-bold">Package</p><p className="font-bold text-neon-cyan mt-0.5 font-mono truncate">{apkMeta.packageName}</p></div>
+                    <div className="col-span-2 sm:col-span-3"><p className="text-[11px]   text-muted-foreground font-bold">Package</p><p className="font-bold text-neon-cyan mt-0.5 font-mono truncate">{apkMeta.packageName}</p></div>
                   )}
                 </CardContent>
               </Card>
@@ -890,7 +890,7 @@ end
                     </CardHeader>
                     <CardContent className="pt-4 flex flex-wrap gap-1.5">
                       {scriptTags.map((t: string, i: number) => (
-                        <Badge key={i} variant="outline" className="text-[10px] text-[hsl(var(--neon-cyan))] border-[hsl(var(--neon-cyan)/0.2)] bg-[hsl(var(--neon-cyan)/0.05)]">
+                        <Badge key={i} variant="outline" className="text-xs text-[hsl(var(--neon-cyan))] border-[hsl(var(--neon-cyan)/0.2)] bg-[hsl(var(--neon-cyan)/0.05)]">
                           #{t}
                         </Badge>
                       ))}
@@ -907,7 +907,7 @@ end
                   <h3 className="text-base sm:text-lg font-bold flex items-center gap-2">
                     <FileCode className="h-4 w-4 sm:h-5 sm:w-5 text-neon-purple" /> Seu Código (Revisão)
                   </h3>
-                  <Badge variant="outline" className="border-neon-purple/30 text-neon-purple bg-neon-purple/5 text-[10px]">
+                  <Badge variant="outline" className="border-neon-purple/30 text-neon-purple bg-neon-purple/5 text-xs">
                     👁️ Visível só para você
                   </Badge>
                 </div>
@@ -937,7 +937,7 @@ end
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-semibold truncate">{relatedTutorial.title}</p>
                       {relatedTutorial.description && (
-                        <p className="text-[10px] text-muted-foreground truncate">{relatedTutorial.description}</p>
+                        <p className="text-xs text-muted-foreground truncate">{relatedTutorial.description}</p>
                       )}
                     </div>
                   </Link>
@@ -977,7 +977,7 @@ end
                       <div key={review.id} className="flex gap-3 p-3 rounded-xl border border-border/60 bg-surface">
                         <Avatar className="h-8 w-8 shrink-0">
                           {rProfile?.avatar_url && <AvatarImage src={rProfile.avatar_url} />}
-                          <AvatarFallback className="bg-secondary text-[10px]">
+                          <AvatarFallback className="bg-secondary text-xs">
                             {(rProfile?.username ?? "U").charAt(0).toUpperCase()}
                           </AvatarFallback>
                         </Avatar>
@@ -1006,7 +1006,7 @@ end
               <div className="h-1 w-full bg-gradient-to-r from-neon-purple via-neon-pink to-neon-cyan" />
 
               <CardHeader className="pb-3 border-b border-border">
-                <CardTitle className="text-[10px] font-bold uppercase tracking-[0.3em] text-muted-foreground flex items-center gap-2">
+                <CardTitle className="text-xs font-bold   text-muted-foreground flex items-center gap-2">
                   <span className="live-dot" /> Compra segura
                 </CardTitle>
               </CardHeader>
@@ -1016,17 +1016,17 @@ end
                   {script.is_paid ? (
                     <>
                       <div className="flex items-baseline gap-1">
-                        <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground">R$</span>
+                        <span className="text-xs font-bold   text-muted-foreground">R$</span>
                         <span className="text-4xl sm:text-5xl font-bold text-foreground tabular-nums">{Number(script.price).toFixed(2)}</span>
                       </div>
-                      <Badge variant="outline" className="rounded-md border-neon-pink/30 text-neon-pink bg-neon-pink/5 px-3 py-1 text-[9px] uppercase tracking-widest font-bold">
+                      <Badge variant="outline" className="rounded-md border-neon-pink/30 text-neon-pink bg-neon-pink/5 px-3 py-1 text-[11px]   font-bold">
                         <Key className="h-3 w-3 mr-1.5" /> {(script as any).license_duration_days ? `${(script as any).license_duration_days} DIAS` : "VITALÍCIO"}
                       </Badge>
                     </>
                   ) : (
                     <>
-                      <span className="text-3xl sm:text-4xl font-bold uppercase text-neon-green tracking-tight">Gratuito</span>
-                      <Badge variant="outline" className="rounded-md border-neon-green/30 text-neon-green bg-neon-green/5 px-3 py-1 text-[9px] uppercase tracking-widest font-bold">ACESSO LIVRE</Badge>
+                      <span className="text-3xl sm:text-4xl font-bold  text-neon-green tracking-tight">Gratuito</span>
+                      <Badge variant="outline" className="rounded-md border-neon-green/30 text-neon-green bg-neon-green/5 px-3 py-1 text-[11px]   font-bold">ACESSO LIVRE</Badge>
                     </>
                   )}
                 </div>
@@ -1034,13 +1034,13 @@ end
                 <div className="space-y-3">
                   {isOwner ? (
                     <div className="bg-neon-purple/5 border border-neon-purple/20 rounded-md p-4 text-center space-y-3">
-                      <Badge className="bg-neon-purple text-primary-foreground rounded-md text-[9px] uppercase tracking-widest font-bold">Autor</Badge>
-                      <p className="text-xs font-bold uppercase tracking-widest text-neon-purple">Esta publicação é sua</p>
+                      <Badge className="bg-neon-purple text-primary-foreground rounded-md text-[11px]   font-bold">Autor</Badge>
+                      <p className="text-xs font-bold   text-neon-purple">Esta publicação é sua</p>
                       {script.is_paid && (
                         <>
                           <Button
                             variant="outline"
-                            className="w-full h-10 rounded-md border-neon-cyan/30 bg-transparent text-neon-cyan hover:bg-neon-cyan/10 hover:text-neon-cyan text-[10px] font-bold uppercase tracking-widest"
+                            className="w-full h-10 rounded-md border-neon-cyan/30 bg-transparent text-neon-cyan hover:bg-neon-cyan/10 hover:text-neon-cyan text-xs font-bold  "
                             onClick={handleTestScript}
                             disabled={testingScript || testActive}
                           >
@@ -1055,21 +1055,21 @@ end
                           </Button>
                           {testActive && lastAccessCode && (
                             <div className="border border-neon-cyan/30 bg-neon-cyan/5 p-2 space-y-2">
-                              <p className="text-[9px] uppercase tracking-widest text-muted-foreground">seu código de teste</p>
+                              <p className="text-[11px]   text-muted-foreground">seu código de teste</p>
                               <div className="flex items-center gap-2">
-                                <code className="flex-1 font-mono text-sm tracking-widest text-neon-cyan">{lastAccessCode}</code>
+                                <code className="flex-1 font-mono text-sm  text-neon-cyan">{lastAccessCode}</code>
                                 <Button size="icon" variant="ghost" className="h-7 w-7" aria-label="Copiar código de teste"
                                   onClick={() => { navigator.clipboard.writeText(lastAccessCode); toast.success("Código copiado!"); }}>
                                   <Copy className="h-3.5 w-3.5" />
                                 </Button>
                               </div>
-                              <a href="/dashboard?tab=purchases" className="block text-[9px] uppercase tracking-widest text-neon-cyan hover:underline">
+                              <a href="/dashboard?tab=purchases" className="block text-[11px]   text-neon-cyan hover:underline">
                                 ver no dashboard
                               </a>
                             </div>
                           )}
                           {testJustExpired && (
-                            <p className="text-[10px] uppercase tracking-widest text-destructive font-bold">
+                            <p className="text-xs   text-destructive font-bold">
                               tempo de teste encerrado — código expirado
                             </p>
                           )}
@@ -1083,11 +1083,11 @@ end
                       {purchaseSuccess || (existingLicense && !isLicenseExpired) ? (
                         <div className="space-y-4">
                           <div className="bg-neon-green/5 border border-neon-green/20 rounded-md p-4 space-y-3">
-                            <div className="flex items-center gap-2 text-neon-green text-[11px] font-bold uppercase tracking-widest">
+                            <div className="flex items-center gap-2 text-neon-green text-[11px] font-bold  ">
                               <CheckCircle className="h-4 w-4" /> LICENÇA ATIVA
                             </div>
                             <div className="bg-surface rounded-md p-2.5 border border-border flex items-center justify-between">
-                              <code className="text-[10px] sm:text-xs font-mono text-neon-green truncate flex-1 mr-2">
+                              <code className="text-xs sm:text-xs font-mono text-neon-green truncate flex-1 mr-2">
                                 {purchaseSuccess || (existingLicense as any).license_key}
                               </code>
                               <Button
@@ -1102,15 +1102,15 @@ end
                                 <Copy className="h-3 w-3" />
                               </Button>
                             </div>
-                            <Button className="w-full h-12 rounded-md bg-neon-green hover:bg-neon-green/90 text-black font-bold uppercase tracking-widest text-xs border border-neon-green shadow-sm" onClick={handleDownloadLoader}>
+                            <Button className="w-full h-12 rounded-md bg-neon-green hover:bg-neon-green/90 text-black font-bold   text-xs border border-neon-green shadow-sm" onClick={handleDownloadLoader}>
                               <Download className="mr-2 h-4 w-4" /> baixar loader
                             </Button>
                           </div>
 
                           {existingLicense?.expires_at && (
                             <div className="text-center">
-                              <p className="text-[9px] text-muted-foreground uppercase font-bold tracking-[0.25em] mb-1">expira em</p>
-                              <Badge variant="outline" className="font-mono text-[10px] border-border px-3 rounded-md bg-surface text-foreground">
+                              <p className="text-[11px] text-muted-foreground  font-bold  mb-1">expira em</p>
+                              <Badge variant="outline" className="font-mono text-xs border-border px-3 rounded-md bg-surface text-foreground">
                                 {new Date(existingLicense.expires_at).toLocaleDateString("pt-BR", { day: '2-digit', month: 'long', year: 'numeric' })}
                               </Badge>
                             </div>
@@ -1119,23 +1119,23 @@ end
                       ) : isLicenseExpired ? (
                         <div className="space-y-3">
                           <div className="bg-destructive/5 border border-destructive/30 rounded-md p-3 text-center">
-                            <p className="text-[11px] font-bold uppercase tracking-widest text-destructive mb-0.5">LICENÇA EXPIRADA</p>
-                            <p className="text-[10px] text-muted-foreground uppercase tracking-widest">Renove para continuar.</p>
+                            <p className="text-[11px] font-bold   text-destructive mb-0.5">LICENÇA EXPIRADA</p>
+                            <p className="text-xs text-muted-foreground  ">Renove para continuar.</p>
                           </div>
-                          <Button className="w-full h-12 rounded-md bg-neon-purple hover:bg-neon-purple/90 text-primary-foreground font-bold uppercase tracking-widest text-xs border border-neon-purple shadow-sm overflow-hidden relative group" onClick={handleRenew} disabled={purchasing}>
+                          <Button className="w-full h-12 rounded-md bg-neon-purple hover:bg-neon-purple/90 text-primary-foreground font-bold   text-xs border border-neon-purple shadow-sm overflow-hidden relative group" onClick={handleRenew} disabled={purchasing}>
                             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
                             <Clock className="mr-2 h-4 w-4" /> {purchasing ? "INICIANDO..." : "renovar acesso"}
                           </Button>
                         </div>
                       ) : (
                         <div className="space-y-2">
-                          <Button className="w-full h-12 rounded-md bg-neon-purple hover:bg-neon-purple/90 text-primary-foreground font-bold uppercase tracking-widest text-xs border border-neon-purple shadow-sm overflow-hidden relative group" onClick={openPaymentMethodModal} disabled={purchasing}>
+                          <Button className="w-full h-12 rounded-md bg-neon-purple hover:bg-neon-purple/90 text-primary-foreground font-bold   text-xs border border-neon-purple shadow-sm overflow-hidden relative group" onClick={openPaymentMethodModal} disabled={purchasing}>
                             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
                             <CreditCard className="mr-2 h-4 w-4" /> {purchasing ? "PROCESSANDO..." : "adquirir agora"}
                           </Button>
                           <Button
                             variant="outline"
-                            className="w-full h-10 rounded-md border-neon-cyan/30 bg-transparent text-neon-cyan hover:bg-neon-cyan/10 hover:text-neon-cyan text-[10px] font-bold uppercase tracking-widest"
+                            className="w-full h-10 rounded-md border-neon-cyan/30 bg-transparent text-neon-cyan hover:bg-neon-cyan/10 hover:text-neon-cyan text-xs font-bold  "
                             onClick={handleTestScript}
                             disabled={testingScript || testActive || testsRemaining === 0}
                           >
@@ -1152,28 +1152,28 @@ end
                           </Button>
                           {testActive && lastAccessCode && (
                             <div className="border border-neon-cyan/30 bg-neon-cyan/5 p-2 space-y-2">
-                              <p className="text-[9px] uppercase tracking-widest text-muted-foreground">seu código de teste</p>
+                              <p className="text-[11px]   text-muted-foreground">seu código de teste</p>
                               <div className="flex items-center gap-2">
-                                <code className="flex-1 font-mono text-sm tracking-widest text-neon-cyan">{lastAccessCode}</code>
+                                <code className="flex-1 font-mono text-sm  text-neon-cyan">{lastAccessCode}</code>
                                 <Button size="icon" variant="ghost" className="h-7 w-7" aria-label="Copiar código de teste"
                                   onClick={() => { navigator.clipboard.writeText(lastAccessCode); toast.success("Código copiado!"); }}>
                                   <Copy className="h-3.5 w-3.5" />
                                 </Button>
                               </div>
-                              <a href="/dashboard?tab=purchases" className="block text-[9px] uppercase tracking-widest text-neon-cyan hover:underline">
+                              <a href="/dashboard?tab=purchases" className="block text-[11px]   text-neon-cyan hover:underline">
                                 ver no dashboard
                               </a>
                             </div>
                           )}
                           {testJustExpired && (
-                            <p className="text-[10px] uppercase tracking-widest text-destructive font-bold text-center">
+                            <p className="text-xs   text-destructive font-bold text-center">
                               {testsRemaining > 0
                                 ? "código expirado — solicite um novo acima"
                                 : "tempo de teste encerrado — adquira para continuar"}
                             </p>
                           )}
                           {!testActive && testsRemaining > 0 && (
-                            <p className="text-[9px] uppercase tracking-widest text-muted-foreground/60 text-center">
+                            <p className="text-[11px]   text-muted-foreground/60 text-center">
                               {testsRemaining} de {MAX_TESTS} testes disponíveis
                             </p>
                           )}
@@ -1182,13 +1182,13 @@ end
                       )}
                     </>
                   ) : (
-                    <Button className="w-full h-12 rounded-md bg-neon-green hover:bg-neon-green/90 text-black font-bold uppercase tracking-widest text-xs border border-neon-green shadow-sm group" onClick={handleDownloadFree}>
+                    <Button className="w-full h-12 rounded-md bg-neon-green hover:bg-neon-green/90 text-black font-bold   text-xs border border-neon-green shadow-sm group" onClick={handleDownloadFree}>
                       <Download className="mr-2 h-4 w-4 group-hover:translate-y-0.5 transition-transform" /> baixar agora
                     </Button>
                   )}
 
                   {!hasAccess && (
-                    <p className="text-[9px] text-center text-muted-foreground/60 px-2 uppercase tracking-widest">
+                    <p className="text-[11px] text-center text-muted-foreground/60 px-2  ">
                       ao adquirir, você concorda com nossos termos.
                     </p>
                   )}
@@ -1196,19 +1196,19 @@ end
 
                 {/* Trust info */}
                 <div className="p-3 rounded-md bg-surface border border-border space-y-1.5">
-                  <p className="text-[9px] text-muted-foreground leading-relaxed flex items-start gap-1.5 uppercase tracking-widest">
+                  <p className="text-[11px] text-muted-foreground leading-relaxed flex items-start gap-1.5  ">
                     <ShieldCheck className="h-3 w-3 text-neon-green shrink-0 mt-0.5" />
                     pagamento seguro · mercado pago
                   </p>
-                  <p className="text-[9px] text-muted-foreground leading-relaxed flex items-start gap-1.5 uppercase tracking-widest">
+                  <p className="text-[11px] text-muted-foreground leading-relaxed flex items-start gap-1.5  ">
                     <CreditCard className="h-3 w-3 text-neon-purple shrink-0 mt-0.5" />
                     Aceitamos Pix e Cartão de crédito
                   </p>
-                  <p className="text-[9px] text-muted-foreground leading-relaxed flex items-start gap-1.5 uppercase tracking-widest">
+                  <p className="text-[11px] text-muted-foreground leading-relaxed flex items-start gap-1.5  ">
                     <Info className="h-3 w-3 text-muted-foreground shrink-0 mt-0.5" />
                     no pix, aparece o nome do vendedor no banco
                   </p>
-                  <p className="text-[9px] text-muted-foreground leading-relaxed flex items-start gap-1.5 uppercase tracking-widest">
+                  <p className="text-[11px] text-muted-foreground leading-relaxed flex items-start gap-1.5  ">
                     <CheckCircle className="h-3 w-3 text-neon-green shrink-0 mt-0.5" />
                     entrega automática após confirmação
                   </p>
@@ -1216,12 +1216,12 @@ end
 
                 <div className="grid grid-cols-2 gap-3 pt-4 border-t border-border/60">
                   <div className="text-center">
-                    <p className="text-[9px] text-muted-foreground uppercase font-bold tracking-widest">Reviews</p>
+                    <p className="text-[11px] text-muted-foreground  font-bold ">Reviews</p>
                     <p className="text-lg font-bold">{script.total_ratings || 0}</p>
                   </div>
                   <div className="text-center border-l border-border/60">
-                    <p className="text-[9px] text-muted-foreground uppercase font-bold tracking-widest">Status</p>
-                    <p className={`text-xs font-bold uppercase ${st.className.split(' ')[1]}`}>{st.label}</p>
+                    <p className="text-[11px] text-muted-foreground  font-bold ">Status</p>
+                    <p className={`text-xs font-bold  ${st.className.split(' ')[1]}`}>{st.label}</p>
                   </div>
                 </div>
               </CardContent>
@@ -1236,7 +1236,7 @@ end
                   </div>
                   <div className="flex-1">
                     <p className="text-xs font-bold mb-0.5">Ofuscação Avançada</p>
-                    <p className="text-[10px] text-muted-foreground leading-relaxed">Código protegido com marca d'água única.</p>
+                    <p className="text-xs text-muted-foreground leading-relaxed">Código protegido com marca d'água única.</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
@@ -1245,7 +1245,7 @@ end
                   </div>
                   <div className="flex-1">
                     <p className="text-xs font-bold mb-0.5">Verificado</p>
-                    <p className="text-[10px] text-muted-foreground leading-relaxed">Testado pela equipe Hidden Mod.</p>
+                    <p className="text-xs text-muted-foreground leading-relaxed">Testado pela equipe Hidden Mod.</p>
                   </div>
                 </div>
               </CardContent>
@@ -1263,8 +1263,8 @@ end
             <Card className="w-full max-w-sm bg-card border border-border rounded-md">
               <div className="h-1 w-full bg-gradient-to-r from-neon-purple via-neon-pink to-neon-cyan" />
               <CardHeader className="text-center pb-2 border-b border-border">
-                <CardTitle className="text-xs uppercase tracking-[0.3em] font-bold text-foreground">método de pagamento</CardTitle>
-                <p className="text-[10px] text-muted-foreground uppercase tracking-widest">
+                <CardTitle className="text-xs   font-bold text-foreground">método de pagamento</CardTitle>
+                <p className="text-xs text-muted-foreground  ">
                   {pendingRenewal ? "renovação" : "Escolha como deseja pagar"}
                 </p>
               </CardHeader>
@@ -1285,9 +1285,9 @@ end
                       >
                         <QrCode className="h-5 w-5 text-neon-green shrink-0" />
                         <div className="text-left flex-1">
-                          <p className="font-bold text-xs uppercase tracking-widest text-neon-green">PIX</p>
-                          <p className="text-[10px] text-muted-foreground uppercase tracking-widest">instantâneo</p>
-                          <div className="mt-1 text-[10px] text-muted-foreground space-y-0.5 normal-case tracking-normal">
+                          <p className="font-bold text-xs   text-neon-green">PIX</p>
+                          <p className="text-xs text-muted-foreground  ">instantâneo</p>
+                          <div className="mt-1 text-xs text-muted-foreground space-y-0.5 normal-case tracking-normal">
                             <p>Subtotal: R$ {basePrice.toFixed(2)}</p>
                             <p>Taxa Pix (1%): R$ {pixFee.toFixed(2)}</p>
                             <p className="text-neon-green font-bold">Total: R$ {pixTotal.toFixed(2)}</p>
@@ -1303,9 +1303,9 @@ end
                       >
                         <CreditCard className="h-5 w-5 text-neon-purple shrink-0" />
                         <div className="text-left flex-1">
-                          <p className="font-bold text-xs uppercase tracking-widest text-neon-purple">cartão</p>
-                          <p className="text-[10px] text-muted-foreground uppercase tracking-widest">parcele em até 12x</p>
-                          <div className="mt-1 text-[10px] text-muted-foreground space-y-0.5 normal-case tracking-normal">
+                          <p className="font-bold text-xs   text-neon-purple">cartão</p>
+                          <p className="text-xs text-muted-foreground  ">parcele em até 12x</p>
+                          <div className="mt-1 text-xs text-muted-foreground space-y-0.5 normal-case tracking-normal">
                             <p>Subtotal: R$ {basePrice.toFixed(2)}</p>
                             <p>Taxa Cartão (4.99%): R$ {cardFee.toFixed(2)}</p>
                             <p className="text-neon-purple font-bold">Total: R$ {cardTotal.toFixed(2)}</p>
@@ -1318,7 +1318,7 @@ end
 
                 <Button
                   variant="ghost"
-                  className="w-full text-muted-foreground hover:text-foreground rounded-md uppercase tracking-widest text-[10px] font-bold"
+                  className="w-full text-muted-foreground hover:text-foreground rounded-md   text-xs font-bold"
                   onClick={() => { setShowPaymentMethodModal(false); setPendingRenewal(false); }}
                 >
                   cancelar
@@ -1336,8 +1336,8 @@ end
             <Card className="w-full max-w-sm bg-card border border-neon-green/30 rounded-md">
               <div className="h-1 w-full bg-gradient-to-r from-neon-green via-neon-cyan to-neon-purple" />
               <CardHeader className="text-center pb-2 border-b border-border">
-                <CardTitle className="text-xs uppercase tracking-[0.3em] font-bold text-neon-green">pagar com pix</CardTitle>
-                <p className="text-[10px] text-muted-foreground uppercase tracking-widest">escaneie ou copie o código</p>
+                <CardTitle className="text-xs   font-bold text-neon-green">pagar com pix</CardTitle>
+                <p className="text-xs text-muted-foreground  ">escaneie ou copie o código</p>
               </CardHeader>
               <CardContent className="space-y-4 pt-4">
                 {pixData.qr_code_base64 && (
@@ -1354,9 +1354,9 @@ end
 
                 {pixData.qr_code && (
                   <div className="space-y-2">
-                    <p className="text-[10px] text-muted-foreground text-center uppercase tracking-widest">copia e cola</p>
+                    <p className="text-xs text-muted-foreground text-center  ">copia e cola</p>
                     <div className="flex items-center gap-2 bg-surface rounded-md p-2 border border-border">
-                      <code className="text-[10px] font-mono text-foreground flex-1 break-all line-clamp-3">
+                      <code className="text-xs font-mono text-foreground flex-1 break-all line-clamp-3">
                         {pixData.qr_code}
                       </code>
                       <Button
@@ -1375,7 +1375,7 @@ end
                 )}
 
                 {pixPolling && (
-                  <div className="flex items-center justify-center gap-2 text-[10px] uppercase tracking-widest text-neon-green">
+                  <div className="flex items-center justify-center gap-2 text-xs   text-neon-green">
                     <div className="h-3 w-3 border-2 border-neon-green border-t-transparent rounded-full animate-spin" />
                     aguardando pagamento...
                   </div>
@@ -1383,7 +1383,7 @@ end
 
                 <Button
                   variant="outline"
-                  className="w-full rounded-md border-border bg-transparent hover:bg-secondary/60 uppercase tracking-widest text-[10px] font-bold"
+                  className="w-full rounded-md border-border bg-transparent hover:bg-secondary/60   text-xs font-bold"
                   onClick={() => {
                     if (pollingRef.current) clearInterval(pollingRef.current);
                     setPixPolling(false);

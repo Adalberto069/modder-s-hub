@@ -280,8 +280,8 @@ function BlockEditor({ block, onChange, onRemove, onMoveUp, onMoveDown, isFirst,
           <div className={`p-1.5 rounded-md ${info.bgColor} ${info.color}`}>
             <IconComp className="h-3.5 w-3.5" />
           </div>
-          <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{info.label}</span>
-          <span className="text-[9px] text-muted-foreground/40 font-mono">#{index + 1}</span>
+          <span className="text-xs font-bold text-muted-foreground  ">{info.label}</span>
+          <span className="text-[11px] text-muted-foreground/40 font-mono">#{index + 1}</span>
         </div>
         <Button
           variant="ghost"
@@ -307,7 +307,7 @@ function BlockEditor({ block, onChange, onRemove, onMoveUp, onMoveDown, isFirst,
           <div className="space-y-3">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-1">
-                <Label className="text-[10px] uppercase font-bold text-muted-foreground/70">URL da Imagem</Label>
+                <Label className="text-xs  font-bold text-muted-foreground/70">URL da Imagem</Label>
                 <Input
                   placeholder="https://..."
                   value={block.imageUrl || ""}
@@ -316,7 +316,7 @@ function BlockEditor({ block, onChange, onRemove, onMoveUp, onMoveDown, isFirst,
                 />
               </div>
               <div className="space-y-1">
-                <Label className="text-[10px] uppercase font-bold text-muted-foreground/70">Legenda / Alt</Label>
+                <Label className="text-xs  font-bold text-muted-foreground/70">Legenda / Alt</Label>
                 <Input
                   placeholder="Descrição da imagem"
                   value={block.content}
@@ -334,7 +334,7 @@ function BlockEditor({ block, onChange, onRemove, onMoveUp, onMoveDown, isFirst,
         ) : block.type === "video" ? (
           <div className="space-y-3">
             <div className="space-y-1">
-              <Label className="text-[10px] uppercase font-bold text-muted-foreground/70">URL do YouTube</Label>
+              <Label className="text-xs  font-bold text-muted-foreground/70">URL do YouTube</Label>
               <Input
                 placeholder="https://www.youtube.com/watch?v=... ou https://youtu.be/..."
                 value={block.content}
@@ -390,7 +390,7 @@ function BlockEditor({ block, onChange, onRemove, onMoveUp, onMoveDown, isFirst,
                 </Button>
               </div>
             ))}
-            <Button variant="outline" size="sm" className="h-7 text-[10px] gap-1" onClick={() => onChange({ ...block, items: [...(block.items || []), ""] })}>
+            <Button variant="outline" size="sm" className="h-7 text-xs gap-1" onClick={() => onChange({ ...block, items: [...(block.items || []), ""] })}>
               <Plus className="h-3 w-3" /> Adicionar Item
             </Button>
           </div>
@@ -457,7 +457,7 @@ function LivePrévia({ form }: { form: TutorialFormData }) {
         {form.tags.length > 0 && (
           <div className="flex flex-wrap gap-1.5 mt-2">
             {form.tags.map((tag) => (
-              <Badge key={tag} variant="outline" className="text-[10px]">{tag}</Badge>
+              <Badge key={tag} variant="outline" className="text-xs">{tag}</Badge>
             ))}
           </div>
         )}
@@ -503,7 +503,7 @@ function LivePrévia({ form }: { form: TutorialFormData }) {
                         <div className="h-2.5 w-2.5 rounded-full bg-amber-400/60" />
                         <div className="h-2.5 w-2.5 rounded-full bg-neon-green/60" />
                       </div>
-                      <span className="text-[10px] font-mono text-muted-foreground/50 uppercase ml-2">{block.language || "code"}</span>
+                      <span className="text-xs font-mono text-muted-foreground/50  ml-2">{block.language || "code"}</span>
                     </div>
                   </div>
                   <pre className="bg-slate-950/90 p-5 text-[13px] font-mono overflow-x-auto">
@@ -517,7 +517,7 @@ function LivePrévia({ form }: { form: TutorialFormData }) {
                 <div key={idx} className="flex gap-4 p-4 rounded-xl bg-neon-cyan/5 border border-neon-cyan/20">
                   <div className="p-2 rounded-lg bg-neon-cyan/10 text-neon-cyan shrink-0 h-fit"><Lightbulb className="h-5 w-5" /></div>
                   <div className="space-y-1 min-w-0">
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-neon-cyan/70">Dica</span>
+                    <span className="text-xs font-bold   text-neon-cyan/70">Dica</span>
                     <p className="text-sm text-foreground/90 leading-relaxed">{renderInline(block.content)}</p>
                   </div>
                 </div>
@@ -528,7 +528,7 @@ function LivePrévia({ form }: { form: TutorialFormData }) {
                 <div key={idx} className="flex gap-4 p-4 rounded-xl bg-destructive/5 border border-destructive/20">
                   <div className="p-2 rounded-lg bg-destructive/10 text-destructive shrink-0 h-fit"><AlertTriangle className="h-5 w-5" /></div>
                   <div className="space-y-1 min-w-0">
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-destructive/70">Atenção</span>
+                    <span className="text-xs font-bold   text-destructive/70">Atenção</span>
                     <p className="text-sm text-foreground/90 leading-relaxed">{renderInline(block.content)}</p>
                   </div>
                 </div>
@@ -609,7 +609,7 @@ function LivePrévia({ form }: { form: TutorialFormData }) {
               <div className="flex gap-4 p-4 rounded-xl bg-destructive/5 border border-destructive/20">
                 <div className="p-2 rounded-lg bg-destructive/10 text-destructive shrink-0 h-fit"><AlertTriangle className="h-5 w-5" /></div>
                 <div className="space-y-1 min-w-0">
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-destructive/70">Problema</span>
+                  <span className="text-xs font-bold   text-destructive/70">Problema</span>
                   <p className="text-sm text-foreground/90 font-medium">{item.problem}</p>
                 </div>
               </div>
@@ -806,7 +806,7 @@ export default function TutorialEditor() {
                 {isEditing ? "Editar Tutorial" : "Novo Tutorial"}
               </h1>
               <div className="flex items-center gap-3 mt-0.5">
-                <span className="text-[10px] text-muted-foreground font-mono">
+                <span className="text-xs text-muted-foreground font-mono">
                   {blockCount} blocos · {wordCount} palavras
                 </span>
               </div>
@@ -918,7 +918,7 @@ export default function TutorialEditor() {
                 <Separator className="opacity-30" />
 
                 <div className="flex flex-wrap gap-1.5">
-                  <span className="text-[10px] text-muted-foreground mr-1 self-center">Adicionar:</span>
+                  <span className="text-xs text-muted-foreground mr-1 self-center">Adicionar:</span>
                   {([
                     { type: "text" as const, label: "Texto", icon: FileText },
                     { type: "step" as const, label: "Passo", icon: ChevronRight },
@@ -928,7 +928,7 @@ export default function TutorialEditor() {
                     { type: "tip" as const, label: "Dica", icon: Lightbulb },
                     { type: "warning" as const, label: "Aviso", icon: AlertTriangle },
                   ]).map(({ type, label, icon: I }) => (
-                    <Button key={type} variant="outline" size="sm" className="h-7 text-[10px] gap-1 border-border/30" onClick={() => addBlock(type)}>
+                    <Button key={type} variant="outline" size="sm" className="h-7 text-xs gap-1 border-border/30" onClick={() => addBlock(type)}>
                       <I className="h-3 w-3" /> {label}
                     </Button>
                   ))}
@@ -961,7 +961,7 @@ export default function TutorialEditor() {
                 {form.troubleshooting.map((item, idx) => (
                   <div key={idx} className="border border-border/30 rounded-lg p-3 bg-secondary/5 space-y-2">
                     <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-mono text-muted-foreground uppercase">Problema #{idx + 1}</span>
+                      <span className="text-xs font-mono text-muted-foreground ">Problema #{idx + 1}</span>
                       <Button variant="ghost" size="icon" className="h-6 w-6"
                         onClick={() => { if (form.troubleshooting.length > 1) setForm((f) => ({ ...f, troubleshooting: f.troubleshooting.filter((_, i) => i !== idx) })); }}>
                         <Trash2 className="h-3 w-3 text-destructive" />
@@ -1032,7 +1032,7 @@ export default function TutorialEditor() {
               <SectionCard title="Tags" icon={Hash} variant="green">
                 <div className="flex flex-wrap gap-1.5">
                   {form.tags.map((tag) => (
-                    <Badge key={tag} variant="secondary" className="text-[10px] gap-1 cursor-pointer hover:bg-destructive/20" onClick={() => removeTag(tag)}>
+                    <Badge key={tag} variant="secondary" className="text-xs gap-1 cursor-pointer hover:bg-destructive/20" onClick={() => removeTag(tag)}>
                       {tag} ×
                     </Badge>
                   ))}
@@ -1051,7 +1051,7 @@ export default function TutorialEditor() {
                 </div>
                 <div className="flex flex-wrap gap-1">
                   {TAG_SUGGESTIONS.filter((t) => !form.tags.includes(t)).slice(0, 8).map((tag) => (
-                    <Badge key={tag} variant="outline" className="text-[9px] cursor-pointer hover:bg-secondary transition-colors" onClick={() => addTag(tag)}>
+                    <Badge key={tag} variant="outline" className="text-[11px] cursor-pointer hover:bg-secondary transition-colors" onClick={() => addTag(tag)}>
                       + {tag}
                     </Badge>
                   ))}
@@ -1065,7 +1065,7 @@ export default function TutorialEditor() {
                     const selected = form.relatedTutorialIds.includes(t.id);
                     return (
                       <Badge key={t.id} variant={selected ? "default" : "outline"}
-                        className="cursor-pointer text-[9px] transition-all hover:scale-105"
+                        className="cursor-pointer text-[11px] transition-all hover:scale-105"
                         onClick={() => {
                           setForm((f) => ({
                             ...f,
@@ -1077,7 +1077,7 @@ export default function TutorialEditor() {
                     );
                   })}
                   {allTutorials.filter((t: any) => t.id !== id).length === 0 && (
-                    <p className="text-[10px] text-muted-foreground">Nenhum disponível.</p>
+                    <p className="text-xs text-muted-foreground">Nenhum disponível.</p>
                   )}
                 </div>
               </SectionCard>
@@ -1098,7 +1098,7 @@ export default function TutorialEditor() {
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-3">
-            <Label className="text-xs uppercase tracking-wider text-muted-foreground">Briefing / Prompt</Label>
+            <Label className="text-xs  tracking-wider text-muted-foreground">Briefing / Prompt</Label>
             <Textarea
               value={aiPrompt}
               onChange={(e) => setAiPrompt(e.target.value)}
@@ -1107,7 +1107,7 @@ export default function TutorialEditor() {
               className="text-sm resize-none bg-background/60 border-border/30 focus:border-primary/50"
               disabled={isGenerating}
             />
-            <p className="text-[10px] text-muted-foreground/70">
+            <p className="text-xs text-muted-foreground/70">
               Dica: quanto mais contexto (público-alvo, nível, exemplos que quer), melhor o resultado.
             </p>
           </div>

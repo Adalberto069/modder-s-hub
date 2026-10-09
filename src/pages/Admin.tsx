@@ -332,7 +332,7 @@ export default function Admin() {
       <div className={`flex items-center justify-between p-4 border-b border-border/60 bg-card hover:bg-secondary transition-colors gap-4 ${!script.is_active ? 'opacity-50 grayscale' : ''}`}>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap mb-1">
-            <p className="font-bold text-sm uppercase tracking-tight text-foreground truncate">{script.title}</p>
+            <p className="font-bold text-sm  tracking-tight text-foreground truncate">{script.title}</p>
             <Badge variant="outline" className={`text-xs ${ps.className}`}>{ps.label}</Badge>
             {script.is_verified && <Badge variant="outline" className="text-xs bg-accent/20 text-accent border-accent/30">✅ Verificado</Badge>}
             {!script.is_active && <Badge variant="destructive" className="text-xs">Inativo</Badge>}
@@ -402,7 +402,7 @@ export default function Admin() {
                 <Badge variant="outline" className="text-xs opacity-60">Base</Badge>
               </div>
               <p className="text-2xl font-bold font-sans text-foreground leading-none">{stats?.users}</p>
-              <p className="text-xs text-muted-foreground mt-1 uppercase tracking-wider font-medium">Usuários</p>
+              <p className="text-xs text-muted-foreground mt-1  tracking-wider font-medium">Usuários</p>
             </CardContent>
           </Card>
 
@@ -415,7 +415,7 @@ export default function Admin() {
                 <Badge variant="outline" className="text-xs text-neon-green/70 border-neon-green/20">Ativos</Badge>
               </div>
               <p className="text-2xl font-bold font-sans text-foreground leading-none">{stats?.scripts}</p>
-              <p className="text-xs text-muted-foreground mt-1 uppercase tracking-wider font-medium">Scripts</p>
+              <p className="text-xs text-muted-foreground mt-1  tracking-wider font-medium">Scripts</p>
             </CardContent>
           </Card>
 
@@ -428,7 +428,7 @@ export default function Admin() {
                 <Badge variant="outline" className="text-xs text-primary/70 border-primary/20">Sucesso</Badge>
               </div>
               <p className="text-2xl font-bold font-sans text-foreground leading-none">{stats?.purchases}</p>
-              <p className="text-xs text-muted-foreground mt-1 uppercase tracking-wider font-medium">Compras</p>
+              <p className="text-xs text-muted-foreground mt-1  tracking-wider font-medium">Compras</p>
             </CardContent>
           </Card>
 
@@ -441,7 +441,7 @@ export default function Admin() {
                 <Badge variant="outline" className="text-xs text-accent/70 border-accent/20">Crescimento</Badge>
               </div>
               <p className="text-2xl font-bold font-sans text-foreground leading-none">R$ {(stats?.totalSales ?? 0).toFixed(0)}</p>
-              <p className="text-xs text-muted-foreground mt-1 uppercase tracking-wider font-medium">Volume Total</p>
+              <p className="text-xs text-muted-foreground mt-1  tracking-wider font-medium">Volume Total</p>
             </CardContent>
           </Card>
         </div>
@@ -451,11 +451,11 @@ export default function Admin() {
           <Card className="lg:col-span-2 bg-card border-border rounded-md shadow-none overflow-hidden">
             <CardHeader className="pb-4 border-b border-border/60 bg-background flex flex-row items-center justify-between">
               <div>
-                <CardTitle className="text-sm font-bold uppercase tracking-widest flex items-center gap-2 text-foreground">
+                <CardTitle className="text-sm font-bold   flex items-center gap-2 text-foreground">
                   <TrendingUp className="h-4 w-4 text-accent" />
                   Vendas da plataforma
                 </CardTitle>
-                <CardDescription className="text-xs uppercase tracking-widest mt-1">Volume de transações nos últimos 30 dias</CardDescription>
+                <CardDescription className="text-xs   mt-1">Volume de transações nos últimos 30 dias</CardDescription>
               </div>
               <Activity className="h-3 w-3 text-muted-foreground/30" />
             </CardHeader>
@@ -508,7 +508,7 @@ export default function Admin() {
 
           <Card className="bg-card border-border rounded-md shadow-none overflow-hidden font-sans">
             <CardHeader className="pb-4 border-b border-border/60 bg-background">
-              <CardTitle className="text-sm font-bold uppercase tracking-widest flex items-center gap-2 text-foreground">
+              <CardTitle className="text-sm font-bold   flex items-center gap-2 text-foreground">
                 <BarChart3 className="h-4 w-4 text-neon-green" />
                 Resumo financeiro
               </CardTitle>
@@ -518,7 +518,7 @@ export default function Admin() {
                 <div className="relative pt-1">
                   <div className="flex mb-2 items-center justify-between">
                     <div>
-                      <span className="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-primary bg-primary/10">
+                      <span className="text-xs font-semibold inline-block py-1 px-2  rounded-full text-primary bg-primary/10">
                         Comissão Plataforma (20%)
                       </span>
                     </div>
@@ -536,7 +536,7 @@ export default function Admin() {
                 <div className="relative pt-1">
                   <div className="flex mb-2 items-center justify-between">
                     <div>
-                      <span className="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-neon-green bg-neon-green/10">
+                      <span className="text-xs font-semibold inline-block py-1 px-2  rounded-full text-neon-green bg-neon-green/10">
                         Ganhos Modders (80%)
                       </span>
                     </div>
@@ -594,28 +594,28 @@ export default function Admin() {
         {/* Main admin tabs */}
         <Tabs defaultValue="scripts" className="font-sans">
           <TabsList className="mb-6 grid w-full grid-cols-2 sm:grid-cols-4 xl:grid-cols-8 p-1 bg-card border border-border rounded-md h-auto">
-            <TabsTrigger value="scripts" className="text-xs sm:text-xs tracking-widest uppercase font-bold gap-2 data-[state=active]:bg-background data-[state=active]:text-neon-purple rounded-md h-full">
+            <TabsTrigger value="scripts" className="text-xs sm:text-xs   font-bold gap-2 data-[state=active]:bg-background data-[state=active]:text-neon-purple rounded-md h-full">
               <Code className="h-4 w-4" /> <span className="hidden sm:inline">Scripts</span>
             </TabsTrigger>
-            <TabsTrigger value="users" className="text-xs sm:text-xs tracking-widest uppercase font-bold gap-2 data-[state=active]:bg-background data-[state=active]:text-neon-cyan rounded-md h-full">
+            <TabsTrigger value="users" className="text-xs sm:text-xs   font-bold gap-2 data-[state=active]:bg-background data-[state=active]:text-neon-cyan rounded-md h-full">
               <Users className="h-4 w-4" /> <span className="hidden sm:inline">Usuários</span>
             </TabsTrigger>
-            <TabsTrigger value="licenses" className="text-xs sm:text-xs tracking-widest uppercase font-bold gap-2 data-[state=active]:bg-background data-[state=active]:text-neon-green rounded-md h-full">
+            <TabsTrigger value="licenses" className="text-xs sm:text-xs   font-bold gap-2 data-[state=active]:bg-background data-[state=active]:text-neon-green rounded-md h-full">
               <Key className="h-4 w-4" /> <span className="hidden sm:inline">Licenças</span>
             </TabsTrigger>
-            <TabsTrigger value="purchases" className="text-xs sm:text-xs tracking-widest uppercase font-bold gap-2 data-[state=active]:bg-background data-[state=active]:text-accent rounded-md h-full">
+            <TabsTrigger value="purchases" className="text-xs sm:text-xs   font-bold gap-2 data-[state=active]:bg-background data-[state=active]:text-accent rounded-md h-full">
               <ShoppingCart className="h-4 w-4" /> <span className="hidden sm:inline">Compras</span>
             </TabsTrigger>
-            <TabsTrigger value="disputes" className="text-xs sm:text-xs tracking-widest uppercase font-bold gap-2 data-[state=active]:bg-background data-[state=active]:text-orange-400 rounded-md h-full">
+            <TabsTrigger value="disputes" className="text-xs sm:text-xs   font-bold gap-2 data-[state=active]:bg-background data-[state=active]:text-orange-400 rounded-md h-full">
               <Gavel className="h-4 w-4" /> <span className="hidden sm:inline">Disputas</span>
             </TabsTrigger>
-            <TabsTrigger value="withdrawals" className="text-xs sm:text-xs tracking-widest uppercase font-bold gap-2 data-[state=active]:bg-background data-[state=active]:text-primary rounded-md h-full">
+            <TabsTrigger value="withdrawals" className="text-xs sm:text-xs   font-bold gap-2 data-[state=active]:bg-background data-[state=active]:text-primary rounded-md h-full">
               <Landmark className="h-4 w-4" /> <span className="hidden sm:inline">Pagamentos</span>
             </TabsTrigger>
-            <TabsTrigger value="audit" className="text-xs sm:text-xs tracking-widest uppercase font-bold gap-2 data-[state=active]:bg-background data-[state=active]:text-yellow-400 rounded-md h-full">
+            <TabsTrigger value="audit" className="text-xs sm:text-xs   font-bold gap-2 data-[state=active]:bg-background data-[state=active]:text-yellow-400 rounded-md h-full">
               <Shield className="h-4 w-4" /> <span className="hidden sm:inline">Auditoria</span>
             </TabsTrigger>
-            <TabsTrigger value="leaks" className="text-xs sm:text-xs tracking-widest uppercase font-bold gap-2 data-[state=active]:bg-background data-[state=active]:text-destructive rounded-md h-full">
+            <TabsTrigger value="leaks" className="text-xs sm:text-xs   font-bold gap-2 data-[state=active]:bg-background data-[state=active]:text-destructive rounded-md h-full">
               <AlertTriangle className="h-4 w-4" /> <span className="hidden sm:inline">Vazamentos</span>
             </TabsTrigger>
           </TabsList>
@@ -624,7 +624,7 @@ export default function Admin() {
           <TabsContent value="scripts">
             <Card className="border-border bg-card rounded-md">
               <CardHeader className="border-b border-border/60 bg-background">
-                <CardTitle className="text-sm font-bold uppercase tracking-widest flex items-center gap-2 text-foreground">
+                <CardTitle className="text-sm font-bold   flex items-center gap-2 text-foreground">
                   <Code className="w-4 h-4 text-neon-purple" />
                   Publicações
                 </CardTitle>
@@ -632,10 +632,10 @@ export default function Admin() {
               <CardContent className="pt-6">
                 <Tabs defaultValue="pending_review">
                   <TabsList className="mb-6 grid w-full grid-cols-4 p-1 bg-background border border-border/60 rounded-md h-12">
-                    <TabsTrigger value="pending_review" className="text-xs sm:text-xs tracking-widest uppercase font-bold gap-2 data-[state=active]:bg-secondary data-[state=active]:text-foreground rounded-md h-full">
+                    <TabsTrigger value="pending_review" className="text-xs sm:text-xs   font-bold gap-2 data-[state=active]:bg-secondary data-[state=active]:text-foreground rounded-md h-full">
                       <Send className="h-3 w-3" /> <span className="hidden sm:inline">Em Análise</span> ({pendingReview.length})
                     </TabsTrigger>
-                    <TabsTrigger value="published" className="text-xs sm:text-xs tracking-widest uppercase font-bold gap-2 data-[state=active]:bg-secondary data-[state=active]:text-neon-cyan rounded-md h-full">
+                    <TabsTrigger value="published" className="text-xs sm:text-xs   font-bold gap-2 data-[state=active]:bg-secondary data-[state=active]:text-neon-cyan rounded-md h-full">
                       <Eye className="h-3 w-3" /> <span className="hidden sm:inline">Ativos</span> ({published.length})
                     </TabsTrigger>
                     <TabsTrigger value="drafts" className="text-xs gap-1">
@@ -679,10 +679,10 @@ export default function Admin() {
           <TabsContent value="disputes">
             <Tabs defaultValue="escrow">
               <TabsList className="mb-4 grid w-full grid-cols-2 p-1 bg-background border border-border/60 rounded-md h-12">
-                <TabsTrigger value="escrow" className="text-xs tracking-widest uppercase font-bold data-[state=active]:bg-secondary data-[state=active]:text-yellow-400 rounded-md h-full">
+                <TabsTrigger value="escrow" className="text-xs   font-bold data-[state=active]:bg-secondary data-[state=active]:text-yellow-400 rounded-md h-full">
                   Custódia (Compras)
                 </TabsTrigger>
-                <TabsTrigger value="bounty" className="text-xs tracking-widest uppercase font-bold data-[state=active]:bg-secondary data-[state=active]:text-orange-400 rounded-md h-full">
+                <TabsTrigger value="bounty" className="text-xs   font-bold data-[state=active]:bg-secondary data-[state=active]:text-orange-400 rounded-md h-full">
                   Encomendas
                 </TabsTrigger>
               </TabsList>
@@ -695,7 +695,7 @@ export default function Admin() {
           <TabsContent value="licenses">
             <Card className="border-border bg-card rounded-md">
               <CardHeader className="border-b border-border/60 bg-background">
-                <CardTitle className="flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-foreground">
+                <CardTitle className="flex items-center gap-2 text-sm font-bold   text-foreground">
                   <Key className="h-4 w-4 text-neon-green" /> Licenças
                 </CardTitle>
               </CardHeader>
@@ -748,7 +748,7 @@ export default function Admin() {
           <TabsContent value="purchases">
             <Card className="border-border bg-card rounded-md">
               <CardHeader className="border-b border-border/60 bg-background">
-                <CardTitle className="flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-foreground">
+                <CardTitle className="flex items-center gap-2 text-sm font-bold   text-foreground">
                   <ShoppingCart className="h-4 w-4 text-accent" /> Transações
                 </CardTitle>
               </CardHeader>
@@ -791,7 +791,7 @@ export default function Admin() {
           <TabsContent value="leaks">
             <Card className="border-border bg-card rounded-md">
               <CardHeader className="border-b border-border/60 bg-background">
-                <CardTitle className="flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-destructive">
+                <CardTitle className="flex items-center gap-2 text-sm font-bold   text-destructive">
                   <AlertTriangle className="h-4 w-4" /> Rastrear Vazamentos (Security Ops)
                 </CardTitle>
               </CardHeader>
@@ -806,7 +806,7 @@ export default function Admin() {
                   rows={8}
                   className="font-sans text-xs bg-background border-border focus-visible:ring-neon-purple rounded-md"
                 />
-                <Button onClick={extractWatermark} disabled={leakSearching} className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-neon rounded-md font-bold uppercase tracking-widest text-xs sm:text-xs">
+                <Button onClick={extractWatermark} disabled={leakSearching} className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-neon rounded-md font-bold   text-xs sm:text-xs">
                   <Search className="h-4 w-4 mr-2" />
                   {leakSearching ? "Decodificando..." : "Extrair Watermark"}
                 </Button>

@@ -433,7 +433,7 @@ export default function ScriptEditor() {
       archived: { label: "Arquivado", cls: "bg-destructive/10 text-destructive border-destructive/30" },
     };
     const m = map[publishStatus] ?? { label: publishStatus, cls: "bg-white/5 text-muted-foreground border-white/10" };
-    return <Badge variant="outline" className={`text-[10px] uppercase tracking-widest font-bold ${m.cls}`}>{m.label}</Badge>;
+    return <Badge variant="outline" className={`text-xs   font-bold ${m.cls}`}>{m.label}</Badge>;
   };
 
 
@@ -567,7 +567,7 @@ export default function ScriptEditor() {
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <FieldLabel>Enviar arquivo .lua (opcional)</FieldLabel>
-                  {file && <span className="text-[10px] font-mono text-neon-cyan truncate max-w-[200px]">{file.name}</span>}
+                  {file && <span className="text-xs font-mono text-neon-cyan truncate max-w-[200px]">{file.name}</span>}
                 </div>
                 <Input
                   type="file"
@@ -604,7 +604,7 @@ export default function ScriptEditor() {
               {luaCode.trim().length > 10 && (
                 <div className="pt-2 border-t border-border/60">
                   <div className="mb-3">
-                    <h4 className="text-[11px] font-bold uppercase tracking-widest text-neon-green">Análise de segurança</h4>
+                    <h4 className="text-[11px] font-bold   text-neon-green">Análise de segurança</h4>
                     <p className="text-[11px] text-muted-foreground mt-0.5">Verificamos o código antes da publicação.</p>
                   </div>
                   <ScriptAnalysis code={luaCode} scriptId={id} onAnalysisComplete={setLastAnalysis} />
@@ -624,7 +624,7 @@ export default function ScriptEditor() {
                 <div className="flex items-center justify-between">
                   <FieldLabel>Arquivo .apk *</FieldLabel>
                   {apkFile && (
-                    <span className="text-[10px] font-mono text-neon-cyan truncate max-w-[220px]">
+                    <span className="text-xs font-mono text-neon-cyan truncate max-w-[220px]">
                       {apkFile.name} · {(apkFile.size / (1024 * 1024)).toFixed(1)}MB
                     </span>
                   )}
@@ -672,7 +672,7 @@ export default function ScriptEditor() {
                   placeholder="https://... (ou cole um link Mediafire/Mega se preferir hospedar fora)"
                   className={inputCls}
                 />
-                <p className="text-[10px] text-muted-foreground">
+                <p className="text-xs text-muted-foreground">
                   Este link é exibido no botão de download da página do APK. Pode ser o upload direto (acima) ou um mirror externo.
                 </p>
               </div>
@@ -845,7 +845,7 @@ export default function ScriptEditor() {
             variant="outline"
             onClick={() => handleSave("draft")}
             disabled={submitting}
-            className="flex-1 h-11 border-border bg-secondary/60 hover:bg-white/10 font-bold uppercase tracking-widest text-[11px]"
+            className="flex-1 h-11 border-border bg-secondary/60 hover:bg-white/10 font-bold   text-[11px]"
           >
             {submitting ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
             Salvar rascunho
@@ -855,7 +855,7 @@ export default function ScriptEditor() {
             <Button
               onClick={() => handleSave("pending_review")}
               disabled={submitting}
-              className="flex-1 h-11 bg-neon-purple hover:bg-neon-purple/90 text-primary-foreground font-bold uppercase tracking-widest text-[11px]"
+              className="flex-1 h-11 bg-neon-purple hover:bg-neon-purple/90 text-primary-foreground font-bold   text-[11px]"
             >
               {submitting ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Send className="h-4 w-4 mr-2" />}
               Enviar para aprovação
@@ -866,7 +866,7 @@ export default function ScriptEditor() {
             <Button
               onClick={() => handleSave("published")}
               disabled={submitting || lastAnalysis?.classification === "malicious"}
-              className={`flex-1 h-11 font-bold uppercase tracking-widest text-[11px] ${
+              className={`flex-1 h-11 font-bold   text-[11px] ${
                 lastAnalysis?.classification === "malicious"
                   ? "bg-destructive/20 text-destructive border border-destructive/30 cursor-not-allowed"
                   : "bg-neon-green hover:bg-neon-green/90 text-black"
@@ -882,7 +882,7 @@ export default function ScriptEditor() {
               variant="outline"
               onClick={() => handleSave("archived")}
               disabled={submitting}
-              className="h-11 sm:w-32 border-destructive/20 text-destructive hover:bg-destructive/5 font-bold uppercase tracking-widest text-[11px]"
+              className="h-11 sm:w-32 border-destructive/20 text-destructive hover:bg-destructive/5 font-bold   text-[11px]"
             >
               Arquivar
             </Button>

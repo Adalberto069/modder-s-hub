@@ -263,8 +263,8 @@ export function AdminBadges() {
                         <div className="min-w-0">
                           <div className="flex items-center gap-2 flex-wrap">
                             <span className="font-semibold text-sm">{badge.name}</span>
-                            <Badge variant="outline" className="text-[10px]">{badge.category}</Badge>
-                            <span className="text-[10px] text-muted-foreground font-mono">{badge.slug}</span>
+                            <Badge variant="outline" className="text-xs">{badge.category}</Badge>
+                            <span className="text-xs text-muted-foreground font-mono">{badge.slug}</span>
                           </div>
                           {badge.description && (
                             <p className="text-xs text-muted-foreground truncate">{badge.description}</p>
@@ -479,7 +479,7 @@ export function AdminBadges() {
                     >
                       <div>
                         <p className="text-sm font-medium">{u.display_name ?? u.username}</p>
-                        <p className="text-[10px] text-muted-foreground">@{u.username}</p>
+                        <p className="text-xs text-muted-foreground">@{u.username}</p>
                       </div>
                       <UserPlus className="h-4 w-4 text-primary shrink-0" />
                     </button>

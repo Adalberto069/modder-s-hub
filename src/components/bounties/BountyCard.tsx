@@ -51,18 +51,18 @@ export function BountyCard({ bounty }: BountyCardProps) {
               </div>
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-1.5 mb-0.5">
-                  <span className={`text-[8px] font-bold uppercase tracking-widest px-1 py-[1px] border ${isApk ? "text-neon-green border-neon-green/40 bg-neon-green/5" : "text-neon-cyan border-neon-cyan/40 bg-neon-cyan/5"}`}>
+                  <span className={`text-[8px] font-bold   px-1 py-[1px] border ${isApk ? "text-neon-green border-neon-green/40 bg-neon-green/5" : "text-neon-cyan border-neon-cyan/40 bg-neon-cyan/5"}`}>
                     {isApk ? "APK MOD" : "SCRIPT .LUA"}
                   </span>
                 </div>
-                <h3 className={`font-bold text-sm uppercase tracking-tight text-foreground truncate transition-colors line-clamp-1 ${isApk ? "group-hover:text-neon-green" : "group-hover:text-neon-purple"}`}>
+                <h3 className={`font-bold text-sm  tracking-tight text-foreground truncate transition-colors line-clamp-1 ${isApk ? "group-hover:text-neon-green" : "group-hover:text-neon-purple"}`}>
                   {cleanTitle}
                 </h3>
               </div>
             </div>
             <Badge
               variant="outline"
-              className={`text-[10px] shrink-0 font-bold uppercase tracking-widest rounded-md ${status.color} ${status.bg} ${status.border}`}
+              className={`text-xs shrink-0 font-bold   rounded-md ${status.color} ${status.bg} ${status.border}`}
             >
               {status.label}
             </Badge>
@@ -77,18 +77,18 @@ export function BountyCard({ bounty }: BountyCardProps) {
           {/* Tags row */}
           <div className="flex flex-wrap gap-1.5">
             {bounty.game_name && (
-              <span className="flex items-center gap-1 text-[10px] font-medium text-neon-cyan bg-neon-cyan/5 border border-neon-cyan/10 px-2 py-0.5">
+              <span className="flex items-center gap-1 text-xs font-medium text-neon-cyan bg-neon-cyan/5 border border-neon-cyan/10 px-2 py-0.5">
                 <Gamepad2 className="h-2.5 w-2.5" />
                 {bounty.game_name}
               </span>
             )}
             {bounty.categories?.name && (
-              <span className="text-[10px] font-medium text-muted-foreground bg-secondary/60 border border-border/60 px-2 py-0.5">
+              <span className="text-xs font-medium text-muted-foreground bg-secondary/60 border border-border/60 px-2 py-0.5">
                 {bounty.categories.icon} {bounty.categories.name}
               </span>
             )}
             {isExpired && (
-              <span className="text-[10px] font-medium text-destructive bg-destructive/10 border border-destructive/20 px-2 py-0.5">
+              <span className="text-xs font-medium text-destructive bg-destructive/10 border border-destructive/20 px-2 py-0.5">
                 EXPIRADA
               </span>
             )}
@@ -101,12 +101,12 @@ export function BountyCard({ bounty }: BountyCardProps) {
                 R$ {bounty.reward_amount.toFixed(2).replace('.', ',')}
               </span>
             ) : (
-              <span className="text-[10px] font-bold uppercase tracking-widest text-neon-cyan/70">
+              <span className="text-xs font-bold   text-neon-cyan/70">
                 Voluntário
               </span>
             )}
             {appCount > 0 && (
-              <span className="flex items-center gap-1 text-[10px] font-bold text-neon-cyan/80">
+              <span className="flex items-center gap-1 text-xs font-bold text-neon-cyan/80">
                 <Users className="h-2.5 w-2.5" />
                 {appCount} candidatura{appCount !== 1 ? 's' : ''}
               </span>
@@ -115,11 +115,11 @@ export function BountyCard({ bounty }: BountyCardProps) {
 
           {/* Footer */}
           <div className="flex items-center gap-3">
-            <span className="flex items-center gap-1 text-[10px] text-muted-foreground/70">
+            <span className="flex items-center gap-1 text-xs text-muted-foreground/70">
               <User className="h-2.5 w-2.5" />
               {bounty.profiles?.display_name ?? bounty.profiles?.username ?? "Anônimo"}
             </span>
-            <span className="flex items-center gap-1 text-[10px] text-muted-foreground/50">
+            <span className="flex items-center gap-1 text-xs text-muted-foreground/50">
               <Clock className="h-2.5 w-2.5" />
               {timeAgo}
             </span>

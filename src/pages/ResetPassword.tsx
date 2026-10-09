@@ -82,7 +82,7 @@ export default function ResetPassword() {
         <Card className="w-full max-w-md neon-border bg-card/80 backdrop-blur-sm">
           <CardHeader className="text-center">
             <Terminal className="h-10 w-10 mx-auto text-neon-purple mb-2" />
-            <CardTitle className="font-mono">Nova Senha</CardTitle>
+            <CardTitle className="font-sans">Nova Senha</CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleReset} className="space-y-4">

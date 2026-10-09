@@ -248,7 +248,7 @@ export function AdminModerationQueue() {
                         <Icon className="h-3 w-3" /> {config.label}
                       </Badge>
                     )}
-                    <Badge variant="outline" className={`text-[10px] ${
+                    <Badge variant="outline" className={`text-xs ${
                       script.security_status === "flagged"
                         ? "bg-destructive/20 text-destructive border-destructive/30"
                         : "bg-primary/20 text-primary border-primary/30"
@@ -256,7 +256,7 @@ export function AdminModerationQueue() {
                       {script.security_status === "flagged" ? "🚩 Flagrado" : "🔍 Em Revisão"}
                     </Badge>
                   </div>
-                  <div className="flex gap-3 text-[10px] text-muted-foreground">
+                  <div className="flex gap-3 text-xs text-muted-foreground">
                     <span>Por: {modder?.display_name || modder?.username || "Desconhecido"}</span>
                     {script.game_name && <span>🎮 {script.game_name}</span>}
                     <span>{new Date(script.created_at).toLocaleDateString("pt-BR")}</span>
@@ -290,7 +290,7 @@ export function AdminModerationQueue() {
                   {Array.isArray(analysis.threats) && analysis.threats.length > 0 && (
                     <div className="flex flex-wrap gap-1">
                       {analysis.threats.map((t: any, i: number) => (
-                        <Badge key={i} variant="outline" className="text-[9px] bg-destructive/10 text-destructive border-destructive/20">
+                        <Badge key={i} variant="outline" className="text-[11px] bg-destructive/10 text-destructive border-destructive/20">
                           {t.type}: {t.description}
                         </Badge>
                       ))}
@@ -334,10 +334,10 @@ export function AdminModerationQueue() {
             ) : (
               <div className="space-y-1 max-h-60 overflow-y-auto">
                 {auditLogs?.map((log: any) => (
-                  <div key={log.id} className="flex items-center gap-2 text-[10px] text-muted-foreground p-2 rounded bg-background/30">
+                  <div key={log.id} className="flex items-center gap-2 text-xs text-muted-foreground p-2 rounded bg-background/30">
                     <Clock className="h-3 w-3 shrink-0" />
                     <span>{new Date(log.created_at).toLocaleString("pt-BR")}</span>
-                    <Badge variant="outline" className={`text-[9px] ${
+                    <Badge variant="outline" className={`text-[11px] ${
                       log.action === "approve" ? "text-accent border-accent/30" :
                       log.action === "reject" ? "text-destructive border-destructive/30" :
                       "text-primary border-primary/30"

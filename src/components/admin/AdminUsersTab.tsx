@@ -79,7 +79,7 @@ export function AdminUsersTab() {
           user: "bg-muted text-muted-foreground border-border",
         };
         return (
-          <Badge key={r.role} variant="outline" className={`text-[10px] ${colors[r.role] || ""}`}>
+          <Badge key={r.role} variant="outline" className={`text-xs ${colors[r.role] || ""}`}>
             {r.role === "admin" && <Shield className="h-3 w-3 mr-1" />}
             {r.role === "modder" && <Code className="h-3 w-3 mr-1" />}
             {r.role === "user" && <User className="h-3 w-3 mr-1" />}
@@ -205,7 +205,7 @@ export function AdminUsersTab() {
     <Card className="border-border bg-card rounded-md">
       <CardHeader className="border-b border-border/60 bg-surface">
 
-        <CardTitle className="text-sm font-bold uppercase tracking-widest flex items-center gap-2 text-foreground">
+        <CardTitle className="text-sm font-bold   flex items-center gap-2 text-foreground">
           <UserCheck className="w-4 h-4 text-neon-purple" />
           Gerenciamento de Usuários
         </CardTitle>
@@ -222,7 +222,7 @@ export function AdminUsersTab() {
               <s.icon className="h-4 w-4" />
               <div className="flex flex-col leading-tight">
                 <span className="text-lg font-bold">{s.value}</span>
-                <span className="text-[9px] uppercase tracking-widest text-muted-foreground">{s.label}</span>
+                <span className="text-[11px]   text-muted-foreground">{s.label}</span>
               </div>
             </div>
           ))}
@@ -237,7 +237,7 @@ export function AdminUsersTab() {
           />
         </div>
 
-        <div className="text-[10px] text-muted-foreground mb-2 uppercase tracking-widest">
+        <div className="text-xs text-muted-foreground mb-2  ">
           {filtered?.length ?? 0} usuário(s) encontrado(s)
         </div>
 
@@ -256,12 +256,12 @@ export function AdminUsersTab() {
                       <span className={`font-bold text-sm truncate ${user.is_banned ? "text-orange-500 line-through" : "text-foreground"}`}>{name}</span>
                       {getRoleBadges(user.user_roles)}
                       {user.is_banned && (
-                        <Badge variant="outline" className="text-[10px] border-orange-500/40 text-orange-500">
+                        <Badge variant="outline" className="text-xs border-orange-500/40 text-orange-500">
                           <Ban className="h-3 w-3 mr-1" /> BANIDO
                         </Badge>
                       )}
                     </div>
-                    <div className="flex gap-3 text-[10px] text-muted-foreground flex-wrap">
+                    <div className="flex gap-3 text-xs text-muted-foreground flex-wrap">
                       <span>@{user.username}</span>
                       {user.email && <span className="text-secondary-foreground/60">{user.email}</span>}
                       <span>Rep: {user.reputation_score ?? 0}</span>
@@ -274,7 +274,7 @@ export function AdminUsersTab() {
                       size="sm"
                       variant="outline"
                       onClick={() => setRolesUser(user)}
-                      className="text-[10px] uppercase tracking-widest font-bold gap-1 rounded-md border-neon-purple/30 text-neon-purple hover:bg-neon-purple/10"
+                      className="text-xs   font-bold gap-1 rounded-md border-neon-purple/30 text-neon-purple hover:bg-neon-purple/10"
                       title="Gerenciar patentes"
                     >
                       <Settings2 className="h-3 w-3" />
@@ -285,7 +285,7 @@ export function AdminUsersTab() {
                       variant="outline"
                       disabled={isAdmin || user.user_id === currentUser?.id}
                       onClick={() => { setBanReason(""); setBanTarget(user); }}
-                      className={`text-[10px] uppercase tracking-widest font-bold gap-1 rounded-md disabled:opacity-30 ${user.is_banned ? "border-green-500/40 text-green-500 hover:bg-green-500/10" : "border-orange-500/40 text-orange-500 hover:bg-orange-500/10"}`}
+                      className={`text-xs   font-bold gap-1 rounded-md disabled:opacity-30 ${user.is_banned ? "border-green-500/40 text-green-500 hover:bg-green-500/10" : "border-orange-500/40 text-orange-500 hover:bg-orange-500/10"}`}
                       title={isAdmin ? "Não é possível banir outro admin" : user.is_banned ? "Desbanir" : "Banir"}
                     >
                       {user.is_banned ? <ShieldOff className="h-3 w-3" /> : <Ban className="h-3 w-3" />}
@@ -296,7 +296,7 @@ export function AdminUsersTab() {
                       variant="outline"
                       disabled={isAdmin || impersonating === user.user_id || user.is_banned}
                       onClick={() => handleImpersonate(user.user_id, name)}
-                      className="text-[10px] uppercase tracking-widest font-bold gap-1 rounded-md border-primary/30 text-primary hover:bg-primary/10 disabled:opacity-30"
+                      className="text-xs   font-bold gap-1 rounded-md border-primary/30 text-primary hover:bg-primary/10 disabled:opacity-30"
                       title={isAdmin ? "Não é possível impersonar outro admin" : "Entrar como este usuário"}
                     >
                       <LogIn className="h-3 w-3" />
@@ -321,7 +321,7 @@ export function AdminUsersTab() {
       <Dialog open={!!rolesUser} onOpenChange={(o) => !o && setRolesUser(null)}>
         <DialogContent className="max-w-md bg-card border-border rounded-md">
           <DialogHeader>
-            <DialogTitle className="font-mono text-sm uppercase tracking-widest text-foreground">
+            <DialogTitle className="font-mono text-sm   text-foreground">
               Patentes de {rolesUser?.display_name || rolesUser?.username}
             </DialogTitle>
           </DialogHeader>
@@ -335,8 +335,8 @@ export function AdminUsersTab() {
                 <div key={role} className="flex items-center justify-between p-3 border border-border bg-surface">
                   <div className="flex items-center gap-2">
                     <Icon className="h-4 w-4 text-neon-purple" />
-                    <span className="text-sm font-bold uppercase tracking-widest text-foreground">{role}</span>
-                    {has && <Badge variant="outline" className="text-[10px] border-primary/40 text-primary">Ativo</Badge>}
+                    <span className="text-sm font-bold   text-foreground">{role}</span>
+                    {has && <Badge variant="outline" className="text-xs border-primary/40 text-primary">Ativo</Badge>}
                   </div>
                   {has ? (
                     <Button
@@ -344,7 +344,7 @@ export function AdminUsersTab() {
                       variant="outline"
                       disabled={savingRm}
                       onClick={() => removeRole(rolesUser.user_id, role)}
-                      className="text-[10px] uppercase font-bold gap-1 rounded-md border-destructive/40 text-destructive hover:bg-destructive/10"
+                      className="text-xs  font-bold gap-1 rounded-md border-destructive/40 text-destructive hover:bg-destructive/10"
                     >
                       <X className="h-3 w-3" /> {savingRm ? "..." : "Remover"}
                     </Button>
@@ -354,7 +354,7 @@ export function AdminUsersTab() {
                       variant="outline"
                       disabled={savingAdd}
                       onClick={() => addRole(rolesUser.user_id, role)}
-                      className="text-[10px] uppercase font-bold gap-1 rounded-md border-primary/40 text-primary hover:bg-primary/10"
+                      className="text-xs  font-bold gap-1 rounded-md border-primary/40 text-primary hover:bg-primary/10"
                     >
                       <Plus className="h-3 w-3" /> {savingAdd ? "..." : "Adicionar"}
                     </Button>
@@ -362,7 +362,7 @@ export function AdminUsersTab() {
                 </div>
               );
             })}
-            <p className="text-[10px] text-muted-foreground mt-3">
+            <p className="text-xs text-muted-foreground mt-3">
               As patentes determinam o acesso do usuário ao sistema. Use com cuidado.
             </p>
           </div>
@@ -372,7 +372,7 @@ export function AdminUsersTab() {
       <Dialog open={!!banTarget} onOpenChange={(o) => { if (!o) { setBanTarget(null); setBanReason(""); } }}>
         <DialogContent className="max-w-md bg-card border-border rounded-md">
           <DialogHeader>
-            <DialogTitle className="font-mono text-sm uppercase tracking-widest text-foreground flex items-center gap-2">
+            <DialogTitle className="font-mono text-sm   text-foreground flex items-center gap-2">
               {banTarget?.is_banned ? <ShieldOff className="h-4 w-4 text-green-500" /> : <Ban className="h-4 w-4 text-orange-500" />}
               {banTarget?.is_banned ? "Desbanir Conta" : "Banir Conta"}
             </DialogTitle>
@@ -384,7 +384,7 @@ export function AdminUsersTab() {
           </DialogHeader>
           {!banTarget?.is_banned && (
             <div className="space-y-2">
-              <label className="text-[10px] uppercase tracking-widest text-muted-foreground">Motivo (opcional)</label>
+              <label className="text-xs   text-muted-foreground">Motivo (opcional)</label>
               <Textarea
                 value={banReason}
                 onChange={(e) => setBanReason(e.target.value)}
@@ -397,14 +397,14 @@ export function AdminUsersTab() {
             <Button
               variant="outline"
               onClick={() => { setBanTarget(null); setBanReason(""); }}
-              className="rounded-md border-border text-xs uppercase tracking-widest"
+              className="rounded-md border-border text-xs  "
             >
               Cancelar
             </Button>
             <Button
               disabled={banning}
               onClick={handleBanToggle}
-              className={`rounded-md text-xs uppercase tracking-widest font-bold ${banTarget?.is_banned ? "bg-green-500/20 border border-green-500/40 text-green-500 hover:bg-green-500/30" : "bg-orange-500/20 border border-orange-500/40 text-orange-500 hover:bg-orange-500/30"}`}
+              className={`rounded-md text-xs   font-bold ${banTarget?.is_banned ? "bg-green-500/20 border border-green-500/40 text-green-500 hover:bg-green-500/30" : "bg-orange-500/20 border border-orange-500/40 text-orange-500 hover:bg-orange-500/30"}`}
             >
               {banning ? "..." : banTarget?.is_banned ? "Confirmar Desban" : "Confirmar Ban"}
             </Button>

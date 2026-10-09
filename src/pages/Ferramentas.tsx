@@ -165,7 +165,7 @@ export default function Ferramentas() {
     return Object.entries(grouped).map(([cat, items]) => (
       <div key={cat} className="space-y-6 pt-6 mb-12">
         <div className="flex items-center gap-4">
-          <h2 className="text-sm font-bold uppercase tracking-[0.3em] text-neon-green flex items-center gap-3">
+          <h2 className="text-sm font-bold   text-neon-green flex items-center gap-3">
              <span className="w-8 h-[2px] bg-neon-green" />
              {categoryLabels[cat] ?? cat}
           </h2>
@@ -190,7 +190,7 @@ export default function Ferramentas() {
                       {iconMap[tool.icon] || <Wrench className="h-6 w-6" />}
                     </div>
                     <div className="flex flex-col items-end gap-2">
-                      <Badge variant="outline" className="bg-glass/60 border-border text-xs uppercase font-bold tracking-widest gap-2 py-1.5 px-3 rounded-md">
+                      <Badge variant="outline" className="bg-glass/60 border-border text-xs  font-bold  gap-2 py-1.5 px-3 rounded-md">
                         {platformIcon(tool.platform)}
                         {platformLabel(tool.platform)}
                       </Badge>
@@ -208,7 +208,7 @@ export default function Ferramentas() {
                   </div>
                   
                   <div className="space-y-2 mb-4 flex-1">
-                    <h3 className="font-bold text-xl tracking-tight uppercase group-hover:text-neon-green transition-colors">
+                    <h3 className="font-bold text-xl tracking-tight  group-hover:text-neon-green transition-colors">
                       {tool.name}
                     </h3>
                     <p className="text-xs font-sans text-muted-foreground/80 leading-relaxed">
@@ -218,7 +218,7 @@ export default function Ferramentas() {
 
                   <div className="flex flex-wrap gap-1.5 mb-8">
                     {(tool.tags || []).map((tag: string) => (
-                      <Badge key={tag} className="bg-foreground/5 border-border text-xs font-bold uppercase tracking-widest py-0.5 px-2 text-muted-foreground group-hover:bg-neon-green/10 group-hover:text-neon-green group-hover:border-neon-green/30 transition-colors rounded-md">
+                      <Badge key={tag} className="bg-foreground/5 border-border text-xs font-bold   py-0.5 px-2 text-muted-foreground group-hover:bg-neon-green/10 group-hover:text-neon-green group-hover:border-neon-green/30 transition-colors rounded-md">
                         {tag}
                       </Badge>
                     ))}
@@ -226,7 +226,7 @@ export default function Ferramentas() {
 
                   <div className="flex flex-col gap-2 mt-auto">
                     {tool.download_url && (
-                      <Button size="sm" className="w-full bg-neon-green hover:bg-neon-green/90 text-primary-foreground font-bold uppercase tracking-widest text-xs h-10 shadow-neon transition-all hover:scale-[1.02] active:scale-95 rounded-md" asChild>
+                      <Button size="sm" className="w-full bg-neon-green hover:bg-neon-green/90 text-primary-foreground font-bold   text-xs h-10 shadow-neon transition-all hover:scale-[1.02] active:scale-95 rounded-md" asChild>
                         <a href={tool.download_url} target="_blank" rel="noopener noreferrer">
                           <Download className="h-4 w-4 mr-2" />
                           Fazer Download
@@ -237,7 +237,7 @@ export default function Ferramentas() {
                     {(tool.external_url || tool.tutorial_id) && (
                       <div className={`grid gap-2 ${tool.download_url ? "mt-1" : ""} ${tool.external_url && tool.tutorial_id ? "grid-cols-2" : "grid-cols-1"}`}>
                         {tool.external_url && (
-                          <Button size="sm" variant="ghost" className="w-full bg-foreground/5 hover:bg-foreground/10 text-foreground font-bold uppercase tracking-widest text-xs h-9 transition-colors rounded-md" asChild>
+                          <Button size="sm" variant="ghost" className="w-full bg-foreground/5 hover:bg-foreground/10 text-foreground font-bold   text-xs h-9 transition-colors rounded-md" asChild>
                             <a href={tool.external_url} target="_blank" rel="noopener noreferrer">
                               <ExternalLink className="h-3.5 w-3.5 mr-2" />
                               Site Oficial
@@ -246,7 +246,7 @@ export default function Ferramentas() {
                         )}
 
                         {tool.tutorial_id && (
-                          <Button size="sm" variant="outline" className="w-full border-border text-foreground/70 hover:text-foreground hover:bg-foreground/10 font-bold uppercase tracking-widest text-xs h-9 rounded-md" asChild>
+                          <Button size="sm" variant="outline" className="w-full border-border text-foreground/70 hover:text-foreground hover:bg-foreground/10 font-bold   text-xs h-9 rounded-md" asChild>
                             <a href={`/tutorial/${tool.tutorial_id}`}>
                               <BookOpen className="h-3.5 w-3.5 mr-2" />
                               Ver Guia
@@ -276,14 +276,14 @@ export default function Ferramentas() {
             <div className="relative z-10 w-full md:w-auto mt-4 md:mt-0">
               <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
                 <DialogTrigger asChild>
-                  <Button onClick={openNew} className="w-full md:w-auto h-14 px-8 bg-primary text-primary-foreground hover:bg-neon-purple/90 font-bold uppercase tracking-widest text-xs rounded-md shadow-neon transition-all hover:-translate-y-1 gap-3">
+                  <Button onClick={openNew} className="w-full md:w-auto h-14 px-8 bg-primary text-primary-foreground hover:bg-neon-purple/90 font-bold   text-xs rounded-md shadow-neon transition-all hover:-translate-y-1 gap-3">
                     <Terminal className="h-5 w-5" /> Nova ferramenta
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="max-w-2xl bg-background border-border p-0 overflow-hidden font-sans text-foreground rounded-md">
                   <div className="p-6 sm:p-8 border-b border-border bg-card">
                     <DialogHeader>
-                      <DialogTitle className="text-2xl font-bold tracking-tighter uppercase flex items-center gap-3">
+                      <DialogTitle className="text-2xl font-bold tracking-tighter  flex items-center gap-3">
                         <Terminal className="h-6 w-6 text-neon-purple" />
                         Editar ferramenta
                       </DialogTitle>
@@ -301,7 +301,7 @@ export default function Ferramentas() {
                     >
                       <div className="grid grid-cols-2 gap-6">
                         <div className="space-y-3 col-span-2">
-                          <Label className="text-xs uppercase font-bold tracking-widest opacity-60">Nome</Label>
+                          <Label className="text-xs  font-bold  opacity-60">Nome</Label>
                           <Input 
                             value={form.name} 
                             onChange={(e) => setForm({ ...form, name: e.target.value })} 
@@ -312,7 +312,7 @@ export default function Ferramentas() {
                         </div>
 
                         <div className="space-y-3 col-span-2">
-                          <Label className="text-xs uppercase font-bold tracking-widest opacity-60">Descrição</Label>
+                          <Label className="text-xs  font-bold  opacity-60">Descrição</Label>
                           <Textarea 
                             value={form.description} 
                             onChange={(e) => setForm({ ...form, description: e.target.value })} 
@@ -322,7 +322,7 @@ export default function Ferramentas() {
                         </div>
 
                         <div className="space-y-3">
-                          <Label className="text-xs uppercase font-bold tracking-widest opacity-60">Ambiente</Label>
+                          <Label className="text-xs  font-bold  opacity-60">Ambiente</Label>
                           <Select value={form.platform} onValueChange={(v) => setForm({ ...form, platform: v })}>
                              <SelectTrigger className="bg-card border-border h-12 rounded-md"><SelectValue /></SelectTrigger>
                              <SelectContent className="bg-card border-border rounded-md">
@@ -334,7 +334,7 @@ export default function Ferramentas() {
                         </div>
 
                         <div className="space-y-3">
-                          <Label className="text-xs uppercase font-bold tracking-widest opacity-60">Classificação</Label>
+                          <Label className="text-xs  font-bold  opacity-60">Classificação</Label>
                           <Select value={form.category} onValueChange={(v) => setForm({ ...form, category: v })}>
                              <SelectTrigger className="bg-card border-border h-12 rounded-md"><SelectValue /></SelectTrigger>
                              <SelectContent className="bg-card border-border rounded-md">
@@ -346,7 +346,7 @@ export default function Ferramentas() {
                         </div>
 
                         <div className="space-y-3">
-                          <Label className="text-xs uppercase font-bold tracking-widest opacity-60">Ícone</Label>
+                          <Label className="text-xs  font-bold  opacity-60">Ícone</Label>
                           <Select value={form.icon} onValueChange={(v) => setForm({ ...form, icon: v })}>
                              <SelectTrigger className="bg-card border-border h-12 rounded-md"><SelectValue /></SelectTrigger>
                              <SelectContent className="bg-card border-border rounded-md">
@@ -358,7 +358,7 @@ export default function Ferramentas() {
                         </div>
 
                         <div className="space-y-3">
-                          <Label className="text-xs uppercase font-bold tracking-widest opacity-60">Doc. Relacionada (Guia)</Label>
+                          <Label className="text-xs  font-bold  opacity-60">Doc. Relacionada (Guia)</Label>
                           <Select value={form.tutorial_id} onValueChange={(v) => setForm({ ...form, tutorial_id: v })}>
                              <SelectTrigger className="bg-card border-border h-12 rounded-md"><SelectValue placeholder="Nenhum vínculo" /></SelectTrigger>
                              <SelectContent className="bg-card border-border rounded-md">
@@ -372,7 +372,7 @@ export default function Ferramentas() {
                       </div>
                       
                       <div className="space-y-3 p-4 border border-border bg-card">
-                        <Label className="text-xs uppercase font-bold tracking-widest opacity-60 flex items-center gap-2">
+                        <Label className="text-xs  font-bold  opacity-60 flex items-center gap-2">
                           <Zap className="h-3 w-3 text-neon-purple" /> Links
                         </Label>
                         <div className="grid sm:grid-cols-2 gap-4 mt-2!">
@@ -392,7 +392,7 @@ export default function Ferramentas() {
                       </div>
 
                       <div className="space-y-3">
-                        <Label className="text-xs uppercase font-bold tracking-widest opacity-60">Tags (Vírgula)</Label>
+                        <Label className="text-xs  font-bold  opacity-60">Tags (Vírgula)</Label>
                         <Input 
                           value={form.tags} 
                           onChange={(e) => setForm({ ...form, tags: e.target.value })} 
@@ -401,7 +401,7 @@ export default function Ferramentas() {
                         />
                       </div>
 
-                      <Button type="submit" disabled={saveTool.isPending} className="w-full h-14 bg-primary hover:bg-primary/90 text-primary-foreground font-bold uppercase tracking-widest text-xs rounded-md shadow-neon">
+                      <Button type="submit" disabled={saveTool.isPending} className="w-full h-14 bg-primary hover:bg-primary/90 text-primary-foreground font-bold   text-xs rounded-md shadow-neon">
                         {saveTool.isPending ? "Processando..." : (editingId ? "Atualizar Software" : "Publicar Software")}
                       </Button>
                     </form>
@@ -416,7 +416,7 @@ export default function Ferramentas() {
         {isLoading ? (
           <div className="flex flex-col items-center justify-center py-32 space-y-4">
              <div className="w-12 h-12 rounded-full border-2 border-neon-green border-t-transparent animate-spin" />
-             <p className="text-sm font-sans text-muted-foreground uppercase tracking-widest">Carregando ferramentas...</p>
+             <p className="text-sm font-sans text-muted-foreground  ">Carregando ferramentas...</p>
           </div>
         ) : tools.length > 0 ? (
           <div className="space-y-8">
@@ -425,8 +425,8 @@ export default function Ferramentas() {
         ) : (
           <div className="flex flex-col items-center justify-center py-32 text-center border border-border/60 bg-card">
              <Terminal className="h-12 w-12 text-muted-foreground/30 mb-6" />
-             <p className="text-xl font-bold uppercase tracking-tight text-foreground mb-2">Nenhuma ferramenta</p>
-             <p className="text-sm font-sans text-muted-foreground uppercase tracking-widest">Nenhuma ferramenta disponível no momento.</p>
+             <p className="text-xl font-bold  tracking-tight text-foreground mb-2">Nenhuma ferramenta</p>
+             <p className="text-sm font-sans text-muted-foreground  ">Nenhuma ferramenta disponível no momento.</p>
           </div>
         )}
       </div>

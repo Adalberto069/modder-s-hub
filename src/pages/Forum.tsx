@@ -234,7 +234,7 @@ export default function Forum() {
           <Button 
             aria-label="Voltar"
             variant="ghost" size="sm" 
-            className="group gap-2 hover:bg-foreground/5 transition-all text-muted-foreground hover:text-foreground uppercase font-bold tracking-widest text-xs sm:text-xs rounded-md" 
+            className="group gap-2 hover:bg-foreground/5 transition-all text-muted-foreground hover:text-foreground  font-bold  text-xs sm:text-xs rounded-md" 
             onClick={() => setSelectedPost(null)}
           >
             <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" /> 
@@ -257,7 +257,7 @@ export default function Forum() {
                     </Avatar>
                   </div>
                   <div className="flex flex-col items-center sm:items-end w-full sm:w-auto overflow-hidden">
-                    <span className="text-sm font-bold uppercase text-foreground truncate max-w-full">{author?.display_name ?? author?.username ?? "Membro"}</span>
+                    <span className="text-sm font-bold  text-foreground truncate max-w-full">{author?.display_name ?? author?.username ?? "Membro"}</span>
                     <span className="text-xs text-muted-foreground mb-3 truncate max-w-full">{formatDistanceToNow(new Date(activePost.created_at), { addSuffix: true, locale: ptBR })}</span>
                     <div className="flex sm:flex-col gap-2 w-full items-center sm:items-end">
                       <UserRoleBadge userId={activePost.user_id} />
@@ -271,10 +271,10 @@ export default function Forum() {
                   <div className="space-y-4">
                     <div className="flex flex-wrap items-center gap-2">
                        <ShieldAlert className="w-4 h-4 text-foreground/40" />
-                       <Badge className={`text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-md border border-transparent ${categoryColor(activePost.category)}`}>
+                       <Badge className={`text-xs font-bold   px-3 py-1 rounded-md border border-transparent ${categoryColor(activePost.category)}`}>
                         {CATEGORIES.find((c) => c.value === activePost.category)?.label ?? activePost.category}
                       </Badge>
-                      <span className="text-xs text-muted-foreground uppercase opacity-60">ID_REF: {activePost.id.split('-')[0]}</span>
+                      <span className="text-xs text-muted-foreground  opacity-60">ID_REF: {activePost.id.split('-')[0]}</span>
                     </div>
                     
                     <h2 className="text-2xl sm:text-4xl font-bold tracking-tighter text-foreground  break-words">{activePost.title}</h2>
@@ -297,7 +297,7 @@ export default function Forum() {
           {/* Replies Section */}
           <div className="space-y-6 pt-6">
             <div className="flex items-center gap-4">
-              <h3 className="text-xs font-bold uppercase tracking-[0.3em] text-neon-purple flex gap-3 items-center whitespace-nowrap">
+              <h3 className="text-xs font-bold   text-neon-purple flex gap-3 items-center whitespace-nowrap">
                 <span className="w-4 h-[2px] bg-neon-purple" />
                 {replies.length} respostas
               </h3>
@@ -319,7 +319,7 @@ export default function Forum() {
                               <AvatarFallback className="bg-background text-xs sm:text-sm font-bold text-foreground">{(rAuthor?.username ?? "U").charAt(0).toUpperCase()}</AvatarFallback>
                             </Avatar>
                             <div className="flex flex-col items-start sm:items-center min-w-0">
-                               <span className="text-xs font-bold uppercase tracking-wide text-foreground truncate max-w-[120px] sm:max-w-full">
+                               <span className="text-xs font-bold  tracking-wide text-foreground truncate max-w-[120px] sm:max-w-full">
                                   {rAuthor?.display_name ?? rAuthor?.username ?? "Membro"}
                                </span>
                                <span className="text-xs text-muted-foreground mt-1 mb-2">
@@ -341,7 +341,7 @@ export default function Forum() {
 
                             <div className="flex items-center justify-end">
                               <Button variant="ghost"
-                                className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold uppercase tracking-widest transition-all rounded-md border ${userLikedReply[reply.id] ? "bg-neon-green/10 text-neon-green border-neon-green/30" : "bg-background text-muted-foreground hover:text-foreground border-border hover:border-border/30"}`}
+                                className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold   transition-all rounded-md border ${userLikedReply[reply.id] ? "bg-neon-green/10 text-neon-green border-neon-green/30" : "bg-background text-muted-foreground hover:text-foreground border-border hover:border-border/30"}`}
                                 onClick={() => requireAuth(() => toggleLike.mutate(reply.id))}
                               >
                                 <ThumbsUp className={`h-3 w-3 ${userLikedReply[reply.id] ? "fill-current" : ""}`} />
@@ -360,7 +360,7 @@ export default function Forum() {
             {/* Reply Input terminal */}
             <div className="mt-8 border border-border bg-card p-1 font-sans relative">
                <div className="absolute -top-3 left-4 bg-card px-2">
-                  <span className="text-xs uppercase font-bold tracking-widest text-neon-purple">Sua resposta</span>
+                  <span className="text-xs  font-bold  text-neon-purple">Sua resposta</span>
                </div>
               <div className="flex flex-col sm:flex-row gap-2 mt-4 p-2 sm:p-4 pb-2 sm:pb-4">
                 <Textarea
@@ -374,14 +374,14 @@ export default function Forum() {
                 <div className="flex flex-row sm:flex-col gap-2 shrink-0 h-[80px] sm:h-auto">
                   <Button
                     variant="outline"
-                    className={`flex-1 sm:flex-none sm:h-[48%] rounded-md uppercase font-bold tracking-widest text-xs transition-all ${showReplyCode ? "border-neon-purple text-neon-purple hover:text-neon-purple/80" : "border-border text-muted-foreground hover:text-foreground hover:bg-background"}`}
+                    className={`flex-1 sm:flex-none sm:h-[48%] rounded-md  font-bold  text-xs transition-all ${showReplyCode ? "border-neon-purple text-neon-purple hover:text-neon-purple/80" : "border-border text-muted-foreground hover:text-foreground hover:bg-background"}`}
                     onClick={() => setShowReplyCode(!showReplyCode)}
                   >
                     <CodeIcon className="h-4 w-4 sm:mr-2" />
                     <span className="hidden sm:inline">Snippet</span>
                   </Button>
                   <Button
-                    className="flex-[2] sm:flex-none sm:h-[48%] rounded-md bg-primary hover:bg-primary/90 text-primary-foreground shadow-neon transition-transform hover:-translate-y-[1px] font-bold uppercase text-xs tracking-widest"
+                    className="flex-[2] sm:flex-none sm:h-[48%] rounded-md bg-primary hover:bg-primary/90 text-primary-foreground shadow-neon transition-transform hover:-translate-y-[1px] font-bold  text-xs "
                     disabled={!replyContent.trim() || createReply.isPending}
                     onClick={() => requireAuth(() => createReply.mutate())}
                   >
@@ -401,8 +401,8 @@ export default function Forum() {
                   >
                     <div className="border border-border bg-background">
                       <div className="flex items-center justify-between px-4 py-2 border-b border-border bg-card">
-                        <span className="text-xs font-bold uppercase tracking-widest text-neon-purple">Terminal File</span>
-                        <Button aria-label="Limpar código" variant="ghost" className="h-5 px-2 text-xs uppercase font-bold text-foreground/50 hover:text-foreground hover:bg-foreground/5 rounded-md" onClick={() => setReplyCode("")}>WIPE</Button>
+                        <span className="text-xs font-bold   text-neon-purple">Terminal File</span>
+                        <Button aria-label="Limpar código" variant="ghost" className="h-5 px-2 text-xs  font-bold text-foreground/50 hover:text-foreground hover:bg-foreground/5 rounded-md" onClick={() => setReplyCode("")}>WIPE</Button>
                       </div>
                       <LuaCodeEditor 
                         value={replyCode} 
@@ -432,14 +432,14 @@ export default function Forum() {
           <div className="relative z-10 w-full sm:w-auto">
             <Dialog open={newPostOpen} onOpenChange={setNewPostOpen}>
               <DialogTrigger asChild>
-                <Button className="w-full sm:w-auto h-14 px-8 bg-primary text-primary-foreground hover:bg-neon-purple/90 font-bold uppercase tracking-widest text-xs rounded-md shadow-neon transition-all hover:-translate-y-1" onClick={(e) => { if (!user) { e.preventDefault(); setShowLoginPrompt(true); } }}>
+                <Button className="w-full sm:w-auto h-14 px-8 bg-primary text-primary-foreground hover:bg-neon-purple/90 font-bold   text-xs rounded-md shadow-neon transition-all hover:-translate-y-1" onClick={(e) => { if (!user) { e.preventDefault(); setShowLoginPrompt(true); } }}>
                   <Plus className="h-4 w-4 mr-3" /> Nova discussão
                 </Button>
               </DialogTrigger>
                 <DialogContent className="max-w-[95vw] sm:max-w-2xl bg-background border-border p-0 font-sans text-foreground rounded-md">
                   <div className="p-6 sm:p-8 border-b border-border bg-card">
                     <DialogHeader>
-                      <DialogTitle className="text-xl sm:text-2xl font-bold tracking-tighter uppercase flex items-center gap-3">
+                      <DialogTitle className="text-xl sm:text-2xl font-bold tracking-tighter  flex items-center gap-3">
                         <TerminalIcon className="h-6 w-6 text-neon-purple" />
                         Nova discussão
                       </DialogTitle>
@@ -447,7 +447,7 @@ export default function Forum() {
                   </div>
                   <div className="p-6 sm:p-8 max-h-[70vh] overflow-y-auto space-y-6 custom-scrollbar bg-background">
                     <div className="space-y-3">
-                      <Label className="text-xs sm:text-xs font-bold uppercase tracking-widest text-foreground/60">Cabeçalho</Label>
+                      <Label className="text-xs sm:text-xs font-bold   text-foreground/60">Cabeçalho</Label>
                       <Input 
                         placeholder="[ Título da Discussão ]" 
                         value={newTitle} 
@@ -459,7 +459,7 @@ export default function Forum() {
                     
                     <div className="grid sm:grid-cols-2 gap-6">
                        <div className="space-y-3">
-                         <Label className="text-xs sm:text-xs font-bold uppercase tracking-widest text-foreground/60">Categoria</Label>
+                         <Label className="text-xs sm:text-xs font-bold   text-foreground/60">Categoria</Label>
                          <Select value={newCategory} onValueChange={setNewCategory}>
                            <SelectTrigger className="bg-card border-border h-12 text-sm rounded-md"><SelectValue /></SelectTrigger>
                            <SelectContent className="bg-card border-border rounded-md">
@@ -473,7 +473,7 @@ export default function Forum() {
                        <div className="space-y-3 flex flex-col justify-end">
                           <Button 
                             variant="outline"
-                            className={`w-full h-12 uppercase font-bold text-xs tracking-widest rounded-md transition-all ${showCodeInput ? "bg-primary text-primary-foreground border-neon-purple shadow-neon" : "bg-card text-foreground/50 hover:text-foreground border-border hover:border-border/30"}`}
+                            className={`w-full h-12  font-bold text-xs  rounded-md transition-all ${showCodeInput ? "bg-primary text-primary-foreground border-neon-purple shadow-neon" : "bg-card text-foreground/50 hover:text-foreground border-border hover:border-border/30"}`}
                             onClick={() => setShowCodeInput(!showCodeInput)}
                           >
                             <CodeIcon className="h-4 w-4 mr-2" />
@@ -483,7 +483,7 @@ export default function Forum() {
                     </div>
 
                     <div className="space-y-3">
-                      <Label className="text-xs sm:text-xs font-bold uppercase tracking-widest text-foreground/60">Mensagem</Label>
+                      <Label className="text-xs sm:text-xs font-bold   text-foreground/60">Mensagem</Label>
                       <Textarea 
                         placeholder=">_ descreva o assunto detalhadamente..." 
                         value={newContent} 
@@ -495,14 +495,14 @@ export default function Forum() {
                     {showCodeInput && (
                       <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="border border-border font-sans bg-card">
                          <div className="flex justify-between items-center p-2 border-b border-border/60 bg-background">
-                            <span className="text-xs text-neon-purple uppercase font-bold px-2 tracking-widest">Compiler View</span>
+                            <span className="text-xs text-neon-purple  font-bold px-2 ">Compiler View</span>
                          </div>
                         <LuaCodeEditor value={newCode} onChange={setNewCode} minHeight="200px" placeholder="-- Inject syntax..." />
                       </motion.div>
                     )}
 
                     <Button
-                      className="w-full h-14 bg-primary hover:bg-primary/90 text-primary-foreground font-bold uppercase tracking-[0.2em] text-xs shadow-neon transition-all rounded-md mt-4"
+                      className="w-full h-14 bg-primary hover:bg-primary/90 text-primary-foreground font-bold   text-xs shadow-neon transition-all rounded-md mt-4"
                       disabled={!newTitle.trim() || !newContent.trim() || createPost.isPending}
                       onClick={() => createPost.mutate()}
                     >
@@ -523,7 +523,7 @@ export default function Forum() {
           ].map((s, i) => (
             <div key={s.label} className={`p-4 sm:p-5 flex flex-col items-center justify-center ${i < 2 ? "border-r border-border" : ""}`}>
               <span className="text-2xl sm:text-3xl font-bold tracking-tighter text-foreground">{s.value}</span>
-              <span className="text-xs sm:text-xs font-bold uppercase tracking-[0.3em] text-muted-foreground mt-1">{s.label}</span>
+              <span className="text-xs sm:text-xs font-bold   text-muted-foreground mt-1">{s.label}</span>
             </div>
           ))}
         </div>
@@ -536,7 +536,7 @@ export default function Forum() {
               <Button variant="ghost"
                 key={c.value}
                 onClick={() => setFilterCat(c.value)}
-                className={`px-3 py-1.5 text-xs sm:text-xs font-bold uppercase tracking-widest border rounded-md transition-all ${
+                className={`px-3 py-1.5 text-xs sm:text-xs font-bold   border rounded-md transition-all ${
                   active
                     ? "bg-primary text-primary-foreground border-neon-purple shadow-neon"
                     : "bg-card text-muted-foreground border-border hover:text-foreground hover:border-border/30"
@@ -556,11 +556,11 @@ export default function Forum() {
               placeholder="Buscar discussões..." 
               value={search} 
               onChange={(e) => setSearch(e.target.value)} 
-              className="pl-14 bg-transparent border-none focus-visible:ring-0 h-10 text-sm placeholder:uppercase placeholder:tracking-widest rounded-md placeholder:text-foreground/20" 
+              className="pl-14 bg-transparent border-none focus-visible:ring-0 h-10 text-sm placeholder: placeholder: rounded-md placeholder:text-foreground/20" 
             />
           </div>
           <Select value={sortBy} onValueChange={(v: any) => setSortBy(v)}>
-            <SelectTrigger className="sm:col-span-1 bg-transparent border-none focus:ring-0 h-14 text-sm rounded-md uppercase tracking-widest px-6 shadow-none">
+            <SelectTrigger className="sm:col-span-1 bg-transparent border-none focus:ring-0 h-14 text-sm rounded-md   px-6 shadow-none">
               <SelectValue placeholder="SORT_BY" />
             </SelectTrigger>
             <SelectContent className="bg-card border-border rounded-md font-sans">
@@ -574,13 +574,13 @@ export default function Forum() {
         {isLoading ? (
           <div className="border border-border/60 bg-card py-20 flex flex-col items-center">
              <div className="w-10 h-10 border-2 border-neon-purple border-b-transparent rounded-full animate-spin mb-4" />
-             <p className="text-xs text-muted-foreground uppercase tracking-[0.3em]">Carregando discussões...</p>
+             <p className="text-xs text-muted-foreground  ">Carregando discussões...</p>
           </div>
         ) : posts.length === 0 ? (
           <div className="text-center py-24 border border-border/60 bg-card flex flex-col items-center">
             <TerminalIcon className="h-12 w-12 text-foreground/10 mb-4" />
-            <p className="text-sm font-bold text-foreground uppercase tracking-widest">Nenhuma discussão</p>
-            <p className="text-xs text-muted-foreground mt-2 uppercase">Nenhuma discussão encontrada.</p>
+            <p className="text-sm font-bold text-foreground  ">Nenhuma discussão</p>
+            <p className="text-xs text-muted-foreground mt-2 ">Nenhuma discussão encontrada.</p>
           </div>
         ) : (
           <div className="space-y-4">
@@ -610,10 +610,10 @@ export default function Forum() {
                       {/* Center: Info */}
                       <div className="flex-1 min-w-0 space-y-2">
                         <div className="flex flex-wrap items-center gap-2 mb-2">
-                          <Badge className={`text-xs sm:text-xs font-bold uppercase tracking-widest px-2 py-0.5 rounded-md border ${categoryColor(post.category)}`}>
+                          <Badge className={`text-xs sm:text-xs font-bold   px-2 py-0.5 rounded-md border ${categoryColor(post.category)}`}>
                             {CATEGORIES.find((c) => c.value === post.category)?.label ?? post.category}
                           </Badge>
-                          <span className="text-xs sm:text-xs font-bold uppercase tracking-widest text-muted-foreground truncate group-hover:text-muted-foreground transition-colors">
+                          <span className="text-xs sm:text-xs font-bold   text-muted-foreground truncate group-hover:text-muted-foreground transition-colors">
                             {author?.display_name ?? author?.username ?? "Membro"} // {formatDistanceToNow(new Date(post.created_at), { addSuffix: true, locale: ptBR })}
                           </span>
                         </div>
@@ -628,7 +628,7 @@ export default function Forum() {
                            <MessageSquare className="h-4 w-4 text-neon-purple mb-1" />
                            <span className="text-sm font-bold text-foreground">{count}</span>
                         </div>
-                        <span className="text-[7px] uppercase font-bold tracking-[0.2em] text-muted-foreground/50 hidden sm:block">RESPOSTAS</span>
+                        <span className="text-[7px]  font-bold  text-muted-foreground/50 hidden sm:block">RESPOSTAS</span>
                       </div>
 
                     </CardContent>
@@ -642,7 +642,7 @@ export default function Forum() {
                 <div className="w-6 h-6 border-2 border-neon-purple border-b-transparent rounded-full animate-spin" />
                 <Button variant="ghost"
                   onClick={() => setVisibleCount((c) => c + PAGE_SIZE)}
-                  className="px-4 py-2 text-xs sm:text-xs font-bold uppercase tracking-widest border border-border bg-card text-muted-foreground hover:text-foreground hover:border-border/30 rounded-md transition-all"
+                  className="px-4 py-2 text-xs sm:text-xs font-bold   border border-border bg-card text-muted-foreground hover:text-foreground hover:border-border/30 rounded-md transition-all"
                 >
                   Carregar mais discussões ({sortedPosts.length - visibleCount})
                 </Button>
@@ -650,7 +650,7 @@ export default function Forum() {
             )}
 
             {!hasMore && sortedPosts.length > PAGE_SIZE && (
-              <p className="text-center py-6 text-xs uppercase tracking-[0.3em] text-muted-foreground/40 font-bold">
+              <p className="text-center py-6 text-xs   text-muted-foreground/40 font-bold">
                 // Fim da transmissão — {sortedPosts.length} threads
               </p>
             )}

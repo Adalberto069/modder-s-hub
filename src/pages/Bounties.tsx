@@ -91,7 +91,7 @@ export default function Bounties() {
                 <PostBountyDialog>
                   <Button variant="ghost"
                     id="post-bounty-btn"
-                    className="flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground px-4 sm:px-6 py-2.5 sm:py-3 font-bold uppercase tracking-widest text-xs sm:text-xs shadow-neon transition-all duration-300 hover:shadow-neon w-full sm:w-auto justify-center"
+                    className="flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground px-4 sm:px-6 py-2.5 sm:py-3 font-bold   text-xs sm:text-xs shadow-neon transition-all duration-300 hover:shadow-neon w-full sm:w-auto justify-center"
                   >
                     <Target className="h-4 w-4" />
                     Postar Encomenda
@@ -132,7 +132,7 @@ export default function Bounties() {
             <Button variant="ghost"
               key={f.v}
               onClick={() => setTypeFilter(f.v as any)}
-              className={`px-3 py-1.5 text-xs font-bold uppercase tracking-widest transition-colors whitespace-nowrap ${
+              className={`px-3 py-1.5 text-xs font-bold   transition-colors whitespace-nowrap ${
                 typeFilter === f.v
                   ? f.v === "apk"
                     ? "bg-neon-green text-primary-foreground"
@@ -156,7 +156,7 @@ export default function Bounties() {
                 <Button variant="ghost"
                   key={f.value}
                   onClick={() => setStatusFilter(f.value)}
-                  className={`px-3 py-1.5 text-xs font-bold uppercase tracking-widest transition-colors flex items-center gap-1 whitespace-nowrap shrink-0 ${
+                  className={`px-3 py-1.5 text-xs font-bold   transition-colors flex items-center gap-1 whitespace-nowrap shrink-0 ${
                     statusFilter === f.value
                       ? "bg-primary text-primary-foreground"
                       : "text-muted-foreground hover:text-foreground"
@@ -225,7 +225,7 @@ function StatItem({ icon, value, label, color }: { icon: React.ReactNode; value:
     <div className="flex flex-col items-center py-4 sm:py-6 gap-1 sm:gap-1.5 hover:bg-foreground/[0.02] transition-colors px-2">
       <div className={`${color} mb-0.5 sm:mb-1`}>{icon}</div>
       <p className="text-lg sm:text-2xl font-bold font-sans leading-none">{value}</p>
-      <p className="text-xs sm:text-xs uppercase tracking-widest text-muted-foreground/70 font-bold text-center leading-tight">{label}</p>
+      <p className="text-xs sm:text-xs   text-muted-foreground/70 font-bold text-center leading-tight">{label}</p>
     </div>
   );
 }

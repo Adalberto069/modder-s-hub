@@ -422,11 +422,11 @@ export default function ProfileSettings() {
                     <p className="text-sm font-medium truncate">{user.email}</p>
                     <div className="flex items-center gap-1.5 mt-0.5">
                       {isEmailVerified ? (
-                        <Badge variant="outline" className="text-[10px] gap-1 border-accent/30 text-accent">
+                        <Badge variant="outline" className="text-xs gap-1 border-accent/30 text-accent">
                           <CheckCircle className="h-3 w-3" /> Verificado
                         </Badge>
                       ) : (
-                        <Badge variant="outline" className="text-[10px] gap-1 border-destructive/30 text-destructive">
+                        <Badge variant="outline" className="text-xs gap-1 border-destructive/30 text-destructive">
                           <XCircle className="h-3 w-3" /> Não verificado
                         </Badge>
                       )}

@@ -121,7 +121,7 @@ export default function Index() {
               { label: 'Publicações', value: stats?.scripts ?? 0 },
               { label: 'Membros', value: stats?.users ?? 0 },
               { label: 'Downloads', value: stats?.downloads ?? 0 },
-            ].map(item => <div key={item.label}><p className="font-display font-bold text-xl text-foreground">{item.value.toLocaleString('pt-BR')}</p><p className="text-xs text-muted-foreground mt-1 uppercase">{item.label}</p></div>)}
+            ].map(item => <div key={item.label}><p className="font-display font-bold text-xl text-foreground">{item.value.toLocaleString('pt-BR')}</p><p className="text-xs text-muted-foreground mt-1 ">{item.label}</p></div>)}
           </div>
         </div>
       </section>
@@ -137,7 +137,7 @@ export default function Index() {
               </h2>
               <p className="text-muted-foreground text-sm mt-3">Conheça as publicações mais baixadas pelos jogadores.</p>
             </div>
-            <Button variant="ghost" onClick={() => navigate("/marketplace")} className="text-muted-foreground hover:text-foreground uppercase font-bold text-xs">
+            <Button variant="ghost" onClick={() => navigate("/marketplace")} className="text-muted-foreground hover:text-foreground  font-bold text-xs">
               ver tudo <ChevronRight className="ml-2 w-4 h-4" />
             </Button>
           </div>
@@ -179,9 +179,9 @@ export default function Index() {
             <div>
               <div className="flex items-center gap-2 mb-1">
                 <div className="h-[1px] w-6 bg-primary/60" />
-                <span className="text-xs font-sans uppercase tracking-[0.25em] text-primary/80">Ranking</span>
+                <span className="text-xs font-sans   text-primary/80">Ranking</span>
               </div>
-              <h2 className="text-xl sm:text-2xl font-bold uppercase tracking-normal text-foreground">
+              <h2 className="text-xl sm:text-2xl font-bold  tracking-normal text-foreground">
                 Top <span className="text-primary/80">modders</span>
               </h2>
             </div>
@@ -189,7 +189,7 @@ export default function Index() {
               variant="ghost"
               size="sm"
               onClick={() => navigate("/marketplace?tab=modders")}
-              className="text-xs font-sans uppercase tracking-widest text-muted-foreground hover:text-primary"
+              className="text-xs font-sans   text-muted-foreground hover:text-primary"
             >
               ver todos →
             </Button>
@@ -213,7 +213,7 @@ export default function Index() {
                     </AvatarFallback>
                   </Avatar>
                   <div className="min-w-0 flex-1">
-                    <p className="font-bold text-sm uppercase tracking-normal text-foreground truncate group-hover:text-primary transition-colors">
+                    <p className="font-bold text-sm  tracking-normal text-foreground truncate group-hover:text-primary transition-colors">
                       {profile.display_name || profile.username || "Anonymous"}
                     </p>
                     <div className="flex items-center gap-2 mt-0.5">
@@ -232,7 +232,7 @@ export default function Index() {
       <section className="py-12 sm:py-16 bg-surface border-t border-neon-green/20 relative">
         <div className="container px-4 text-center max-w-3xl mx-auto relative z-10">
           <Network className="w-12 h-12 text-neon-green mx-auto mb-6 opacity-50" />
-          <h2 className="text-4xl sm:text-6xl font-bold uppercase tracking-normal text-foreground mb-6">
+          <h2 className="text-4xl sm:text-6xl font-bold  tracking-normal text-foreground mb-6">
             {user ? <>Continue <span className="text-neon-green">explorando</span></> : <>Sua próxima <span className="text-neon-green">jogada</span></>}
           </h2>
           <p className="text-muted-foreground font-sans text-sm sm:text-base mb-10 border-l-2 border-r-2 border-neon-green/30 inline-block px-6">
@@ -242,16 +242,16 @@ export default function Index() {
           </p>
           <div className="flex justify-center flex-col sm:flex-row gap-4">
              {!user && (
-               <Button size="lg" onClick={() => navigate("/auth?tab=signup")} className="h-14 px-10 bg-foreground text-background hover:bg-foreground/90 font-bold uppercase tracking-widest rounded-md text-xs w-full sm:w-auto">
+               <Button size="lg" onClick={() => navigate("/auth?tab=signup")} className="h-14 px-10 bg-foreground text-background hover:bg-foreground/90 font-bold   rounded-md text-xs w-full sm:w-auto">
                  criar conta
                </Button>
              )}
              {user && (
-               <Button size="lg" onClick={() => navigate("/bounties")} className="h-14 px-10 bg-neon-green text-background hover:bg-neon-green/90 font-bold uppercase tracking-widest rounded-md text-xs w-full sm:w-auto">
+               <Button size="lg" onClick={() => navigate("/bounties")} className="h-14 px-10 bg-neon-green text-background hover:bg-neon-green/90 font-bold   rounded-md text-xs w-full sm:w-auto">
                  ver encomendas
                </Button>
              )}
-             <Button size="lg" onClick={() => navigate("/marketplace")} variant="outline" className="h-14 px-10 text-foreground border-foreground/20 hover:bg-foreground/5 font-bold uppercase tracking-widest rounded-md text-xs w-full sm:w-auto">
+             <Button size="lg" onClick={() => navigate("/marketplace")} variant="outline" className="h-14 px-10 text-foreground border-foreground/20 hover:bg-foreground/5 font-bold   rounded-md text-xs w-full sm:w-auto">
                ver marketplace
              </Button>
           </div>
@@ -270,7 +270,7 @@ export default function Index() {
                 <div className="h-2 w-full bg-primary" />
                 <div className="p-8 pb-4">
                   <div className="flex justify-between items-start mb-8">
-                     <span className="text-xs text-muted-foreground tracking-widest uppercase opacity-50">Perfil do modder</span>
+                     <span className="text-xs text-muted-foreground   opacity-50">Perfil do modder</span>
                      <Fingerprint className="w-5 h-5 text-primary" />
                   </div>
                   
@@ -282,8 +282,8 @@ export default function Index() {
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex flex-col">
-                      <h3 className="text-2xl font-bold uppercase tracking-normal">{selectedModder.display_name || selectedModder.username}</h3>
-                      <p className="text-xs text-muted-foreground uppercase opacity-70 mt-1 mb-2">ID: {selectedModder.id.substring(0, 12)}</p>
+                      <h3 className="text-2xl font-bold  tracking-normal">{selectedModder.display_name || selectedModder.username}</h3>
+                      <p className="text-xs text-muted-foreground  opacity-70 mt-1 mb-2">ID: {selectedModder.id.substring(0, 12)}</p>
                       <RoleBadge role={displayRole} />
                     </div>
                   </div>
@@ -309,7 +309,7 @@ export default function Index() {
 
                   <Button
                     size="lg"
-                    className="w-full h-12 bg-foreground text-background hover:bg-foreground/90 font-bold uppercase tracking-widest text-xs rounded-md"
+                    className="w-full h-12 bg-foreground text-background hover:bg-foreground/90 font-bold   text-xs rounded-md"
                     onClick={() => {
                       setSelectedModder(null);
                       navigate(`/modder/${selectedModder.user_id}`);

@@ -180,7 +180,7 @@ function TableOfContents({ blocks, activeSection }: { blocks: ParsedBlock[]; act
     <nav className="space-y-1">
       <div className="flex items-center gap-2 mb-3 px-2">
         <List className="h-4 w-4 text-primary" />
-        <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Índice</span>
+        <span className="text-xs font-bold   text-muted-foreground">Índice</span>
       </div>
       {headings.map((h, idx) => {
         const slug = h.content.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '');
@@ -254,7 +254,7 @@ function ContentRenderer({ content, onSectionIds }: { content: string; onSection
                   <Lightbulb className="h-5 w-5" />
                 </div>
                 <div className="space-y-1 min-w-0">
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-neon-cyan/70">Dica</span>
+                  <span className="text-xs font-bold   text-neon-cyan/70">Dica</span>
                   <p className="text-sm text-foreground/90 leading-relaxed">{renderInline(block.content)}</p>
                 </div>
               </motion.div>
@@ -268,7 +268,7 @@ function ContentRenderer({ content, onSectionIds }: { content: string; onSection
                   <AlertTriangle className="h-5 w-5" />
                 </div>
                 <div className="space-y-1 min-w-0">
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-destructive/70">Atenção</span>
+                  <span className="text-xs font-bold   text-destructive/70">Atenção</span>
                   <p className="text-sm text-foreground/90 leading-relaxed">{renderInline(block.content)}</p>
                 </div>
               </motion.div>
@@ -286,12 +286,12 @@ function ContentRenderer({ content, onSectionIds }: { content: string; onSection
                       <div className="h-2.5 w-2.5 rounded-full bg-amber-400/60" />
                       <div className="h-2.5 w-2.5 rounded-full bg-neon-green/60" />
                     </div>
-                    <span className="text-[10px] font-mono text-muted-foreground/50 uppercase ml-2">{block.lang}</span>
+                    <span className="text-xs font-mono text-muted-foreground/50  ml-2">{block.lang}</span>
                   </div>
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="h-6 text-[10px] gap-1 text-muted-foreground hover:text-foreground"
+                    className="h-6 text-xs gap-1 text-muted-foreground hover:text-foreground"
                     onClick={() => copyToClipboard(block.content, idx)}
                   >
                     {copiedIdx === idx ? <Check className="h-3 w-3 text-neon-green" /> : <Copy className="h-3 w-3" />}
@@ -801,14 +801,14 @@ export default function TutorialDetail() {
                     <div className="flex items-start gap-3">
                       <Avatar className="h-8 w-8 shrink-0">
                         {author?.avatar_url ? <AvatarImage src={author.avatar_url} /> : null}
-                        <AvatarFallback className="bg-background border border-border/20 text-[10px] font-bold">
+                        <AvatarFallback className="bg-background border border-border/20 text-xs font-bold">
                           {(author?.username ?? "U").charAt(0).toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
                           <span className="text-xs font-medium">{author?.display_name ?? author?.username ?? "Usuário"}</span>
-                          <span className="text-[10px] text-muted-foreground">
+                          <span className="text-xs text-muted-foreground">
                             {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true, locale: ptBR })}
                           </span>
                         </div>

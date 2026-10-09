@@ -250,7 +250,6 @@ export default function Tutorials() {
                         )}
 
                         <div className="absolute top-0 left-0 p-1 bg-card border-b border-r border-border z-10 hidden sm:block">
-                           <span className="text-[7px] text-muted-foreground uppercase font-sans tracking-widest">[{tutorial.id.substring(0,6)}]</span>
                         </div>
 
                         {/* Glitch Overlay Effect on Hover */}

@@ -169,7 +169,7 @@ export default function ModderProfile() {
                     </h1>
                     <RoleBadge role={displayRole} />
                     {isElite && (
-                      <Badge className="bg-neon-purple text-primary-foreground border-none  text-[10px]">ELITE</Badge>
+                      <Badge className="bg-neon-purple text-primary-foreground border-none  text-xs">ELITE</Badge>
                     )}
                   </div>
                   <p className="text-xs sm:text-sm font-mono text-neon-purple/80 break-all">@{profile.username}</p>
@@ -186,12 +186,12 @@ export default function ModderProfile() {
                 )}
 
                 <div className="flex flex-wrap items-center gap-2 sm:gap-4 justify-center sm:justify-start pt-1 sm:pt-2">
-                  <div className="flex items-center gap-1.5 text-[10px] sm:text-xs text-muted-foreground bg-secondary/60 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full border border-border/60">
+                  <div className="flex items-center gap-1.5 text-xs sm:text-xs text-muted-foreground bg-secondary/60 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full border border-border/60">
                     <Calendar className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-neon-purple" />
                     Membro desde {memberSince}
                   </div>
                   {profile.reputation_score > 100 && (
-                    <div className="flex items-center gap-1.5 text-[10px] sm:text-xs text-neon-green bg-neon-green/5 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full border border-neon-green/10">
+                    <div className="flex items-center gap-1.5 text-xs sm:text-xs text-neon-green bg-neon-green/5 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full border border-neon-green/10">
                       <Trophy className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
                       Modder Referência
                     </div>
@@ -266,7 +266,7 @@ export default function ModderProfile() {
           <TabsContent value="tutorials" className="space-y-4">
             {isAdmin && (
               <div className="flex justify-end">
-                <Button asChild size="sm" className="bg-neon-purple hover:bg-neon-purple/90 text-primary-foreground font-bold uppercase tracking-widest text-[10px] gap-2">
+                <Button asChild size="sm" className="bg-neon-purple hover:bg-neon-purple/90 text-primary-foreground font-bold   text-xs gap-2">
                   <Link to="/tutorial/new">
                     <Plus className="h-3.5 w-3.5" /> Criar novo tutorial
                   </Link>
@@ -291,16 +291,16 @@ export default function ModderProfile() {
                           <Badge className="absolute top-3 left-3 bg-neon-purple/80 text-primary-foreground border-none ">{t.category}</Badge>
                         </div>
                         <div className="p-5 space-y-3">
-                          <h3 className="font-bold text-lg line-clamp-1 group-hover:text-neon-purple transition-colors uppercase tracking-tight">{t.title}</h3>
+                          <h3 className="font-bold text-lg line-clamp-1 group-hover:text-neon-purple transition-colors  tracking-tight">{t.title}</h3>
                           {t.description && (
                             <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">{t.description}</p>
                           )}
                           <div className="flex items-center justify-between pt-2 border-t border-border/60">
-                            <span className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground/60">
+                            <span className="text-xs  font-bold  text-muted-foreground/60">
                               Publicado em {new Date(t.created_at).toLocaleDateString("pt-BR")}
                             </span>
                             <div className="flex items-center gap-1 text-neon-purple group-hover:gap-2 transition-all">
-                              <span className="text-[10px] font-bold">VER TUTORIAL</span>
+                              <span className="text-xs font-bold">VER TUTORIAL</span>
                               <BookOpen className="h-3 w-3" />
                             </div>
                           </div>
@@ -337,7 +337,7 @@ export default function ModderProfile() {
             <Card className="border-border/60 bg-card  overflow-hidden relative">
               <CardContent className="p-8 space-y-8">
                 <div className="space-y-3">
-                  <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-neon-purple">Sobre o criador</h3>
+                  <h3 className="text-xs font-bold   text-neon-purple">Sobre o criador</h3>
                   <p className="text-lg text-foreground/80 leading-relaxed font-medium">
                     {profile.bio || "Este criador ainda não adicionou uma biografia."}
                   </p>
@@ -345,28 +345,28 @@ export default function ModderProfile() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 pt-6 border-t border-border/60">
                   <div className="space-y-1">
-                    <h3 className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Membro da Comunidade</h3>
+                    <h3 className="text-xs font-bold   text-muted-foreground">Membro da Comunidade</h3>
                     <div className="flex items-center gap-2">
                       <Calendar className="h-4 w-4 text-neon-purple" />
                       <p className="font-bold">{memberSince}</p>
                     </div>
                   </div>
                   <div className="space-y-1">
-                    <h3 className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Publicações</h3>
+                    <h3 className="text-xs font-bold   text-muted-foreground">Publicações</h3>
                     <div className="flex items-center gap-2">
                       <Code className="h-4 w-4 text-neon-pink" />
                       <p className="font-bold">{(scripts?.length ?? 0) + (tutorials?.length ?? 0)} Publicações</p>
                     </div>
                   </div>
                   <div className="space-y-1">
-                    <h3 className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Impacto no Mercado</h3>
+                    <h3 className="text-xs font-bold   text-muted-foreground">Impacto no Mercado</h3>
                     <div className="flex items-center gap-2">
                       <Download className="h-4 w-4 text-neon-green" />
                       <p className="font-bold">{totalDownloads.toLocaleString("pt-BR")} Downloads</p>
                     </div>
                   </div>
                   <div className="space-y-1">
-                    <h3 className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Selo de Qualidade</h3>
+                    <h3 className="text-xs font-bold   text-muted-foreground">Selo de Qualidade</h3>
                     <div className="flex items-center gap-2">
                       <Star className="h-4 w-4 text-neon-cyan" />
                       <p className="font-bold">{avgRating.toFixed(1)} / 5.0 (Média)</p>
@@ -387,7 +387,7 @@ function StatItem({ icon, value, label, color }: { icon: React.ReactNode; value:
     <div className="flex flex-col items-center py-3 sm:py-6 gap-1.5 sm:gap-2 group hover:bg-secondary/60 transition-colors px-2 text-center">
       <div className={`${color} p-1.5 sm:p-2 rounded-lg bg-secondary/60 border border-border/60 group-hover:scale-110 transition-transform`}>{icon}</div>
       <p className="text-base sm:text-2xl font-bold font-mono tracking-tight leading-none">{value}</p>
-      <p className="text-[8px] sm:text-[10px] uppercase font-bold tracking-widest text-muted-foreground/70 leading-tight">{label}</p>
+      <p className="text-[8px] sm:text-xs  font-bold  text-muted-foreground/70 leading-tight">{label}</p>
     </div>
   );
 }

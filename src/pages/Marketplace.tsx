@@ -147,10 +147,10 @@ export default function Marketplace() {
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-border/60 pb-4">
               <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full sm:w-auto">
                 <TabsList className="bg-surface border border-border/60 p-1 h-auto w-full rounded-md font-sans">
-                  <TabsTrigger value="script" className="gap-2 px-6 py-2.5 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all flex-1 rounded-md text-xs uppercase font-bold tracking-widest shadow-neon">
+                  <TabsTrigger value="script" className="gap-2 px-6 py-2.5 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all flex-1 rounded-md text-xs  font-bold  shadow-neon">
                     <Code className="h-3.5 w-3.5" /> Scripts Lua
                   </TabsTrigger>
-                  <TabsTrigger value="apk" className="gap-2 px-6 py-2.5 data-[state=active]:bg-neon-cyan data-[state=active]:text-background transition-all flex-1 rounded-md text-xs uppercase font-bold tracking-widest shadow-neon">
+                  <TabsTrigger value="apk" className="gap-2 px-6 py-2.5 data-[state=active]:bg-neon-cyan data-[state=active]:text-background transition-all flex-1 rounded-md text-xs  font-bold  shadow-neon">
                     <Package className="h-3.5 w-3.5" /> APKs de jogos
                   </TabsTrigger>
                 </TabsList>
@@ -158,7 +158,7 @@ export default function Marketplace() {
 
               <div className="flex items-center gap-2">
                 {!isLoading && (
-                  <p className="text-xs font-sans uppercase tracking-widest text-muted-foreground hidden sm:block">
+                  <p className="text-xs font-sans   text-muted-foreground hidden sm:block">
                     <span className="font-bold text-neon-green">[{totalResults}]</span> resultados
                   </p>
                 )}
@@ -172,7 +172,7 @@ export default function Marketplace() {
                 <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
                   <Button size="sm"
                     variant="outline"
-                    className={`cursor-pointer whitespace-nowrap px-4 py-1.5 transition-all duration-200 text-xs uppercase tracking-widest rounded-md shrink-0 ${
+                    className={`cursor-pointer whitespace-nowrap px-4 py-1.5 transition-all duration-200 text-xs   rounded-md shrink-0 ${
                       activeCategory === "all" ? "bg-primary text-primary-foreground border-primary shadow-neon" : "border-border hover:border-border/30 bg-surface text-muted-foreground hover:text-foreground"
                     }`}
                     onClick={() => setFilter("category", "all")}
@@ -183,7 +183,7 @@ export default function Marketplace() {
                     <Button size="sm"
                       key={cat.id}
                       variant="outline"
-                      className={`cursor-pointer whitespace-nowrap px-4 py-1.5 transition-all duration-200 text-xs uppercase tracking-widest rounded-md shrink-0 ${
+                      className={`cursor-pointer whitespace-nowrap px-4 py-1.5 transition-all duration-200 text-xs   rounded-md shrink-0 ${
                          activeCategory === cat.slug ? "bg-primary text-primary-foreground border-primary shadow-neon" : "border-border hover:border-border/30 bg-surface text-muted-foreground hover:text-foreground"
                       }`}
                       onClick={() => setFilter("category", cat.slug)}
@@ -203,7 +203,7 @@ export default function Marketplace() {
                   <Button size="sm"
                     key={item.key}
                     variant="outline"
-                    className={`cursor-pointer px-4 py-1.5 transition-all text-xs font-bold uppercase tracking-widest whitespace-nowrap rounded-md ${
+                    className={`cursor-pointer px-4 py-1.5 transition-all text-xs font-bold   whitespace-nowrap rounded-md ${
                        priceFilter === item.key ? item.active : "border-border bg-surface text-muted-foreground hover:bg-foreground/5"
                     }`}
                     onClick={() => setFilter("price", item.key)}
@@ -224,7 +224,7 @@ export default function Marketplace() {
                 <Button size="sm"
                   key={item.key}
                   variant="outline"
-                  className={`cursor-pointer px-3 py-1.5 transition-all text-xs font-bold uppercase tracking-widest whitespace-nowrap rounded-md flex items-center gap-1.5 ${
+                  className={`cursor-pointer px-3 py-1.5 transition-all text-xs font-bold   whitespace-nowrap rounded-md flex items-center gap-1.5 ${
                     sortBy === item.key ? "bg-neon-cyan/10 text-neon-cyan border-neon-cyan/30" : "border-border bg-surface text-muted-foreground hover:bg-foreground/5"
                   }`}
                   onClick={() => setFilter("sort", item.key)}
@@ -237,7 +237,7 @@ export default function Marketplace() {
               {user && (
                 <Button size="sm"
                   variant="outline"
-                  className={`cursor-pointer px-3 py-1.5 transition-all text-xs font-bold uppercase tracking-widest whitespace-nowrap rounded-md flex items-center gap-1.5 ml-auto ${
+                  className={`cursor-pointer px-3 py-1.5 transition-all text-xs font-bold   whitespace-nowrap rounded-md flex items-center gap-1.5 ml-auto ${
                     showFavs ? "bg-neon-pink/10 text-neon-pink border-neon-pink/30" : "border-border bg-surface text-muted-foreground hover:bg-foreground/5"
                   }`}
                   onClick={toggleFavs}
@@ -299,10 +299,10 @@ export default function Marketplace() {
             <div className="p-4 bg-surface border border-border/60 mb-4 shadow-neon">
               {showFavs ? <Heart className="h-8 w-8 text-muted-foreground" /> : <Search className="h-8 w-8 text-muted-foreground" />}
             </div>
-            <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-1">
+            <p className="text-xs font-bold   text-muted-foreground mb-1">
               {showFavs ? "Nenhum favorito encontrado" : activeTab === "script" ? "Nenhum script encontrado" : "Nenhum APK encontrado"}
             </p>
-            <p className="text-xs uppercase tracking-widest text-primary">
+            <p className="text-xs   text-primary">
               {showFavs ? "Adicione scripts aos favoritos clicando no ❤️" : "Verifique os parâmetros de busca e filtros ativos."}
             </p>
           </motion.div>

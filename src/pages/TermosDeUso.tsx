@@ -60,15 +60,15 @@ export default function TermosDeUso() {
               <Scale className="h-6 w-6 text-primary" />
             </div>
             <div>
-              <p className="text-xs font-mono text-muted-foreground tracking-widest uppercase">
-                ~/legal/termos
+              <p className="text-xs font-sans text-muted-foreground  ">
+                INFORMAÇÕES / TERMOS
               </p>
-              <h1 className="text-2xl sm:text-3xl font-black font-mono">
+              <h1 className="text-2xl sm:text-3xl font-bold font-sans">
                 Termos de <span className="text-primary">Uso</span>
               </h1>
             </div>
           </div>
-          <p className="text-sm text-muted-foreground font-mono border-l-2 border-primary/30 pl-4">
+          <p className="text-sm text-muted-foreground font-sans border-l-2 border-primary/30 pl-4">
             Última atualização: {new Date().toLocaleDateString("pt-BR")}
           </p>
         </motion.div>
@@ -81,12 +81,12 @@ export default function TermosDeUso() {
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: idx * 0.05 }}
-              className="rounded-xl border border-border/30 bg-card/40 backdrop-blur-sm overflow-hidden"
+              className="rounded-xl border border-border/30 bg-card backdrop-blur-sm overflow-hidden"
             >
               {/* Section header - terminal style */}
               <div className="flex items-center gap-2 px-4 py-3 border-b border-border/20 bg-background/40">
                 <Terminal className="h-3.5 w-3.5 text-neon-green" />
-                <span className="font-mono font-bold text-sm text-foreground">
+                <span className="font-sans font-bold text-sm text-foreground">
                   {section.title}
                 </span>
               </div>
@@ -116,8 +116,8 @@ export default function TermosDeUso() {
           transition={{ delay: 0.5 }}
           className="mt-10 text-center"
         >
-          <p className="text-xs text-muted-foreground font-mono">
-            <span className="text-neon-green">$</span> Dúvidas? Entre em contato pelo fórum ou painel da plataforma.
+          <p className="text-xs text-muted-foreground font-sans">
+            Dúvidas? Entre em contato pelo fórum ou painel da plataforma.
           </p>
         </motion.div>
       </div>
