@@ -18,6 +18,7 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { UserBadges } from "@/components/UserBadges";
 import { RoleBadge } from "@/components/RoleBadge";
 import hubImage from "@/assets/hiddenmod-gaming-hub.jpg";
+import { TerminalBackdrop } from "@/components/TerminalBackdrop";
 import { MarqueeTicker } from "@/components/MarqueeTicker";
 import { useState } from "react";
 
@@ -103,19 +104,22 @@ export default function Index() {
 
   return (
     <Layout>
-      <section className="relative overflow-hidden border-b border-border bg-background">
+      <section className="relative overflow-hidden border-b border-border bg-background signal-divider">
         <img src={hubImage} alt="Console de jogos com iluminação verde e ciano" width={1920} height={1024} fetchPriority="high" className="absolute inset-0 h-full w-full object-cover object-right" />
         <div className="absolute inset-0 hero-shade" />
+        <TerminalBackdrop />
         <div className="container relative py-12 sm:py-16 lg:py-20">
           <div className="max-w-xl">
-            <p className="flex items-center gap-3 text-xs text-primary mb-7"><span className="h-px w-8 bg-primary" /> GAMING / MODDING / COMMUNITY</p>
-            <h1 className="text-5xl sm:text-7xl font-extrabold leading-none text-foreground mb-5">Hidden<span className="text-primary">Mod</span><span className="text-primary">.</span></h1>
-            <p className="font-display text-xl sm:text-2xl font-semibold text-foreground mb-4">Seu próximo nível começa aqui.</p>
-            <p className="text-sm text-muted-foreground leading-relaxed max-w-md mb-8">Scripts para Game Guardian, APKs de jogos e uma comunidade que cria além dos limites.</p>
+            <p className="flex flex-wrap items-center gap-3 text-xs text-primary mb-5"><span className="h-px w-8 bg-primary" /> HIDDENMOD / MODDING UNDERGROUND</p>
+            <div aria-hidden="true" className="mb-4 flex items-center gap-3 text-neon-cyan"><span className="font-handwritten text-lg -rotate-3"><span className="text-muted-foreground line-through decoration-primary">padrão</span> não. elite.</span><span className="handwritten-arrow" /></div>
+            <h1 data-text="HiddenMod." className="glitch text-5xl sm:text-7xl font-extrabold leading-none text-foreground mb-5">Hidden<span className="text-primary">Mod</span><span className="text-primary">.</span></h1>
+            <p className="font-display text-xl sm:text-2xl font-semibold text-foreground mb-4">Menos limites. Mais controle.</p>
+            <p className="text-sm text-muted-foreground leading-relaxed max-w-md mb-6">Scripts Lua para Game Guardian. APKs de jogos modificados. Feitos por quem não joga no padrão.</p>
             <div className="flex flex-wrap gap-3">
-              <Button size="lg" className="h-12" onClick={() => navigate('/marketplace')}>Explorar scripts <ChevronRight /></Button>
+              <Button size="lg" className="h-12" onClick={() => navigate('/marketplace')}>Abrir repositório <ChevronRight /></Button>
               <Button size="lg" variant="outline" className="h-12 bg-glass/60" onClick={() => navigate('/marketplace?type=apk')}>APKs de jogos <Code /></Button>
             </div>
+            <p aria-hidden="true" className="mt-4 text-[10px] text-muted-foreground">[LUA / ANDROID] <span className="text-primary">// além do padrão</span></p>
           </div>
           <div className="flex flex-wrap gap-6 sm:gap-10 mt-10 pt-5 border-t border-foreground/10 max-w-xl">
             {[
@@ -129,14 +133,15 @@ export default function Index() {
       <MarqueeTicker />
 
       {/* ══════════════ RECENT BREACHES (MARKETPLACE PREVIEW) ══════════════ */}
-      <section className="py-10 sm:py-16 bg-background border-t border-border">
-        <div className="container px-4 sm:px-6">
+      <section className="relative overflow-hidden py-10 sm:py-16 bg-background border-t border-border signal-divider">
+        <TerminalBackdrop className="catalog-terminal" />
+        <div className="container relative px-4 sm:px-6">
           <div className="flex flex-col md:flex-row items-end justify-between mb-7 sm:mb-9 gap-4">
             <div>
-              <h2 className="text-3xl sm:text-4xl font-black uppercase tracking-normal text-foreground">
-                Em <span className="text-primary">destaque</span>
+              <h2 data-text="Repositório em destaque" className="glitch text-3xl sm:text-4xl font-black uppercase tracking-normal text-foreground">
+                Repositório <span className="text-primary">em destaque</span>
               </h2>
-              <p className="text-muted-foreground font-mono text-sm mt-2">Scripts e mods mais baixados pela comunidade.</p>
+              <p className="text-muted-foreground font-mono text-sm mt-2">O código é deles. O próximo movimento é seu.</p>
             </div>
             <Button variant="ghost" onClick={() => navigate("/marketplace")} className="text-muted-foreground hover:text-foreground uppercase font-bold text-xs">
               ver tudo <ChevronRight className="ml-2 w-4 h-4" />

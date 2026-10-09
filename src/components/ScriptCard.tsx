@@ -26,6 +26,7 @@ export function ScriptCard({ id, title, modderName, modderId, status, downloadCo
   return (
     <Card className="group relative overflow-hidden rounded-sm border-border hover:border-primary/50 transition-all duration-300 bg-card h-full flex flex-col shadow-none hover:shadow-neon">
       <Link to={`/script/${id}`} aria-label={`Ver ${title}`} className="script-thumbnail aspect-video bg-surface flex items-center justify-center overflow-hidden relative border-b border-border">
+        <span aria-hidden="true" className="absolute top-3 left-3 z-10 bg-glass/90 px-2 py-1 text-[9px] text-neon-cyan font-mono">{isApk ? 'PKG' : 'SRC'}: 0x{id.replace(/-/g, '').slice(0, 4).toUpperCase()}</span>
         {thumbnailUrl ? <img src={thumbnailUrl} alt={title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" loading="lazy" /> : <div className="flex flex-col items-center gap-3 text-muted-foreground">{isApk ? <Smartphone className="h-12 w-12 text-neon-cyan/50" /> : <Code className="h-12 w-12 text-primary/50" />}<span className="text-[10px] uppercase">{isApk ? "Android / Gaming" : "Lua / Game Guardian"}</span></div>}
         <div className="absolute bottom-3 left-3 flex flex-wrap gap-2">
           <Badge variant="outline" className={`bg-glass/90 backdrop-blur-md text-[10px] rounded-sm ${st.className}`}>{st.label}</Badge>
@@ -40,7 +41,7 @@ export function ScriptCard({ id, title, modderName, modderId, status, downloadCo
           <div className="flex gap-1"><UserRoleBadge userId={modderId} /><UserBadges userId={modderId} compact /></div>
         </div>
         <div className="flex gap-4 text-xs text-muted-foreground"><span className="flex gap-1.5 items-center"><Download className="h-3.5 w-3.5 text-neon-cyan" />{downloadCount.toLocaleString('pt-BR')}</span><span className="flex gap-1.5 items-center"><Star className="h-3.5 w-3.5 text-rating" />{averageRating.toFixed(1)}</span></div>
-        <div className="mt-auto pt-4 border-t border-border flex items-center justify-between gap-2">
+        <div className="mt-auto pt-4 border-t border-border flex items-center justify-between gap-2 signal-divider">
           <span className={`font-display text-xl font-bold ${isPaid ? 'text-foreground' : 'text-primary'}`}>{isPaid ? `R$ ${(price ?? 0).toFixed(2).replace('.', ',')}` : 'Grátis'}</span>
           <Button asChild variant="ghost" size="sm" className="text-primary"><Link to={`/script/${id}`}>Ver {isApk ? 'APK' : 'script'}<ArrowUpRight /></Link></Button>
         </div>

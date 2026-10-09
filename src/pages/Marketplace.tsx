@@ -13,6 +13,7 @@ import { useFavorites } from "@/hooks/use-favorites";
 import { useAuth } from "@/lib/auth";
 import { Search, Code, Package, Store, SlidersHorizontal, Sparkles, ArrowDownAZ, TrendingUp, Star, Heart } from "lucide-react";
 import { motion } from "framer-motion";
+import { TerminalBackdrop } from "@/components/TerminalBackdrop";
 
 function ScriptCardSkeleton() {
   return (
@@ -128,12 +129,13 @@ export default function Marketplace() {
           transition={{ duration: 0.5 }}
           className="mb-8"
         >
-          <div className="border-b border-border pb-8 mb-6">
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <div className="relative overflow-hidden border-b border-border pb-8 mb-6 signal-divider">
+            <TerminalBackdrop className="catalog-terminal" />
+            <div className="relative flex flex-col md:flex-row md:items-end justify-between gap-6">
               <div>
                 <p className="text-primary text-xs mb-3">HIDDENMOD / MARKETPLACE</p>
-                <h1 className="text-3xl sm:text-5xl font-extrabold text-foreground">{activeTab === 'script' ? 'Scripts' : 'APKs de jogos'}<span className="text-primary">.</span></h1>
-                <p className="text-muted-foreground text-xs sm:text-sm mt-3">{activeTab === 'script' ? 'Explore criações para Game Guardian.' : 'Descubra mods para seus jogos mobile.'}</p>
+                <h1 data-text={activeTab === 'script' ? 'Repositório de Scripts.' : 'APKs de jogos.'} className="glitch text-3xl sm:text-5xl font-extrabold text-foreground">{activeTab === 'script' ? 'Repositório de Scripts' : 'APKs de jogos'}<span className="text-primary">.</span></h1>
+                <p className="text-muted-foreground text-xs sm:text-sm mt-3">{activeTab === 'script' ? 'Lua no comando. Game Guardian em ação.' : 'Seu jogo. Outras possibilidades.'}</p>
               </div>
               <div className="relative w-full md:w-80 shrink-0">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-primary" />
