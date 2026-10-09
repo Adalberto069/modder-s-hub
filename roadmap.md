@@ -13,6 +13,6 @@
 - [x] Conferir apresentação e navegação.
 
 # Reformulação completa
-- [ ] Unificar páginas, controles, formulários e janelas no estilo premium.
-- [ ] Reformular tutoriais, fórum, ferramentas, encomendas e painéis.
-- [ ] Verificar páginas públicas, navegação e testes existentes.
+- [x] Unificar páginas, controles, formulários e janelas no estilo premium.
+- [x] Reformular tutoriais, fórum, ferramentas, encomendas e painéis.
+- [x] Verificar páginas públicas, navegação e testes existentes.
