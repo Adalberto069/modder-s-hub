@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Layout } from "@/components/layout/Layout";
 import { ScriptCard } from "@/components/ScriptCard";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -15,14 +16,14 @@ import { motion } from "framer-motion";
 
 function ScriptCardSkeleton() {
   return (
-    <div className="rounded-none border border-white/5 bg-[#050505] overflow-hidden animate-pulse">
-      <div className="aspect-video bg-[#030304]" />
+    <div className="rounded-none border border-border/5 bg-surface overflow-hidden animate-pulse">
+      <div className="aspect-video bg-surface" />
       <div className="p-4 space-y-3">
-        <div className="h-4 bg-white/5 rounded-none w-3/4" />
-        <div className="h-3 bg-white/5 rounded-none w-1/2" />
-        <div className="flex justify-between pt-3 border-t border-white/5">
-          <div className="h-3 bg-white/5 rounded-none w-16" />
-          <div className="h-3 bg-white/5 rounded-none w-12" />
+        <div className="h-4 bg-foreground/5 rounded-none w-3/4" />
+        <div className="h-3 bg-foreground/5 rounded-none w-1/2" />
+        <div className="flex justify-between pt-3 border-t border-border/5">
+          <div className="h-3 bg-foreground/5 rounded-none w-16" />
+          <div className="h-3 bg-foreground/5 rounded-none w-12" />
         </div>
       </div>
     </div>
@@ -127,53 +128,30 @@ export default function Marketplace() {
           transition={{ duration: 0.5 }}
           className="mb-8"
         >
-          <div className="relative overflow-hidden border border-white/10 bg-[#050505] p-5 sm:p-10 mb-6 sm:mb-8 rounded-none">
-            <div className="absolute top-0 right-0 w-72 h-72 bg-neon-purple/5 blur-[100px] -z-10" />
-            <div className="absolute bottom-0 left-0 w-48 h-48 bg-neon-cyan/5 blur-[60px] -z-10" />
-
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-5 sm:gap-6">
-              <div className="space-y-3 sm:space-y-4">
-                <div className="flex items-center gap-2 font-mono flex-wrap">
-                  <Badge variant="outline" className="border-neon-purple/30 text-neon-purple px-2 py-0.5 bg-neon-purple/5 text-[9px] sm:text-[10px] uppercase tracking-widest rounded-none">
-                    <Store className="h-3 w-3 mr-1" /> ROOT_MARKET
-                  </Badge>
-                  <Badge variant="outline" className="border-neon-cyan/30 text-neon-cyan px-2 py-0.5 bg-neon-cyan/5 text-[9px] sm:text-[10px] uppercase tracking-widest rounded-none">
-                    <Sparkles className="h-3 w-3 mr-1" /> ELITE_TIER
-                  </Badge>
-                </div>
-                <div>
-                  <h1 className="text-2xl sm:text-4xl md:text-5xl font-black tracking-tight text-white uppercase italic">
-                    Mercado <span className="text-neon-purple shadow-neon-purple">Negro</span>
-                  </h1>
-                  <p className="text-muted-foreground max-w-xl text-[11px] sm:text-sm leading-relaxed mt-2 font-mono uppercase tracking-widest">
-                    Acesse o repositório central de payloads, scripts e vulnerabilidades. Transmissões seguras e verificadas.
-                  </p>
-                </div>
+          <div className="border-b border-border pb-8 mb-6">
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+              <div>
+                <p className="text-primary text-xs mb-3">HIDDENMOD / MARKETPLACE</p>
+                <h1 className="text-3xl sm:text-5xl font-extrabold text-foreground">{activeTab === 'script' ? 'Scripts' : 'APKs de jogos'}<span className="text-primary">.</span></h1>
+                <p className="text-muted-foreground text-xs sm:text-sm mt-3">{activeTab === 'script' ? 'Explore criações para Game Guardian.' : 'Descubra mods para seus jogos mobile.'}</p>
               </div>
-
-              {/* Search */}
-              <div className="relative w-full md:w-96 group shrink-0">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground transition-colors group-focus-within:text-neon-purple" />
-                <Input
-                  placeholder={activeTab === "script" ? ">_ BUSCAR SCRIPTS..." : ">_ BUSCAR APKS..."}
-                  className="pl-12 bg-[#030304] border-white/10 focus-visible:ring-neon-purple rounded-none h-11 sm:h-14 text-neon-green font-mono uppercase tracking-widest text-xs"
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                />
+              <div className="relative w-full md:w-80 shrink-0">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-primary" />
+                <Input aria-label={activeTab === 'script' ? 'Buscar scripts' : 'Buscar APKs'} placeholder={activeTab === 'script' ? 'Buscar scripts...' : 'Buscar APKs...'} className="pl-11 bg-surface border-border h-12 text-sm" value={search} onChange={(e) => setSearch(e.target.value)} />
               </div>
             </div>
           </div>
 
           {/* Tabs + Filters */}
           <div className="space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-white/5 pb-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-border/5 pb-4">
               <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full sm:w-auto">
-                <TabsList className="bg-[#030304] border border-white/5 p-1 h-auto w-full rounded-none font-mono">
-                  <TabsTrigger value="script" className="gap-2 px-6 py-2.5 data-[state=active]:bg-neon-purple data-[state=active]:text-white transition-all flex-1 rounded-none text-[10px] uppercase font-black tracking-widest data-[state=active]:shadow-[0_0_15px_rgba(168,85,247,0.3)]">
-                    <Code className="h-3.5 w-3.5" /> LUA_PAYLOADS
+                <TabsList className="bg-surface border border-border/5 p-1 h-auto w-full rounded-none font-mono">
+                  <TabsTrigger value="script" className="gap-2 px-6 py-2.5 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all flex-1 rounded-none text-[10px] uppercase font-black tracking-widest shadow-neon">
+                    <Code className="h-3.5 w-3.5" /> Scripts Lua
                   </TabsTrigger>
-                  <TabsTrigger value="apk" className="gap-2 px-6 py-2.5 data-[state=active]:bg-neon-cyan data-[state=active]:text-[#050505] transition-all flex-1 rounded-none text-[10px] uppercase font-black tracking-widest data-[state=active]:shadow-[0_0_15px_rgba(34,211,238,0.3)]">
-                    <Package className="h-3.5 w-3.5" /> MOD_APKS
+                  <TabsTrigger value="apk" className="gap-2 px-6 py-2.5 data-[state=active]:bg-neon-cyan data-[state=active]:text-background transition-all flex-1 rounded-none text-[10px] uppercase font-black tracking-widest shadow-neon">
+                    <Package className="h-3.5 w-3.5" /> APKs de jogos
                   </TabsTrigger>
                 </TabsList>
               </Tabs>
@@ -181,57 +159,57 @@ export default function Marketplace() {
               <div className="flex items-center gap-2">
                 {!isLoading && (
                   <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground hidden sm:block">
-                    <span className="font-black text-neon-green">[{totalResults}]</span> RECORDS
+                    <span className="font-black text-neon-green">[{totalResults}]</span> resultados
                   </p>
                 )}
               </div>
             </div>
 
             {/* Filter Bar */}
-            <div className="flex flex-col lg:flex-row gap-4 bg-[#050505] border border-white/5 p-4 rounded-none font-mono">
+            <div className="flex flex-col lg:flex-row gap-4 bg-surface border border-border/5 p-4 rounded-none font-mono">
               <div className="flex items-center gap-3 flex-1 min-w-0">
-                <SlidersHorizontal className="h-4 w-4 text-neon-purple shrink-0 hidden sm:block" />
+                <SlidersHorizontal className="h-4 w-4 text-primary shrink-0 hidden sm:block" />
                 <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
-                  <Badge
+                  <Button size="sm"
                     variant="outline"
                     className={`cursor-pointer whitespace-nowrap px-4 py-1.5 transition-all duration-200 text-[9px] uppercase tracking-widest rounded-none shrink-0 ${
-                      activeCategory === "all" ? "bg-neon-purple text-white border-neon-purple shadow-[0_0_10px_rgba(168,85,247,0.2)]" : "border-white/10 hover:border-white/30 bg-[#030304] text-muted-foreground hover:text-white"
+                      activeCategory === "all" ? "bg-primary text-primary-foreground border-primary shadow-neon" : "border-border/10 hover:border-border/30 bg-surface text-muted-foreground hover:text-foreground"
                     }`}
                     onClick={() => setFilter("category", "all")}
                   >
-                    --ALL_SYSTEMS--
-                  </Badge>
+                    Todas
+                  </Button>
                   {categories?.map((cat: any) => (
-                    <Badge
+                    <Button size="sm"
                       key={cat.id}
                       variant="outline"
                       className={`cursor-pointer whitespace-nowrap px-4 py-1.5 transition-all duration-200 text-[9px] uppercase tracking-widest rounded-none shrink-0 ${
-                         activeCategory === cat.slug ? "bg-neon-purple text-white border-neon-purple shadow-[0_0_10px_rgba(168,85,247,0.2)]" : "border-white/10 hover:border-white/30 bg-[#030304] text-muted-foreground hover:text-white"
+                         activeCategory === cat.slug ? "bg-primary text-primary-foreground border-primary shadow-neon" : "border-border/10 hover:border-border/30 bg-surface text-muted-foreground hover:text-foreground"
                       }`}
                       onClick={() => setFilter("category", cat.slug)}
                     >
                       {cat.name}
-                    </Badge>
+                    </Button>
                   ))}
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 shrink-0 lg:border-l border-white/5 lg:pl-4 pt-4 lg:pt-0 border-t lg:border-t-0">
+              <div className="flex items-center gap-2 shrink-0 lg:border-l border-border/5 lg:pl-4 pt-4 lg:pt-0 border-t lg:border-t-0">
                 {[
-                  { key: "all", label: "TUDO", active: "bg-white/10 text-white border-white/20" },
-                  { key: "free", label: "FREE", active: "bg-neon-green/10 text-neon-green border-neon-green/30" },
-                  { key: "paid", label: "PAID", active: "bg-neon-pink/10 text-neon-pink border-neon-pink/30" },
+                  { key: "all", label: "TUDO", active: "bg-foreground/10 text-foreground border-border/20" },
+                  { key: "free", label: "Grátis", active: "bg-neon-green/10 text-neon-green border-neon-green/30" },
+                  { key: "paid", label: "Pagos", active: "bg-neon-pink/10 text-neon-pink border-neon-pink/30" },
                 ].map((item) => (
-                  <Badge
+                  <Button size="sm"
                     key={item.key}
                     variant="outline"
                     className={`cursor-pointer px-4 py-1.5 transition-all text-[9px] font-black uppercase tracking-widest whitespace-nowrap rounded-none ${
-                       priceFilter === item.key ? item.active : "border-white/10 bg-[#030304] text-muted-foreground hover:bg-white/5"
+                       priceFilter === item.key ? item.active : "border-border/10 bg-surface text-muted-foreground hover:bg-foreground/5"
                     }`}
                     onClick={() => setFilter("price", item.key)}
                   >
                     {item.label}
-                  </Badge>
+                  </Button>
                 ))}
               </div>
             </div>
@@ -243,30 +221,30 @@ export default function Marketplace() {
                 { key: "popular", label: "Popular", icon: TrendingUp },
                 { key: "rating", label: "Avaliação", icon: Star },
               ].map((item) => (
-                <Badge
+                <Button size="sm"
                   key={item.key}
                   variant="outline"
                   className={`cursor-pointer px-3 py-1.5 transition-all text-[9px] font-black uppercase tracking-widest whitespace-nowrap rounded-none flex items-center gap-1.5 ${
-                    sortBy === item.key ? "bg-neon-cyan/10 text-neon-cyan border-neon-cyan/30" : "border-white/10 bg-[#030304] text-muted-foreground hover:bg-white/5"
+                    sortBy === item.key ? "bg-neon-cyan/10 text-neon-cyan border-neon-cyan/30" : "border-border/10 bg-surface text-muted-foreground hover:bg-foreground/5"
                   }`}
                   onClick={() => setFilter("sort", item.key)}
                 >
                   <item.icon className="h-3 w-3" />
                   {item.label}
-                </Badge>
+                </Button>
               ))}
 
               {user && (
-                <Badge
+                <Button size="sm"
                   variant="outline"
                   className={`cursor-pointer px-3 py-1.5 transition-all text-[9px] font-black uppercase tracking-widest whitespace-nowrap rounded-none flex items-center gap-1.5 ml-auto ${
-                    showFavs ? "bg-neon-pink/10 text-neon-pink border-neon-pink/30" : "border-white/10 bg-[#030304] text-muted-foreground hover:bg-white/5"
+                    showFavs ? "bg-neon-pink/10 text-neon-pink border-neon-pink/30" : "border-border/10 bg-surface text-muted-foreground hover:bg-foreground/5"
                   }`}
                   onClick={toggleFavs}
                 >
                   <Heart className={`h-3 w-3 ${showFavs ? "fill-neon-pink" : ""}`} />
                   Favoritos {favorites.length > 0 && `(${favorites.length})`}
-                </Badge>
+                </Button>
               )}
             </div>
           </div>
@@ -274,7 +252,7 @@ export default function Marketplace() {
 
         {/* Grid */}
         {isLoading ? (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5">
+          <div className="catalog-bento">
             {Array.from({ length: 8 }).map((_, i) => (
               <ScriptCardSkeleton key={i} />
             ))}
@@ -284,7 +262,7 @@ export default function Marketplace() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.4, delay: 0.1 }}
-            className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5"
+            className="catalog-bento"
           >
             {displayScripts.map((script: any, index: number) => (
               <motion.div
@@ -318,13 +296,13 @@ export default function Marketplace() {
             animate={{ opacity: 1, scale: 1 }}
             className="flex flex-col items-center justify-center py-20 text-center font-mono"
           >
-            <div className="p-4 bg-[#030304] border border-white/5 mb-4 shadow-[0_0_15px_rgba(255,255,255,0.05)]">
+            <div className="p-4 bg-surface border border-border/5 mb-4 shadow-neon">
               {showFavs ? <Heart className="h-8 w-8 text-muted-foreground" /> : <Search className="h-8 w-8 text-muted-foreground" />}
             </div>
             <p className="text-[11px] font-black uppercase tracking-widest text-muted-foreground mb-1">
-              {showFavs ? "SYS: NENHUM FAVORITO ENCONTRADO" : activeTab === "script" ? "SYS_ERR: NO PAYLOAD FOUND" : "SYS_ERR: NO MOD FOUND"}
+              {showFavs ? "Nenhum favorito encontrado" : activeTab === "script" ? "Nenhum script encontrado" : "Nenhum APK encontrado"}
             </p>
-            <p className="text-[9px] uppercase tracking-widest text-[#a855f7]">
+            <p className="text-[9px] uppercase tracking-widest text-primary">
               {showFavs ? "Adicione scripts aos favoritos clicando no ❤️" : "Verifique os parâmetros de busca e filtros ativos."}
             </p>
           </motion.div>

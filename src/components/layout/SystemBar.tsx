@@ -16,7 +16,7 @@ export function SystemBar() {
   const build = "h1dd3n.04a7"; // visual flavor — not a real hash
 
   return (
-    <div className="hidden md:block w-full border-b border-white/5 bg-[#030305] text-[10px] font-mono uppercase tracking-[0.2em] text-muted-foreground">
+    <div className="hidden md:block w-full border-b border-border/60 bg-surface text-[10px] font-mono uppercase tracking-[0.2em] text-muted-foreground">
       <div className="container flex h-7 items-center justify-between">
         <div className="flex items-center gap-4">
           <span className="flex items-center gap-2">
