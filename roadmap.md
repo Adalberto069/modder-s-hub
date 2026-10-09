@@ -9,5 +9,5 @@
 - [x] Verificar leitura, navegação e ausência de erros.
 
 # Referência Elysium
-- [ ] Adaptar início, fontes e navegação ao visual mais limpo da referência.
-- [ ] Conferir apresentação e navegação.
+- [x] Adaptar início, fontes e navegação ao visual mais limpo da referência.
+- [x] Conferir apresentação e navegação.
