@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { Layout } from "@/components/layout/Layout";
+import { PageHeader } from "@/components/layout/PageHeader";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { BountyCard } from "@/components/bounties/BountyCard";
 import { PostBountyDialog } from "@/components/bounties/PostBountyDialog";
@@ -79,50 +81,25 @@ export default function Bounties() {
   return (
     <Layout>
       {/* Hero */}
-      <section className="relative border-b border-white/5 overflow-hidden bg-[#030304]">
-        <div
-          className="absolute inset-0 opacity-[0.03]"
-          style={{
-            backgroundImage: "linear-gradient(rgba(168,85,247,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(168,85,247,0.5) 1px, transparent 1px)",
-            backgroundSize: "40px 40px",
-          }}
-        />
-        <div className="absolute top-0 right-1/4 w-96 h-96 bg-neon-purple/10 rounded-full blur-[120px] pointer-events-none" />
-        <div className="absolute bottom-0 left-1/3 w-64 h-64 bg-neon-cyan/5 rounded-full blur-[80px] pointer-events-none" />
-
-        <div className="container relative py-10 sm:py-16 md:py-24 px-4">
-          <div className="max-w-3xl">
-            <div className="flex items-center gap-2 mb-4 sm:mb-6">
-              <div className="h-[1px] w-6 sm:w-8 bg-neon-purple/60" />
-              <span className="text-[9px] sm:text-[10px] font-mono uppercase tracking-[0.25em] sm:tracking-[0.3em] text-neon-purple/80">
-                Sistema de Encomendas
-              </span>
-            </div>
-
-            <h1 className="text-3xl sm:text-5xl md:text-6xl font-black uppercase tracking-tighter text-white mb-3 sm:mb-4 leading-none">
-              Bounty{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-neon-purple to-neon-cyan">
-                Board
-              </span>
-            </h1>
-            <p className="text-muted-foreground text-xs sm:text-base max-w-xl leading-relaxed font-mono">
-              Precisa de um script custom? Poste uma encomenda e deixa os modders da comunidade fazerem por você.
-            </p>
+      <section className="relative border-b border-border/60 overflow-hidden bg-background">
+        <div className="container relative py-8 sm:py-12 px-4">
+          <div className="max-w-none">
+            <PageHeader eyebrow="HIDDENMOD / ENCOMENDAS" title={<>Seu próximo <span className="text-primary">projeto.</span></>} description="Encomende um script Lua ou um APK de jogo aos modders da comunidade." />
 
             <div className="flex items-center gap-3 sm:gap-4 mt-5 sm:mt-8 flex-wrap">
               {user && (
                 <PostBountyDialog>
-                  <button
+                  <Button variant="ghost"
                     id="post-bounty-btn"
-                    className="flex items-center gap-2 bg-neon-purple hover:bg-neon-purple/90 text-white px-4 sm:px-6 py-2.5 sm:py-3 font-black uppercase tracking-widest text-[10px] sm:text-xs shadow-[0_0_20px_rgba(168,85,247,0.3)] transition-all duration-300 hover:shadow-[0_0_30px_rgba(168,85,247,0.5)] w-full sm:w-auto justify-center"
+                    className="flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground px-4 sm:px-6 py-2.5 sm:py-3 font-bold uppercase tracking-widest text-xs sm:text-xs shadow-neon transition-all duration-300 hover:shadow-neon w-full sm:w-auto justify-center"
                   >
                     <Target className="h-4 w-4" />
                     Postar Encomenda
-                  </button>
+                  </Button>
                 </PostBountyDialog>
               )}
               {isModder && (
-                <span className="flex items-center gap-2 text-[10px] sm:text-xs text-neon-green font-mono border border-neon-green/20 px-3 sm:px-4 py-2.5 sm:py-3 bg-neon-green/5">
+                <span className="flex items-center gap-2 text-xs sm:text-xs text-neon-green font-sans border border-neon-green/20 px-3 sm:px-4 py-2.5 sm:py-3 bg-neon-green/5">
                   <Zap className="h-3 w-3 shrink-0" />
                   <span className="leading-tight">Você pode se candidatar às encomendas abertas</span>
                 </span>
@@ -133,9 +110,9 @@ export default function Bounties() {
       </section>
 
       {/* Stats Bar */}
-      <section className="border-b border-white/5 bg-[#050505]">
+      <section className="border-b border-border/60 bg-card">
         <div className="container">
-          <div className="grid grid-cols-3 divide-x divide-white/5">
+          <div className="grid grid-cols-3 divide-x divide-border/5">
             <StatItem icon={<Target className="h-4 w-4" />} value={stats?.total ?? 0} label="Total" color="text-neon-purple" />
             <StatItem icon={<TrendingUp className="h-4 w-4" />} value={stats?.open ?? 0} label="Abertas" color="text-neon-green" />
             <StatItem icon={<Trophy className="h-4 w-4" />} value={stats?.completed ?? 0} label="Concluídas" color="text-neon-cyan" />
@@ -146,48 +123,48 @@ export default function Bounties() {
       {/* Filters & List */}
       <section className="container py-5 sm:py-8 px-3 sm:px-6 space-y-5 sm:space-y-6">
         {/* Type chips (Script vs APK) */}
-        <div className="flex gap-1 p-1 bg-[#050505] border border-white/5 overflow-x-auto scrollbar-none">
+        <div className="flex gap-1 p-1 bg-card border border-border/60 overflow-x-auto scrollbar-none">
           {[
             { v: "all", label: `Tudo (${(scriptCount + apkCount) || 0})` },
             { v: "script", label: `Scripts .lua (${scriptCount})` },
             { v: "apk", label: `APK Mods (${apkCount})` },
           ].map((f) => (
-            <button
+            <Button variant="ghost"
               key={f.v}
               onClick={() => setTypeFilter(f.v as any)}
-              className={`px-3 py-1.5 text-[10px] font-black uppercase tracking-widest transition-colors whitespace-nowrap ${
+              className={`px-3 py-1.5 text-xs font-bold uppercase tracking-widest transition-colors whitespace-nowrap ${
                 typeFilter === f.v
                   ? f.v === "apk"
-                    ? "bg-neon-green text-black"
+                    ? "bg-neon-green text-primary-foreground"
                     : f.v === "script"
-                      ? "bg-neon-cyan text-black"
-                      : "bg-neon-purple text-white"
-                  : "text-muted-foreground hover:text-white"
+                      ? "bg-neon-cyan text-primary-foreground"
+                      : "bg-primary text-primary-foreground"
+                  : "text-muted-foreground hover:text-foreground"
               }`}
             >
               {f.label}
-            </button>
+            </Button>
           ))}
         </div>
 
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           {/* Status filters */}
-          <div className="flex gap-1 p-1 bg-[#050505] border border-white/5 overflow-x-auto scrollbar-none -mx-3 px-3 sm:mx-0 sm:px-1">
+          <div className="flex gap-1 p-1 bg-card border border-border/60 overflow-x-auto scrollbar-none -mx-3 px-3 sm:mx-0 sm:px-1">
             {STATUS_FILTERS.map((f) => {
               if (f.value === "mine" && !user) return null;
               return (
-                <button
+                <Button variant="ghost"
                   key={f.value}
                   onClick={() => setStatusFilter(f.value)}
-                  className={`px-3 py-1.5 text-[10px] font-black uppercase tracking-widest transition-colors flex items-center gap-1 whitespace-nowrap shrink-0 ${
+                  className={`px-3 py-1.5 text-xs font-bold uppercase tracking-widest transition-colors flex items-center gap-1 whitespace-nowrap shrink-0 ${
                     statusFilter === f.value
-                      ? "bg-neon-purple text-white"
-                      : "text-muted-foreground hover:text-white"
+                      ? "bg-primary text-primary-foreground"
+                      : "text-muted-foreground hover:text-foreground"
                   }`}
                 >
                   {f.value === "mine" && <UserCheck className="h-3 w-3" />}
                   {f.label}
-                </button>
+                </Button>
               );
             })}
           </div>
@@ -201,7 +178,7 @@ export default function Bounties() {
               placeholder="Buscar encomendas..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="pl-9 h-10 bg-[#050505] border-white/10 focus-visible:ring-neon-purple rounded-none text-sm font-mono"
+              className="pl-9 h-10 bg-card border-border focus-visible:ring-neon-purple rounded-md text-sm font-sans"
             />
           </div>
         </div>
@@ -210,24 +187,24 @@ export default function Bounties() {
         {isLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {Array.from({ length: 6 }).map((_, i) => (
-              <Skeleton key={i} className="h-48 rounded-none bg-white/5" />
+              <Skeleton key={i} className="h-48 rounded-md bg-foreground/5" />
             ))}
           </div>
         ) : filtered.length === 0 ? (
           <div className="py-24 text-center space-y-4">
-            <div className="h-16 w-16 mx-auto rounded-none bg-neon-purple/5 border border-neon-purple/10 flex items-center justify-center">
+            <div className="h-16 w-16 mx-auto rounded-md bg-neon-purple/5 border border-neon-purple/10 flex items-center justify-center">
               <Target className="h-8 w-8 text-neon-purple/30" />
             </div>
-            <p className="text-muted-foreground font-mono text-sm">
+            <p className="text-muted-foreground font-sans text-sm">
               {search ? "Nenhuma encomenda encontrada para essa busca." :
                statusFilter === "mine" ? "Você ainda não postou nenhuma encomenda." :
                "Nenhuma encomenda disponível no momento."}
             </p>
             {user && !search && statusFilter !== "mine" && (
               <PostBountyDialog>
-                <button className="text-xs text-neon-purple underline underline-offset-4 font-mono">
+                <Button variant="ghost" className="text-xs text-neon-purple underline underline-offset-4 font-sans">
                   Seja o primeiro a postar uma encomenda →
-                </button>
+                </Button>
               </PostBountyDialog>
             )}
           </div>
@@ -245,10 +222,10 @@ export default function Bounties() {
 
 function StatItem({ icon, value, label, color }: { icon: React.ReactNode; value: string | number; label: string; color: string }) {
   return (
-    <div className="flex flex-col items-center py-4 sm:py-6 gap-1 sm:gap-1.5 hover:bg-white/[0.02] transition-colors px-2">
+    <div className="flex flex-col items-center py-4 sm:py-6 gap-1 sm:gap-1.5 hover:bg-foreground/[0.02] transition-colors px-2">
       <div className={`${color} mb-0.5 sm:mb-1`}>{icon}</div>
-      <p className="text-lg sm:text-2xl font-black font-mono leading-none">{value}</p>
-      <p className="text-[9px] sm:text-[10px] uppercase tracking-widest text-muted-foreground/70 font-bold text-center leading-tight">{label}</p>
+      <p className="text-lg sm:text-2xl font-bold font-sans leading-none">{value}</p>
+      <p className="text-xs sm:text-xs uppercase tracking-widest text-muted-foreground/70 font-bold text-center leading-tight">{label}</p>
     </div>
   );
 }

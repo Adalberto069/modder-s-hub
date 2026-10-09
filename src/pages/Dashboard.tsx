@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { validateFileWithToast } from "@/lib/secure-upload";
 import { Layout } from "@/components/layout/Layout";
+import { PageHeader } from "@/components/layout/PageHeader";
 import { ModderFinanceTab } from "@/components/modder/ModderFinanceTab";
 import { ModderModerationInbox } from "@/components/ModderModerationInbox";
 import { useAuth } from "@/lib/auth";
@@ -270,102 +271,89 @@ end
   return (
     <Layout>
       <div className="container py-8">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-8 border border-white/10 bg-[#030304] p-6 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-neon-purple/10 blur-[80px] pointer-events-none" />
-          <div className="relative z-10 space-y-1">
-            <h1 className="text-3xl font-black uppercase tracking-tighter text-white">Hidden Mod</h1>
-            <p className="text-[10px] text-muted-foreground uppercase font-mono tracking-widest flex items-center gap-2">
-              <Code className="w-3 h-3 text-neon-purple" /> Acesso Desenvolvedor
-            </p>
-          </div>
-          {isModder && (
-            <Button onClick={() => navigate("/script/new")} className="bg-neon-purple hover:bg-neon-purple/90 text-white shadow-[0_0_15px_rgba(168,85,247,0.3)] rounded-none font-black uppercase tracking-widest text-[10px] sm:text-xs h-10 sm:h-12 px-6 w-full sm:w-auto relative z-10 transition-transform hover:-translate-y-1">
-              <Plus className="mr-2 h-4 w-4" /> Novo Payload
-            </Button>
-          )}
-        </div>
+        <PageHeader eyebrow="HIDDENMOD / MINHA CONTA" title={<>Meu <span className="text-primary">painel.</span></>} description={isModder ? "Acompanhe suas publicações, vendas e arquivos comprados." : "Seus arquivos, licenças e códigos de teste em um só lugar."} actions={isModder ? <Button onClick={() => navigate("/script/new")}><Plus /> Nova publicação</Button> : undefined} />
 
         {/* Stats - only for modders */}
         {isModder && (
           <div className="space-y-6 mb-8">
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 font-mono">
-              <Card className="bg-[#050505] border-white/10 hover:border-primary/40 rounded-none transition-all group">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 font-sans">
+              <Card className="bg-card border-border hover:border-primary/40 rounded-md transition-all group">
                 <CardContent className="p-5">
                   <div className="flex justify-between items-start mb-4">
                     <div className="bg-primary/5 border border-primary/20 p-2 group-hover:bg-primary/10 transition-colors">
                       <Code className="h-4 w-4 text-primary" />
                     </div>
-                    <Badge variant="outline" className="text-[10px] opacity-60">Total</Badge>
+                    <Badge variant="outline" className="text-xs opacity-60">Total</Badge>
                   </div>
-                  <p className="text-2xl font-bold text-white leading-none">
+                  <p className="text-2xl font-bold text-foreground leading-none">
                     {myScripts?.length ?? 0}
                   </p>
-                  <p className="text-[10px] text-muted-foreground mt-2 uppercase tracking-widest font-black">Publicações</p>
+                  <p className="text-xs text-muted-foreground mt-2 uppercase tracking-widest font-bold">Publicações</p>
                 </CardContent>
               </Card>
 
-              <Card className="bg-[#050505] border-white/10 hover:border-accent/40 rounded-none transition-all group">
+              <Card className="bg-card border-border hover:border-accent/40 rounded-md transition-all group">
                 <CardContent className="p-5">
                   <div className="flex justify-between items-start mb-4">
                     <div className="bg-accent/5 border border-accent/20 p-2 group-hover:bg-accent/10 transition-colors">
                       <Download className="h-4 w-4 text-accent" />
                     </div>
-                    <Badge variant="outline" className="text-[10px] text-accent/70 border-accent/20">Popularidade</Badge>
+                    <Badge variant="outline" className="text-xs text-accent/70 border-accent/20">Popularidade</Badge>
                   </div>
-                  <p className="text-2xl font-bold text-white leading-none">
+                  <p className="text-2xl font-bold text-foreground leading-none">
                     {totalDownloads}
                   </p>
-                  <p className="text-[10px] text-muted-foreground mt-2 uppercase tracking-widest font-black">Downloads</p>
+                  <p className="text-xs text-muted-foreground mt-2 uppercase tracking-widest font-bold">Downloads</p>
                 </CardContent>
               </Card>
 
-              <Card className="bg-[#050505] border-white/10 hover:border-neon-purple/40 rounded-none transition-all group">
+              <Card className="bg-card border-border hover:border-neon-purple/40 rounded-md transition-all group">
                 <CardContent className="p-5">
                   <div className="flex justify-between items-start mb-4">
                     <div className="bg-neon-purple/5 border border-neon-purple/20 p-2 group-hover:bg-neon-purple/10 transition-colors">
                       <ShoppingBag className="h-4 w-4 text-neon-purple" />
                     </div>
-                    <Badge variant="outline" className="text-[10px] text-neon-purple/70 border-neon-purple/20">Volume</Badge>
+                    <Badge variant="outline" className="text-xs text-neon-purple/70 border-neon-purple/20">Volume</Badge>
                   </div>
-                  <p className="text-2xl font-bold text-white leading-none">
+                  <p className="text-2xl font-bold text-foreground leading-none">
                     {totalSales}
                   </p>
-                  <p className="text-[10px] text-muted-foreground mt-2 uppercase tracking-widest font-black">Vendas</p>
+                  <p className="text-xs text-muted-foreground mt-2 uppercase tracking-widest font-bold">Vendas</p>
                 </CardContent>
               </Card>
 
-              <Card className="bg-[#050505] border-white/10 hover:border-neon-green/40 rounded-none transition-all group">
+              <Card className="bg-card border-border hover:border-neon-green/40 rounded-md transition-all group">
                 <CardContent className="p-5">
                   <div className="flex justify-between items-start mb-4">
                     <div className="bg-neon-green/5 border border-neon-green/20 p-2 group-hover:bg-neon-green/10 transition-colors">
                       <DollarSign className="h-4 w-4 text-neon-green" />
                     </div>
                     <div className="flex items-center gap-1">
-                      <ArrowUpRight className={`h-3 w-3 ${dailyGrowth ? 'text-neon-green' : 'text-[#333]'}`} />
-                      <span className="text-[10px] font-black uppercase text-neon-green">Lucro</span>
+                      <ArrowUpRight className={`h-3 w-3 ${dailyGrowth ? 'text-neon-green' : 'text-muted-foreground'}`} />
+                      <span className="text-xs font-bold uppercase text-neon-green">Lucro</span>
                     </div>
                   </div>
                   <p className="text-2xl font-bold text-neon-green leading-none">
                     R$ {totalEarnings.toFixed(2)}
                   </p>
-                  <p className="text-[10px] text-muted-foreground mt-2 uppercase tracking-widest font-black">Ganhos (80%)</p>
+                  <p className="text-xs text-muted-foreground mt-2 uppercase tracking-widest font-bold">Ganhos (80%)</p>
                 </CardContent>
               </Card>
             </div>
 
-            <div className="grid grid-cols-1 gap-6 font-mono">
-              <Card className="bg-[#050505] border-white/10 rounded-none shadow-none overflow-hidden">
-                <CardHeader className="pb-4 border-b border-white/5 bg-[#030304]">
+            <div className="grid grid-cols-1 gap-6 font-sans">
+              <Card className="bg-card border-border rounded-md shadow-none overflow-hidden">
+                <CardHeader className="pb-4 border-b border-border/60 bg-background">
                   <div className="flex items-center justify-between">
                     <div>
-                      <CardTitle className="text-sm font-black uppercase tracking-widest flex items-center gap-2 text-white">
+                      <CardTitle className="text-sm font-bold uppercase tracking-widest flex items-center gap-2 text-foreground">
                         <TrendingUp className="h-4 w-4 text-primary" />
                         Desempenho de Vendas
                       </CardTitle>
-                      <CardDescription className="text-[9px] uppercase tracking-widest mt-1">Ganhos líquidos nos últimos 7 dias</CardDescription>
+                      <CardDescription className="text-xs uppercase tracking-widest mt-1">Ganhos líquidos nos últimos 7 dias</CardDescription>
                     </div>
                     <div className="flex items-center gap-2">
-                       <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 border border-white/10 bg-[#030304] text-[10px] font-black uppercase tracking-widest">
+                       <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 border border-border bg-background text-xs font-bold uppercase tracking-widest">
                         <Calendar className="h-3 w-3" /> 
                         Última semana
                       </div>
@@ -428,17 +416,17 @@ end
 
         {isModder && <ModderModerationInbox />}
 
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="font-mono">
-          <TabsList className={`mb-8 grid w-full ${isModder ? "grid-cols-3" : "grid-cols-1"} p-1 bg-[#050505] border border-white/10 rounded-none h-14`}>
-            <TabsTrigger value="purchases" className="text-[9px] sm:text-[10px] tracking-widest uppercase font-black gap-2 data-[state=active]:bg-[#030304] data-[state=active]:text-neon-purple rounded-none h-full">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="font-sans">
+          <TabsList className={`mb-8 grid w-full ${isModder ? "grid-cols-3" : "grid-cols-1"} p-1 bg-card border border-border rounded-md h-14`}>
+            <TabsTrigger value="purchases" className="text-xs sm:text-xs tracking-widest uppercase font-bold gap-2 data-[state=active]:bg-background data-[state=active]:text-neon-purple rounded-md h-full">
               <Key className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> <span className="hidden sm:inline">Meus </span>Arquivos Comprados
             </TabsTrigger>
             {isModder && (
               <>
-                <TabsTrigger value="my-scripts" className="text-[9px] sm:text-[10px] tracking-widest uppercase font-black gap-2 data-[state=active]:bg-[#030304] data-[state=active]:text-neon-green rounded-none h-full">
+                <TabsTrigger value="my-scripts" className="text-xs sm:text-xs tracking-widest uppercase font-bold gap-2 data-[state=active]:bg-background data-[state=active]:text-neon-green rounded-md h-full">
                   <Code className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> Minhas Publicações
                 </TabsTrigger>
-                <TabsTrigger value="finance" className="text-[9px] sm:text-[10px] tracking-widest uppercase font-black gap-2 data-[state=active]:bg-[#030304] data-[state=active]:text-accent rounded-none h-full">
+                <TabsTrigger value="finance" className="text-xs sm:text-xs tracking-widest uppercase font-bold gap-2 data-[state=active]:bg-background data-[state=active]:text-accent rounded-md h-full">
                   <DollarSign className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> <span className="hidden sm:inline">Meu </span>Financeiro
                 </TabsTrigger>
               </>
@@ -449,7 +437,7 @@ end
           <TabsContent value="purchases">
             <TestSessionsList />
             <PurchaseEscrowList />
-            <h2 className="text-sm font-black uppercase tracking-widest mb-6 flex items-center gap-2 text-white bg-[#030304] border border-white/5 p-4 rounded-none">
+            <h2 className="text-sm font-bold uppercase tracking-widest mb-6 flex items-center gap-2 text-foreground bg-background border border-border/60 p-4 rounded-md">
               <Key className="h-4 w-4 text-neon-purple" /> Scripts Adquiridos
             </h2>
             <div className="space-y-4">
@@ -469,12 +457,12 @@ end
                           <p className="text-sm sm:font-semibold truncate">{license.scripts?.title ?? "Script"}</p>
                           <div className="flex items-center gap-2 mt-1 flex-wrap">
                             {license.scripts?.game_name && (
-                              <Badge variant="secondary" className="text-[10px]">🎮 {license.scripts.game_name}</Badge>
+                              <Badge variant="secondary" className="text-xs">🎮 {license.scripts.game_name}</Badge>
                             )}
                             {license.scripts?.version && (
-                              <Badge variant="outline" className="text-[10px]">v{license.scripts.version}</Badge>
+                              <Badge variant="outline" className="text-xs">v{license.scripts.version}</Badge>
                             )}
-                            <Badge variant={license.status === "active" ? "default" : "destructive"} className="text-[10px]">
+                            <Badge variant={license.status === "active" ? "default" : "destructive"} className="text-xs">
                               {license.status === "active" ? "✅ Ativa" : "🚫 Banida"}
                             </Badge>
                             {license.expires_at ? (() => {
@@ -483,7 +471,7 @@ end
                               const diffMs = expires.getTime() - now.getTime();
                               if (diffMs <= 0) {
                                 return (
-                                  <Badge variant="destructive" className="text-[10px]">
+                                  <Badge variant="destructive" className="text-xs">
                                     ❌ Expirada
                                   </Badge>
                                 );
@@ -497,12 +485,12 @@ end
                               else timeLabel = `${diffMinutes}min restantes`;
                               const urgentClass = diffDays <= 3 ? "border-destructive/50 text-destructive" : "border-yellow-500/30 text-yellow-400";
                               return (
-                                <Badge variant="outline" className={`text-[10px] ${urgentClass}`}>
+                                <Badge variant="outline" className={`text-xs ${urgentClass}`}>
                                   ⏳ {timeLabel}
                                 </Badge>
                               );
                             })() : (
-                              <Badge variant="outline" className="text-[10px] border-accent/30 text-accent">
+                              <Badge variant="outline" className="text-xs border-accent/30 text-accent">
                                 ♾️ Permanente
                               </Badge>
                             )}
@@ -515,8 +503,8 @@ end
                     </div>
 
                     {/* License Key */}
-                    <div className="mt-3 p-3 rounded-lg bg-secondary/30 border border-border/50">
-                      <p className="text-[10px] text-muted-foreground mb-1">Licença:</p>
+                    <div className="mt-3 p-3 rounded-lg bg-secondary/30 border border-border/600">
+                      <p className="text-xs text-muted-foreground mb-1">Licença:</p>
                       <div className="flex flex-col sm:flex-row sm:items-center gap-2">
                         <div className="flex items-center gap-2 flex-1">
                           <Key className="h-3 w-3 text-primary shrink-0" />
@@ -525,7 +513,7 @@ end
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="h-7 px-2 text-[10px] sm:text-xs self-end sm:self-center"
+                          className="h-7 px-2 text-xs sm:text-xs self-end sm:self-center"
                           onClick={() => { navigator.clipboard.writeText(license.license_key); toast.success("Copiada!"); }}
                         >
                           <Copy className="h-3 w-3 mr-1" /> Copiar
@@ -567,23 +555,23 @@ end
             <TabsContent value="my-scripts" className="space-y-6">
               {/* Upload form */}
               {showForm && (
-                <Card className="border-white/10 bg-[#050505] rounded-none p-2 mb-8 relative font-mono">
+                <Card className="border-border bg-card rounded-md p-2 mb-8 relative font-sans">
                   <div className="absolute top-0 right-0 p-1 bg-neon-purple/20 border-b border-l border-neon-purple/50">
-                    <span className="text-[8px] uppercase font-black tracking-widest text-neon-purple">MODDER_AUTH_OK</span>
+                    <span className="text-xs uppercase font-bold tracking-widest text-neon-purple">MODDER_AUTH_OK</span>
                   </div>
-                  <CardHeader className="border-b border-white/5 bg-[#030304] pb-4">
-                    <CardTitle className="text-sm font-black uppercase tracking-widest text-white">Init Payload Config</CardTitle>
+                  <CardHeader className="border-b border-border/60 bg-background pb-4">
+                    <CardTitle className="text-sm font-bold uppercase tracking-widest text-foreground">Init Payload Config</CardTitle>
                   </CardHeader>
                   <CardContent className="pt-6">
                     <form onSubmit={handleSubmit} className="space-y-4">
                       <div>
-                        <Label className="mb-2 block text-[10px] font-black uppercase tracking-widest text-muted-foreground">Classificação do Payload</Label>
+                        <Label className="mb-2 block text-xs font-bold uppercase tracking-widest text-muted-foreground">Classificação do Payload</Label>
                         <Tabs value={scriptType} onValueChange={setScriptType}>
-                          <TabsList className="grid w-full max-w-xs grid-cols-2 p-1 bg-[#030304] border border-white/10 rounded-none h-12">
-                            <TabsTrigger value="script" className="text-[10px] tracking-widest uppercase font-black gap-2 data-[state=active]:bg-[#0a0a0c] data-[state=active]:text-neon-cyan rounded-none h-full">
+                          <TabsList className="grid w-full max-w-xs grid-cols-2 p-1 bg-background border border-border rounded-md h-12">
+                            <TabsTrigger value="script" className="text-xs tracking-widest uppercase font-bold gap-2 data-[state=active]:bg-secondary data-[state=active]:text-neon-cyan rounded-md h-full">
                               <Code className="h-4 w-4" /> Script LUA
                             </TabsTrigger>
-                            <TabsTrigger value="apk" className="text-[10px] tracking-widest uppercase font-black gap-2 data-[state=active]:bg-[#0a0a0c] data-[state=active]:text-neon-green rounded-none h-full">
+                            <TabsTrigger value="apk" className="text-xs tracking-widest uppercase font-bold gap-2 data-[state=active]:bg-secondary data-[state=active]:text-neon-green rounded-md h-full">
                               <Package className="h-4 w-4" /> Mod Menu
                             </TabsTrigger>
                           </TabsList>
@@ -592,14 +580,14 @@ end
 
                       <div className="grid md:grid-cols-2 gap-4">
                         <div className="space-y-2">
-                          <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Nome Operacional</Label>
-                          <Input value={title} onChange={(e) => setTitle(e.target.value)} required className="bg-[#030304] border-white/10 focus-visible:ring-neon-purple rounded-none h-12" />
+                          <Label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Nome Operacional</Label>
+                          <Input value={title} onChange={(e) => setTitle(e.target.value)} required className="bg-background border-border focus-visible:ring-neon-purple rounded-md h-12" />
                         </div>
                         <div className="space-y-2">
-                          <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Classificação Global</Label>
+                          <Label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Classificação Global</Label>
                           <Select value={categoryId} onValueChange={setCategoryId}>
-                            <SelectTrigger className="bg-[#030304] border-white/10 focus-visible:ring-neon-purple rounded-none h-12"><SelectValue placeholder="SORT_BY" /></SelectTrigger>
-                            <SelectContent className="bg-[#050505] border-white/10 rounded-none">
+                            <SelectTrigger className="bg-background border-border focus-visible:ring-neon-purple rounded-md h-12"><SelectValue placeholder="SORT_BY" /></SelectTrigger>
+                            <SelectContent className="bg-card border-border rounded-md">
                               {categories?.map((c: any) => (
                                 <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
                               ))}
@@ -608,15 +596,15 @@ end
                         </div>
                       </div>
                       <div className="space-y-2">
-                        <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Documentação (TXT)</Label>
-                        <Textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={4} className="bg-[#030304] border-white/10 focus-visible:ring-neon-purple rounded-none resize-none p-4" />
+                        <Label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Documentação (TXT)</Label>
+                        <Textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={4} className="bg-background border-border focus-visible:ring-neon-purple rounded-md resize-none p-4" />
                       </div>
                       <div className="grid md:grid-cols-2 gap-4">
                         <div className="space-y-2">
-                          <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Estado Operacional</Label>
+                          <Label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Estado Operacional</Label>
                           <Select value={status} onValueChange={setStatus}>
-                            <SelectTrigger className="bg-[#030304] border-white/10 focus-visible:ring-neon-purple rounded-none h-12 text-xs"><SelectValue /></SelectTrigger>
-                            <SelectContent className="bg-[#050505] border-white/10 rounded-none text-xs">
+                            <SelectTrigger className="bg-background border-border focus-visible:ring-neon-purple rounded-md h-12 text-xs"><SelectValue /></SelectTrigger>
+                            <SelectContent className="bg-card border-border rounded-md text-xs">
                               <SelectItem value="working">WORKING_OK</SelectItem>
                               <SelectItem value="detected">DETECTED_RISK</SelectItem>
                               <SelectItem value="updating">UPDATING_NOW</SelectItem>
@@ -625,15 +613,15 @@ end
                         </div>
                         <div className="flex items-center gap-4 pt-8">
                           <Switch checked={isPaid} onCheckedChange={setIsPaid} className="data-[state=checked]:bg-neon-purple" />
-                          <Label className="uppercase text-[10px] font-black tracking-widest text-white">Monetização</Label>
-                          {isPaid && <Input type="number" placeholder="Value (R$)" value={price} onChange={(e) => setPrice(e.target.value)} className="w-32 bg-[#030304] border-white/10 focus-visible:ring-neon-purple rounded-none text-neon-green font-mono" step="0.01" />}
+                          <Label className="uppercase text-xs font-bold tracking-widest text-foreground">Monetização</Label>
+                          {isPaid && <Input type="number" placeholder="Value (R$)" value={price} onChange={(e) => setPrice(e.target.value)} className="w-32 bg-background border-border focus-visible:ring-neon-purple rounded-md text-neon-green font-sans" step="0.01" />}
                         </div>
                       </div>
 
                       <div className="grid md:grid-cols-2 gap-4">
                         <div className="space-y-2">
-                          <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Upload Raw File</Label>
-                          <Input type="file" className="bg-[#030304] border-white/10 focus-visible:ring-neon-purple rounded-none h-12 file:bg-[#050505] file:text-white file:border-0 file:mr-4 file:h-full cursor-pointer text-xs" onChange={async (e) => {
+                          <Label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Upload Raw File</Label>
+                          <Input type="file" className="bg-background border-border focus-visible:ring-neon-purple rounded-md h-12 file:bg-card file:text-foreground file:border-0 file:mr-4 file:h-full cursor-pointer text-xs" onChange={async (e) => {
                             const f = e.target.files?.[0] ?? null;
                             if (!f) {
                               setFile(null);
@@ -649,12 +637,12 @@ end
                           }} />
                         </div>
                         <div className="space-y-2">
-                          <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">URL da Miniatura / Link Externo</Label>
+                          <Label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">URL da Miniatura / Link Externo</Label>
                           <div className="flex gap-2 h-12">
                              <Input 
                               type="file" 
                               accept=".jpg,.jpeg,.png,.webp"
-                               className="bg-[#030304] border-white/10 focus-visible:ring-neon-purple rounded-none h-12 file:bg-[#050505] file:text-white file:border-0 file:mr-4 file:h-full cursor-pointer text-xs w-full"
+                               className="bg-background border-border focus-visible:ring-neon-purple rounded-md h-12 file:bg-card file:text-foreground file:border-0 file:mr-4 file:h-full cursor-pointer text-xs w-full"
                               onChange={async (e) => {
                                 const f = e.target.files?.[0];
                                 if (!f) return;
@@ -676,15 +664,15 @@ end
                               }}
                             />
                           </div>
-                          <p className="text-[9px] text-muted-foreground mt-1 uppercase tracking-widest font-mono">JPG/PNG/WebP, 1MB Max.</p>
+                          <p className="text-xs text-muted-foreground mt-1 uppercase tracking-widest font-sans">JPG/PNG/WebP, 1MB Max.</p>
                         </div>
                       </div>
 
                       <div className="space-y-2 pt-2">
-                        <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Endpoint / Thumbnail URL</Label>
-                        <Input value={externalLink} onChange={(e) => setExternalLink(e.target.value)} placeholder="https://..." className="bg-[#030304] border-white/10 focus-visible:ring-neon-purple rounded-none h-12 font-mono text-xs" />
+                        <Label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Endpoint / Thumbnail URL</Label>
+                        <Input value={externalLink} onChange={(e) => setExternalLink(e.target.value)} placeholder="https://..." className="bg-background border-border focus-visible:ring-neon-purple rounded-md h-12 font-sans text-xs" />
                       </div>
-                      <Button type="submit" disabled={submitting} className="w-full bg-neon-purple hover:bg-neon-purple/90 text-white shadow-[0_0_15px_rgba(168,85,247,0.3)] rounded-none font-black uppercase tracking-widest text-[10px] sm:text-xs h-12 mt-4">
+                      <Button type="submit" disabled={submitting} className="w-full bg-primary hover:bg-primary/90 text-primary-foreground shadow-neon rounded-md font-bold uppercase tracking-widest text-xs sm:text-xs h-12 mt-4">
                         {submitting ? "Executando..." : `Deploy ${scriptType === "script" ? "LUA" : "MOD"}`}
                       </Button>
                     </form>
@@ -703,31 +691,31 @@ end
                 return (
                   <>
                     <div className="flex items-center justify-between mb-4 gap-3 flex-wrap">
-                      <h2 className="text-sm font-black uppercase tracking-widest text-white flex items-center gap-2">
+                      <h2 className="text-sm font-bold uppercase tracking-widest text-foreground flex items-center gap-2">
                         <Code className="h-4 w-4 text-neon-green" /> Minhas publicações
                       </h2>
-                      <div className="flex gap-1 border border-white/10 bg-[#030304] p-1 rounded-none font-mono">
+                      <div className="flex gap-1 border border-border bg-background p-1 rounded-md font-sans">
                         {([
-                          { key: "all", label: `Tudo (${myScripts?.length ?? 0})`, color: "text-white" },
+                          { key: "all", label: `Tudo (${myScripts?.length ?? 0})`, color: "text-foreground" },
                           { key: "script", label: `Scripts (${scriptCount})`, color: "text-neon-cyan" },
                           { key: "apk", label: `APKs (${apkCount})`, color: "text-neon-green" },
                         ] as const).map((f) => (
-                          <button
+                          <Button variant="ghost"
                             key={f.key}
                             onClick={() => setPubFilter(f.key)}
-                            className={`px-3 py-1.5 text-[9px] uppercase tracking-widest font-black transition-all rounded-none ${
-                              pubFilter === f.key ? `bg-[#050505] ${f.color} border border-white/10` : "text-muted-foreground hover:text-white"
+                            className={`px-3 py-1.5 text-xs uppercase tracking-widest font-bold transition-all rounded-md ${
+                              pubFilter === f.key ? `bg-card ${f.color} border border-border` : "text-muted-foreground hover:text-foreground"
                             }`}
                           >
                             {f.label}
-                          </button>
+                          </Button>
                         ))}
                       </div>
                     </div>
                     <div className="space-y-4">
                       {filtered.map((script: any) => (
-                        <Card key={script.id} className={`bg-[#050505] border border-white/5 rounded-none hover:bg-[#08080a] transition-colors p-0 shadow-none ${!script.is_active ? 'opacity-50 grayscale' : ''}`}>
-                          <CardContent className="p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 font-mono">
+                        <Card key={script.id} className={`bg-card border border-border/60 rounded-md hover:bg-secondary transition-colors p-0 shadow-none ${!script.is_active ? 'opacity-50 grayscale' : ''}`}>
+                          <CardContent className="p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 font-sans">
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-2 mb-2 flex-wrap">
                                 {script.script_type === "apk" ? (
@@ -735,46 +723,46 @@ end
                                 ) : (
                                   <Code className="h-4 w-4 text-neon-cyan" />
                                 )}
-                                <p className="font-black text-sm uppercase tracking-tight text-white truncate italic">{script.title}</p>
-                                {script.is_paid && <Badge variant="secondary" className="text-[9px] uppercase tracking-widest bg-neon-purple/20 text-neon-purple hover:bg-neon-purple/30 rounded-none border-t border-neon-purple/50">R$ {Number(script.price).toFixed(2)}</Badge>}
-                                {!script.is_active && <Badge variant="destructive" className="text-[9px] uppercase tracking-widest rounded-none">INATIVO</Badge>}
+                                <p className="font-bold text-sm uppercase tracking-tight text-foreground truncate">{script.title}</p>
+                                {script.is_paid && <Badge variant="secondary" className="text-xs uppercase tracking-widest bg-neon-purple/20 text-neon-purple hover:bg-neon-purple/30 rounded-md border-t border-neon-purple/50">R$ {Number(script.price).toFixed(2)}</Badge>}
+                                {!script.is_active && <Badge variant="destructive" className="text-xs uppercase tracking-widest rounded-md">INATIVO</Badge>}
                               </div>
-                              <div className="flex flex-wrap gap-3 text-[10px] text-muted-foreground uppercase tracking-widest">
+                              <div className="flex flex-wrap gap-3 text-xs text-muted-foreground uppercase tracking-widest">
                                 <span className="flex items-center gap-1"><FolderOpen className="h-3 w-3" /> {script.categories?.name}</span>
                                 <span className="flex items-center gap-1"><Download className="h-3 w-3" /> {script.download_count}</span>
-                                <Badge variant="outline" className="text-[9px] border-white/10 bg-[#030304] rounded-none">{script.status}</Badge>
-                                <Badge variant="secondary" className={`text-[9px] border-white/10 bg-[#030304] rounded-none ${script.script_type === "apk" ? "text-neon-green" : "text-neon-cyan"}`}>
+                                <Badge variant="outline" className="text-xs border-border bg-background rounded-md">{script.status}</Badge>
+                                <Badge variant="secondary" className={`text-xs border-border bg-background rounded-md ${script.script_type === "apk" ? "text-neon-green" : "text-neon-cyan"}`}>
                                   {script.script_type === "apk" ? "APK MOD" : "LUA"}
                                 </Badge>
                                 {script.script_type === "apk" && script.apk_version && (
-                                  <Badge variant="outline" className="text-[9px] border-neon-green/20 text-neon-green bg-[#030304] rounded-none font-mono">v{script.apk_version}</Badge>
+                                  <Badge variant="outline" className="text-xs border-neon-green/20 text-neon-green bg-background rounded-md font-sans">v{script.apk_version}</Badge>
                                 )}
                               </div>
                             </div>
                             <div className="flex gap-2 shrink-0">
-                              <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-white/5 rounded-none text-muted-foreground hover:text-white transition-colors" onClick={() => navigate(`/script/${script.id}/edit`)}>
+                              <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-foreground/5 rounded-md text-muted-foreground hover:text-foreground transition-colors" onClick={() => navigate(`/script/${script.id}/edit`)}>
                                 <Pencil className="h-4 w-4" />
                               </Button>
                               <Button
                                 variant="ghost"
                                 size="icon"
-                                className={`h-8 w-8 hover:bg-white/5 rounded-none transition-colors ${script.is_active ? "text-neon-cyan hover:text-neon-cyan" : "text-muted-foreground hover:text-white"}`}
+                                className={`h-8 w-8 hover:bg-foreground/5 rounded-md transition-colors ${script.is_active ? "text-neon-cyan hover:text-neon-cyan" : "text-muted-foreground hover:text-foreground"}`}
                                 onClick={() => handleToggleActive(script.id, script.is_active)}
                                 title={script.is_active ? "Desativar" : "Reativar"}
                               >
                                 {script.is_active ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                               </Button>
-                              <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-destructive/10 rounded-none text-destructive transition-colors" onClick={() => setScriptToDelete({ id: script.id, title: script.title })}>
+                              <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-destructive/10 rounded-md text-destructive transition-colors" onClick={() => setScriptToDelete({ id: script.id, title: script.title })}>
                                 <Trash2 className="h-4 w-4" />
                               </Button>
                             </div>
                           </CardContent>
                         </Card>
                       ))}
-                      <div className="flex border-t border-white/5 mt-4 pt-4 justify-center">
+                      <div className="flex border-t border-border/60 mt-4 pt-4 justify-center">
                         {filtered.length === 0 && (
-                          <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-                            {pubFilter === "apk" ? "Nenhum APK Mod publicado ainda." : pubFilter === "script" ? "Nenhum script Lua publicado ainda." : "Nenhuma transmissão encontrada no terminal."}
+                          <p className="text-xs font-sans uppercase tracking-widest text-muted-foreground">
+                            {pubFilter === "apk" ? "Nenhum APK Mod publicado ainda." : pubFilter === "script" ? "Nenhum script Lua publicado ainda." : "Nenhuma publicação encontrada."}
                           </p>
                         )}
                       </div>
