@@ -150,7 +150,7 @@ export default function Marketplace() {
                   <TabsTrigger value="script" className="gap-2 px-6 py-2.5 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all flex-1 rounded-none text-[10px] uppercase font-black tracking-widest shadow-neon">
                     <Code className="h-3.5 w-3.5" /> Scripts Lua
                   </TabsTrigger>
-                  <TabsTrigger value="apk" className="gap-2 px-6 py-2.5 data-[state=active]:bg-neon-cyan data-[state=active]:text-primary transition-all flex-1 rounded-none text-[10px] uppercase font-black tracking-widest shadow-neon">
+                  <TabsTrigger value="apk" className="gap-2 px-6 py-2.5 data-[state=active]:bg-neon-cyan data-[state=active]:text-background transition-all flex-1 rounded-none text-[10px] uppercase font-black tracking-widest shadow-neon">
                     <Package className="h-3.5 w-3.5" /> APKs de jogos
                   </TabsTrigger>
                 </TabsList>

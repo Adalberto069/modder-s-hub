@@ -201,7 +201,7 @@ export default function Index() {
               const roleKey = hallRolesMap[profile.user_id] || hallRolesMap[profile.id];
               const displayRole: "admin" | "modder" | "member" = roleKey === "admin" ? "admin" : "modder";
               return (
-                <button
+                <Button variant="ghost"
                   key={profile.id}
                   onClick={() => setSelectedModder(profile)}
                   className="flex items-center gap-3 h-auto whitespace-normal justify-start p-3 bg-surface border border-foreground/10 hover:border-primary/40 hover:bg-surface transition-all text-left group"
