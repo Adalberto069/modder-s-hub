@@ -4,6 +4,7 @@ import { detectLuaObfuscation } from "@/lib/lua-obfuscation";
 import LuaCodeEditor from "@/components/LuaCodeEditor";
 import ScriptAnalysis, { type AnalysisResult } from "@/components/ScriptAnalysis";
 import { useParams, useNavigate } from "react-router-dom";
+import { PageHeader } from "@/components/layout/PageHeader";
 import { Layout } from "@/components/layout/Layout";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
@@ -28,7 +29,7 @@ import { Navigate } from "react-router-dom";
 const SectionCard = ({ icon: Icon, title, hint, children }: any) => (
   <Card className="border-border/60 bg-card rounded-xl shadow-none">
     <CardHeader className="pb-3 border-b border-border/60">
-      <CardTitle className="text-xs font-bold uppercase tracking-[0.18em] flex items-center gap-2 text-foreground/90">
+      <CardTitle className="text-base font-semibold flex items-center gap-2 text-foreground/90">
         <Icon className="h-3.5 w-3.5 text-neon-purple" /> {title}
       </CardTitle>
       {hint && <p className="text-[11px] text-muted-foreground mt-1">{hint}</p>}
@@ -38,7 +39,7 @@ const SectionCard = ({ icon: Icon, title, hint, children }: any) => (
 );
 
 const FieldLabel = ({ children }: { children: React.ReactNode }) => (
-  <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{children}</Label>
+  <Label className="text-xs font-medium text-muted-foreground">{children}</Label>
 );
 
 const inputCls = "bg-white/[0.03] border-white/10 focus-visible:border-neon-purple/50 focus-visible:ring-neon-purple/20 h-10";
@@ -444,20 +445,10 @@ export default function ScriptEditor() {
         </Button>
 
         {/* Header */}
-        <div className="flex items-start justify-between gap-4 mb-8">
-          <div className="min-w-0">
-            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight flex items-center gap-2">
-              {isApk && <Smartphone className="h-6 w-6 text-neon-cyan" />}
-              {isEditing ? `Editar ${entityLabel}` : `Novo ${entityLabel}`}
-            </h1>
-            <p className="text-xs text-muted-foreground mt-1">
-              {isApk
-                ? "Publique um APK modificado. Preencha versão, tamanho e changelog para os usuários."
-                : "Preencha as informações abaixo. Você pode salvar como rascunho a qualquer momento."}
-            </p>
-          </div>
-          {statusBadge()}
-        </div>
+        <PageHeader eyebrow={isApk ? "PUBLICAR / APK MOD" : "PUBLICAR / SCRIPT LUA"}
+          title={isEditing ? `Editar ${entityLabel}` : `Novo ${entityLabel}`}
+          description={isApk ? "Apresente seu APK, os recursos do mod e as informações de instalação." : "Organize seu código, adicione uma capa e escolha como publicar."}
+          actions={statusBadge()} />
 
         <div className="space-y-5">
           {/* 1. Fundamentos */}
@@ -466,10 +457,10 @@ export default function ScriptEditor() {
               <FieldLabel>Tipo de projeto</FieldLabel>
               <Tabs value={scriptType} onValueChange={setScriptType} className="w-full">
                 <TabsList className="grid w-full max-w-xs grid-cols-2 bg-secondary/60 border border-border p-1 h-10">
-                  <TabsTrigger value="script" className="gap-2 text-xs data-[state=active]:bg-neon-purple data-[state=active]:text-foreground">
+                  <TabsTrigger value="script" className="gap-2 text-xs data-[state=active]:bg-neon-purple data-[state=active]:text-primary-foreground">
                     <Code className="h-3.5 w-3.5" /> Lua Script
                   </TabsTrigger>
-                  <TabsTrigger value="apk" className="gap-2 text-xs data-[state=active]:bg-neon-cyan data-[state=active]:text-foreground">
+                  <TabsTrigger value="apk" className="gap-2 text-xs data-[state=active]:bg-neon-cyan data-[state=active]:text-primary-foreground">
                     <Smartphone className="h-3.5 w-3.5" /> APK Mod
                   </TabsTrigger>
                 </TabsList>

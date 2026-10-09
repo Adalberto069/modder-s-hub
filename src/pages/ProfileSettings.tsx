@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { validateFileWithToast } from "@/lib/secure-upload";
+import { PageHeader } from "@/components/layout/PageHeader";
 import { Layout } from "@/components/layout/Layout";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
@@ -255,29 +256,23 @@ export default function ProfileSettings() {
   return (
     <Layout>
       <div className="container py-8 max-w-3xl">
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold flex items-center gap-2">
-            <Settings className="h-6 w-6 text-primary" />
-            Configurações
-          </h1>
-          <p className="text-sm text-muted-foreground mt-1">Gerencie seu perfil, conta e preferências</p>
-        </div>
+        <PageHeader eyebrow="MINHA CONTA" title="Configurações" description="Seu perfil, segurança e preferências em um só lugar." />
 
         <Tabs defaultValue="profile" className="space-y-6">
-          <TabsList className="w-full grid grid-cols-5 bg-secondary/50 p-1">
-            <TabsTrigger value="profile" className="text-xs sm:text-sm gap-1.5 data-[state=active]:bg-primary/20">
+          <TabsList className="w-full flex flex-wrap h-auto bg-secondary/50 p-1">
+            <TabsTrigger value="profile" className="flex-1 text-xs sm:text-sm gap-1.5">
               <User className="h-3.5 w-3.5 hidden sm:block" /> Perfil
             </TabsTrigger>
-            <TabsTrigger value="account" className="text-xs sm:text-sm gap-1.5 data-[state=active]:bg-primary/20">
+            <TabsTrigger value="account" className="flex-1 text-xs sm:text-sm gap-1.5">
               <Mail className="h-3.5 w-3.5 hidden sm:block" /> Conta
             </TabsTrigger>
-            <TabsTrigger value="security" className="text-xs sm:text-sm gap-1.5 data-[state=active]:bg-primary/20">
+            <TabsTrigger value="security" className="flex-1 text-xs sm:text-sm gap-1.5">
               <Lock className="h-3.5 w-3.5 hidden sm:block" /> Segurança
             </TabsTrigger>
-            <TabsTrigger value="preferences" className="text-xs sm:text-sm gap-1.5 data-[state=active]:bg-primary/20">
+            <TabsTrigger value="preferences" className="flex-1 text-xs sm:text-sm gap-1.5">
               <Palette className="h-3.5 w-3.5 hidden sm:block" /> Preferências
             </TabsTrigger>
-            <TabsTrigger value="privacy" className="text-xs sm:text-sm gap-1.5 data-[state=active]:bg-primary/20">
+            <TabsTrigger value="privacy" className="flex-1 text-xs sm:text-sm gap-1.5">
               <Shield className="h-3.5 w-3.5 hidden sm:block" /> Privacidade
             </TabsTrigger>
           </TabsList>
