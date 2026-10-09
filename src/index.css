@@ -256,7 +256,6 @@
 
 @layer base {
   h1, h2, h3 { font-family: 'Plus Jakarta Sans', sans-serif; }
-  * { letter-spacing: 0 !important; }
   .lucide { stroke-width: 1.5; }
 }
 @layer utilities {
@@ -346,7 +345,6 @@
   .ui-input { text-transform: none; font-family: 'Plus Jakarta Sans', sans-serif; }
   .ui-tabs { gap: 0.25rem; border-radius: var(--radius); }
   .ui-tab { min-width: 0; }
-  .site-main .container { max-width: 1280px; }
   .site-main :where(input:not([type="checkbox"]):not([type="radio"]), textarea) {
     border-radius: calc(var(--radius) - 2px);
   }
