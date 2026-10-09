@@ -25,17 +25,17 @@ export function Navbar() {
   };
 
   return (
-    <nav className="sticky top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-xl">
+    <nav className="sticky top-0 z-50 border-b border-border/50 bg-glass/70 backdrop-blur-xl">
       <div className="container flex h-16 items-center justify-between">
         <Link to="/" className="flex items-center gap-2.5 group">
           <HiddenMark size={26} className="transition-transform group-hover:rotate-[8deg]" />
-          <span className="text-lg font-black font-mono tracking-tight uppercase glitch" data-text="Hidden//Mod">
-            Hidden<span className="text-neon-green">//</span>Mod
+          <span className="text-lg font-black font-display tracking-normal uppercase glitch" data-text="HiddenMod">
+            Hidden<span className="text-primary">Mod</span>
           </span>
         </Link>
 
         {/* Desktop nav */}
-        <div className="hidden md:flex items-center gap-6">
+        <div className="hidden lg:flex items-center gap-6">
           <Link to="/marketplace" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
             Marketplace
           </Link>
@@ -56,7 +56,7 @@ export function Navbar() {
               <Button variant="ghost" size="sm" onClick={() => navigate("/auth")}>
                 Login
               </Button>
-              <Button size="sm" className="neon-glow-purple" onClick={() => navigate("/auth?tab=signup")}>
+              <Button size="sm" className="shadow-neon" onClick={() => navigate("/auth?tab=signup")}>
                 Cadastrar
               </Button>
             </div>
@@ -106,19 +106,20 @@ export function Navbar() {
         </div>
 
         {/* Mobile toggle */}
-        <button
-          className="md:hidden"
+        <Button
+          variant="ghost" size="icon"
+          className="lg:hidden"
           onClick={() => setMobileOpen(!mobileOpen)}
           aria-label={mobileOpen ? "Fechar menu" : "Menu"}
           aria-expanded={mobileOpen}
         >
           {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-        </button>
+        </Button>
       </div>
 
       {/* Mobile menu */}
       {mobileOpen && (
-        <div className="md:hidden border-t border-border bg-background p-4 space-y-3">
+        <div className="lg:hidden border-t border-border bg-background p-4 space-y-3">
           <Link to="/marketplace" className="block text-sm text-muted-foreground hover:text-foreground" onClick={() => setMobileOpen(false)}>
             Marketplace
           </Link>
@@ -137,7 +138,7 @@ export function Navbar() {
           {!user ? (
             <div className="flex gap-2 pt-2">
               <Button variant="ghost" size="sm" onClick={() => { navigate("/auth"); setMobileOpen(false); }}>Login</Button>
-              <Button size="sm" className="neon-glow-purple" onClick={() => { navigate("/auth?tab=signup"); setMobileOpen(false); }}>Cadastrar</Button>
+              <Button size="sm" className="shadow-neon" onClick={() => { navigate("/auth?tab=signup"); setMobileOpen(false); }}>Cadastrar</Button>
             </div>
           ) : (
             <div className="space-y-3 pt-2 border-t border-border">
@@ -164,9 +165,9 @@ export function Navbar() {
                   <Shield className="h-4 w-4" /> Admin
                 </Link>
               )}
-              <button className="flex items-center gap-2 text-sm text-destructive hover:text-destructive/80" onClick={() => { handleSignOut(); setMobileOpen(false); }}>
+              <Button variant="ghost" className="flex items-center gap-2 text-sm text-destructive hover:text-destructive/80" onClick={() => { handleSignOut(); setMobileOpen(false); }}>
                 <LogOut className="h-4 w-4" /> Sair
-              </button>
+              </Button>
             </div>
           )}
         </div>

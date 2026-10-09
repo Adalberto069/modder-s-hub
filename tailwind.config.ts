@@ -14,10 +14,14 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ["Space Grotesk", "sans-serif"],
+        sans: ["JetBrains Mono", "monospace"],
+        display: ["Syne", "sans-serif"],
         mono: ["JetBrains Mono", "monospace"],
       },
       colors: {
+        surface: "hsl(var(--surface))",
+        glass: "hsl(var(--glass))",
+        rating: "hsl(var(--rating))",
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",

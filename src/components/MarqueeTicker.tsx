@@ -13,7 +13,7 @@ export function MarqueeTicker() {
   // duplicate the list so the loop appears seamless
   const loop = [...items, ...items];
   return (
-    <div className="marquee border-y border-white/10 bg-[#030305] py-3">
+    <div className="marquee border-y border-border bg-surface py-3">
       <div className="marquee-track">
         {loop.map((it, i) => {
           const Icon = it.icon;
@@ -24,7 +24,7 @@ export function MarqueeTicker() {
             >
               <Icon className="h-3.5 w-3.5 text-neon-green/70" />
               {it.text}
-              <span className="text-white/15">//</span>
+              <span className="text-foreground/15">//</span>
             </span>
           );
         })}

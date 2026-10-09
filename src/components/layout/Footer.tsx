@@ -3,7 +3,7 @@ import { HiddenMark } from "@/components/brand/HiddenMark";
 
 export function Footer() {
   return (
-    <footer className="relative border-t border-white/10 bg-[#030305] py-10 sm:py-14 overflow-hidden">
+    <footer className="relative border-t border-border bg-surface py-10 sm:py-14 overflow-hidden">
       {/* faint grid */}
       <div className="absolute inset-0 bg-grid-pattern opacity-40 pointer-events-none" />
 
@@ -50,7 +50,7 @@ export function Footer() {
           ]} />
         </div>
 
-        <div className="border-t border-white/10 pt-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+        <div className="border-t border-border pt-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
           <p>
             © {new Date().getFullYear()} hidden//mod · all signals encrypted
           </p>
@@ -69,7 +69,7 @@ export function Footer() {
 function FooterCol({ title, links }: { title: string; links: [string, string][] }) {
   return (
     <div className="space-y-3">
-      <h4 className="text-[11px] font-mono font-bold uppercase tracking-[0.25em] text-neon-purple/80">
+      <h4 className="text-[11px] font-mono font-bold uppercase tracking-[0.25em] text-primary/80">
         {title}
       </h4>
       <ul className="space-y-2 text-sm text-muted-foreground font-mono">
