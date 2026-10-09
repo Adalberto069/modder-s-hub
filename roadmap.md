@@ -7,3 +7,7 @@
 - [x] Adicionar código decorativo e anotações manuscritas no início.
 - [x] Aplicar glitch, divisórias interrompidas e identificadores na vitrine.
 - [x] Verificar leitura, navegação e ausência de erros.
+
+# Referência Elysium
+- [x] Adaptar início, fontes e navegação ao visual mais limpo da referência.
+- [x] Conferir apresentação e navegação.
