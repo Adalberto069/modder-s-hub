@@ -25,17 +25,17 @@ export function Navbar() {
   };
 
   return (
-    <nav className="sticky top-0 z-50 border-b border-border/50 bg-glass/70 backdrop-blur-xl">
-      <div className="container flex h-16 items-center justify-between">
+    <nav className="sticky top-0 z-50 border-b border-border/50 bg-glass/90 backdrop-blur-xl">
+      <div className="container flex h-20 items-center justify-between">
         <Link to="/" className="flex items-center gap-2.5 group">
           <HiddenMark size={26} className="transition-transform group-hover:rotate-[8deg]" />
-          <span className="text-lg font-black font-display tracking-normal uppercase glitch" data-text="HiddenMod">
+          <span className="text-lg font-extrabold font-display tracking-normal uppercase">
             Hidden<span className="text-primary">Mod</span>
           </span>
         </Link>
 
         {/* Desktop nav */}
-        <div className="hidden lg:flex items-center gap-6">
+        <div className="hidden lg:flex items-center gap-7 font-semibold">
           <Link to="/marketplace" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
             Marketplace
           </Link>
@@ -56,7 +56,7 @@ export function Navbar() {
               <Button variant="ghost" size="sm" onClick={() => navigate("/auth")}>
                 Login
               </Button>
-              <Button size="sm" className="shadow-neon" onClick={() => navigate("/auth?tab=signup")}>
+              <Button size="sm" className="rounded-md shadow-neon" onClick={() => navigate("/auth?tab=signup")}>
                 Cadastrar
               </Button>
             </div>
