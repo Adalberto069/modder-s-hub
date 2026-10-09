@@ -39,30 +39,30 @@ export function BountyCard({ bounty }: BountyCardProps) {
 
   return (
     <Link to={`/bounties/${bounty.id}`} className="group block">
-      <div className={`relative overflow-hidden border bg-[#050505] hover:bg-[#07070a] transition-all duration-300 h-full flex flex-col ${isApk ? "border-neon-green/20 hover:border-neon-green/40 hover:shadow-[0_0_20px_rgba(57,255,20,0.08)]" : "border-white/5 hover:border-neon-purple/30 hover:shadow-[0_0_20px_rgba(168,85,247,0.08)]"}`}>
+      <div className={`relative overflow-hidden border bg-card hover:bg-secondary transition-all duration-300 h-full flex flex-col ${isApk ? "border-neon-green/20 hover:border-neon-green/40 hover:shadow-sm" : "border-border/60 hover:border-neon-purple/30 hover:shadow-sm"}`}>
         <div className={`absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 ${isApk ? "via-neon-green/50" : "via-neon-purple/50"}`} />
 
         <div className="p-5 space-y-3 flex-1 flex flex-col">
           {/* Header row */}
           <div className="flex items-start justify-between gap-3">
             <div className="flex items-center gap-2 min-w-0">
-              <div className={`shrink-0 h-8 w-8 rounded-none border flex items-center justify-center transition-colors ${isApk ? "bg-neon-green/10 border-neon-green/20 group-hover:bg-neon-green/20" : "bg-neon-purple/10 border-neon-purple/20 group-hover:bg-neon-purple/20"}`}>
+              <div className={`shrink-0 h-8 w-8 rounded-md border flex items-center justify-center transition-colors ${isApk ? "bg-neon-green/10 border-neon-green/20 group-hover:bg-neon-green/20" : "bg-neon-purple/10 border-neon-purple/20 group-hover:bg-neon-purple/20"}`}>
                 {isApk ? <Smartphone className="h-4 w-4 text-neon-green" /> : <Target className="h-4 w-4 text-neon-purple" />}
               </div>
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-1.5 mb-0.5">
-                  <span className={`text-[8px] font-black uppercase tracking-widest px-1 py-[1px] border ${isApk ? "text-neon-green border-neon-green/40 bg-neon-green/5" : "text-neon-cyan border-neon-cyan/40 bg-neon-cyan/5"}`}>
+                  <span className={`text-[8px] font-bold uppercase tracking-widest px-1 py-[1px] border ${isApk ? "text-neon-green border-neon-green/40 bg-neon-green/5" : "text-neon-cyan border-neon-cyan/40 bg-neon-cyan/5"}`}>
                     {isApk ? "APK MOD" : "SCRIPT .LUA"}
                   </span>
                 </div>
-                <h3 className={`font-black text-sm uppercase tracking-tight text-white truncate transition-colors line-clamp-1 ${isApk ? "group-hover:text-neon-green" : "group-hover:text-neon-purple"}`}>
+                <h3 className={`font-bold text-sm uppercase tracking-tight text-foreground truncate transition-colors line-clamp-1 ${isApk ? "group-hover:text-neon-green" : "group-hover:text-neon-purple"}`}>
                   {cleanTitle}
                 </h3>
               </div>
             </div>
             <Badge
               variant="outline"
-              className={`text-[10px] shrink-0 font-black uppercase tracking-widest rounded-none ${status.color} ${status.bg} ${status.border}`}
+              className={`text-[10px] shrink-0 font-bold uppercase tracking-widest rounded-md ${status.color} ${status.bg} ${status.border}`}
             >
               {status.label}
             </Badge>
@@ -83,7 +83,7 @@ export function BountyCard({ bounty }: BountyCardProps) {
               </span>
             )}
             {bounty.categories?.name && (
-              <span className="text-[10px] font-medium text-muted-foreground bg-white/5 border border-white/5 px-2 py-0.5">
+              <span className="text-[10px] font-medium text-muted-foreground bg-secondary/60 border border-border/60 px-2 py-0.5">
                 {bounty.categories.icon} {bounty.categories.name}
               </span>
             )}
@@ -95,9 +95,9 @@ export function BountyCard({ bounty }: BountyCardProps) {
           </div>
 
           {/* Reward */}
-          <div className="flex items-center justify-between pt-2 border-t border-white/5">
+          <div className="flex items-center justify-between pt-2 border-t border-border/60">
             {bounty.reward_amount > 0 ? (
-              <span className="text-sm font-black text-neon-green tracking-tight">
+              <span className="text-sm font-bold text-neon-green tracking-tight">
                 R$ {bounty.reward_amount.toFixed(2).replace('.', ',')}
               </span>
             ) : (

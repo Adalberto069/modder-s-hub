@@ -63,7 +63,7 @@ export default function PoliticaPrivacidade() {
               <p className="text-xs font-mono text-muted-foreground tracking-widest uppercase">
                 ~/legal/privacidade
               </p>
-              <h1 className="text-2xl sm:text-3xl font-black font-mono">
+              <h1 className="text-2xl sm:text-3xl font-bold font-mono">
                 Política de <span className="text-neon-green">Privacidade</span>
               </h1>
             </div>
@@ -81,7 +81,7 @@ export default function PoliticaPrivacidade() {
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: idx * 0.05 }}
-              className="rounded-xl border border-border/30 bg-card/40 backdrop-blur-sm overflow-hidden"
+              className="rounded-xl border border-border/30 bg-card backdrop-blur-sm overflow-hidden"
             >
               <div className="flex items-center gap-2 px-4 py-3 border-b border-border/20 bg-background/40">
                 <Terminal className="h-3.5 w-3.5 text-neon-green" />

@@ -343,10 +343,10 @@ export function BountyChat({ bountyId, bountyStatus, requesterId, assignedModder
   const anyDisputed = deliveries?.some((d: any) => d.disputed && !d.dispute_resolved);
 
   return (
-    <div className="border border-white/5 bg-[#050505]">
+    <div className="border border-border/60 bg-card">
       {/* Header */}
-      <div className="p-4 border-b border-white/5 bg-[#030304] flex items-center justify-between">
-        <h2 className="text-sm font-black uppercase tracking-widest flex items-center gap-2 text-white">
+      <div className="p-4 border-b border-border/60 bg-surface flex items-center justify-between">
+        <h2 className="text-sm font-bold uppercase tracking-widest flex items-center gap-2 text-foreground">
           <MessageSquare className="h-4 w-4 text-neon-cyan" />
           Chat da Encomenda
         </h2>
@@ -365,8 +365,8 @@ export function BountyChat({ bountyId, bountyStatus, requesterId, assignedModder
 
       {/* Delivery Section */}
       {hasDeliveries && (
-        <div className="p-4 border-b border-white/5 space-y-3">
-          <p className="text-[10px] font-black uppercase tracking-widest text-neon-green flex items-center gap-1.5">
+        <div className="p-4 border-b border-border/60 space-y-3">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-neon-green flex items-center gap-1.5">
             <FileCode className="h-3.5 w-3.5" /> Entregas ({deliveries.length})
           </p>
 
@@ -380,14 +380,14 @@ export function BountyChat({ bountyId, bountyStatus, requesterId, assignedModder
               <div key={del.id} className={`p-3 border ${
                 del.test_approved ? "bg-neon-green/5 border-neon-green/20" :
                 isDisputed ? "bg-destructive/5 border-destructive/20" :
-                "bg-[#030304] border-white/5"
+                "bg-surface border-border/60"
               }`}>
                 {/* File info row */}
                 <div className="flex items-center justify-between gap-3 mb-2">
                   <div className="flex items-center gap-2 min-w-0 flex-1">
                     <FileCode className="h-4 w-4 text-neon-cyan shrink-0" />
                     <div className="min-w-0">
-                      <p className="text-xs font-mono text-white truncate">{del.file_name}</p>
+                      <p className="text-xs font-mono text-foreground truncate">{del.file_name}</p>
                       <p className="text-[9px] text-muted-foreground/50 font-mono">
                         {formatDistanceToNow(new Date(del.delivered_at), { locale: ptBR, addSuffix: true })}
                       </p>
@@ -431,7 +431,7 @@ export function BountyChat({ bountyId, bountyStatus, requesterId, assignedModder
                         size="sm"
                         onClick={() => handleTestDownload(del.id)}
                         disabled={testing === del.id || testsExhausted}
-                        className="h-7 px-3 rounded-none bg-yellow-500/10 hover:bg-yellow-500/20 text-yellow-500 border border-yellow-500/30 text-[10px] font-black uppercase tracking-widest"
+                        className="h-7 px-3 rounded-md bg-yellow-500/10 hover:bg-yellow-500/20 text-yellow-500 border border-yellow-500/30 text-[10px] font-bold uppercase tracking-widest"
                       >
                         {testing === del.id ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : <FlaskConical className="h-3 w-3 mr-1" />}
                         {testsExhausted ? "Testes esgotados" : `Testar (${2 - usedTests}/2)`}
@@ -444,7 +444,7 @@ export function BountyChat({ bountyId, bountyStatus, requesterId, assignedModder
                     <Button
                       size="sm"
                       onClick={() => handleApprove(del.id)}
-                      className="h-7 px-3 rounded-none bg-neon-green/10 hover:bg-neon-green/20 text-neon-green border border-neon-green/30 text-[10px] font-black uppercase tracking-widest"
+                      className="h-7 px-3 rounded-md bg-neon-green/10 hover:bg-neon-green/20 text-neon-green border border-neon-green/30 text-[10px] font-bold uppercase tracking-widest"
                     >
                       <CheckCircle className="h-3 w-3 mr-1" /> Aprovar
                     </Button>
@@ -457,14 +457,14 @@ export function BountyChat({ bountyId, bountyStatus, requesterId, assignedModder
                         <Button
                           size="sm"
                           variant="outline"
-                          className="h-7 px-3 rounded-none border-destructive/30 text-destructive hover:bg-destructive/10 text-[10px] font-black uppercase tracking-widest"
+                          className="h-7 px-3 rounded-md border-destructive/30 text-destructive hover:bg-destructive/10 text-[10px] font-bold uppercase tracking-widest"
                         >
                           <XCircle className="h-3 w-3 mr-1" /> Disputar
                         </Button>
                       </AlertDialogTrigger>
-                      <AlertDialogContent className="bg-[#050505] border-white/10 rounded-none">
+                      <AlertDialogContent className="bg-card border-border rounded-md">
                         <AlertDialogHeader>
-                          <AlertDialogTitle className="text-white">Abrir Disputa</AlertDialogTitle>
+                          <AlertDialogTitle className="text-foreground">Abrir Disputa</AlertDialogTitle>
                           <AlertDialogDescription className="text-muted-foreground text-xs">
                             Descreva o problema encontrado. Um administrador irá analisar e decidir. O pagamento NÃO será processado até a disputa ser resolvida.
                           </AlertDialogDescription>
@@ -473,15 +473,15 @@ export function BountyChat({ bountyId, bountyStatus, requesterId, assignedModder
                           value={disputeReason}
                           onChange={(e) => setDisputeReason(e.target.value)}
                           placeholder="Ex: O script não é o que foi combinado, não funciona no jogo X..."
-                          className="bg-[#030304] border-white/10 rounded-none text-sm font-mono resize-none"
+                          className="bg-surface border-border rounded-md text-sm font-mono resize-none"
                           rows={3}
                           maxLength={500}
                         />
                         <AlertDialogFooter>
-                          <AlertDialogCancel className="rounded-none">Cancelar</AlertDialogCancel>
+                          <AlertDialogCancel className="rounded-md">Cancelar</AlertDialogCancel>
                           <AlertDialogAction
                             onClick={() => handleDispute(del.id)}
-                            className="bg-destructive hover:bg-destructive/90 rounded-none"
+                            className="bg-destructive hover:bg-destructive/90 rounded-md"
                             disabled={!disputeReason.trim()}
                           >
                             Enviar Disputa
@@ -497,7 +497,7 @@ export function BountyChat({ bountyId, bountyStatus, requesterId, assignedModder
                       size="sm"
                       onClick={() => handleDownload(del.id)}
                       disabled={downloading === del.id}
-                      className="h-7 px-3 rounded-none bg-neon-green/10 hover:bg-neon-green/20 text-neon-green border border-neon-green/30 text-[10px] font-black uppercase tracking-widest"
+                      className="h-7 px-3 rounded-md bg-neon-green/10 hover:bg-neon-green/20 text-neon-green border border-neon-green/30 text-[10px] font-bold uppercase tracking-widest"
                     >
                       {downloading === del.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Download className="h-3 w-3 mr-1" />}
                       Baixar
@@ -509,7 +509,7 @@ export function BountyChat({ bountyId, bountyStatus, requesterId, assignedModder
                     <Button
                       size="sm"
                       onClick={() => handleResolveDispute(del.id)}
-                      className="h-7 px-3 rounded-none bg-neon-purple/10 hover:bg-neon-purple/20 text-neon-purple border border-neon-purple/30 text-[10px] font-black uppercase tracking-widest"
+                      className="h-7 px-3 rounded-md bg-neon-purple/10 hover:bg-neon-purple/20 text-neon-purple border border-neon-purple/30 text-[10px] font-bold uppercase tracking-widest"
                     >
                       <Shield className="h-3 w-3 mr-1" /> Resolver Disputa
                     </Button>
@@ -602,7 +602,7 @@ export function BountyChat({ bountyId, bountyStatus, requesterId, assignedModder
                     </button>
                   )}
                 </div>
-                <div className={`max-w-[80%] px-4 py-2.5 text-sm leading-relaxed ${isMine ? "bg-neon-purple/10 border border-neon-purple/20 text-foreground/90" : "bg-[#030304] border border-white/5 text-foreground/80"}`}>
+                <div className={`max-w-[80%] px-4 py-2.5 text-sm leading-relaxed ${isMine ? "bg-neon-purple/10 border border-neon-purple/20 text-foreground/90" : "bg-surface border border-border/60 text-foreground/80"}`}>
                   {DOMPurify.sanitize(msg.content, { ALLOWED_TAGS: [] })}
                 </div>
               </div>
@@ -613,7 +613,7 @@ export function BountyChat({ bountyId, bountyStatus, requesterId, assignedModder
 
       {/* Input */}
       {canSend ? (
-        <div className="p-4 border-t border-white/5 bg-[#030304] space-y-3">
+        <div className="p-4 border-t border-border/60 bg-surface space-y-3">
           {isModderUser && bountyStatus === "in_progress" && (
             <div className="flex items-center gap-2">
               <input ref={fileRef} type="file" accept=".lua,.apk" onChange={handleFileUpload} className="hidden" />
@@ -621,7 +621,7 @@ export function BountyChat({ bountyId, bountyStatus, requesterId, assignedModder
                 size="sm" variant="outline"
                 onClick={() => fileRef.current?.click()}
                 disabled={uploading}
-                className="rounded-none text-[10px] font-black uppercase tracking-widest border-neon-green/30 text-neon-green hover:bg-neon-green/10"
+                className="rounded-md text-[10px] font-bold uppercase tracking-widest border-neon-green/30 text-neon-green hover:bg-neon-green/10"
               >
                 {uploading ? <Loader2 className="h-3 w-3 mr-1.5 animate-spin" /> : <Upload className="h-3 w-3 mr-1.5" />}
                 {uploading ? "Enviando..." : "Entregar (.lua / .apk)"}
@@ -636,7 +636,7 @@ export function BountyChat({ bountyId, bountyStatus, requesterId, assignedModder
             <textarea
               value={message} onChange={(e) => setMessage(e.target.value)} onKeyDown={handleKeyDown}
               placeholder="Digite sua mensagem..." rows={1} maxLength={2000}
-              className="flex-1 bg-[#050505] border border-white/10 focus:border-neon-cyan/30 focus:outline-none focus:ring-1 focus:ring-neon-cyan/20 px-4 py-2.5 text-sm font-mono text-foreground placeholder:text-muted-foreground/40 resize-none"
+              className="flex-1 bg-card border border-border focus:border-neon-cyan/30 focus:outline-none focus:ring-1 focus:ring-neon-cyan/20 px-4 py-2.5 text-sm font-mono text-foreground placeholder:text-muted-foreground/40 resize-none"
             />
             <button onClick={handleSend} disabled={sending || !message.trim()}
               className="shrink-0 h-10 w-10 flex items-center justify-center bg-neon-cyan/10 border border-neon-cyan/20 text-neon-cyan hover:bg-neon-cyan/20 disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
@@ -648,13 +648,13 @@ export function BountyChat({ bountyId, bountyStatus, requesterId, assignedModder
           </p>
         </div>
       ) : bountyStatus === "completed" ? (
-        <div className="p-3 border-t border-white/5 text-center">
+        <div className="p-3 border-t border-border/60 text-center">
           <p className="text-[10px] text-muted-foreground/40 font-mono uppercase tracking-widest">
             Encomenda concluída — chat encerrado
           </p>
         </div>
       ) : isAdmin && !isParticipant ? (
-        <div className="p-3 border-t border-white/5 text-center">
+        <div className="p-3 border-t border-border/60 text-center">
           <p className="text-[10px] text-muted-foreground/40 font-mono uppercase tracking-widest">
             Modo visualização admin — somente leitura
           </p>

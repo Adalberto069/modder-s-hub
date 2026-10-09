@@ -92,11 +92,11 @@ export function TestSessionsList() {
   if (!sessions?.length) return null;
 
   return (
-    <Card className="border-white/10 bg-card/40 p-4 sm:p-5 mb-6">
+    <Card className="border-border bg-card p-4 sm:p-5 mb-6">
       <div className="flex items-center justify-between gap-2 mb-3">
         <div className="flex items-center gap-2">
           <KeyRound className="h-4 w-4 text-neon-cyan" />
-          <h3 className="text-xs font-black uppercase tracking-widest">Seus códigos de teste</h3>
+          <h3 className="text-xs font-bold uppercase tracking-widest">Seus códigos de teste</h3>
         </div>
         {expiredCount > 0 && (
           <Button
@@ -124,7 +124,7 @@ export function TestSessionsList() {
           return (
             <div
               key={s.id}
-              className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-white/10 bg-background/40 p-3"
+              className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-background/40 p-3"
             >
               <div className="min-w-0">
                 <p className="truncate text-xs font-bold">{s.title}</p>

@@ -94,9 +94,9 @@ export function AdminPurchaseDisputesTab() {
 
   return (
     <div className="space-y-6 font-mono">
-      <Card className="bg-[#050505] border-yellow-500/20 rounded-none">
+      <Card className="bg-card border-yellow-500/20 rounded-md">
         <CardHeader className="border-b border-yellow-500/10 bg-yellow-500/5">
-          <CardTitle className="text-sm font-black uppercase tracking-widest text-yellow-400 flex items-center gap-2">
+          <CardTitle className="text-sm font-bold uppercase tracking-widest text-yellow-400 flex items-center gap-2">
             <Gavel className="h-4 w-4" /> Disputas Abertas ({open.length})
           </CardTitle>
         </CardHeader>
@@ -106,10 +106,10 @@ export function AdminPurchaseDisputesTab() {
             <p className="text-[10px] text-muted-foreground uppercase tracking-widest">Nenhuma disputa aberta.</p>
           )}
           {open.map((d: any) => (
-            <div key={d.id} className="p-4 border border-white/10 bg-[#030304] space-y-3">
+            <div key={d.id} className="p-4 border border-border bg-surface space-y-3">
               <div className="flex items-start justify-between gap-2 flex-wrap">
                 <div>
-                  <Badge variant="outline" className="rounded-none text-[9px] mb-2">
+                  <Badge variant="outline" className="rounded-md text-[9px] mb-2">
                     {d.purchase_type === "script" ? "SCRIPT" : "ENCOMENDA"}
                   </Badge>
                   <p className="text-[10px] text-muted-foreground uppercase tracking-widest">
@@ -124,8 +124,8 @@ export function AdminPurchaseDisputesTab() {
                 <p className="text-[9px] text-muted-foreground">{format(new Date(d.created_at), "dd/MM HH:mm")}</p>
               </div>
 
-              <div className="p-3 bg-[#050505] border border-white/5">
-                <p className="text-[10px] font-black uppercase text-muted-foreground mb-1">Motivo:</p>
+              <div className="p-3 bg-card border border-border/60">
+                <p className="text-[10px] font-bold uppercase text-muted-foreground mb-1">Motivo:</p>
                 <p className="text-xs whitespace-pre-wrap">{d.reason}</p>
               </div>
 
@@ -134,7 +134,7 @@ export function AdminPurchaseDisputesTab() {
                 onChange={(e) => setNotesById({ ...notesById, [d.id]: e.target.value })}
                 placeholder="Notas do admin (opcional)"
                 rows={2}
-                className="bg-[#050505] border-white/10 rounded-none resize-none text-xs"
+                className="bg-card border-border rounded-md resize-none text-xs"
               />
 
               <div className="flex gap-2">
@@ -142,7 +142,7 @@ export function AdminPurchaseDisputesTab() {
                   size="sm"
                   onClick={() => resolve(d, "buyer")}
                   disabled={busy === d.id}
-                  className="rounded-none bg-red-500/10 text-red-400 border border-red-500/30 hover:bg-red-500/20 text-[10px] uppercase font-black tracking-widest flex-1"
+                  className="rounded-md bg-red-500/10 text-red-400 border border-red-500/30 hover:bg-red-500/20 text-[10px] uppercase font-bold tracking-widest flex-1"
                 >
                   {busy === d.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <XCircle className="h-3 w-3 mr-1" />}
                   Reembolsar comprador
@@ -151,7 +151,7 @@ export function AdminPurchaseDisputesTab() {
                   size="sm"
                   onClick={() => resolve(d, "seller")}
                   disabled={busy === d.id}
-                  className="rounded-none bg-neon-green/10 text-neon-green border border-neon-green/30 hover:bg-neon-green/20 text-[10px] uppercase font-black tracking-widest flex-1"
+                  className="rounded-md bg-neon-green/10 text-neon-green border border-neon-green/30 hover:bg-neon-green/20 text-[10px] uppercase font-bold tracking-widest flex-1"
                 >
                   {busy === d.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <CheckCircle2 className="h-3 w-3 mr-1" />}
                   Liberar ao modder
@@ -163,15 +163,15 @@ export function AdminPurchaseDisputesTab() {
       </Card>
 
       {resolved.length > 0 && (
-        <Card className="bg-[#050505] border-white/10 rounded-none">
-          <CardHeader className="border-b border-white/5 bg-[#030304]">
-            <CardTitle className="text-sm font-black uppercase tracking-widest text-muted-foreground">
+        <Card className="bg-card border-border rounded-md">
+          <CardHeader className="border-b border-border/60 bg-surface">
+            <CardTitle className="text-sm font-bold uppercase tracking-widest text-muted-foreground">
               Histórico ({resolved.length})
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-4 space-y-2">
             {resolved.slice(0, 20).map((d: any) => (
-              <div key={d.id} className="flex items-center justify-between p-3 border border-white/5 bg-[#030304]">
+              <div key={d.id} className="flex items-center justify-between p-3 border border-border/60 bg-surface">
                 <div>
                   <p className="text-[10px] uppercase tracking-widest">
                     {d.purchase_type} · {d.opener?.display_name || d.opener?.username}
@@ -179,7 +179,7 @@ export function AdminPurchaseDisputesTab() {
                   {d.admin_notes && <p className="text-[9px] text-muted-foreground mt-1">"{d.admin_notes}"</p>}
                 </div>
                 <Badge
-                  className={`rounded-none text-[9px] ${
+                  className={`rounded-md text-[9px] ${
                     d.status === "resolved_buyer"
                       ? "bg-red-500/10 text-red-400 border-red-500/30"
                       : "bg-neon-green/10 text-neon-green border-neon-green/30"

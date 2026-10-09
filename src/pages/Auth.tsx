@@ -322,7 +322,7 @@ export default function Auth() {
         <Card className="w-full max-w-md neon-border bg-card/80 backdrop-blur-sm">
           <CardHeader className="text-center">
             <Terminal className="h-10 w-10 mx-auto text-primary mb-2" />
-            <CardTitle className="font-mono font-black tracking-tight">
+            <CardTitle className="font-mono font-bold tracking-tight">
               Hidden<span className="text-neon-green">Mod</span>
             </CardTitle>
           </CardHeader>

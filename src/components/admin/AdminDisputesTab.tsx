@@ -185,7 +185,7 @@ export function AdminDisputesTab() {
 
   if (isLoading) {
     return (
-      <Card className="border-white/10 bg-[#050505] rounded-none">
+      <Card className="border-border bg-card rounded-md">
         <CardContent className="p-8 text-center text-muted-foreground">Carregando disputas...</CardContent>
       </Card>
     );
@@ -193,10 +193,10 @@ export function AdminDisputesTab() {
 
   return (
     <div className="space-y-6">
-      <Card className="border-white/10 bg-[#050505] rounded-none">
-        <CardHeader className="border-b border-white/5 bg-[#030304]">
+      <Card className="border-border bg-card rounded-md">
+        <CardHeader className="border-b border-border/60 bg-surface">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-sm font-black uppercase tracking-widest flex items-center gap-2 text-white">
+            <CardTitle className="text-sm font-bold uppercase tracking-widest flex items-center gap-2 text-foreground">
               <AlertTriangle className="w-4 h-4 text-destructive" />
               Disputas Abertas ({disputes?.length ?? 0})
             </CardTitle>
@@ -232,7 +232,7 @@ export function AdminDisputesTab() {
           ) : (
             <>
               {/* Select all */}
-              <div className="flex items-center gap-2 px-4 py-3 border-b border-white/5 bg-[#030304]">
+              <div className="flex items-center gap-2 px-4 py-3 border-b border-border/60 bg-surface">
                 <Checkbox
                   checked={selectedIds.size === disputes.length && disputes.length > 0}
                   onCheckedChange={toggleAll}
@@ -243,7 +243,7 @@ export function AdminDisputesTab() {
               {disputes.map(delivery => {
                 const bounty = bountyMap[delivery.bounty_id];
                 return (
-                  <div key={delivery.id} className="flex items-start gap-3 p-4 border-b border-white/5 hover:bg-[#08080a] transition-colors">
+                  <div key={delivery.id} className="flex items-start gap-3 p-4 border-b border-border/60 hover:bg-secondary transition-colors">
                     <Checkbox
                       checked={selectedIds.has(delivery.id)}
                       onCheckedChange={() => toggleSelect(delivery.id)}
@@ -251,7 +251,7 @@ export function AdminDisputesTab() {
                     />
                     <div className="flex-1 min-w-0 space-y-2">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className="font-black text-sm text-white uppercase tracking-tight italic truncate">
+                        <span className="font-bold text-sm text-foreground uppercase tracking-tight italic truncate">
                           {bounty?.title ?? "Encomenda Desconhecida"}
                         </span>
                         <Badge variant="destructive" className="text-[10px]">Em Disputa</Badge>
@@ -325,9 +325,9 @@ export function AdminDisputesTab() {
 
       {/* Resolved disputes history */}
       {resolvedDisputes && resolvedDisputes.length > 0 && (
-        <Card className="border-white/10 bg-[#050505] rounded-none">
-          <CardHeader className="border-b border-white/5 bg-[#030304]">
-            <CardTitle className="text-sm font-black uppercase tracking-widest flex items-center gap-2 text-white">
+        <Card className="border-border bg-card rounded-md">
+          <CardHeader className="border-b border-border/60 bg-surface">
+            <CardTitle className="text-sm font-bold uppercase tracking-widest flex items-center gap-2 text-foreground">
               <CheckCircle className="w-4 h-4 text-accent" />
               Disputas Resolvidas (Últimas {resolvedDisputes.length})
             </CardTitle>
@@ -336,9 +336,9 @@ export function AdminDisputesTab() {
             {resolvedDisputes.map(delivery => {
               const bounty = bountyMap[delivery.bounty_id];
               return (
-                <div key={delivery.id} className="flex items-center justify-between p-4 border-b border-white/5 opacity-60">
+                <div key={delivery.id} className="flex items-center justify-between p-4 border-b border-border/60 opacity-60">
                   <div className="flex-1 min-w-0">
-                    <span className="font-bold text-sm text-white truncate block">
+                    <span className="font-bold text-sm text-foreground truncate block">
                       {bounty?.title ?? "Encomenda"}
                     </span>
                     <div className="flex gap-3 text-[10px] text-muted-foreground mt-1">
