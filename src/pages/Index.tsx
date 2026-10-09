@@ -107,7 +107,7 @@ export default function Index() {
         <div className="absolute inset-0 hero-shade" />
         <div className="container relative py-14 sm:py-20 lg:py-24">
           <div className="max-w-xl">
-            <p className="inline-flex items-center gap-3 text-[10px] font-mono text-neon-cyan mb-7 border border-neon-cyan/25 rounded-md bg-glass/70 px-3 py-2"><span className="h-1.5 w-1.5 rounded-full bg-neon-cyan" /> HIDDENMOD / GAMING SOFTWARE</p>
+            <p className="inline-flex items-center gap-3 text-xs font-sans text-neon-cyan mb-7 border border-neon-cyan/25 rounded-md bg-glass/70 px-3 py-2"><span className="h-1.5 w-1.5 rounded-full bg-neon-cyan" /> HIDDENMOD / GAMING SOFTWARE</p>
             <h1 className="text-5xl sm:text-7xl font-extrabold leading-tight text-foreground mb-5">Hidden<span className="text-primary">Mod</span><span className="text-primary">.</span></h1>
             <p className="font-display text-3xl sm:text-4xl font-extrabold text-foreground mb-5">Seu jogo.<br /><span className="text-neon-cyan">Outro nível.</span></p>
             <p className="text-base text-muted-foreground leading-relaxed max-w-md mb-8">Scripts para Game Guardian e APKs de jogos modificados. Explore criações de modders em um só lugar.</p>
@@ -121,7 +121,7 @@ export default function Index() {
               { label: 'Publicações', value: stats?.scripts ?? 0 },
               { label: 'Membros', value: stats?.users ?? 0 },
               { label: 'Downloads', value: stats?.downloads ?? 0 },
-            ].map(item => <div key={item.label}><p className="font-display font-bold text-xl text-foreground">{item.value.toLocaleString('pt-BR')}</p><p className="text-[10px] text-muted-foreground mt-1 uppercase">{item.label}</p></div>)}
+            ].map(item => <div key={item.label}><p className="font-display font-bold text-xl text-foreground">{item.value.toLocaleString('pt-BR')}</p><p className="text-xs text-muted-foreground mt-1 ">{item.label}</p></div>)}
           </div>
         </div>
       </section>
@@ -137,7 +137,7 @@ export default function Index() {
               </h2>
               <p className="text-muted-foreground text-sm mt-3">Conheça as publicações mais baixadas pelos jogadores.</p>
             </div>
-            <Button variant="ghost" onClick={() => navigate("/marketplace")} className="text-muted-foreground hover:text-foreground uppercase font-bold text-xs">
+            <Button variant="ghost" onClick={() => navigate("/marketplace")} className="text-muted-foreground hover:text-foreground  font-bold text-xs">
               ver tudo <ChevronRight className="ml-2 w-4 h-4" />
             </Button>
           </div>
@@ -179,9 +179,9 @@ export default function Index() {
             <div>
               <div className="flex items-center gap-2 mb-1">
                 <div className="h-[1px] w-6 bg-primary/60" />
-                <span className="text-[9px] font-mono uppercase tracking-[0.25em] text-primary/80">Ranking</span>
+                <span className="text-xs font-sans   text-primary/80">Ranking</span>
               </div>
-              <h2 className="text-xl sm:text-2xl font-black uppercase tracking-normal text-foreground">
+              <h2 className="text-xl sm:text-2xl font-bold  tracking-normal text-foreground">
                 Top <span className="text-primary/80">modders</span>
               </h2>
             </div>
@@ -189,7 +189,7 @@ export default function Index() {
               variant="ghost"
               size="sm"
               onClick={() => navigate("/marketplace?tab=modders")}
-              className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground hover:text-primary"
+              className="text-xs font-sans   text-muted-foreground hover:text-primary"
             >
               ver todos →
             </Button>
@@ -205,15 +205,15 @@ export default function Index() {
                   onClick={() => setSelectedModder(profile)}
                   className="flex items-center gap-3 h-auto whitespace-normal justify-start p-3 bg-surface border border-foreground/10 hover:border-primary/40 hover:bg-surface transition-all text-left group"
                 >
-                  <span className="text-[10px] font-mono text-primary/60 font-black w-4 shrink-0">#{i + 1}</span>
-                  <Avatar className="h-10 w-10 rounded-none border border-foreground/10 bg-background shrink-0">
+                  <span className="text-xs font-sans text-primary/60 font-bold w-4 shrink-0">#{i + 1}</span>
+                  <Avatar className="h-10 w-10 rounded-md border border-foreground/10 bg-background shrink-0">
                     <AvatarImage src={profile.avatar_url} />
-                    <AvatarFallback className="bg-transparent text-foreground text-sm font-black">
+                    <AvatarFallback className="bg-transparent text-foreground text-sm font-bold">
                       {(profile.display_name || profile.username || "?")[0].toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
                   <div className="min-w-0 flex-1">
-                    <p className="font-bold text-sm uppercase tracking-normal text-foreground truncate group-hover:text-primary transition-colors">
+                    <p className="font-bold text-sm  tracking-normal text-foreground truncate group-hover:text-primary transition-colors">
                       {profile.display_name || profile.username || "Anonymous"}
                     </p>
                     <div className="flex items-center gap-2 mt-0.5">
@@ -232,26 +232,26 @@ export default function Index() {
       <section className="py-12 sm:py-16 bg-surface border-t border-neon-green/20 relative">
         <div className="container px-4 text-center max-w-3xl mx-auto relative z-10">
           <Network className="w-12 h-12 text-neon-green mx-auto mb-6 opacity-50" />
-          <h2 className="text-4xl sm:text-6xl font-black uppercase tracking-normal text-foreground mb-6">
-            {user ? <>bora <span className="text-neon-green">operar</span></> : <>entra na <span className="text-neon-green">rede</span></>}
+          <h2 className="text-4xl sm:text-6xl font-bold  tracking-normal text-foreground mb-6">
+            {user ? <>Continue <span className="text-neon-green">explorando</span></> : <>Sua próxima <span className="text-neon-green">jogada</span></>}
           </h2>
-          <p className="text-muted-foreground font-mono text-sm sm:text-base mb-10 border-l-2 border-r-2 border-neon-green/30 inline-block px-6">
+          <p className="text-muted-foreground font-sans text-sm sm:text-base mb-10 border-l-2 border-r-2 border-neon-green/30 inline-block px-6">
             {user
               ? "explore o marketplace, poste encomendas ou publique um novo mod."
               : "cadastro grátis. compre scripts, peça encomendas ou aplique como modder e comece a vender hoje."}
           </p>
           <div className="flex justify-center flex-col sm:flex-row gap-4">
              {!user && (
-               <Button size="lg" onClick={() => navigate("/auth?tab=signup")} className="h-14 px-10 bg-foreground text-background hover:bg-foreground/90 font-black uppercase tracking-widest rounded-none text-xs w-full sm:w-auto">
+               <Button size="lg" onClick={() => navigate("/auth?tab=signup")} className="h-14 px-10 bg-foreground text-background hover:bg-foreground/90 font-bold   rounded-md text-xs w-full sm:w-auto">
                  criar conta
                </Button>
              )}
              {user && (
-               <Button size="lg" onClick={() => navigate("/bounties")} className="h-14 px-10 bg-neon-green text-background hover:bg-neon-green/90 font-black uppercase tracking-widest rounded-none text-xs w-full sm:w-auto">
+               <Button size="lg" onClick={() => navigate("/bounties")} className="h-14 px-10 bg-neon-green text-background hover:bg-neon-green/90 font-bold   rounded-md text-xs w-full sm:w-auto">
                  ver encomendas
                </Button>
              )}
-             <Button size="lg" onClick={() => navigate("/marketplace")} variant="outline" className="h-14 px-10 text-foreground border-foreground/20 hover:bg-foreground/5 font-black uppercase tracking-widest rounded-none text-xs w-full sm:w-auto">
+             <Button size="lg" onClick={() => navigate("/marketplace")} variant="outline" className="h-14 px-10 text-foreground border-foreground/20 hover:bg-foreground/5 font-bold   rounded-md text-xs w-full sm:w-auto">
                ver marketplace
              </Button>
           </div>
@@ -261,7 +261,7 @@ export default function Index() {
 
       {/* ══════════════ MODDER DIALOG ══════════════ */}
       <Dialog open={!!selectedModder} onOpenChange={(open) => !open && setSelectedModder(null)}>
-        <DialogContent className="max-w-md bg-surface border-foreground/10 p-0 overflow-hidden font-mono text-foreground rounded-none">
+        <DialogContent className="max-w-md bg-surface border-foreground/10 p-0 overflow-hidden font-sans text-foreground rounded-md">
           {selectedModder && (() => {
             const roleKey = hallRolesMap[selectedModder.user_id] || hallRolesMap[selectedModder.id];
             const displayRole: "admin" | "modder" | "member" = roleKey === "admin" ? "admin" : "modder";
@@ -270,52 +270,52 @@ export default function Index() {
                 <div className="h-2 w-full bg-primary" />
                 <div className="p-8 pb-4">
                   <div className="flex justify-between items-start mb-8">
-                     <span className="text-[10px] text-muted-foreground tracking-widest uppercase opacity-50">Authorized Personnel Only</span>
+                     <span className="text-xs text-muted-foreground   opacity-50">Perfil do modder</span>
                      <Fingerprint className="w-5 h-5 text-primary" />
                   </div>
                   
                   <div className="flex gap-6 items-center mb-8">
-                    <Avatar className="h-20 w-20 rounded-none border border-foreground/20 bg-background">
+                    <Avatar className="h-20 w-20 rounded-md border border-foreground/20 bg-background">
                       <AvatarImage src={selectedModder.avatar_url} />
-                      <AvatarFallback className="bg-transparent text-foreground text-2xl font-black">
+                      <AvatarFallback className="bg-transparent text-foreground text-2xl font-bold">
                         {(selectedModder.display_name || selectedModder.username || "?")[0].toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex flex-col">
-                      <h3 className="text-2xl font-black uppercase tracking-normal">{selectedModder.display_name || selectedModder.username}</h3>
-                      <p className="text-xs text-muted-foreground uppercase opacity-70 mt-1 mb-2">ID: {selectedModder.id.substring(0, 12)}</p>
+                      <h3 className="text-2xl font-bold  tracking-normal">{selectedModder.display_name || selectedModder.username}</h3>
+                      <p className="text-xs text-muted-foreground  opacity-70 mt-1 mb-2">ID: {selectedModder.id.substring(0, 12)}</p>
                       <RoleBadge role={displayRole} />
                     </div>
                   </div>
 
                   <div className="bg-surface border border-foreground/5 p-4 mb-8">
                      <p className="text-xs text-muted-foreground leading-relaxed lowercase">
-                       {selectedModder.bio ? `> ${selectedModder.bio}` : "> no public data available for this operative."}
+                       {selectedModder.bio ? `> ${selectedModder.bio}` : "Este modder ainda não adicionou uma bio."}
                      </p>
                   </div>
 
                   <div className="grid grid-cols-3 divide-x divide-border/10 border-t border-b border-foreground/10 py-4 mb-8">
                     {[
-                       { value: selectedModder.reputation_score ?? 0, label: "REP" },
-                       { value: selectedModder.total_downloads ?? 0, label: "EXFIL" },
-                       { value: selectedModder.total_positive_reviews ?? 0, label: "TRUST" },
+                       { value: selectedModder.reputation_score ?? 0, label: "Reputação" },
+                       { value: selectedModder.total_downloads ?? 0, label: "Downloads" },
+                       { value: selectedModder.total_positive_reviews ?? 0, label: "Avaliações" },
                     ].map(st => (
                       <div key={st.label} className="text-center">
-                        <p className="text-xl font-black text-foreground">{st.value}</p>
-                        <p className="text-[9px] text-muted-foreground mt-1">{st.label}</p>
+                        <p className="text-xl font-bold text-foreground">{st.value}</p>
+                        <p className="text-xs text-muted-foreground mt-1">{st.label}</p>
                       </div>
                     ))}
                   </div>
 
                   <Button
                     size="lg"
-                    className="w-full h-12 bg-foreground text-background hover:bg-foreground/90 font-black uppercase tracking-widest text-xs rounded-none"
+                    className="w-full h-12 bg-foreground text-background hover:bg-foreground/90 font-bold   text-xs rounded-md"
                     onClick={() => {
                       setSelectedModder(null);
                       navigate(`/modder/${selectedModder.user_id}`);
                     }}
                   >
-                    Acessar Dossiê Completo
+                    Ver perfil completo
                   </Button>
                 </div>
               </div>

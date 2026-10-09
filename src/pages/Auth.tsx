@@ -205,7 +205,7 @@ export default function Auth() {
               <div className="mx-auto w-16 h-16 rounded-full bg-destructive/10 flex items-center justify-center">
                 <AlertTriangle className="h-8 w-8 text-destructive" />
               </div>
-              <h2 className="text-xl font-bold font-mono">Email já cadastrado</h2>
+              <h2 className="text-xl font-bold font-sans">Email já cadastrado</h2>
               <p className="text-sm text-muted-foreground">
                 O email <span className="font-medium text-foreground break-all">{duplicateEmail}</span> já está registrado na plataforma.
               </p>
@@ -257,7 +257,7 @@ export default function Auth() {
               <div className="mx-auto w-16 h-16 rounded-full bg-accent/10 flex items-center justify-center">
                 <Mail className="h-8 w-8 text-accent" />
               </div>
-              <h2 className="text-xl font-bold font-mono">Conta criada com sucesso!</h2>
+              <h2 className="text-xl font-bold font-sans">Conta criada com sucesso!</h2>
               <p className="text-sm text-muted-foreground">Enviamos um email de confirmação para:</p>
               <p className="text-sm font-medium text-primary break-all">{sentEmail}</p>
               <div className="bg-secondary/50 rounded-lg p-4 text-left space-y-2">
@@ -291,7 +291,7 @@ export default function Auth() {
           <Card className="w-full max-w-md neon-border bg-card/80 backdrop-blur-sm">
             <CardHeader className="text-center">
               <Terminal className="h-10 w-10 mx-auto text-primary mb-2" />
-              <CardTitle className="font-mono text-lg">Recuperar Senha</CardTitle>
+              <CardTitle className="font-sans text-lg">Recuperar Senha</CardTitle>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleForgotPassword} className="space-y-4">
@@ -322,7 +322,7 @@ export default function Auth() {
         <Card className="w-full max-w-md neon-border bg-card/80 backdrop-blur-sm">
           <CardHeader className="text-center">
             <Terminal className="h-10 w-10 mx-auto text-primary mb-2" />
-            <CardTitle className="font-mono font-black tracking-tight">
+            <CardTitle className="font-sans font-bold tracking-tight">
               Hidden<span className="text-neon-green">Mod</span>
             </CardTitle>
           </CardHeader>

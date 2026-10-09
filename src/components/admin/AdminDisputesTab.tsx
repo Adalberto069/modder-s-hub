@@ -185,7 +185,7 @@ export function AdminDisputesTab() {
 
   if (isLoading) {
     return (
-      <Card className="border-white/10 bg-[#050505] rounded-none">
+      <Card className="border-border bg-card rounded-md">
         <CardContent className="p-8 text-center text-muted-foreground">Carregando disputas...</CardContent>
       </Card>
     );
@@ -193,10 +193,10 @@ export function AdminDisputesTab() {
 
   return (
     <div className="space-y-6">
-      <Card className="border-white/10 bg-[#050505] rounded-none">
-        <CardHeader className="border-b border-white/5 bg-[#030304]">
+      <Card className="border-border bg-card rounded-md">
+        <CardHeader className="border-b border-border/60 bg-surface">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-sm font-black uppercase tracking-widest flex items-center gap-2 text-white">
+            <CardTitle className="text-sm font-bold   flex items-center gap-2 text-foreground">
               <AlertTriangle className="w-4 h-4 text-destructive" />
               Disputas Abertas ({disputes?.length ?? 0})
             </CardTitle>
@@ -205,7 +205,7 @@ export function AdminDisputesTab() {
                 <Button
                   size="sm"
                   variant="outline"
-                  className="text-[10px] uppercase tracking-widest border-accent/30 text-accent"
+                  className="text-xs   border-accent/30 text-accent"
                   disabled={selectedIds.size === 0 || resolving}
                   onClick={() => resolveBatch("requester")}
                 >
@@ -215,7 +215,7 @@ export function AdminDisputesTab() {
                 <Button
                   size="sm"
                   variant="outline"
-                  className="text-[10px] uppercase tracking-widest border-primary/30 text-primary"
+                  className="text-xs   border-primary/30 text-primary"
                   disabled={selectedIds.size === 0 || resolving}
                   onClick={() => resolveBatch("modder")}
                 >
@@ -232,18 +232,18 @@ export function AdminDisputesTab() {
           ) : (
             <>
               {/* Select all */}
-              <div className="flex items-center gap-2 px-4 py-3 border-b border-white/5 bg-[#030304]">
+              <div className="flex items-center gap-2 px-4 py-3 border-b border-border/60 bg-surface">
                 <Checkbox
                   checked={selectedIds.size === disputes.length && disputes.length > 0}
                   onCheckedChange={toggleAll}
                 />
-                <span className="text-[10px] text-muted-foreground uppercase tracking-widest">Selecionar Todos</span>
+                <span className="text-xs text-muted-foreground  ">Selecionar Todos</span>
               </div>
 
               {disputes.map(delivery => {
                 const bounty = bountyMap[delivery.bounty_id];
                 return (
-                  <div key={delivery.id} className="flex items-start gap-3 p-4 border-b border-white/5 hover:bg-[#08080a] transition-colors">
+                  <div key={delivery.id} className="flex items-start gap-3 p-4 border-b border-border/60 hover:bg-secondary transition-colors">
                     <Checkbox
                       checked={selectedIds.has(delivery.id)}
                       onCheckedChange={() => toggleSelect(delivery.id)}
@@ -251,12 +251,12 @@ export function AdminDisputesTab() {
                     />
                     <div className="flex-1 min-w-0 space-y-2">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className="font-black text-sm text-white uppercase tracking-tight italic truncate">
+                        <span className="font-bold text-sm text-foreground  tracking-tight italic truncate">
                           {bounty?.title ?? "Encomenda Desconhecida"}
                         </span>
-                        <Badge variant="destructive" className="text-[10px]">Em Disputa</Badge>
+                        <Badge variant="destructive" className="text-xs">Em Disputa</Badge>
                         {bounty && (
-                          <Badge variant="outline" className="text-[10px] text-accent border-accent/30">
+                          <Badge variant="outline" className="text-xs text-accent border-accent/30">
                             R$ {bounty.reward_amount}
                           </Badge>
                         )}
@@ -264,15 +264,15 @@ export function AdminDisputesTab() {
 
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-[11px] text-muted-foreground">
                         <div>
-                          <span className="text-[9px] uppercase tracking-widest block mb-0.5">Modder</span>
+                          <span className="text-[11px]   block mb-0.5">Modder</span>
                           <span className="text-foreground font-medium">{getName(delivery.modder_id)}</span>
                         </div>
                         <div>
-                          <span className="text-[9px] uppercase tracking-widest block mb-0.5">Solicitante</span>
+                          <span className="text-[11px]   block mb-0.5">Solicitante</span>
                           <span className="text-foreground font-medium">{bounty ? getName(bounty.requester_id) : "—"}</span>
                         </div>
                         <div>
-                          <span className="text-[9px] uppercase tracking-widest block mb-0.5">Data Entrega</span>
+                          <span className="text-[11px]   block mb-0.5">Data Entrega</span>
                           <span className="text-foreground font-medium">
                             {format(new Date(delivery.delivered_at), "dd/MM/yyyy HH:mm", { locale: ptBR })}
                           </span>
@@ -281,7 +281,7 @@ export function AdminDisputesTab() {
 
                       {delivery.dispute_reason && (
                         <div className="bg-destructive/10 border border-destructive/20 p-3 mt-2">
-                          <p className="text-[10px] uppercase tracking-widest text-destructive mb-1 font-bold">Motivo da Disputa</p>
+                          <p className="text-xs   text-destructive mb-1 font-bold">Motivo da Disputa</p>
                           <p className="text-xs text-foreground">{delivery.dispute_reason}</p>
                         </div>
                       )}
@@ -290,7 +290,7 @@ export function AdminDisputesTab() {
                         <Button
                           size="sm"
                           variant="outline"
-                          className="text-[10px] h-7 border-accent/30 text-accent"
+                          className="text-xs h-7 border-accent/30 text-accent"
                           disabled={resolving}
                           onClick={() => resolveDispute(delivery.id, "requester")}
                         >
@@ -299,7 +299,7 @@ export function AdminDisputesTab() {
                         <Button
                           size="sm"
                           variant="outline"
-                          className="text-[10px] h-7 border-primary/30 text-primary"
+                          className="text-xs h-7 border-primary/30 text-primary"
                           disabled={resolving}
                           onClick={() => resolveDispute(delivery.id, "modder")}
                         >
@@ -308,7 +308,7 @@ export function AdminDisputesTab() {
                         <Button
                           size="sm"
                           variant="ghost"
-                          className="text-[10px] h-7"
+                          className="text-xs h-7"
                           onClick={() => window.open(`/bounties/${delivery.bounty_id}`, "_blank")}
                         >
                           <Eye className="h-3 w-3 mr-1" /> Ver Encomenda
@@ -325,9 +325,9 @@ export function AdminDisputesTab() {
 
       {/* Resolved disputes history */}
       {resolvedDisputes && resolvedDisputes.length > 0 && (
-        <Card className="border-white/10 bg-[#050505] rounded-none">
-          <CardHeader className="border-b border-white/5 bg-[#030304]">
-            <CardTitle className="text-sm font-black uppercase tracking-widest flex items-center gap-2 text-white">
+        <Card className="border-border bg-card rounded-md">
+          <CardHeader className="border-b border-border/60 bg-surface">
+            <CardTitle className="text-sm font-bold   flex items-center gap-2 text-foreground">
               <CheckCircle className="w-4 h-4 text-accent" />
               Disputas Resolvidas (Últimas {resolvedDisputes.length})
             </CardTitle>
@@ -336,17 +336,17 @@ export function AdminDisputesTab() {
             {resolvedDisputes.map(delivery => {
               const bounty = bountyMap[delivery.bounty_id];
               return (
-                <div key={delivery.id} className="flex items-center justify-between p-4 border-b border-white/5 opacity-60">
+                <div key={delivery.id} className="flex items-center justify-between p-4 border-b border-border/60 opacity-60">
                   <div className="flex-1 min-w-0">
-                    <span className="font-bold text-sm text-white truncate block">
+                    <span className="font-bold text-sm text-foreground truncate block">
                       {bounty?.title ?? "Encomenda"}
                     </span>
-                    <div className="flex gap-3 text-[10px] text-muted-foreground mt-1">
+                    <div className="flex gap-3 text-xs text-muted-foreground mt-1">
                       <span>Modder: {getName(delivery.modder_id)}</span>
                       <span>Arquivo: {delivery.file_name}</span>
                     </div>
                   </div>
-                  <Badge variant="outline" className="text-[10px] text-accent border-accent/30">Resolvida</Badge>
+                  <Badge variant="outline" className="text-xs text-accent border-accent/30">Resolvida</Badge>
                 </div>
               );
             })}

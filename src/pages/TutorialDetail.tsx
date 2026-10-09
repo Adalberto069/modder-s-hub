@@ -59,7 +59,7 @@ function StarRating({ rating, onRate, interactive = false, size = "md" }: {
           <Star
             className={`${px} transition-all duration-200 ${
               star <= (hover || rating)
-                ? "fill-amber-400 text-amber-400 drop-shadow-[0_0_6px_rgba(251,191,36,0.5)]"
+                ? "fill-amber-400 text-amber-400 drop-shadow-sm"
                 : "text-muted-foreground/20"
             }`}
           />
@@ -180,7 +180,7 @@ function TableOfContents({ blocks, activeSection }: { blocks: ParsedBlock[]; act
     <nav className="space-y-1">
       <div className="flex items-center gap-2 mb-3 px-2">
         <List className="h-4 w-4 text-primary" />
-        <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Índice</span>
+        <span className="text-xs font-bold   text-muted-foreground">Índice</span>
       </div>
       {headings.map((h, idx) => {
         const slug = h.content.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '');
@@ -234,8 +234,8 @@ function ContentRenderer({ content, onSectionIds }: { content: string; onSection
             const slug = block.content.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '');
             return (
               <div key={idx} id={`section-${slug}`} className="scroll-mt-24 pt-6 first:pt-0">
-                <h2 className="text-lg sm:text-xl font-bold font-mono text-foreground flex items-center gap-3 group">
-                  <div className="h-7 w-1.5 rounded-full bg-gradient-to-b from-primary to-primary/40 shadow-[0_0_12px_hsl(var(--primary)/0.4)]" />
+                <h2 className="text-lg sm:text-xl font-bold text-foreground flex items-center gap-3 group">
+                  <div className="h-7 w-1.5 rounded-full bg-gradient-to-b from-primary to-primary/40 shadow-sm" />
                   <span>{block.content}</span>
                   <a href={`#section-${slug}`} className="opacity-0 group-hover:opacity-50 transition-opacity">
                     <Hash className="h-4 w-4" />
@@ -254,7 +254,7 @@ function ContentRenderer({ content, onSectionIds }: { content: string; onSection
                   <Lightbulb className="h-5 w-5" />
                 </div>
                 <div className="space-y-1 min-w-0">
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-neon-cyan/70">Dica</span>
+                  <span className="text-xs font-bold   text-neon-cyan/70">Dica</span>
                   <p className="text-sm text-foreground/90 leading-relaxed">{renderInline(block.content)}</p>
                 </div>
               </motion.div>
@@ -268,7 +268,7 @@ function ContentRenderer({ content, onSectionIds }: { content: string; onSection
                   <AlertTriangle className="h-5 w-5" />
                 </div>
                 <div className="space-y-1 min-w-0">
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-destructive/70">Atenção</span>
+                  <span className="text-xs font-bold   text-destructive/70">Atenção</span>
                   <p className="text-sm text-foreground/90 leading-relaxed">{renderInline(block.content)}</p>
                 </div>
               </motion.div>
@@ -277,21 +277,21 @@ function ContentRenderer({ content, onSectionIds }: { content: string; onSection
           case 'code':
             return (
               <motion.div key={idx} initial={{ opacity: 0, y: 8 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
-                className="relative group rounded-xl overflow-hidden border border-white/5 shadow-2xl">
+                className="relative group rounded-xl overflow-hidden border border-border/60 shadow-sm">
                 {/* Header bar */}
-                <div className="flex items-center justify-between px-4 py-2 bg-slate-900/80 border-b border-white/5">
+                <div className="flex items-center justify-between px-4 py-2 bg-slate-900/80 border-b border-border/60">
                   <div className="flex items-center gap-2">
                     <div className="flex gap-1.5">
                       <div className="h-2.5 w-2.5 rounded-full bg-destructive/60" />
                       <div className="h-2.5 w-2.5 rounded-full bg-amber-400/60" />
                       <div className="h-2.5 w-2.5 rounded-full bg-neon-green/60" />
                     </div>
-                    <span className="text-[10px] font-mono text-muted-foreground/50 uppercase ml-2">{block.lang}</span>
+                    <span className="text-xs font-mono text-muted-foreground/50  ml-2">{block.lang}</span>
                   </div>
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="h-6 text-[10px] gap-1 text-muted-foreground hover:text-foreground"
+                    className="h-6 text-xs gap-1 text-muted-foreground hover:text-foreground"
                     onClick={() => copyToClipboard(block.content, idx)}
                   >
                     {copiedIdx === idx ? <Check className="h-3 w-3 text-neon-green" /> : <Copy className="h-3 w-3" />}
@@ -310,8 +310,7 @@ function ContentRenderer({ content, onSectionIds }: { content: string; onSection
               <motion.div key={idx} initial={{ opacity: 0, x: -12 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}
                 className="flex gap-4 items-start group">
                 <div className="relative shrink-0 mt-0.5">
-                  <div className="absolute inset-0 bg-primary/30 blur-lg rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
-                  <span className="relative flex items-center justify-center h-9 w-9 rounded-xl bg-gradient-to-br from-primary to-primary/70 text-primary-foreground text-sm font-black shadow-lg">
+                  <span className="relative flex items-center justify-center h-9 w-9 rounded-xl bg-gradient-to-br from-primary to-primary/70 text-primary-foreground text-sm font-bold shadow-lg">
                     {block.lang}
                   </span>
                 </div>
@@ -332,7 +331,7 @@ function ContentRenderer({ content, onSectionIds }: { content: string; onSection
           case 'image':
             return (
               <motion.div key={idx} initial={{ opacity: 0, scale: 0.98 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }}
-                className="my-4 rounded-2xl overflow-hidden border border-border/20 shadow-2xl bg-black/20 group mx-auto max-w-md">
+                className="my-4 rounded-lg overflow-hidden border border-border/20 shadow-sm bg-black/20 group mx-auto max-w-md">
                 <img src={block.url} alt={block.content} className="w-full object-contain max-h-[320px] group-hover:scale-[1.01] transition-transform duration-700" loading="lazy" />
                 {block.content && (
                   <div className="px-4 py-2 bg-secondary/30 border-t border-border/10">
@@ -345,7 +344,7 @@ function ContentRenderer({ content, onSectionIds }: { content: string; onSection
           case 'video':
             return (
               <motion.div key={idx} initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
-                className="my-6 rounded-xl overflow-hidden shadow-2xl border border-white/10 bg-black/30">
+                className="my-6 rounded-xl overflow-hidden shadow-sm border border-border bg-black/30">
                 <div className="aspect-video">
                   <iframe
                     src={block.url}
@@ -616,10 +615,9 @@ export default function TutorialDetail() {
 
         {/* Header Hero */}
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
-          <div className="relative rounded-2xl overflow-hidden bg-gradient-to-br from-card via-card to-secondary/30 border border-border/30 p-6 sm:p-8">
+          <div className="relative rounded-lg overflow-hidden bg-gradient-to-br from-card via-card to-secondary/30 border border-border/30 p-6 sm:p-8">
             {/* Background decoration */}
             <div className="absolute inset-0 bg-grid-pattern opacity-30" />
-            <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl" />
 
             <div className="relative">
               <div className="flex flex-wrap items-center gap-2 mb-4">
@@ -642,7 +640,7 @@ export default function TutorialDetail() {
                 )}
               </div>
 
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold font-mono leading-tight mb-3">{tutorial.title}</h1>
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold leading-tight mb-3">{tutorial.title}</h1>
 
               {tutorial.description && (
                 <p className="text-muted-foreground max-w-2xl leading-relaxed">{renderInline(tutorial.description)}</p>
@@ -670,7 +668,7 @@ export default function TutorialDetail() {
         {/* Video */}
         {embedUrl && (
           <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="mb-8">
-            <div className="aspect-video rounded-xl overflow-hidden shadow-2xl border border-white/10 bg-black/30">
+            <div className="aspect-video rounded-xl overflow-hidden shadow-sm border border-border bg-black/30">
               <iframe
                 src={embedUrl}
                 title={tutorial.title}
@@ -707,13 +705,13 @@ export default function TutorialDetail() {
             className="flex-1 min-w-0"
           >
             {tutorial.content ? (
-              <Card className="bg-card/60 backdrop-blur-sm border-border/30 shadow-xl">
+              <Card className="bg-card backdrop-blur-sm border-border/30 shadow-xl">
                 <CardContent className="p-5 sm:p-8">
                   <ContentRenderer content={tutorial.content} onSectionIds={setSectionIds} />
                 </CardContent>
               </Card>
             ) : (
-              <Card className="bg-card/60">
+              <Card className="bg-card">
                 <CardContent className="p-8 text-center">
                   <BookOpen className="h-10 w-10 mx-auto text-muted-foreground/30 mb-2" />
                   <p className="text-sm text-muted-foreground italic">Conteúdo em breve.</p>
@@ -725,11 +723,11 @@ export default function TutorialDetail() {
 
         {/* Rating */}
         <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.2 }} className="mb-10">
-          <Card className="bg-card/40 backdrop-blur-md border-primary/10 overflow-hidden">
+          <Card className="bg-card  border-primary/10 overflow-hidden">
             <CardContent className="p-8 text-center space-y-4 relative">
               <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent" />
               <div className="relative space-y-4">
-                <h3 className="font-bold font-mono text-lg">Avalie este Tutorial</h3>
+                <h3 className="font-bold text-lg">Avalie este Tutorial</h3>
                 <div className="flex justify-center">
                   <StarRating
                     rating={userRating || (existingRating?.rating ?? 0)}
@@ -749,7 +747,7 @@ export default function TutorialDetail() {
 
         {/* Comments */}
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }} className="mb-10">
-          <h3 className="text-xl font-bold font-mono mb-6 flex items-center gap-3">
+          <h3 className="text-xl font-bold mb-6 flex items-center gap-3">
             <div className="p-2 rounded-lg bg-neon-cyan/10 text-neon-cyan">
               <MessageSquare className="h-5 w-5" />
             </div>
@@ -757,7 +755,7 @@ export default function TutorialDetail() {
           </h3>
 
           {/* Comment input */}
-          <Card className="mb-6 bg-card/40 border-border/20">
+          <Card className="mb-6 bg-card border-border/20">
             <CardContent className="p-4">
               <div className="flex gap-3">
                 <Avatar className="h-8 w-8 shrink-0 mt-1">
@@ -798,19 +796,19 @@ export default function TutorialDetail() {
             {comments.map((comment: any) => {
               const author = profileMap[comment.user_id];
               return (
-                <Card key={comment.id} className="bg-card/30 border-border/15">
+                <Card key={comment.id} className="bg-card border-border/15">
                   <CardContent className="p-4">
                     <div className="flex items-start gap-3">
                       <Avatar className="h-8 w-8 shrink-0">
                         {author?.avatar_url ? <AvatarImage src={author.avatar_url} /> : null}
-                        <AvatarFallback className="bg-background border border-border/20 text-[10px] font-bold">
+                        <AvatarFallback className="bg-background border border-border/20 text-xs font-bold">
                           {(author?.username ?? "U").charAt(0).toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
                           <span className="text-xs font-medium">{author?.display_name ?? author?.username ?? "Usuário"}</span>
-                          <span className="text-[10px] text-muted-foreground">
+                          <span className="text-xs text-muted-foreground">
                             {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true, locale: ptBR })}
                           </span>
                         </div>
@@ -829,7 +827,7 @@ export default function TutorialDetail() {
         {/* Related tutorials */}
         {relatedTutorials.length > 0 && (
           <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
-            <h3 className="text-lg font-bold font-mono mb-4">Tutoriais Relacionados</h3>
+            <h3 className="text-lg font-bold mb-4">Tutoriais Relacionados</h3>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               {relatedTutorials.map((t: any) => (
                 <Link key={t.id} to={`/tutorial/${t.id}`}>

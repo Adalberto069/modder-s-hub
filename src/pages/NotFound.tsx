@@ -24,13 +24,13 @@ const NotFound = () => {
         className="text-center px-6 max-w-lg"
       >
         {/* Icon */}
-        <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-neon-purple/10 border border-neon-purple/20 mb-6">
+        <div className="inline-flex items-center justify-center w-20 h-20 rounded-lg bg-neon-purple/10 border border-neon-purple/20 mb-6">
           <Terminal className="h-9 w-9 text-neon-purple" />
         </div>
 
         {/* Error code */}
         <div className="mb-2">
-          <span className="text-[100px] sm:text-[140px] font-black leading-none bg-gradient-to-b from-foreground/80 to-foreground/10 bg-clip-text text-transparent">
+          <span className="text-[100px] sm:text-[140px] font-bold leading-none bg-gradient-to-b from-foreground/80 to-foreground/10 bg-clip-text text-transparent">
             404
           </span>
         </div>
@@ -55,7 +55,7 @@ const NotFound = () => {
               Voltar ao Início
             </Link>
           </Button>
-          <Button variant="outline" onClick={() => window.history.back()} className="gap-2 border-white/10">
+          <Button variant="outline" onClick={() => window.history.back()} className="gap-2 border-border">
             <ArrowLeft className="h-4 w-4" />
             Página Anterior
           </Button>

@@ -141,7 +141,7 @@ export function AdminFlaggedScripts() {
                       Score: {analysis.security_score}/100
                     </span>
                     {analysis.reviewed && (
-                      <Badge variant="outline" className="text-[10px] bg-accent/10 text-accent border-accent/30 gap-1">
+                      <Badge variant="outline" className="text-xs bg-accent/10 text-accent border-accent/30 gap-1">
                         <CheckCircle className="h-3 w-3" /> Revisado
                       </Badge>
                     )}
@@ -190,7 +190,7 @@ export function AdminFlaggedScripts() {
               {Array.isArray(analysis.threats) && analysis.threats.length > 0 && (
                 <div className="flex flex-wrap gap-1">
                   {analysis.threats.map((t: any, i: number) => (
-                    <Badge key={i} variant="outline" className="text-[9px] bg-destructive/10 text-destructive border-destructive/20">
+                    <Badge key={i} variant="outline" className="text-[11px] bg-destructive/10 text-destructive border-destructive/20">
                       {t.description}
                     </Badge>
                   ))}

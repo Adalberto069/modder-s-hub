@@ -11,3 +11,8 @@
 # Referência Elysium
 - [x] Adaptar início, fontes e navegação ao visual mais limpo da referência.
 - [x] Conferir apresentação e navegação.
+
+# Reformulação completa
+- [x] Unificar páginas, controles, formulários e janelas no estilo premium.
+- [x] Reformular tutoriais, fórum, ferramentas, encomendas e painéis.
+- [x] Verificar páginas públicas, navegação e testes existentes.

@@ -177,8 +177,8 @@ export function AdminAuditTab() {
                   open={expanded === run.id}
                   onOpenChange={(o) => setExpanded(o ? run.id : null)}
                 >
-                  <div className="border border-white/10 rounded-md">
-                    <CollapsibleTrigger className="w-full p-3 flex items-center justify-between hover:bg-white/5 transition">
+                  <div className="border border-border rounded-md">
+                    <CollapsibleTrigger className="w-full p-3 flex items-center justify-between hover:bg-secondary/60 transition">
                       <div className="flex items-center gap-3 text-left">
                         {run.total_issues > 0 ? (
                           <AlertTriangle className="h-4 w-4 text-destructive flex-shrink-0" />
@@ -214,7 +214,7 @@ export function AdminAuditTab() {
                     </CollapsibleTrigger>
 
                     <CollapsibleContent>
-                      <div className="p-3 border-t border-white/10 bg-black/30">
+                      <div className="p-3 border-t border-border bg-black/30">
                         {run.total_issues === 0 ? (
                           <p className="text-sm text-muted-foreground">
                             Nenhum registro suspeito detectado nesta execução.
@@ -258,8 +258,8 @@ export function AdminAuditTab() {
                   open={expanded === b.id}
                   onOpenChange={(o) => setExpanded(o ? b.id : null)}
                 >
-                  <div className="border border-white/10 rounded-md">
-                    <CollapsibleTrigger className="w-full p-3 flex items-center justify-between hover:bg-white/5 transition">
+                  <div className="border border-border rounded-md">
+                    <CollapsibleTrigger className="w-full p-3 flex items-center justify-between hover:bg-secondary/60 transition">
                       <div className="flex items-center gap-3 text-left min-w-0">
                         <Ban className="h-4 w-4 text-destructive flex-shrink-0" />
                         <div className="min-w-0">
@@ -271,10 +271,10 @@ export function AdminAuditTab() {
                         </div>
                       </div>
                       <div className="flex items-center gap-2 flex-shrink-0">
-                        <Badge variant="outline" className="font-mono text-[10px]">
+                        <Badge variant="outline" className="font-mono text-xs">
                           {b.source === "uploaded_file" ? "arquivo" : "código"}
                         </Badge>
-                        <span className="text-[10px] text-muted-foreground font-mono hidden sm:inline">
+                        <span className="text-xs text-muted-foreground font-mono hidden sm:inline">
                           {formatDistanceToNow(new Date(b.created_at), { addSuffix: true, locale: ptBR })}
                         </span>
                         <ChevronDown
@@ -283,7 +283,7 @@ export function AdminAuditTab() {
                       </div>
                     </CollapsibleTrigger>
                     <CollapsibleContent>
-                      <div className="p-3 border-t border-white/10 bg-black/30 space-y-2">
+                      <div className="p-3 border-t border-border bg-black/30 space-y-2">
                         <div className="text-xs font-mono text-muted-foreground">
                           user_id: {b.user_id}
                           {b.script_id && <> · script_id: {b.script_id}</>}

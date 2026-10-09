@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Layout } from "@/components/layout/Layout";
+import { PageHeader } from "@/components/layout/PageHeader";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -118,70 +119,44 @@ export default function Tutorials() {
       <div className="container py-5 sm:py-8 px-3 sm:px-4 max-w-6xl">
         {/* Hero header */}
         <div className="mb-8">
-          <div className="relative overflow-hidden border border-white/10 bg-[#050505] p-6 sm:p-10 mb-8 rounded-none">
-            <div className="absolute top-0 right-0 w-72 h-72 bg-neon-cyan/5 blur-[100px] -z-10" />
-            <div className="absolute bottom-0 left-0 w-48 h-48 bg-neon-purple/5 blur-[80px] -z-10" />
-            
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
-              <div className="space-y-4">
-                <div className="flex items-center gap-2 font-mono">
-                  <Badge variant="outline" className="border-neon-cyan/30 text-neon-cyan px-2 py-0.5 bg-neon-cyan/5 text-[10px] uppercase tracking-widest rounded-none">
-                    <BookOpen className="h-3 w-3 mr-1" /> EDUCATION_MODULE
-                  </Badge>
-                </div>
-                <div>
-                  <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-white uppercase italic">
-                    Central de <span className="text-neon-cyan shadow-neon-cyan">Treinamento</span>
-                  </h1>
-                  <p className="text-muted-foreground max-w-xl text-xs sm:text-sm leading-relaxed mt-2 font-mono uppercase tracking-widest">
-                    Aprenda táticas de nível root, do zero ao avançado. Documentação completa para exploração e deobfuscamento.
-                  </p>
-                </div>
-              </div>
-              {isAdmin && (
-                <Button onClick={() => navigate("/tutorial/new")} className="bg-neon-purple hover:bg-neon-purple/90 text-white shadow-[0_0_15px_rgba(168,85,247,0.3)] rounded-none font-black uppercase tracking-widest text-[10px] shrink-0 w-full sm:w-auto h-12 px-6">
-                  <Plus className="h-4 w-4 mr-2" /> Novo Registro
-                </Button>
-              )}
-            </div>
-          </div>
+          <PageHeader eyebrow="HIDDENMOD / TUTORIAIS" title={<>Aprenda. <span className="text-primary">Evolua.</span></>} description="Guias da comunidade sobre Game Guardian, scripts Lua e jogos Android." actions={isAdmin ? <Button onClick={() => navigate("/tutorial/new")}><Plus /> Novo tutorial</Button> : undefined} />
 
           {/* Search and Filters Bar */}
-          <div className="flex flex-col lg:flex-row gap-4 bg-[#050505] border border-white/5 p-4 rounded-none font-mono relative">
+          <div className="flex flex-col lg:flex-row gap-4 bg-card border border-border/60 p-4 rounded-md font-sans relative">
             
             {/* Search */}
-            <div className="relative w-full lg:w-96 shrink-0 lg:border-r border-white/5 lg:pr-4 group">
+            <div className="relative w-full lg:w-96 shrink-0 lg:border-r border-border/60 lg:pr-4 group">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground transition-colors group-focus-within:text-neon-cyan" />
               <Input 
-                placeholder=">_ QUERY_DATABASE..." 
+                aria-label="Buscar tutoriais" placeholder="Buscar tutoriais..." 
                 value={search} 
                 onChange={(e) => setSearch(e.target.value)} 
-                className="pl-10 bg-[#030304] border-white/10 focus-visible:ring-neon-cyan rounded-none h-12 text-neon-green font-mono uppercase tracking-widest text-[10px]" 
+                className="pl-10 bg-background border-border focus-visible:ring-neon-cyan rounded-md h-12 text-neon-green font-sans text-xs" 
               />
             </div>
 
             {/* Category filters */}
             <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none flex-1 min-w-0">
-              <Badge
+              <Button size="sm"
                 variant="outline"
-                className={`cursor-pointer whitespace-nowrap px-4 py-1.5 transition-all duration-200 text-[9px] uppercase tracking-widest rounded-none shrink-0 ${
-                  activeCategory === "all" ? "bg-neon-cyan text-[#050505] border-neon-cyan shadow-[0_0_10px_rgba(34,211,238,0.2)]" : "border-white/10 hover:border-white/30 bg-[#030304] text-muted-foreground hover:text-white"
+                className={`cursor-pointer whitespace-nowrap px-4 py-1.5 transition-all duration-200 text-xs rounded-md shrink-0 ${
+                  activeCategory === "all" ? "bg-neon-cyan text-background border-neon-cyan shadow-neon" : "border-border hover:border-border/30 bg-background text-muted-foreground hover:text-foreground"
                 }`}
                 onClick={() => setActiveCategory("all")}
               >
-                [TODOS: {tutorials.length}]
-              </Badge>
+                Todos ({tutorials.length})
+              </Button>
               {CATEGORIES.map((cat) => (
-                <Badge
+                <Button size="sm"
                   key={cat.value}
                   variant="outline"
-                   className={`cursor-pointer whitespace-nowrap px-4 py-1.5 transition-all duration-200 text-[9px] uppercase tracking-widest rounded-none shrink-0 ${
-                    activeCategory === cat.value ? "bg-neon-cyan text-[#050505] border-neon-cyan shadow-[0_0_10px_rgba(34,211,238,0.2)]" : "border-white/10 hover:border-white/30 bg-[#030304] text-muted-foreground hover:text-white"
+                   className={`cursor-pointer whitespace-nowrap px-4 py-1.5 transition-all duration-200 text-xs rounded-md shrink-0 ${
+                    activeCategory === cat.value ? "bg-neon-cyan text-background border-neon-cyan shadow-neon" : "border-border hover:border-border/30 bg-background text-muted-foreground hover:text-foreground"
                   }`}
                   onClick={() => setActiveCategory(cat.value)}
                 >
                   {cat.icon} {cat.label} {categoryCounts[cat.value] ? `[${categoryCounts[cat.value]}]` : ""}
-                </Badge>
+                </Button>
               ))}
             </div>
           </div>
@@ -190,27 +165,27 @@ export default function Tutorials() {
         {/* Tópicos rápidos do HiddenMod */}
         {!search && activeCategory === "all" && (
           <div className="mb-8">
-            <div className="flex items-center gap-2 mb-3 font-mono">
-              <span className="text-[10px] uppercase tracking-widest text-muted-foreground">// quick_topics ·</span>
-              <span className="text-[10px] uppercase tracking-widest text-neon-green">hiddenmod_stack</span>
+            <div className="flex items-center gap-2 mb-3 font-sans">
+              <span className="text-xs text-muted-foreground">Explore por assunto</span>
+              <span className="text-xs text-neon-green"></span>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3">
               {HIDDENMOD_TOPICS.map((topic) => {
                 const Icon = topic.icon;
                 return (
-                  <button
+                  <Button variant="outline"
                     key={topic.q}
                     onClick={() => setSearch(topic.q)}
-                    className={`group text-left bg-[#050505] border border-white/10 ${topic.hover} hover:bg-[#080808] transition-all duration-200 p-3 rounded-none font-mono`}
+                    className={`group h-auto whitespace-normal flex-col items-start text-left bg-card border border-border ${topic.hover} hover:bg-secondary transition-all duration-200 p-3 rounded-md font-sans`}
                   >
                     <Icon className={`h-4 w-4 mb-2 ${topic.color} group-hover:scale-110 transition-transform`} />
-                    <div className="text-[10px] sm:text-[11px] font-black text-white uppercase tracking-tight leading-tight">
+                    <div className="text-xs sm:text-xs font-bold text-foreground tracking-normal leading-tight">
                       {topic.label}
                     </div>
-                    <div className="text-[8px] sm:text-[9px] text-muted-foreground uppercase tracking-widest mt-1 leading-tight line-clamp-2">
+                    <div className="text-xs sm:text-xs text-muted-foreground mt-1 leading-tight line-clamp-2">
                       {topic.desc}
                     </div>
-                  </button>
+                  </Button>
                 );
               })}
             </div>
@@ -219,8 +194,8 @@ export default function Tutorials() {
 
         {/* Results count */}
         {!isLoading && (
-          <p className="text-[10px] sm:text-[10px] font-mono uppercase tracking-widest text-muted-foreground mb-4 sm:mb-6">
-            <span className="font-black text-neon-cyan">[{filtered.length}]</span> REGISTROS ENCONTRADOS
+          <p className="text-xs sm:text-xs font-sans text-muted-foreground mb-4 sm:mb-6">
+            <span className="font-bold text-neon-cyan">[{filtered.length}]</span> tutoriais encontrados
           </p>
         )}
 
@@ -248,66 +223,65 @@ export default function Tutorials() {
                   transition={{ delay: i * 0.04, duration: 0.3 }}
                 >
                   <Link to={`/tutorial/${tutorial.id}`} className="block h-full">
-                    <Card className="group overflow-hidden border-white/10 hover:border-neon-cyan/50 transition-all duration-300 bg-[#050505] rounded-none h-full flex flex-col shadow-none hover:shadow-[0_0_15px_rgba(34,211,238,0.1)]">
+                    <Card className="group overflow-hidden border-border hover:border-neon-cyan/50 transition-all duration-300 bg-card rounded-md h-full flex flex-col shadow-none hover:shadow-neon">
                       {/* Thumbnail */}
-                      <div className="aspect-video bg-[#030304] border-b border-white/5 flex items-center justify-center overflow-hidden relative">
+                      <div className="aspect-video bg-background border-b border-border/60 flex items-center justify-center overflow-hidden relative">
                         {tutorial.thumbnail_url ? (
                           <img src={tutorial.thumbnail_url} alt={tutorial.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out opacity-80 group-hover:opacity-100" loading="lazy" />
                         ) : (
-                          <BookOpen className="h-8 w-8 sm:h-12 sm:w-12 text-white/5 shadow-neon-purple" />
+                          <BookOpen className="h-8 w-8 sm:h-12 sm:w-12 text-foreground/5 shadow-neon-purple" />
                         )}
                         {tutorial.video_url && (
                           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                            <div className="bg-[#050505]/80 border border-white/10 backdrop-blur-sm rounded-none p-3 group-hover:scale-110 transition-transform duration-300">
+                            <div className="bg-card/80 border border-border backdrop-blur-sm rounded-md p-3 group-hover:scale-110 transition-transform duration-300">
                               <Play className="h-4 w-4 sm:h-6 sm:w-6 text-neon-cyan fill-neon-cyan/30" />
                             </div>
                           </div>
                         )}
                         {isAdmin && (
-                          <div className="absolute top-0 right-0 p-1 flex gap-1 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity z-20 bg-[#050505] border-b border-l border-white/10">
-                            <Button aria-label="Editar tutorial" size="icon" variant="ghost" className="h-6 w-6 rounded-none hover:bg-white/10 text-muted-foreground hover:text-white" onClick={(e) => { e.preventDefault(); e.stopPropagation(); navigate(`/tutorial/${tutorial.id}/edit`); }}>
+                          <div className="absolute top-0 right-0 p-1 flex gap-1 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity z-20 bg-card border-b border-l border-border">
+                            <Button aria-label="Editar tutorial" size="icon" variant="ghost" className="h-6 w-6 rounded-md hover:bg-foreground/10 text-muted-foreground hover:text-foreground" onClick={(e) => { e.preventDefault(); e.stopPropagation(); navigate(`/tutorial/${tutorial.id}/edit`); }}>
                               <Pencil className="h-3 w-3" />
                             </Button>
-                            <Button aria-label="Excluir tutorial" size="icon" variant="ghost" className="h-6 w-6 rounded-none hover:bg-destructive/20 text-destructive" onClick={(e) => { e.preventDefault(); e.stopPropagation(); setTutorialToDelete({ id: tutorial.id, title: tutorial.title }); }}>
+                            <Button aria-label="Excluir tutorial" size="icon" variant="ghost" className="h-6 w-6 rounded-md hover:bg-destructive/20 text-destructive" onClick={(e) => { e.preventDefault(); e.stopPropagation(); setTutorialToDelete({ id: tutorial.id, title: tutorial.title }); }}>
                               <Trash2 className="h-3 w-3" />
                             </Button>
                           </div>
                         )}
 
-                        <div className="absolute top-0 left-0 p-1 bg-[#050505] border-b border-r border-white/10 z-10 hidden sm:block">
-                           <span className="text-[7px] text-muted-foreground uppercase font-mono tracking-widest">[{tutorial.id.substring(0,6)}]</span>
+                        <div className="absolute top-0 left-0 p-1 bg-card border-b border-r border-border z-10 hidden sm:block">
                         </div>
 
                         {/* Glitch Overlay Effect on Hover */}
                         <div className="absolute inset-0 bg-neon-cyan/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 mix-blend-overlay pointer-events-none" />
                       </div>
 
-                      <CardContent className="p-4 flex-1 flex flex-col gap-3 font-mono">
+                      <CardContent className="p-4 flex-1 flex flex-col gap-3 font-sans">
                         <div className="flex items-center justify-between">
-                          <Badge variant="outline" className="text-[8px] sm:text-[9px] bg-[#030304] text-white/70 border-white/10 px-2 uppercase tracking-widest rounded-none">
+                          <Badge variant="outline" className="text-xs sm:text-xs bg-background text-foreground/70 border-border px-2 rounded-md">
                             {categoryLabels[tutorial.category] ?? tutorial.category}
                           </Badge>
                           {rating && (
-                            <div className="flex items-center gap-1.5 border border-white/5 bg-[#030304] px-1.5 py-0.5">
-                              <Star className="h-2.5 w-2.5 sm:h-3 sm:w-3 fill-amber-500 text-amber-500" />
-                              <span className="text-[8px] sm:text-[9px] font-black text-amber-500 uppercase tracking-widest">{rating.avg.toFixed(1)}</span>
+                            <div className="flex items-center gap-1.5 border border-border/60 bg-background px-1.5 py-0.5">
+                              <Star className="h-2.5 w-2.5 sm:h-3 sm:w-3 fill-rating text-rating" />
+                              <span className="text-xs sm:text-xs font-bold text-rating">{rating.avg.toFixed(1)}</span>
                             </div>
                           )}
                         </div>
-                        <h3 className="font-black text-sm uppercase tracking-tight text-white group-hover:text-neon-cyan transition-colors duration-300 leading-tight italic truncate">
+                        <h3 className="font-bold text-sm tracking-normal text-foreground group-hover:text-neon-cyan transition-colors duration-300 leading-tight truncate">
                           {tutorial.title}
                         </h3>
                         {tutorial.description && (
-                          <p className="text-[10px] text-muted-foreground uppercase tracking-widest line-clamp-2 leading-relaxed hidden sm:block">
+                          <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed hidden sm:block">
                             {tutorial.description}
                           </p>
                         )}
-                        <div className="flex items-center justify-between text-[8px] sm:text-[9px] text-muted-foreground uppercase tracking-widest pt-3 mt-auto border-t border-white/5">
+                        <div className="flex items-center justify-between text-xs sm:text-xs text-muted-foreground pt-3 mt-auto border-t border-border/60">
                           <div className="flex items-center gap-1.5">
                             <Clock className="h-3 w-3 text-neon-purple" />
                             {new Date(tutorial.created_at).toLocaleDateString("pt-BR")}
                           </div>
-                           <span className="bg-transparent hover:bg-white/5 text-muted-foreground transition-all duration-300 font-black px-2 py-1">
+                           <span className="bg-transparent hover:bg-foreground/5 text-muted-foreground transition-all duration-300 font-bold px-2 py-1">
                              <BookOpen className="inline h-3 w-3 mr-1" /> DOC
                            </span>
                         </div>

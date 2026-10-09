@@ -352,9 +352,9 @@ export default function BountyDetail() {
     return (
       <Layout>
         <div className="container py-8 max-w-4xl space-y-6">
-          <Skeleton className="h-12 w-3/4 rounded-none bg-white/5" />
-          <Skeleton className="h-48 rounded-none bg-white/5" />
-          <Skeleton className="h-32 rounded-none bg-white/5" />
+          <Skeleton className="h-12 w-3/4 rounded-md bg-secondary/60" />
+          <Skeleton className="h-48 rounded-md bg-secondary/60" />
+          <Skeleton className="h-32 rounded-md bg-secondary/60" />
         </div>
       </Layout>
     );
@@ -393,7 +393,7 @@ export default function BountyDetail() {
         </Link>
 
         {/* Main Card */}
-        <div className="relative overflow-hidden border border-white/5 bg-[#050505]">
+        <div className="relative overflow-hidden border border-border/60 bg-card">
           <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-neon-purple/50 via-neon-cyan/30 to-transparent" />
 
           <div className="p-4 sm:p-8 space-y-5 sm:space-y-6">
@@ -402,29 +402,29 @@ export default function BountyDetail() {
               <div className="space-y-2 flex-1 min-w-0">
                 <div className="flex items-start gap-2">
                   <Target className="h-4 w-4 sm:h-5 sm:w-5 text-neon-purple shrink-0 mt-1" />
-                  <h1 className="text-lg sm:text-2xl font-black uppercase tracking-tighter text-white break-words">{bounty.title}</h1>
+                  <h1 className="text-lg sm:text-2xl font-bold  tracking-tight text-foreground break-words">{bounty.title}</h1>
                 </div>
                 <div className="flex flex-wrap gap-1.5 sm:gap-2 items-center">
-                  <Badge variant="outline" className={`text-[9px] sm:text-[10px] font-black uppercase tracking-widest rounded-none ${status.color} ${status.bg} ${status.border}`}>
+                  <Badge variant="outline" className={`text-[11px] sm:text-xs font-bold   rounded-md ${status.color} ${status.bg} ${status.border}`}>
                     {status.label}
                   </Badge>
                   {bounty.game_name && (
-                    <span className="flex items-center gap-1 text-[9px] sm:text-[10px] font-medium text-neon-cyan bg-neon-cyan/5 border border-neon-cyan/10 px-2 py-0.5">
+                    <span className="flex items-center gap-1 text-[11px] sm:text-xs font-medium text-neon-cyan bg-neon-cyan/5 border border-neon-cyan/10 px-2 py-0.5">
                       <Gamepad2 className="h-2.5 w-2.5" /> {bounty.game_name}
                     </span>
                   )}
                   {bounty.categories && (
-                    <span className="text-[9px] sm:text-[10px] font-medium text-muted-foreground bg-white/5 border border-white/5 px-2 py-0.5">
+                    <span className="text-[11px] sm:text-xs font-medium text-muted-foreground bg-secondary/60 border border-border/60 px-2 py-0.5">
                       {bounty.categories.icon} {bounty.categories.name}
                     </span>
                   )}
                   {isDeadlineExpired && (
-                    <span className="text-[9px] sm:text-[10px] font-medium text-destructive bg-destructive/10 border border-destructive/20 px-2 py-0.5 flex items-center gap-1">
+                    <span className="text-[11px] sm:text-xs font-medium text-destructive bg-destructive/10 border border-destructive/20 px-2 py-0.5 flex items-center gap-1">
                       <AlertTriangle className="h-2.5 w-2.5" /> PRAZO EXPIRADO
                     </span>
                   )}
                   {isPurchaseCompleted && (
-                    <Badge variant="outline" className="text-[9px] sm:text-[10px] font-black uppercase tracking-widest rounded-none text-neon-green bg-neon-green/10 border-neon-green/30">
+                    <Badge variant="outline" className="text-[11px] sm:text-xs font-bold   rounded-md text-neon-green bg-neon-green/10 border-neon-green/30">
                       ✅ Pago
                     </Badge>
                   )}
@@ -432,45 +432,45 @@ export default function BountyDetail() {
               </div>
 
               {/* Reward — PUBLIC */}
-              <div className="text-left sm:text-right shrink-0 border-t sm:border-t-0 border-white/5 pt-3 sm:pt-0">
+              <div className="text-left sm:text-right shrink-0 border-t sm:border-t-0 border-border/60 pt-3 sm:pt-0">
                 {isPaid ? (
                   <>
-                    <p className="text-[10px] text-muted-foreground uppercase tracking-widest">Recompensa</p>
-                    <p className="text-2xl sm:text-3xl font-black text-neon-green font-mono flex items-center gap-1 sm:justify-end">
+                    <p className="text-xs text-muted-foreground  ">Recompensa</p>
+                    <p className="text-2xl sm:text-3xl font-bold text-neon-green font-mono flex items-center gap-1 sm:justify-end">
                       <DollarSign className="h-5 w-5 sm:h-6 sm:w-6" />
                       R$ {rewardAmount.toFixed(2).replace('.', ',')}
                     </p>
-                    <p className="text-[9px] text-muted-foreground/50 font-mono mt-0.5">
+                    <p className="text-[11px] text-muted-foreground/50 font-mono mt-0.5">
                       Pagamento via Mercado Pago
                     </p>
                   </>
                 ) : (
                   <div className="flex sm:flex-col items-center sm:items-end gap-2 sm:gap-1">
                     <Heart className="h-5 w-5 text-neon-cyan" />
-                    <p className="text-sm font-black text-neon-cyan uppercase tracking-widest">Voluntário</p>
-                    <p className="text-[9px] text-muted-foreground/50 font-mono hidden sm:block">Sem recompensa</p>
+                    <p className="text-sm font-bold text-neon-cyan  ">Voluntário</p>
+                    <p className="text-[11px] text-muted-foreground/50 font-mono hidden sm:block">Sem recompensa</p>
                   </div>
                 )}
               </div>
             </div>
 
             {/* Description */}
-            <div className="bg-[#030304] border border-white/5 p-5">
-              <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-mono mb-3">DESCRIÇÃO</p>
+            <div className="bg-surface border border-border/60 p-5">
+              <p className="text-xs   text-muted-foreground font-mono mb-3">DESCRIÇÃO</p>
               <p className="text-sm text-foreground/80 leading-relaxed whitespace-pre-wrap">{bounty.description}</p>
             </div>
 
             {/* Meta info */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs font-mono border-t border-white/5 pt-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs font-mono border-t border-border/60 pt-4">
               <div>
-                <p className="text-[10px] text-muted-foreground uppercase tracking-widest mb-1">Solicitante</p>
+                <p className="text-xs text-muted-foreground   mb-1">Solicitante</p>
                 <Link to={`/modder/${bounty.profiles?.user_id}`} className="flex items-center gap-1 text-neon-purple hover:underline">
                   <User className="h-3 w-3" />
                   {bounty.profiles?.display_name ?? bounty.profiles?.username ?? "Anônimo"}
                 </Link>
               </div>
               <div>
-                <p className="text-[10px] text-muted-foreground uppercase tracking-widest mb-1">Postado</p>
+                <p className="text-xs text-muted-foreground   mb-1">Postado</p>
                 <span className="flex items-center gap-1 text-muted-foreground">
                   <Clock className="h-3 w-3" />
                   {formatDistanceToNow(new Date(bounty.created_at), { locale: ptBR, addSuffix: true })}
@@ -478,7 +478,7 @@ export default function BountyDetail() {
               </div>
               {bounty.deadline && (
                 <div>
-                  <p className="text-[10px] text-muted-foreground uppercase tracking-widest mb-1">Prazo</p>
+                  <p className="text-xs text-muted-foreground   mb-1">Prazo</p>
                   <span className={`flex items-center gap-1 ${isDeadlineExpired ? "text-destructive" : "text-muted-foreground"}`}>
                     <Calendar className="h-3 w-3" />
                     {new Date(bounty.deadline).toLocaleDateString("pt-BR")}
@@ -486,7 +486,7 @@ export default function BountyDetail() {
                 </div>
               )}
               <div>
-                <p className="text-[10px] text-muted-foreground uppercase tracking-widest mb-1">Tipo</p>
+                <p className="text-xs text-muted-foreground   mb-1">Tipo</p>
                 <span className={`flex items-center gap-1 ${isPaid ? "text-neon-green" : "text-neon-cyan"}`}>
                   {isPaid ? <DollarSign className="h-3 w-3" /> : <Heart className="h-3 w-3" />}
                   {isPaid ? `R$ ${rewardAmount.toFixed(2).replace('.', ',')}` : "Voluntário"}
@@ -497,7 +497,7 @@ export default function BountyDetail() {
             {/* Delivery info */}
             {bounty.status === "in_progress" && (isRequester || bounty.assigned_modder_id === user?.id) && (
               <div className="bg-neon-cyan/5 border border-neon-cyan/20 p-4">
-                <p className="text-[10px] uppercase tracking-widest text-neon-cyan font-mono font-bold mb-2">🔐 Entrega Segura (Escrow)</p>
+                <p className="text-xs   text-neon-cyan font-mono font-bold mb-2">🔐 Entrega Segura (Escrow)</p>
                 <p className="text-xs text-foreground/70 leading-relaxed">
                   O modder envia o script .lua pelo botão de upload no chat. O arquivo fica <strong className="text-neon-green">protegido e trancado</strong> até o pagamento ser confirmado.
                 </p>
@@ -508,18 +508,18 @@ export default function BountyDetail() {
                 </ul>
                 {isPaid && !isPurchaseCompleted && isRequester && (
                   <div className="mt-3 p-3 bg-neon-green/5 border border-neon-green/20">
-                    <p className="text-[10px] text-neon-green font-mono font-bold mb-1">💰 Pagamento Pendente</p>
-                    <p className="text-[10px] text-foreground/60">
+                    <p className="text-xs text-neon-green font-mono font-bold mb-1">💰 Pagamento Pendente</p>
+                    <p className="text-xs text-foreground/60">
                       Ao clicar em "Pagar e Concluir", o download do script será liberado automaticamente.
                     </p>
-                    <div className="flex gap-4 mt-2 text-[9px] text-muted-foreground font-mono">
+                    <div className="flex gap-4 mt-2 text-[11px] text-muted-foreground font-mono">
                       <span>Pix: R$ {pixTotal.toFixed(2).replace('.', ',')} (+1%)</span>
                       <span>Cartão: R$ {cardTotal.toFixed(2).replace('.', ',')} (+4,99%)</span>
                     </div>
                   </div>
                 )}
                 {isPurchaseCompleted && (
-                  <p className="text-[10px] text-neon-green font-mono mt-2">✅ Pagamento confirmado — download liberado!</p>
+                  <p className="text-xs text-neon-green font-mono mt-2">✅ Pagamento confirmado — download liberado!</p>
                 )}
 
                 {/* Unified action area — pay OR download */}
@@ -527,14 +527,14 @@ export default function BountyDetail() {
                   <div className="mt-4 p-4 bg-neon-green/5 border-2 border-neon-green/30 space-y-3">
                     <div className="flex items-center gap-2">
                       <Trophy className="h-4 w-4 text-neon-green" />
-                      <p className="text-xs font-black text-neon-green uppercase tracking-widest">Script aprovado — pronto para pagar!</p>
+                      <p className="text-xs font-bold text-neon-green  ">Script aprovado — pronto para pagar!</p>
                     </div>
-                    <p className="text-[10px] text-foreground/60 font-mono">
+                    <p className="text-xs text-foreground/60 font-mono">
                       O download será liberado automaticamente após a confirmação do pagamento.
                     </p>
                     <Button
                       onClick={handleMarkCompleted}
-                      className="w-full bg-neon-green/20 hover:bg-neon-green/30 text-neon-green border border-neon-green/50 rounded-none font-black uppercase tracking-widest text-xs h-12"
+                      className="w-full bg-neon-green/20 hover:bg-neon-green/30 text-neon-green border border-neon-green/50 rounded-md font-bold   text-xs h-12"
                     >
                       <DollarSign className="h-4 w-4 mr-2" />
                       Pagar R$ {rewardAmount.toFixed(2).replace('.', ',')} e Liberar Download
@@ -545,9 +545,9 @@ export default function BountyDetail() {
                   <div className="mt-4 p-4 bg-neon-green/5 border-2 border-neon-green/30 space-y-2">
                     <div className="flex items-center gap-2">
                       <CheckCircle className="h-4 w-4 text-neon-green" />
-                      <p className="text-xs font-black text-neon-green uppercase tracking-widest">Pagamento confirmado!</p>
+                      <p className="text-xs font-bold text-neon-green  ">Pagamento confirmado!</p>
                     </div>
-                    <p className="text-[10px] text-foreground/60 font-mono">
+                    <p className="text-xs text-foreground/60 font-mono">
                       O download do script está disponível na seção de entregas abaixo. 👇
                     </p>
                   </div>
@@ -557,13 +557,13 @@ export default function BountyDetail() {
 
             {/* Owner/Admin actions */}
             {(isRequester || isAdmin) && bounty.status !== "completed" && bounty.status !== "cancelled" && (
-              <div className="flex flex-wrap gap-2 border-t border-white/5 pt-4">
+              <div className="flex flex-wrap gap-2 border-t border-border/60 pt-4">
                 {bounty.status === "in_progress" && (
                   <Button
                     onClick={handleMarkCompleted}
                     size="sm"
                     disabled={isRequester && !isAdmin && (hasOpenDispute || (isPaid && hasAnyDelivery && !hasApprovedDelivery))}
-                    className="bg-neon-green/10 hover:bg-neon-green/20 text-neon-green border border-neon-green/30 rounded-none font-black uppercase tracking-widest text-[10px] disabled:opacity-30"
+                    className="bg-neon-green/10 hover:bg-neon-green/20 text-neon-green border border-neon-green/30 rounded-md font-bold   text-xs disabled:opacity-30"
                   >
                     <Trophy className="h-3.5 w-3.5 mr-1.5" />
                     {isPaid && isRequester && !isPurchaseCompleted
@@ -571,7 +571,7 @@ export default function BountyDetail() {
                       : "Marcar Concluída"}
                   </Button>
                 )}
-                <Button onClick={handleCancelBounty} size="sm" variant="outline" className="border-destructive/30 text-destructive hover:bg-destructive/10 rounded-none font-black uppercase tracking-widest text-[10px]">
+                <Button onClick={handleCancelBounty} size="sm" variant="outline" className="border-destructive/30 text-destructive hover:bg-destructive/10 rounded-md font-bold   text-xs">
                   <XCircle className="h-3.5 w-3.5 mr-1.5" /> Cancelar Encomenda
                 </Button>
               </div>
@@ -580,51 +580,51 @@ export default function BountyDetail() {
             {/* Admin Panel */}
             {isAdmin && (
               <div className="border border-neon-purple/20 bg-neon-purple/5 p-4 space-y-3">
-                <p className="text-[10px] font-black uppercase tracking-widest text-neon-purple flex items-center gap-1.5">
+                <p className="text-xs font-bold   text-neon-purple flex items-center gap-1.5">
                   <Shield className="h-3.5 w-3.5" /> Painel Admin
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {bounty.status !== "open" && (
                     <Button size="sm" variant="outline" onClick={() => handleChangeStatus("open")}
-                      className="rounded-none text-[10px] font-bold uppercase tracking-widest border-neon-green/20 text-neon-green hover:bg-neon-green/10">
+                      className="rounded-md text-xs font-bold   border-neon-green/20 text-neon-green hover:bg-neon-green/10">
                       <RefreshCw className="h-3 w-3 mr-1" /> Reabrir
                     </Button>
                   )}
                   {bounty.status !== "completed" && (
                     <Button size="sm" variant="outline" onClick={() => handleChangeStatus("completed")}
-                      className="rounded-none text-[10px] font-bold uppercase tracking-widest border-neon-purple/20 text-neon-purple hover:bg-neon-purple/10">
+                      className="rounded-md text-xs font-bold   border-neon-purple/20 text-neon-purple hover:bg-neon-purple/10">
                       <Trophy className="h-3 w-3 mr-1" /> Forçar Conclusão
                     </Button>
                   )}
                   {bounty.status !== "cancelled" && (
                     <Button size="sm" variant="outline" onClick={() => handleChangeStatus("cancelled")}
-                      className="rounded-none text-[10px] font-bold uppercase tracking-widest border-destructive/20 text-destructive hover:bg-destructive/10">
+                      className="rounded-md text-xs font-bold   border-destructive/20 text-destructive hover:bg-destructive/10">
                       <XCircle className="h-3 w-3 mr-1" /> Forçar Cancelamento
                     </Button>
                   )}
                   {bounty.assigned_modder_id && (
                     <Button size="sm" variant="outline" onClick={handleUnassignModder}
-                      className="rounded-none text-[10px] font-bold uppercase tracking-widest border-yellow-500/20 text-yellow-500 hover:bg-yellow-500/10">
+                      className="rounded-md text-xs font-bold   border-yellow-500/20 text-yellow-500 hover:bg-yellow-500/10">
                       <UserMinus className="h-3 w-3 mr-1" /> Desatribuir Modder
                     </Button>
                   )}
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
                       <Button size="sm" variant="outline"
-                        className="rounded-none text-[10px] font-bold uppercase tracking-widest border-destructive/30 text-destructive hover:bg-destructive/10">
+                        className="rounded-md text-xs font-bold   border-destructive/30 text-destructive hover:bg-destructive/10">
                         <Trash2 className="h-3 w-3 mr-1" /> Excluir Encomenda
                       </Button>
                     </AlertDialogTrigger>
-                    <AlertDialogContent className="bg-[#050505] border-white/10 rounded-none">
+                    <AlertDialogContent className="bg-card border-border rounded-md">
                       <AlertDialogHeader>
-                        <AlertDialogTitle className="text-white">Excluir encomenda?</AlertDialogTitle>
+                        <AlertDialogTitle className="text-foreground">Excluir encomenda?</AlertDialogTitle>
                         <AlertDialogDescription>
                           Isso excluirá permanentemente a encomenda, todas as candidaturas, mensagens e pagamentos. Essa ação não pode ser desfeita.
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>
-                        <AlertDialogCancel className="rounded-none">Cancelar</AlertDialogCancel>
-                        <AlertDialogAction onClick={handleDeleteBounty} className="bg-destructive hover:bg-destructive/90 rounded-none">
+                        <AlertDialogCancel className="rounded-md">Cancelar</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleDeleteBounty} className="bg-destructive hover:bg-destructive/90 rounded-md">
                           Excluir
                         </AlertDialogAction>
                       </AlertDialogFooter>
@@ -637,19 +637,19 @@ export default function BountyDetail() {
         </div>
 
         {/* Applications Section */}
-        <div className="border border-white/5 bg-[#050505]">
-          <div className="p-5 border-b border-white/5 bg-[#030304] flex items-center justify-between">
-            <h2 className="text-sm font-black uppercase tracking-widest flex items-center gap-2 text-white">
+        <div className="border border-border/60 bg-card">
+          <div className="p-5 border-b border-border/60 bg-surface flex items-center justify-between">
+            <h2 className="text-sm font-bold   flex items-center gap-2 text-foreground">
               <Shield className="h-4 w-4 text-neon-purple" />
               Candidaturas {(isRequester || isAdmin) ? `(${applications?.length ?? 0})` : ""}
             </h2>
-            {bounty.status === "open" && <span className="text-[10px] font-mono text-neon-green animate-pulse">● ACEITANDO</span>}
+            {bounty.status === "open" && <span className="text-xs font-mono text-neon-green animate-pulse">● ACEITANDO</span>}
           </div>
 
           <div className="p-5 space-y-4">
             {isModder && !isRequester && bounty.status === "open" && !hasApplied && (
-              <div className="bg-[#030304] border border-neon-purple/20 p-5 space-y-3">
-                <p className="text-[10px] font-black uppercase tracking-widest text-neon-purple">Enviar Candidatura</p>
+              <div className="bg-surface border border-neon-purple/20 p-5 space-y-3">
+                <p className="text-xs font-bold   text-neon-purple">Enviar Candidatura</p>
                 {isPaid && (
                   <p className="text-xs text-neon-green/70 font-mono">
                     💰 Recompensa: R$ {rewardAmount.toFixed(2).replace('.', ',')} (você recebe 80%)
@@ -666,12 +666,12 @@ export default function BountyDetail() {
                   value={applyMessage}
                   onChange={(e) => setApplyMessage(e.target.value)}
                   rows={4}
-                  className="bg-[#050505] border-white/10 focus-visible:ring-neon-purple rounded-none text-sm font-mono resize-none"
+                  className="bg-card border-border focus-visible:ring-neon-purple rounded-md text-sm font-mono resize-none"
                 />
                 <Button
                   onClick={handleApply}
                   disabled={applying}
-                  className="bg-neon-purple hover:bg-neon-purple/90 text-white rounded-none font-black uppercase tracking-widest text-[10px] h-10 px-6"
+                  className="bg-neon-purple hover:bg-neon-purple/90 text-primary-foreground rounded-md font-bold   text-xs h-10 px-6"
                 >
                   <Send className="h-3.5 w-3.5 mr-2" />
                   {applying ? "Enviando..." : "Candidatar-se"}
@@ -690,7 +690,7 @@ export default function BountyDetail() {
               <div className={`p-4 border text-sm font-mono ${
                 myApplication.status === "accepted" ? "border-neon-green/30 bg-neon-green/5 text-neon-green" :
                 myApplication.status === "rejected" ? "border-destructive/30 bg-destructive/5 text-destructive" :
-                "border-white/10 bg-white/5 text-muted-foreground"
+                "border-border bg-secondary/60 text-muted-foreground"
               }`}>
                 {myApplication.status === "accepted" && "✅ Sua candidatura foi aceita! Use o chat abaixo para comunicação."}
                 {myApplication.status === "rejected" && "❌ Sua candidatura foi recusada."}
@@ -710,23 +710,23 @@ export default function BountyDetail() {
                   {applications.map((app: any) => (
                     <div key={app.id} className={`p-4 border transition-colors ${
                       app.status === "accepted" ? "border-neon-green/30 bg-neon-green/5" :
-                      app.status === "rejected" ? "border-white/5 opacity-40" :
-                      "border-white/5 bg-[#030304]"
+                      app.status === "rejected" ? "border-border/60 opacity-40" :
+                      "border-border/60 bg-surface"
                     }`}>
                       <div className="flex items-start justify-between gap-3">
                         <div className="space-y-1 flex-1">
                           <div className="flex items-center gap-2">
-                            <Link to={`/modder/${app.profiles?.user_id}`} className="text-xs font-black text-neon-cyan hover:underline font-mono">
+                            <Link to={`/modder/${app.profiles?.user_id}`} className="text-xs font-bold text-neon-cyan hover:underline font-mono">
                               @{app.profiles?.display_name ?? app.profiles?.username}
                             </Link>
-                            <span className="text-[10px] text-muted-foreground/50 font-mono">
+                            <span className="text-xs text-muted-foreground/50 font-mono">
                               {formatDistanceToNow(new Date(app.created_at), { locale: ptBR, addSuffix: true })}
                             </span>
                             {app.status === "accepted" && (
-                              <Badge variant="outline" className="text-[10px] rounded-none text-neon-green border-neon-green/30 bg-neon-green/10">Aceito</Badge>
+                              <Badge variant="outline" className="text-xs rounded-md text-neon-green border-neon-green/30 bg-neon-green/10">Aceito</Badge>
                             )}
                             {app.status === "rejected" && (
-                              <Badge variant="outline" className="text-[10px] rounded-none text-destructive border-destructive/30 bg-destructive/10">Recusado</Badge>
+                              <Badge variant="outline" className="text-xs rounded-md text-destructive border-destructive/30 bg-destructive/10">Recusado</Badge>
                             )}
                           </div>
                           <p className="text-sm text-foreground/70 leading-relaxed">{app.message}</p>
@@ -736,7 +736,7 @@ export default function BountyDetail() {
                             <Button
                               size="sm"
                               onClick={() => handleAcceptModder(app)}
-                              className="shrink-0 bg-neon-green/10 hover:bg-neon-green/20 text-neon-green border border-neon-green/30 rounded-none font-black uppercase tracking-widest text-[10px] h-8 px-3"
+                              className="shrink-0 bg-neon-green/10 hover:bg-neon-green/20 text-neon-green border border-neon-green/30 rounded-md font-bold   text-xs h-8 px-3"
                             >
                               <CheckCircle className="h-3.5 w-3.5 mr-1" />
                               Aceitar
@@ -747,7 +747,7 @@ export default function BountyDetail() {
                               size="sm"
                               variant="outline"
                               onClick={() => handleDeleteApplication(app.id)}
-                              className="h-8 w-8 p-0 border-destructive/20 text-destructive hover:bg-destructive/10 rounded-none"
+                              className="h-8 w-8 p-0 border-destructive/20 text-destructive hover:bg-destructive/10 rounded-md"
                             >
                               <Trash2 className="h-3 w-3" />
                             </Button>
@@ -782,9 +782,9 @@ export default function BountyDetail() {
 
         {/* Payment Dialog */}
         <Dialog open={showPaymentDialog} onOpenChange={setShowPaymentDialog}>
-          <DialogContent className="bg-[#050505] border-white/10 rounded-none max-w-md">
+          <DialogContent className="bg-card border-border rounded-md max-w-md">
             <DialogHeader>
-              <DialogTitle className="text-white font-black uppercase tracking-widest text-sm">
+              <DialogTitle className="text-foreground font-bold   text-sm">
                 💰 Pagar Encomenda
               </DialogTitle>
               <DialogDescription className="text-muted-foreground text-xs">
@@ -801,13 +801,13 @@ export default function BountyDetail() {
                     className={`p-4 border text-left transition-colors ${
                       paymentMethod === "pix"
                         ? "border-neon-green/50 bg-neon-green/5"
-                        : "border-white/10 bg-[#030304] hover:border-white/20"
+                        : "border-border bg-surface hover:border-white/20"
                     }`}
                   >
                     <QrCode className={`h-5 w-5 mb-2 ${paymentMethod === "pix" ? "text-neon-green" : "text-muted-foreground"}`} />
-                    <p className="text-xs font-black uppercase text-white">Pix</p>
-                    <p className="text-[10px] text-muted-foreground mt-0.5">Taxa: 1%</p>
-                    <p className="text-sm font-black text-neon-green mt-1 font-mono">
+                    <p className="text-xs font-bold  text-foreground">Pix</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">Taxa: 1%</p>
+                    <p className="text-sm font-bold text-neon-green mt-1 font-mono">
                       R$ {pixTotal.toFixed(2).replace('.', ',')}
                     </p>
                   </button>
@@ -816,20 +816,20 @@ export default function BountyDetail() {
                     className={`p-4 border text-left transition-colors ${
                       paymentMethod === "card"
                         ? "border-neon-cyan/50 bg-neon-cyan/5"
-                        : "border-white/10 bg-[#030304] hover:border-white/20"
+                        : "border-border bg-surface hover:border-white/20"
                     }`}
                   >
                     <CreditCard className={`h-5 w-5 mb-2 ${paymentMethod === "card" ? "text-neon-cyan" : "text-muted-foreground"}`} />
-                    <p className="text-xs font-black uppercase text-white">Cartão</p>
-                    <p className="text-[10px] text-muted-foreground mt-0.5">Taxa: 4,99%</p>
-                    <p className="text-sm font-black text-neon-cyan mt-1 font-mono">
+                    <p className="text-xs font-bold  text-foreground">Cartão</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">Taxa: 4,99%</p>
+                    <p className="text-sm font-bold text-neon-cyan mt-1 font-mono">
                       R$ {cardTotal.toFixed(2).replace('.', ',')}
                     </p>
                   </button>
                 </div>
 
                 {/* Breakdown */}
-                <div className="bg-[#030304] border border-white/5 p-3 space-y-1.5 text-xs font-mono">
+                <div className="bg-surface border border-border/60 p-3 space-y-1.5 text-xs font-mono">
                   <div className="flex justify-between text-muted-foreground">
                     <span>Recompensa</span>
                     <span>R$ {rewardAmount.toFixed(2).replace('.', ',')}</span>
@@ -838,11 +838,11 @@ export default function BountyDetail() {
                     <span>Taxa ({paymentMethod === "pix" ? "1%" : "4,99%"})</span>
                     <span>R$ {(paymentMethod === "pix" ? pixFee : cardFee).toFixed(2).replace('.', ',')}</span>
                   </div>
-                  <div className="flex justify-between text-white font-bold border-t border-white/10 pt-1.5">
+                  <div className="flex justify-between text-foreground font-bold border-t border-border pt-1.5">
                     <span>Total</span>
                     <span>R$ {(paymentMethod === "pix" ? pixTotal : cardTotal).toFixed(2).replace('.', ',')}</span>
                   </div>
-                  <div className="flex justify-between text-neon-green/70 text-[10px]">
+                  <div className="flex justify-between text-neon-green/70 text-xs">
                     <span>Modder recebe (80%)</span>
                     <span>R$ {(rewardAmount * 0.8).toFixed(2).replace('.', ',')}</span>
                   </div>
@@ -851,7 +851,7 @@ export default function BountyDetail() {
                 <Button
                   onClick={handleInitPayment}
                   disabled={paymentLoading}
-                  className="w-full bg-neon-green/10 hover:bg-neon-green/20 text-neon-green border border-neon-green/30 rounded-none font-black uppercase tracking-widest text-[10px] h-11"
+                  className="w-full bg-neon-green/10 hover:bg-neon-green/20 text-neon-green border border-neon-green/30 rounded-md font-bold   text-xs h-11"
                 >
                   {paymentLoading ? (
                     <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Processando...</>
@@ -876,18 +876,18 @@ export default function BountyDetail() {
 
                 {pixData.qr_code && (
                   <div className="space-y-2">
-                    <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-mono">Pix Copia e Cola</p>
+                    <p className="text-xs text-muted-foreground   font-mono">Pix Copia e Cola</p>
                     <div className="flex gap-2">
                       <input
                         readOnly
                         value={pixData.qr_code}
-                        className="flex-1 bg-[#030304] border border-white/10 px-3 py-2 text-[10px] font-mono text-foreground/70 truncate"
+                        className="flex-1 bg-surface border border-border px-3 py-2 text-xs font-mono text-foreground/70 truncate"
                       />
                       <Button
                         onClick={handleCopyPix}
                         size="sm"
                         variant="outline"
-                        className="rounded-none border-neon-green/30 text-neon-green hover:bg-neon-green/10 shrink-0"
+                        className="rounded-md border-neon-green/30 text-neon-green hover:bg-neon-green/10 shrink-0"
                       >
                         {copied ? <CheckCheck className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
                       </Button>
@@ -912,7 +912,7 @@ export default function BountyDetail() {
                       </p>
                     </>
                   ) : (
-                    <p className="text-[10px] text-muted-foreground/50 font-mono text-center">
+                    <p className="text-xs text-muted-foreground/50 font-mono text-center">
                       O pagamento será confirmado automaticamente após o Pix.
                     </p>
                   )}
@@ -926,7 +926,7 @@ export default function BountyDetail() {
                     setShowPaymentDialog(false); 
                   }}
                   variant="outline"
-                  className="w-full rounded-none text-[10px] font-bold uppercase tracking-widest"
+                  className="w-full rounded-md text-xs font-bold  "
                 >
                   Fechar
                 </Button>

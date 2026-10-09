@@ -4,6 +4,7 @@ import { detectLuaObfuscation } from "@/lib/lua-obfuscation";
 import LuaCodeEditor from "@/components/LuaCodeEditor";
 import ScriptAnalysis, { type AnalysisResult } from "@/components/ScriptAnalysis";
 import { useParams, useNavigate } from "react-router-dom";
+import { PageHeader } from "@/components/layout/PageHeader";
 import { Layout } from "@/components/layout/Layout";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
@@ -26,9 +27,9 @@ import {
 import { Navigate } from "react-router-dom";
 
 const SectionCard = ({ icon: Icon, title, hint, children }: any) => (
-  <Card className="border-white/5 bg-card/40 rounded-xl shadow-none">
-    <CardHeader className="pb-3 border-b border-white/5">
-      <CardTitle className="text-xs font-black uppercase tracking-[0.18em] flex items-center gap-2 text-foreground/90">
+  <Card className="border-border/60 bg-card rounded-xl shadow-none">
+    <CardHeader className="pb-3 border-b border-border/60">
+      <CardTitle className="text-base font-semibold flex items-center gap-2 text-foreground/90">
         <Icon className="h-3.5 w-3.5 text-neon-purple" /> {title}
       </CardTitle>
       {hint && <p className="text-[11px] text-muted-foreground mt-1">{hint}</p>}
@@ -38,7 +39,7 @@ const SectionCard = ({ icon: Icon, title, hint, children }: any) => (
 );
 
 const FieldLabel = ({ children }: { children: React.ReactNode }) => (
-  <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{children}</Label>
+  <Label className="text-xs font-medium text-muted-foreground">{children}</Label>
 );
 
 const inputCls = "bg-white/[0.03] border-white/10 focus-visible:border-neon-purple/50 focus-visible:ring-neon-purple/20 h-10";
@@ -432,7 +433,7 @@ export default function ScriptEditor() {
       archived: { label: "Arquivado", cls: "bg-destructive/10 text-destructive border-destructive/30" },
     };
     const m = map[publishStatus] ?? { label: publishStatus, cls: "bg-white/5 text-muted-foreground border-white/10" };
-    return <Badge variant="outline" className={`text-[10px] uppercase tracking-widest font-bold ${m.cls}`}>{m.label}</Badge>;
+    return <Badge variant="outline" className={`text-xs   font-bold ${m.cls}`}>{m.label}</Badge>;
   };
 
 
@@ -444,20 +445,10 @@ export default function ScriptEditor() {
         </Button>
 
         {/* Header */}
-        <div className="flex items-start justify-between gap-4 mb-8">
-          <div className="min-w-0">
-            <h1 className="text-2xl sm:text-3xl font-black tracking-tight flex items-center gap-2">
-              {isApk && <Smartphone className="h-6 w-6 text-neon-cyan" />}
-              {isEditing ? `Editar ${entityLabel}` : `Novo ${entityLabel}`}
-            </h1>
-            <p className="text-xs text-muted-foreground mt-1">
-              {isApk
-                ? "Publique um APK modificado. Preencha versão, tamanho e changelog para os usuários."
-                : "Preencha as informações abaixo. Você pode salvar como rascunho a qualquer momento."}
-            </p>
-          </div>
-          {statusBadge()}
-        </div>
+        <PageHeader eyebrow={isApk ? "PUBLICAR / APK MOD" : "PUBLICAR / SCRIPT LUA"}
+          title={isEditing ? `Editar ${entityLabel}` : `Novo ${entityLabel}`}
+          description={isApk ? "Apresente seu APK, os recursos do mod e as informações de instalação." : "Organize seu código, adicione uma capa e escolha como publicar."}
+          actions={statusBadge()} />
 
         <div className="space-y-5">
           {/* 1. Fundamentos */}
@@ -465,11 +456,11 @@ export default function ScriptEditor() {
             <div className="space-y-2">
               <FieldLabel>Tipo de projeto</FieldLabel>
               <Tabs value={scriptType} onValueChange={setScriptType} className="w-full">
-                <TabsList className="grid w-full max-w-xs grid-cols-2 bg-white/5 border border-white/10 p-1 h-10">
-                  <TabsTrigger value="script" className="gap-2 text-xs data-[state=active]:bg-neon-purple data-[state=active]:text-white">
+                <TabsList className="grid w-full max-w-xs grid-cols-2 bg-secondary/60 border border-border p-1 h-10">
+                  <TabsTrigger value="script" className="gap-2 text-xs data-[state=active]:bg-neon-purple data-[state=active]:text-primary-foreground">
                     <Code className="h-3.5 w-3.5" /> Lua Script
                   </TabsTrigger>
-                  <TabsTrigger value="apk" className="gap-2 text-xs data-[state=active]:bg-neon-cyan data-[state=active]:text-white">
+                  <TabsTrigger value="apk" className="gap-2 text-xs data-[state=active]:bg-neon-cyan data-[state=active]:text-primary-foreground">
                     <Smartphone className="h-3.5 w-3.5" /> APK Mod
                   </TabsTrigger>
                 </TabsList>
@@ -493,7 +484,7 @@ export default function ScriptEditor() {
                 <FieldLabel>Categoria</FieldLabel>
                 <Select value={categoryId} onValueChange={setCategoryId}>
                   <SelectTrigger className={inputCls}><SelectValue placeholder="Selecione" /></SelectTrigger>
-                  <SelectContent className="bg-[#0a0a0c] border-white/10">
+                  <SelectContent className="bg-surface border-border">
                     {categories?.map((c: any) => (<SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>))}
                   </SelectContent>
                 </Select>
@@ -502,7 +493,7 @@ export default function ScriptEditor() {
                 <FieldLabel>Status operacional</FieldLabel>
                 <Select value={status} onValueChange={setStatus}>
                   <SelectTrigger className={inputCls}><SelectValue /></SelectTrigger>
-                  <SelectContent className="bg-[#0a0a0c] border-white/10">
+                  <SelectContent className="bg-surface border-border">
                     <SelectItem value="working" className="text-neon-green">Working</SelectItem>
                     <SelectItem value="detected" className="text-neon-pink">Detected</SelectItem>
                     <SelectItem value="updating" className="text-neon-cyan">Updating</SelectItem>
@@ -518,7 +509,7 @@ export default function ScriptEditor() {
                 onChange={(e) => setDescription(e.target.value)}
                 rows={4}
                 placeholder={isApk ? "Explique quais recursos foram desbloqueados/modificados neste mod do jogo (ex: aimbot, wallhack, skins, moedas ilimitadas)..." : "Explique o que o script faz e como usar..."}
-                className="bg-white/[0.03] border-white/10 focus-visible:border-neon-purple/50 focus-visible:ring-neon-purple/20 resize-none"
+                className="bg-surface border-border focus-visible:border-neon-purple/50 focus-visible:ring-neon-purple/20 resize-none"
               />
             </div>
           </SectionCard>
@@ -558,7 +549,7 @@ export default function ScriptEditor() {
                     onChange={(e) => setApkChangelog(e.target.value)}
                     rows={4}
                     placeholder="- Aimbot ativado&#10;- Wallhack / ESP&#10;- Skins desbloqueadas&#10;- Anti-ban integrado..."
-                    className="bg-white/[0.03] border-white/10 focus-visible:border-neon-cyan/50 focus-visible:ring-neon-cyan/20 resize-none font-mono text-xs"
+                    className="bg-surface border-border focus-visible:border-neon-cyan/50 focus-visible:ring-neon-cyan/20 resize-none font-mono text-xs"
                   />
                 </div>
               </div>
@@ -576,7 +567,7 @@ export default function ScriptEditor() {
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <FieldLabel>Enviar arquivo .lua (opcional)</FieldLabel>
-                  {file && <span className="text-[10px] font-mono text-neon-cyan truncate max-w-[200px]">{file.name}</span>}
+                  {file && <span className="text-xs font-mono text-neon-cyan truncate max-w-[200px]">{file.name}</span>}
                 </div>
                 <Input
                   type="file"
@@ -594,13 +585,13 @@ export default function ScriptEditor() {
                     };
                     reader.readAsText(f);
                   }}
-                  className="bg-white/[0.03] border-white/10 h-10 file:bg-neon-cyan/20 file:text-neon-cyan file:border-none file:px-3 file:mr-3 file:text-xs file:font-bold hover:file:bg-neon-cyan/30 cursor-pointer"
+                  className="bg-surface border-border h-10 file:bg-neon-cyan/20 file:text-neon-cyan file:border-none file:px-3 file:mr-3 file:text-xs file:font-bold hover:file:bg-neon-cyan/30 cursor-pointer"
                 />
               </div>
 
               <div className="space-y-2">
                 <FieldLabel>Código-fonte (editável)</FieldLabel>
-                <div className="rounded-lg overflow-hidden border border-white/10 bg-[hsl(240,15%,3%)]">
+                <div className="rounded-lg overflow-hidden border border-border bg-surface">
                   <LuaCodeEditor
                     value={luaCode}
                     onChange={setLuaCode}
@@ -611,9 +602,9 @@ export default function ScriptEditor() {
               </div>
 
               {luaCode.trim().length > 10 && (
-                <div className="pt-2 border-t border-white/5">
+                <div className="pt-2 border-t border-border/60">
                   <div className="mb-3">
-                    <h4 className="text-[11px] font-black uppercase tracking-widest text-neon-green">Análise de segurança</h4>
+                    <h4 className="text-[11px] font-bold   text-neon-green">Análise de segurança</h4>
                     <p className="text-[11px] text-muted-foreground mt-0.5">Verificamos o código antes da publicação.</p>
                   </div>
                   <ScriptAnalysis code={luaCode} scriptId={id} onAnalysisComplete={setLastAnalysis} />
@@ -633,7 +624,7 @@ export default function ScriptEditor() {
                 <div className="flex items-center justify-between">
                   <FieldLabel>Arquivo .apk *</FieldLabel>
                   {apkFile && (
-                    <span className="text-[10px] font-mono text-neon-cyan truncate max-w-[220px]">
+                    <span className="text-xs font-mono text-neon-cyan truncate max-w-[220px]">
                       {apkFile.name} · {(apkFile.size / (1024 * 1024)).toFixed(1)}MB
                     </span>
                   )}
@@ -664,7 +655,7 @@ export default function ScriptEditor() {
                     setApkUploading(false);
                     toast.success("APK enviado!");
                   }}
-                  className="bg-white/[0.03] border-white/10 h-10 file:bg-neon-cyan/20 file:text-neon-cyan file:border-none file:px-3 file:mr-3 file:text-xs file:font-bold hover:file:bg-neon-cyan/30 cursor-pointer"
+                  className="bg-surface border-border h-10 file:bg-neon-cyan/20 file:text-neon-cyan file:border-none file:px-3 file:mr-3 file:text-xs file:font-bold hover:file:bg-neon-cyan/30 cursor-pointer"
                 />
                 {apkUploading && (
                   <div className="flex items-center gap-2 text-[11px] text-neon-cyan">
@@ -681,7 +672,7 @@ export default function ScriptEditor() {
                   placeholder="https://... (ou cole um link Mediafire/Mega se preferir hospedar fora)"
                   className={inputCls}
                 />
-                <p className="text-[10px] text-muted-foreground">
+                <p className="text-xs text-muted-foreground">
                   Este link é exibido no botão de download da página do APK. Pode ser o upload direto (acima) ou um mirror externo.
                 </p>
               </div>
@@ -715,12 +706,12 @@ export default function ScriptEditor() {
                     setThumbnailUrl(publicUrl);
                     toast.success("Miniatura enviada!");
                   }}
-                  className="bg-white/[0.03] border-white/10 h-10 file:bg-neon-purple/20 file:text-neon-purple file:border-none file:px-3 file:mr-3 file:text-xs file:font-bold hover:file:bg-neon-purple/30 cursor-pointer"
+                  className="bg-surface border-border h-10 file:bg-neon-purple/20 file:text-neon-purple file:border-none file:px-3 file:mr-3 file:text-xs file:font-bold hover:file:bg-neon-purple/30 cursor-pointer"
                 />
               </div>
             </div>
             {thumbnailUrl && (
-              <div className="rounded-lg overflow-hidden border border-white/10 w-32 h-20">
+              <div className="rounded-lg overflow-hidden border border-border w-32 h-20">
                 <img src={thumbnailUrl} alt="preview" className="w-full h-full object-cover" />
               </div>
             )}
@@ -748,7 +739,7 @@ export default function ScriptEditor() {
                   placeholder="Ex: Anti-Ban, Speed Hack..."
                   className={inputCls}
                 />
-                <Button type="button" variant="outline" size="icon" onClick={addFeature} className="h-10 w-10 border-white/10 hover:bg-neon-cyan/10"><Plus className="h-4 w-4 text-neon-cyan" /></Button>
+                <Button type="button" variant="outline" size="icon" onClick={addFeature} className="h-10 w-10 border-border hover:bg-neon-cyan/10"><Plus className="h-4 w-4 text-neon-cyan" /></Button>
               </div>
               {features.length > 0 && (
                 <div className="flex flex-wrap gap-1.5 pt-1">
@@ -772,7 +763,7 @@ export default function ScriptEditor() {
                   placeholder="Ex: roblox, farm..."
                   className={inputCls}
                 />
-                <Button type="button" variant="outline" size="icon" onClick={addTag} className="h-10 w-10 border-white/10 hover:bg-neon-pink/10"><Plus className="h-4 w-4 text-neon-pink" /></Button>
+                <Button type="button" variant="outline" size="icon" onClick={addTag} className="h-10 w-10 border-border hover:bg-neon-pink/10"><Plus className="h-4 w-4 text-neon-pink" /></Button>
               </div>
               {tags.length > 0 && (
                 <div className="flex flex-wrap gap-1.5 pt-1">
@@ -790,7 +781,7 @@ export default function ScriptEditor() {
               <FieldLabel><span className="inline-flex items-center gap-1"><BookOpen className="h-3 w-3" /> Tutorial de apoio</span></FieldLabel>
               <Select value={relatedTutorialId} onValueChange={setRelatedTutorialId}>
                 <SelectTrigger className={inputCls}><SelectValue placeholder="Nenhum tutorial vinculado" /></SelectTrigger>
-                <SelectContent className="bg-[#0a0a0c] border-white/10">
+                <SelectContent className="bg-surface border-border">
                   <SelectItem value="none">Nenhum tutorial vinculado</SelectItem>
                   {tutorials?.map((t: any) => (<SelectItem key={t.id} value={t.id}>{t.title}</SelectItem>))}
                 </SelectContent>
@@ -800,7 +791,7 @@ export default function ScriptEditor() {
 
           {/* 5. Monetização */}
           <SectionCard icon={Lock} title="Monetização" hint={`Defina se o ${entityLabel} é gratuito ou pago${isApk ? "." : " e o modelo de licença."}`}>
-            <div className="flex items-center justify-between p-3 rounded-lg bg-white/[0.03] border border-white/10">
+            <div className="flex items-center justify-between p-3 rounded-lg bg-surface border border-border">
               <div className="flex items-center gap-3 min-w-0">
                 <Switch checked={isPaid} onCheckedChange={setIsPaid} disabled={!!licenseFieldsLocked} className="data-[state=checked]:bg-orange-500" />
                 <div className="space-y-0.5 min-w-0">
@@ -832,7 +823,7 @@ export default function ScriptEditor() {
                     <FieldLabel>Duração da licença</FieldLabel>
                     <Select value={licenseType} onValueChange={setLicenseType} disabled={!!licenseFieldsLocked}>
                       <SelectTrigger className={inputCls}><SelectValue /></SelectTrigger>
-                      <SelectContent className="bg-[#0a0a0c] border-white/10">
+                      <SelectContent className="bg-surface border-border">
                         <SelectItem value="permanent">Permanente (vitalício)</SelectItem>
                         <SelectItem value="monthly">Mensal (30 dias)</SelectItem>
                         <SelectItem value="weekly">Semanal (7 dias)</SelectItem>
@@ -848,13 +839,13 @@ export default function ScriptEditor() {
       </div>
 
       {/* Sticky action bar */}
-      <div className="fixed bottom-0 left-0 right-0 border-t border-white/10 bg-[#050505]/95 backdrop-blur-xl z-40">
+      <div className="fixed bottom-0 left-0 right-0 border-t border-border bg-card/95  z-40">
         <div className="container max-w-4xl py-3 flex flex-col sm:flex-row gap-2">
           <Button
             variant="outline"
             onClick={() => handleSave("draft")}
             disabled={submitting}
-            className="flex-1 h-11 border-white/10 bg-white/5 hover:bg-white/10 font-bold uppercase tracking-widest text-[11px]"
+            className="flex-1 h-11 border-border bg-secondary/60 hover:bg-white/10 font-bold   text-[11px]"
           >
             {submitting ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
             Salvar rascunho
@@ -864,7 +855,7 @@ export default function ScriptEditor() {
             <Button
               onClick={() => handleSave("pending_review")}
               disabled={submitting}
-              className="flex-1 h-11 bg-neon-purple hover:bg-neon-purple/90 text-white font-bold uppercase tracking-widest text-[11px]"
+              className="flex-1 h-11 bg-neon-purple hover:bg-neon-purple/90 text-primary-foreground font-bold   text-[11px]"
             >
               {submitting ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Send className="h-4 w-4 mr-2" />}
               Enviar para aprovação
@@ -875,7 +866,7 @@ export default function ScriptEditor() {
             <Button
               onClick={() => handleSave("published")}
               disabled={submitting || lastAnalysis?.classification === "malicious"}
-              className={`flex-1 h-11 font-bold uppercase tracking-widest text-[11px] ${
+              className={`flex-1 h-11 font-bold   text-[11px] ${
                 lastAnalysis?.classification === "malicious"
                   ? "bg-destructive/20 text-destructive border border-destructive/30 cursor-not-allowed"
                   : "bg-neon-green hover:bg-neon-green/90 text-black"
@@ -891,7 +882,7 @@ export default function ScriptEditor() {
               variant="outline"
               onClick={() => handleSave("archived")}
               disabled={submitting}
-              className="h-11 sm:w-32 border-destructive/20 text-destructive hover:bg-destructive/5 font-bold uppercase tracking-widest text-[11px]"
+              className="h-11 sm:w-32 border-destructive/20 text-destructive hover:bg-destructive/5 font-bold   text-[11px]"
             >
               Arquivar
             </Button>

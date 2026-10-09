@@ -92,16 +92,16 @@ export function AdminWithdrawalsTab() {
   return (
     <div className="space-y-6">
       {/* Platform Revenue Summary */}
-      <Card className="bg-[#050505] border-white/10 rounded-none font-mono">
+      <Card className="bg-card border-border rounded-md font-mono">
         <CardContent className="p-6">
           <div className="flex items-center gap-4">
             <div className="bg-primary/5 border border-primary/20 p-3">
               <LinkIcon className="h-5 w-5 text-primary" />
             </div>
             <div>
-              <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-black">Receita Plataforma (20%)</p>
+              <p className="text-xs text-muted-foreground   font-bold">Receita Plataforma (20%)</p>
               <p className="text-2xl font-bold text-foreground mt-1">R$ {totalPlatformRevenue.toFixed(2)}</p>
-              <p className="text-[9px] text-muted-foreground mt-1">
+              <p className="text-[11px] text-muted-foreground mt-1">
                 {connected.length} modder(s) conectado(s) • Split automático via Mercado Pago Marketplace
               </p>
             </div>
@@ -110,13 +110,13 @@ export function AdminWithdrawalsTab() {
       </Card>
 
       {/* Connected Modders */}
-      <Card className="bg-[#050505] border-white/10 rounded-none font-mono">
-        <CardHeader className="border-b border-white/5 bg-[#030304]">
-          <CardTitle className="text-sm font-black uppercase tracking-widest text-foreground flex items-center gap-2">
+      <Card className="bg-card border-border rounded-md font-mono">
+        <CardHeader className="border-b border-border/60 bg-surface">
+          <CardTitle className="text-sm font-bold   text-foreground flex items-center gap-2">
             <CheckCircle2 className="h-4 w-4 text-accent" />
             Modders Conectados ({connected.length})
           </CardTitle>
-          <CardDescription className="text-[10px] uppercase font-mono mt-1">
+          <CardDescription className="text-xs  font-mono mt-1">
             Pagamentos são divididos automaticamente: 80% modder, 20% plataforma.
           </CardDescription>
         </CardHeader>
@@ -125,20 +125,20 @@ export function AdminWithdrawalsTab() {
             {connected.map(m => {
               const earnings = modderEarnings.get(m.user_id);
               return (
-                <div key={m.user_id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 bg-[#030304] border border-white/5 gap-2">
+                <div key={m.user_id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 bg-surface border border-border/60 gap-2">
                   <div>
                     <p className="text-xs font-bold text-foreground">{m.display_name || m.username}</p>
-                    <p className="text-[9px] text-muted-foreground">
+                    <p className="text-[11px] text-muted-foreground">
                       MP ID: {m.mp_user_id} • Conectado em {new Date(m.mp_connected_at).toLocaleDateString("pt-BR")}
                     </p>
                   </div>
                   <div className="flex items-center gap-3">
                     {earnings && (
-                      <span className="text-[10px] text-muted-foreground">
+                      <span className="text-xs text-muted-foreground">
                         {earnings.count} vendas • R$ {earnings.total.toFixed(2)} recebidos
                       </span>
                     )}
-                    <Badge variant="outline" className="text-[9px] rounded-none border-accent/30 text-accent uppercase tracking-widest">
+                    <Badge variant="outline" className="text-[11px] rounded-md border-accent/30 text-accent  ">
                       Ativo
                     </Badge>
                   </div>
@@ -146,7 +146,7 @@ export function AdminWithdrawalsTab() {
               );
             })}
             {connected.length === 0 && (
-              <p className="text-center text-[10px] text-muted-foreground uppercase tracking-widest py-4">
+              <p className="text-center text-xs text-muted-foreground   py-4">
                 Nenhum modder conectou o Mercado Pago ainda.
               </p>
             )}
@@ -155,28 +155,28 @@ export function AdminWithdrawalsTab() {
       </Card>
 
       {/* Not Connected Modders */}
-      <Card className="bg-[#050505] border-white/10 rounded-none font-mono">
-        <CardHeader className="border-b border-white/5 bg-[#030304]">
-          <CardTitle className="text-sm font-black uppercase tracking-widest text-foreground flex items-center gap-2">
+      <Card className="bg-card border-border rounded-md font-mono">
+        <CardHeader className="border-b border-border/60 bg-surface">
+          <CardTitle className="text-sm font-bold   text-foreground flex items-center gap-2">
             <XCircle className="h-4 w-4 text-destructive" />
             Modders Sem Conexão ({notConnected.length})
           </CardTitle>
-          <CardDescription className="text-[10px] uppercase font-mono mt-1">
+          <CardDescription className="text-xs  font-mono mt-1">
             Estes modders precisam conectar o Mercado Pago para vender scripts pagos.
           </CardDescription>
         </CardHeader>
         <CardContent className="pt-4">
           <div className="space-y-2">
             {notConnected.map(m => (
-              <div key={m.user_id} className="flex items-center justify-between p-3 bg-[#030304] border border-white/5">
+              <div key={m.user_id} className="flex items-center justify-between p-3 bg-surface border border-border/60">
                 <p className="text-xs font-bold text-foreground">{m.display_name || m.username}</p>
-                <Badge variant="outline" className="text-[9px] rounded-none border-destructive/30 text-destructive uppercase tracking-widest">
+                <Badge variant="outline" className="text-[11px] rounded-md border-destructive/30 text-destructive  ">
                   Não conectado
                 </Badge>
               </div>
             ))}
             {notConnected.length === 0 && (
-              <p className="text-center text-[10px] text-muted-foreground uppercase tracking-widest py-4">
+              <p className="text-center text-xs text-muted-foreground   py-4">
                 Todos os modders estão conectados!
               </p>
             )}

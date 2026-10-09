@@ -88,34 +88,34 @@ export function PostBountyDialog({ children }: PostBountyDialogProps) {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         {children ?? (
-          <Button className="bg-neon-purple hover:bg-neon-purple/90 text-white shadow-[0_0_15px_rgba(168,85,247,0.3)] rounded-none font-black uppercase tracking-widest text-xs h-12 px-6">
+          <Button className="bg-neon-purple hover:bg-neon-purple/90 text-primary-foreground shadow-sm rounded-md font-bold   text-xs h-12 px-6">
             <Plus className="mr-2 h-4 w-4" /> Nova Encomenda
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="max-w-lg bg-[#050505] border-white/10 rounded-none p-0 overflow-hidden">
-        <DialogHeader className="p-6 border-b border-white/5 bg-[#030304]">
-          <DialogTitle className="flex items-center gap-2 text-sm font-black uppercase tracking-widest text-white">
+      <DialogContent className="max-w-lg bg-card border-border rounded-md p-0 overflow-hidden">
+        <DialogHeader className="p-6 border-b border-border/60 bg-surface">
+          <DialogTitle className="flex items-center gap-2 text-sm font-bold   text-foreground">
             <Target className="h-4 w-4 text-neon-purple" />
             Postar Nova Encomenda
           </DialogTitle>
-          <p className="text-[10px] text-muted-foreground uppercase tracking-widest mt-1">
+          <p className="text-xs text-muted-foreground   mt-1">
             Descreva o script que você precisa e defina uma recompensa
           </p>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="p-6 space-y-4 font-mono">
           <div className="space-y-2">
-            <Label className="text-[10px] uppercase tracking-widest text-muted-foreground">
+            <Label className="text-xs   text-muted-foreground">
               Tipo de entrega *
             </Label>
             <div className="grid grid-cols-2 gap-2">
               <button
                 type="button"
                 onClick={() => setDeliveryType("script")}
-                className={`flex items-center justify-center gap-2 p-3 border rounded-none text-xs font-black uppercase tracking-widest transition-all ${
+                className={`flex items-center justify-center gap-2 p-3 border rounded-md text-xs font-bold   transition-all ${
                   deliveryType === "script"
                     ? "border-neon-purple bg-neon-purple/10 text-neon-purple"
-                    : "border-white/10 bg-[#030304] text-muted-foreground hover:border-white/20"
+                    : "border-border bg-surface text-muted-foreground hover:border-white/20"
                 }`}
               >
                 <Code2 className="h-4 w-4" /> Script (.lua)
@@ -123,10 +123,10 @@ export function PostBountyDialog({ children }: PostBountyDialogProps) {
               <button
                 type="button"
                 onClick={() => setDeliveryType("apk")}
-                className={`flex items-center justify-center gap-2 p-3 border rounded-none text-xs font-black uppercase tracking-widest transition-all ${
+                className={`flex items-center justify-center gap-2 p-3 border rounded-md text-xs font-bold   transition-all ${
                   deliveryType === "apk"
                     ? "border-neon-green bg-neon-green/10 text-neon-green"
-                    : "border-white/10 bg-[#030304] text-muted-foreground hover:border-white/20"
+                    : "border-border bg-surface text-muted-foreground hover:border-white/20"
                 }`}
               >
                 <Smartphone className="h-4 w-4" /> APK Mod
@@ -135,7 +135,7 @@ export function PostBountyDialog({ children }: PostBountyDialogProps) {
           </div>
 
           <div className="space-y-2">
-            <Label className="text-[10px] uppercase tracking-widest text-muted-foreground">
+            <Label className="text-xs   text-muted-foreground">
               Título da Encomenda *
             </Label>
             <Input
@@ -143,13 +143,13 @@ export function PostBountyDialog({ children }: PostBountyDialogProps) {
               placeholder="Ex: Script de modo deus para Free Fire"
               value={form.title}
               onChange={(e) => setForm({ ...form, title: e.target.value })}
-              className="bg-[#030304] border-white/10 focus-visible:ring-neon-purple rounded-none text-sm"
+              className="bg-surface border-border focus-visible:ring-neon-purple rounded-md text-sm"
               required
             />
           </div>
 
           <div className="space-y-2">
-            <Label className="text-[10px] uppercase tracking-widest text-muted-foreground">
+            <Label className="text-xs   text-muted-foreground">
               Descrição Detalhada *
             </Label>
             <Textarea
@@ -158,14 +158,14 @@ export function PostBountyDialog({ children }: PostBountyDialogProps) {
               value={form.description}
               onChange={(e) => setForm({ ...form, description: e.target.value })}
               rows={4}
-              className="bg-[#030304] border-white/10 focus-visible:ring-neon-purple rounded-none text-sm resize-none"
+              className="bg-surface border-border focus-visible:ring-neon-purple rounded-md text-sm resize-none"
               required
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label className="text-[10px] uppercase tracking-widest text-muted-foreground flex items-center gap-1">
+              <Label className="text-xs   text-muted-foreground flex items-center gap-1">
                 <Gamepad2 className="h-3 w-3" /> Jogo
               </Label>
               <Input
@@ -173,18 +173,18 @@ export function PostBountyDialog({ children }: PostBountyDialogProps) {
                 placeholder="Free Fire, PUBG..."
                 value={form.game_name}
                 onChange={(e) => setForm({ ...form, game_name: e.target.value })}
-                className="bg-[#030304] border-white/10 focus-visible:ring-neon-purple rounded-none text-sm"
+                className="bg-surface border-border focus-visible:ring-neon-purple rounded-md text-sm"
               />
             </div>
             <div className="space-y-2">
-              <Label className="text-[10px] uppercase tracking-widest text-muted-foreground">
+              <Label className="text-xs   text-muted-foreground">
                 Categoria
               </Label>
               <Select value={form.category_id} onValueChange={(v) => setForm({ ...form, category_id: v })}>
-                <SelectTrigger id="bounty-category" className="bg-[#030304] border-white/10 focus:ring-neon-purple rounded-none text-sm">
+                <SelectTrigger id="bounty-category" className="bg-surface border-border focus:ring-neon-purple rounded-md text-sm">
                   <SelectValue placeholder="Escolher..." />
                 </SelectTrigger>
-                <SelectContent className="bg-[#050505] border-white/10 rounded-none">
+                <SelectContent className="bg-card border-border rounded-md">
                   {categories?.map((cat: any) => (
                     <SelectItem key={cat.id} value={cat.id} className="text-sm">
                       {cat.icon} {cat.name}
@@ -197,7 +197,7 @@ export function PostBountyDialog({ children }: PostBountyDialogProps) {
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label className="text-[10px] uppercase tracking-widest text-muted-foreground flex items-center gap-1">
+              <Label className="text-xs   text-muted-foreground flex items-center gap-1">
                 <DollarSign className="h-3 w-3 text-neon-green" /> Recompensa (R$)
               </Label>
               <Input
@@ -208,11 +208,11 @@ export function PostBountyDialog({ children }: PostBountyDialogProps) {
                 step="0.01"
                 value={form.reward_amount}
                 onChange={(e) => setForm({ ...form, reward_amount: e.target.value })}
-                className="bg-[#030304] border-white/10 focus-visible:ring-neon-green rounded-none text-sm"
+                className="bg-surface border-border focus-visible:ring-neon-green rounded-md text-sm"
               />
             </div>
             <div className="space-y-2">
-              <Label className="text-[10px] uppercase tracking-widest text-muted-foreground flex items-center gap-1">
+              <Label className="text-xs   text-muted-foreground flex items-center gap-1">
                 <Calendar className="h-3 w-3" /> Prazo (opcional)
               </Label>
               <Input
@@ -220,19 +220,19 @@ export function PostBountyDialog({ children }: PostBountyDialogProps) {
                 type="date"
                 value={form.deadline}
                 onChange={(e) => setForm({ ...form, deadline: e.target.value })}
-                className="bg-[#030304] border-white/10 focus-visible:ring-neon-purple rounded-none text-sm"
+                className="bg-surface border-border focus-visible:ring-neon-purple rounded-md text-sm"
               />
             </div>
           </div>
 
-          <div className="pt-2 border-t border-white/5 flex items-center justify-between">
-            <p className="text-[10px] text-muted-foreground/60">
+          <div className="pt-2 border-t border-border/60 flex items-center justify-between">
+            <p className="text-xs text-muted-foreground/60">
               * A recompensa é simbólica — pagamento offline combinado entre as partes.
             </p>
             <Button
               type="submit"
               disabled={loading}
-              className="bg-neon-purple hover:bg-neon-purple/90 text-white rounded-none font-black uppercase tracking-widest text-[10px] h-10 px-6"
+              className="bg-neon-purple hover:bg-neon-purple/90 text-primary-foreground rounded-md font-bold   text-xs h-10 px-6"
             >
               {loading ? "Postando..." : "Postar"}
             </Button>

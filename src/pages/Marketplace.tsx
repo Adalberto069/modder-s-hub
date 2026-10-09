@@ -16,14 +16,14 @@ import { motion } from "framer-motion";
 
 function ScriptCardSkeleton() {
   return (
-    <div className="rounded-none border border-border/5 bg-surface overflow-hidden animate-pulse">
+    <div className="rounded-md border border-border/60 bg-surface overflow-hidden animate-pulse">
       <div className="aspect-video bg-surface" />
       <div className="p-4 space-y-3">
-        <div className="h-4 bg-foreground/5 rounded-none w-3/4" />
-        <div className="h-3 bg-foreground/5 rounded-none w-1/2" />
-        <div className="flex justify-between pt-3 border-t border-border/5">
-          <div className="h-3 bg-foreground/5 rounded-none w-16" />
-          <div className="h-3 bg-foreground/5 rounded-none w-12" />
+        <div className="h-4 bg-foreground/5 rounded-md w-3/4" />
+        <div className="h-3 bg-foreground/5 rounded-md w-1/2" />
+        <div className="flex justify-between pt-3 border-t border-border/60">
+          <div className="h-3 bg-foreground/5 rounded-md w-16" />
+          <div className="h-3 bg-foreground/5 rounded-md w-12" />
         </div>
       </div>
     </div>
@@ -144,13 +144,13 @@ export default function Marketplace() {
 
           {/* Tabs + Filters */}
           <div className="space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-border/5 pb-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-border/60 pb-4">
               <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full sm:w-auto">
-                <TabsList className="bg-surface border border-border/5 p-1 h-auto w-full rounded-none font-mono">
-                  <TabsTrigger value="script" className="gap-2 px-6 py-2.5 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all flex-1 rounded-none text-[10px] uppercase font-black tracking-widest shadow-neon">
+                <TabsList className="bg-surface border border-border/60 p-1 h-auto w-full rounded-md font-sans">
+                  <TabsTrigger value="script" className="gap-2 px-6 py-2.5 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all flex-1 rounded-md text-xs  font-bold  shadow-neon">
                     <Code className="h-3.5 w-3.5" /> Scripts Lua
                   </TabsTrigger>
-                  <TabsTrigger value="apk" className="gap-2 px-6 py-2.5 data-[state=active]:bg-neon-cyan data-[state=active]:text-background transition-all flex-1 rounded-none text-[10px] uppercase font-black tracking-widest shadow-neon">
+                  <TabsTrigger value="apk" className="gap-2 px-6 py-2.5 data-[state=active]:bg-neon-cyan data-[state=active]:text-background transition-all flex-1 rounded-md text-xs  font-bold  shadow-neon">
                     <Package className="h-3.5 w-3.5" /> APKs de jogos
                   </TabsTrigger>
                 </TabsList>
@@ -158,22 +158,22 @@ export default function Marketplace() {
 
               <div className="flex items-center gap-2">
                 {!isLoading && (
-                  <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground hidden sm:block">
-                    <span className="font-black text-neon-green">[{totalResults}]</span> resultados
+                  <p className="text-xs font-sans   text-muted-foreground hidden sm:block">
+                    <span className="font-bold text-neon-green">[{totalResults}]</span> resultados
                   </p>
                 )}
               </div>
             </div>
 
             {/* Filter Bar */}
-            <div className="flex flex-col lg:flex-row gap-4 bg-surface border border-border/5 p-4 rounded-none font-mono">
+            <div className="flex flex-col lg:flex-row gap-4 bg-surface border border-border/60 p-4 rounded-md font-sans">
               <div className="flex items-center gap-3 flex-1 min-w-0">
                 <SlidersHorizontal className="h-4 w-4 text-primary shrink-0 hidden sm:block" />
                 <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
                   <Button size="sm"
                     variant="outline"
-                    className={`cursor-pointer whitespace-nowrap px-4 py-1.5 transition-all duration-200 text-[9px] uppercase tracking-widest rounded-none shrink-0 ${
-                      activeCategory === "all" ? "bg-primary text-primary-foreground border-primary shadow-neon" : "border-border/10 hover:border-border/30 bg-surface text-muted-foreground hover:text-foreground"
+                    className={`cursor-pointer whitespace-nowrap px-4 py-1.5 transition-all duration-200 text-xs   rounded-md shrink-0 ${
+                      activeCategory === "all" ? "bg-primary text-primary-foreground border-primary shadow-neon" : "border-border hover:border-border/30 bg-surface text-muted-foreground hover:text-foreground"
                     }`}
                     onClick={() => setFilter("category", "all")}
                   >
@@ -183,8 +183,8 @@ export default function Marketplace() {
                     <Button size="sm"
                       key={cat.id}
                       variant="outline"
-                      className={`cursor-pointer whitespace-nowrap px-4 py-1.5 transition-all duration-200 text-[9px] uppercase tracking-widest rounded-none shrink-0 ${
-                         activeCategory === cat.slug ? "bg-primary text-primary-foreground border-primary shadow-neon" : "border-border/10 hover:border-border/30 bg-surface text-muted-foreground hover:text-foreground"
+                      className={`cursor-pointer whitespace-nowrap px-4 py-1.5 transition-all duration-200 text-xs   rounded-md shrink-0 ${
+                         activeCategory === cat.slug ? "bg-primary text-primary-foreground border-primary shadow-neon" : "border-border hover:border-border/30 bg-surface text-muted-foreground hover:text-foreground"
                       }`}
                       onClick={() => setFilter("category", cat.slug)}
                     >
@@ -194,17 +194,17 @@ export default function Marketplace() {
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 shrink-0 lg:border-l border-border/5 lg:pl-4 pt-4 lg:pt-0 border-t lg:border-t-0">
+              <div className="flex items-center gap-2 shrink-0 lg:border-l border-border/60 lg:pl-4 pt-4 lg:pt-0 border-t lg:border-t-0">
                 {[
-                  { key: "all", label: "TUDO", active: "bg-foreground/10 text-foreground border-border/20" },
+                  { key: "all", label: "TUDO", active: "bg-foreground/10 text-foreground border-border" },
                   { key: "free", label: "Grátis", active: "bg-neon-green/10 text-neon-green border-neon-green/30" },
                   { key: "paid", label: "Pagos", active: "bg-neon-pink/10 text-neon-pink border-neon-pink/30" },
                 ].map((item) => (
                   <Button size="sm"
                     key={item.key}
                     variant="outline"
-                    className={`cursor-pointer px-4 py-1.5 transition-all text-[9px] font-black uppercase tracking-widest whitespace-nowrap rounded-none ${
-                       priceFilter === item.key ? item.active : "border-border/10 bg-surface text-muted-foreground hover:bg-foreground/5"
+                    className={`cursor-pointer px-4 py-1.5 transition-all text-xs font-bold   whitespace-nowrap rounded-md ${
+                       priceFilter === item.key ? item.active : "border-border bg-surface text-muted-foreground hover:bg-foreground/5"
                     }`}
                     onClick={() => setFilter("price", item.key)}
                   >
@@ -215,7 +215,7 @@ export default function Marketplace() {
             </div>
 
             {/* Sort + Favorites Bar */}
-            <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none font-mono">
+            <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none font-sans">
               {[
                 { key: "recent", label: "Recentes", icon: ArrowDownAZ },
                 { key: "popular", label: "Popular", icon: TrendingUp },
@@ -224,8 +224,8 @@ export default function Marketplace() {
                 <Button size="sm"
                   key={item.key}
                   variant="outline"
-                  className={`cursor-pointer px-3 py-1.5 transition-all text-[9px] font-black uppercase tracking-widest whitespace-nowrap rounded-none flex items-center gap-1.5 ${
-                    sortBy === item.key ? "bg-neon-cyan/10 text-neon-cyan border-neon-cyan/30" : "border-border/10 bg-surface text-muted-foreground hover:bg-foreground/5"
+                  className={`cursor-pointer px-3 py-1.5 transition-all text-xs font-bold   whitespace-nowrap rounded-md flex items-center gap-1.5 ${
+                    sortBy === item.key ? "bg-neon-cyan/10 text-neon-cyan border-neon-cyan/30" : "border-border bg-surface text-muted-foreground hover:bg-foreground/5"
                   }`}
                   onClick={() => setFilter("sort", item.key)}
                 >
@@ -237,8 +237,8 @@ export default function Marketplace() {
               {user && (
                 <Button size="sm"
                   variant="outline"
-                  className={`cursor-pointer px-3 py-1.5 transition-all text-[9px] font-black uppercase tracking-widest whitespace-nowrap rounded-none flex items-center gap-1.5 ml-auto ${
-                    showFavs ? "bg-neon-pink/10 text-neon-pink border-neon-pink/30" : "border-border/10 bg-surface text-muted-foreground hover:bg-foreground/5"
+                  className={`cursor-pointer px-3 py-1.5 transition-all text-xs font-bold   whitespace-nowrap rounded-md flex items-center gap-1.5 ml-auto ${
+                    showFavs ? "bg-neon-pink/10 text-neon-pink border-neon-pink/30" : "border-border bg-surface text-muted-foreground hover:bg-foreground/5"
                   }`}
                   onClick={toggleFavs}
                 >
@@ -294,15 +294,15 @@ export default function Marketplace() {
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="flex flex-col items-center justify-center py-20 text-center font-mono"
+            className="flex flex-col items-center justify-center py-20 text-center font-sans"
           >
-            <div className="p-4 bg-surface border border-border/5 mb-4 shadow-neon">
+            <div className="p-4 bg-surface border border-border/60 mb-4 shadow-neon">
               {showFavs ? <Heart className="h-8 w-8 text-muted-foreground" /> : <Search className="h-8 w-8 text-muted-foreground" />}
             </div>
-            <p className="text-[11px] font-black uppercase tracking-widest text-muted-foreground mb-1">
+            <p className="text-xs font-bold   text-muted-foreground mb-1">
               {showFavs ? "Nenhum favorito encontrado" : activeTab === "script" ? "Nenhum script encontrado" : "Nenhum APK encontrado"}
             </p>
-            <p className="text-[9px] uppercase tracking-widest text-primary">
+            <p className="text-xs   text-primary">
               {showFavs ? "Adicione scripts aos favoritos clicando no ❤️" : "Verifique os parâmetros de busca e filtros ativos."}
             </p>
           </motion.div>

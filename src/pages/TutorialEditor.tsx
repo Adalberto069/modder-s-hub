@@ -211,10 +211,10 @@ function SectionCard({ title, description, icon: Icon, children, delay = 0, vari
 
   return (
     <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay, duration: 0.25 }}>
-      <Card className={`bg-card/50 backdrop-blur-md transition-all duration-300 shadow-md ${borderColor}`}>
+      <Card className={`bg-card  transition-all duration-300 shadow-md ${borderColor}`}>
         <CardHeader className="pb-3 cursor-pointer" onClick={() => collapsible && setCollapsed(!collapsed)}>
           <div className="flex items-center justify-between">
-            <CardTitle className="text-sm font-bold font-mono flex items-center gap-2.5">
+            <CardTitle className="text-sm font-bold flex items-center gap-2.5">
               <div className={`p-1.5 rounded-lg ${iconColor}`}>
                 <Icon className="h-4 w-4" />
               </div>
@@ -280,8 +280,8 @@ function BlockEditor({ block, onChange, onRemove, onMoveUp, onMoveDown, isFirst,
           <div className={`p-1.5 rounded-md ${info.bgColor} ${info.color}`}>
             <IconComp className="h-3.5 w-3.5" />
           </div>
-          <span className="text-[10px] font-bold font-mono text-muted-foreground uppercase tracking-widest">{info.label}</span>
-          <span className="text-[9px] text-muted-foreground/40 font-mono">#{index + 1}</span>
+          <span className="text-xs font-bold text-muted-foreground  ">{info.label}</span>
+          <span className="text-[11px] text-muted-foreground/40 font-mono">#{index + 1}</span>
         </div>
         <Button
           variant="ghost"
@@ -307,7 +307,7 @@ function BlockEditor({ block, onChange, onRemove, onMoveUp, onMoveDown, isFirst,
           <div className="space-y-3">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-1">
-                <Label className="text-[10px] uppercase font-bold text-muted-foreground/70">URL da Imagem</Label>
+                <Label className="text-xs  font-bold text-muted-foreground/70">URL da Imagem</Label>
                 <Input
                   placeholder="https://..."
                   value={block.imageUrl || ""}
@@ -316,7 +316,7 @@ function BlockEditor({ block, onChange, onRemove, onMoveUp, onMoveDown, isFirst,
                 />
               </div>
               <div className="space-y-1">
-                <Label className="text-[10px] uppercase font-bold text-muted-foreground/70">Legenda / Alt</Label>
+                <Label className="text-xs  font-bold text-muted-foreground/70">Legenda / Alt</Label>
                 <Input
                   placeholder="Descrição da imagem"
                   value={block.content}
@@ -334,7 +334,7 @@ function BlockEditor({ block, onChange, onRemove, onMoveUp, onMoveDown, isFirst,
         ) : block.type === "video" ? (
           <div className="space-y-3">
             <div className="space-y-1">
-              <Label className="text-[10px] uppercase font-bold text-muted-foreground/70">URL do YouTube</Label>
+              <Label className="text-xs  font-bold text-muted-foreground/70">URL do YouTube</Label>
               <Input
                 placeholder="https://www.youtube.com/watch?v=... ou https://youtu.be/..."
                 value={block.content}
@@ -390,7 +390,7 @@ function BlockEditor({ block, onChange, onRemove, onMoveUp, onMoveDown, isFirst,
                 </Button>
               </div>
             ))}
-            <Button variant="outline" size="sm" className="h-7 text-[10px] gap-1" onClick={() => onChange({ ...block, items: [...(block.items || []), ""] })}>
+            <Button variant="outline" size="sm" className="h-7 text-xs gap-1" onClick={() => onChange({ ...block, items: [...(block.items || []), ""] })}>
               <Plus className="h-3 w-3" /> Adicionar Item
             </Button>
           </div>
@@ -418,8 +418,8 @@ function BlockEditor({ block, onChange, onRemove, onMoveUp, onMoveDown, isFirst,
   );
 }
 
-// ─── Live Preview (renders blocks properly) ───
-function LivePreview({ form }: { form: TutorialFormData }) {
+// ─── Live Prévia (renders blocks properly) ───
+function LivePrévia({ form }: { form: TutorialFormData }) {
   function getYouTubeEmbedUrl(url: string) {
     const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/);
     return match ? `https://www.youtube.com/embed/${match[1]}` : null;
@@ -452,12 +452,12 @@ function LivePreview({ form }: { form: TutorialFormData }) {
         <Badge className="bg-primary/15 text-primary border-primary/20">
           {CATEGORIES.find((c) => c.value === form.category)?.label ?? form.category}
         </Badge>
-        <h1 className="text-2xl sm:text-3xl font-bold font-mono">{form.title || "Sem título"}</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold">{form.title || "Sem título"}</h1>
         {form.description && <p className="text-muted-foreground leading-relaxed">{renderInline(form.description)}</p>}
         {form.tags.length > 0 && (
           <div className="flex flex-wrap gap-1.5 mt-2">
             {form.tags.map((tag) => (
-              <Badge key={tag} variant="outline" className="text-[10px]">{tag}</Badge>
+              <Badge key={tag} variant="outline" className="text-xs">{tag}</Badge>
             ))}
           </div>
         )}
@@ -467,7 +467,7 @@ function LivePreview({ form }: { form: TutorialFormData }) {
       {form.video_url && (() => {
         const embed = getYouTubeEmbedUrl(form.video_url);
         return embed ? (
-          <div className="aspect-video rounded-xl overflow-hidden border border-white/10 shadow-lg bg-black/30">
+          <div className="aspect-video rounded-xl overflow-hidden border border-border shadow-lg bg-black/30">
             <iframe src={embed} className="w-full h-full" allowFullScreen loading="lazy" />
           </div>
         ) : null;
@@ -486,7 +486,7 @@ function LivePreview({ form }: { form: TutorialFormData }) {
               stepCounter++;
               return (
                 <div key={idx} className="flex gap-4 items-start">
-                  <span className="flex items-center justify-center h-9 w-9 rounded-xl bg-gradient-to-br from-primary to-primary/70 text-primary-foreground text-sm font-black shadow-lg shrink-0">
+                  <span className="flex items-center justify-center h-9 w-9 rounded-xl bg-gradient-to-br from-primary to-primary/70 text-primary-foreground text-sm font-bold shadow-lg shrink-0">
                     {stepCounter}
                   </span>
                   <p className="text-[15px] text-foreground/85 leading-relaxed pt-1.5">{renderInline(block.content)}</p>
@@ -495,15 +495,15 @@ function LivePreview({ form }: { form: TutorialFormData }) {
 
             case "code":
               return (
-                <div key={idx} className="rounded-xl overflow-hidden border border-white/5 shadow-xl">
-                  <div className="flex items-center justify-between px-4 py-2 bg-slate-900/80 border-b border-white/5">
+                <div key={idx} className="rounded-xl overflow-hidden border border-border/60 shadow-xl">
+                  <div className="flex items-center justify-between px-4 py-2 bg-slate-900/80 border-b border-border/60">
                     <div className="flex items-center gap-2">
                       <div className="flex gap-1.5">
                         <div className="h-2.5 w-2.5 rounded-full bg-destructive/60" />
                         <div className="h-2.5 w-2.5 rounded-full bg-amber-400/60" />
                         <div className="h-2.5 w-2.5 rounded-full bg-neon-green/60" />
                       </div>
-                      <span className="text-[10px] font-mono text-muted-foreground/50 uppercase ml-2">{block.language || "code"}</span>
+                      <span className="text-xs font-mono text-muted-foreground/50  ml-2">{block.language || "code"}</span>
                     </div>
                   </div>
                   <pre className="bg-slate-950/90 p-5 text-[13px] font-mono overflow-x-auto">
@@ -517,7 +517,7 @@ function LivePreview({ form }: { form: TutorialFormData }) {
                 <div key={idx} className="flex gap-4 p-4 rounded-xl bg-neon-cyan/5 border border-neon-cyan/20">
                   <div className="p-2 rounded-lg bg-neon-cyan/10 text-neon-cyan shrink-0 h-fit"><Lightbulb className="h-5 w-5" /></div>
                   <div className="space-y-1 min-w-0">
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-neon-cyan/70">Dica</span>
+                    <span className="text-xs font-bold   text-neon-cyan/70">Dica</span>
                     <p className="text-sm text-foreground/90 leading-relaxed">{renderInline(block.content)}</p>
                   </div>
                 </div>
@@ -528,7 +528,7 @@ function LivePreview({ form }: { form: TutorialFormData }) {
                 <div key={idx} className="flex gap-4 p-4 rounded-xl bg-destructive/5 border border-destructive/20">
                   <div className="p-2 rounded-lg bg-destructive/10 text-destructive shrink-0 h-fit"><AlertTriangle className="h-5 w-5" /></div>
                   <div className="space-y-1 min-w-0">
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-destructive/70">Atenção</span>
+                    <span className="text-xs font-bold   text-destructive/70">Atenção</span>
                     <p className="text-sm text-foreground/90 leading-relaxed">{renderInline(block.content)}</p>
                   </div>
                 </div>
@@ -537,14 +537,14 @@ function LivePreview({ form }: { form: TutorialFormData }) {
             case "video":
               const embedUrl = getYouTubeEmbedUrl(block.content);
               return embedUrl ? (
-                <div key={idx} className="aspect-video rounded-xl overflow-hidden border border-white/10 shadow-lg bg-black/30">
+                <div key={idx} className="aspect-video rounded-xl overflow-hidden border border-border shadow-lg bg-black/30">
                   <iframe src={embedUrl} className="w-full h-full" allowFullScreen loading="lazy" />
                 </div>
               ) : null;
 
             case "image":
               return block.imageUrl ? (
-                <div key={idx} className="rounded-2xl overflow-hidden border border-border/20 shadow-lg bg-black/20">
+                <div key={idx} className="rounded-lg overflow-hidden border border-border/20 shadow-lg bg-black/20">
                   <img src={block.imageUrl} alt={block.content} className="w-full object-contain max-h-[400px]" />
                   {block.content && <div className="px-4 py-2 bg-secondary/30 border-t border-border/10"><p className="text-[11px] text-muted-foreground italic text-center">{block.content}</p></div>}
                 </div>
@@ -584,7 +584,7 @@ function LivePreview({ form }: { form: TutorialFormData }) {
       {/* Tips section */}
       {form.tips.some(t => t.trim()) && (
         <div className="space-y-4">
-          <h2 className="text-lg font-bold font-mono flex items-center gap-3">
+          <h2 className="text-lg font-bold flex items-center gap-3">
             <div className="h-6 w-1.5 rounded-full bg-gradient-to-b from-primary to-primary/40" />
             Dicas
           </h2>
@@ -600,7 +600,7 @@ function LivePreview({ form }: { form: TutorialFormData }) {
       {/* Troubleshooting */}
       {form.troubleshooting.some(t => t.problem.trim()) && (
         <div className="space-y-4">
-          <h2 className="text-lg font-bold font-mono flex items-center gap-3">
+          <h2 className="text-lg font-bold flex items-center gap-3">
             <div className="h-6 w-1.5 rounded-full bg-gradient-to-b from-destructive to-destructive/40" />
             Solução de Problemas
           </h2>
@@ -609,7 +609,7 @@ function LivePreview({ form }: { form: TutorialFormData }) {
               <div className="flex gap-4 p-4 rounded-xl bg-destructive/5 border border-destructive/20">
                 <div className="p-2 rounded-lg bg-destructive/10 text-destructive shrink-0 h-fit"><AlertTriangle className="h-5 w-5" /></div>
                 <div className="space-y-1 min-w-0">
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-destructive/70">Problema</span>
+                  <span className="text-xs font-bold   text-destructive/70">Problema</span>
                   <p className="text-sm text-foreground/90 font-medium">{item.problem}</p>
                 </div>
               </div>
@@ -802,25 +802,25 @@ export default function TutorialEditor() {
               <ArrowLeft className="h-4 w-4" />
             </Button>
             <div>
-              <h1 className="text-xl font-bold font-mono">
+              <h1 className="text-xl font-bold">
                 {isEditing ? "Editar Tutorial" : "Novo Tutorial"}
               </h1>
               <div className="flex items-center gap-3 mt-0.5">
-                <span className="text-[10px] text-muted-foreground font-mono">
+                <span className="text-xs text-muted-foreground font-mono">
                   {blockCount} blocos · {wordCount} palavras
                 </span>
               </div>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <Tabs value={activeTab} onValueChange={setActiveTab}>
               <TabsList className="h-9">
                 <TabsTrigger value="edit" className="text-xs px-4 h-7 gap-1.5">
                   <FileText className="h-3.5 w-3.5" /> Editor
                 </TabsTrigger>
                 <TabsTrigger value="preview" className="text-xs px-4 h-7 gap-1.5">
-                  <Eye className="h-3.5 w-3.5" /> Preview
+                  <Eye className="h-3.5 w-3.5" /> Prévia
                 </TabsTrigger>
               </TabsList>
             </Tabs>
@@ -844,7 +844,7 @@ export default function TutorialEditor() {
 
         {activeTab === "preview" ? (
           <Card className="bg-card/80 backdrop-blur-sm border-border/20 shadow-xl">
-            <LivePreview form={form} />
+            <LivePrévia form={form} />
           </Card>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-[1fr,340px] gap-5">
@@ -918,7 +918,7 @@ export default function TutorialEditor() {
                 <Separator className="opacity-30" />
 
                 <div className="flex flex-wrap gap-1.5">
-                  <span className="text-[10px] text-muted-foreground mr-1 self-center">Adicionar:</span>
+                  <span className="text-xs text-muted-foreground mr-1 self-center">Adicionar:</span>
                   {([
                     { type: "text" as const, label: "Texto", icon: FileText },
                     { type: "step" as const, label: "Passo", icon: ChevronRight },
@@ -928,7 +928,7 @@ export default function TutorialEditor() {
                     { type: "tip" as const, label: "Dica", icon: Lightbulb },
                     { type: "warning" as const, label: "Aviso", icon: AlertTriangle },
                   ]).map(({ type, label, icon: I }) => (
-                    <Button key={type} variant="outline" size="sm" className="h-7 text-[10px] gap-1 border-border/30" onClick={() => addBlock(type)}>
+                    <Button key={type} variant="outline" size="sm" className="h-7 text-xs gap-1 border-border/30" onClick={() => addBlock(type)}>
                       <I className="h-3 w-3" /> {label}
                     </Button>
                   ))}
@@ -961,7 +961,7 @@ export default function TutorialEditor() {
                 {form.troubleshooting.map((item, idx) => (
                   <div key={idx} className="border border-border/30 rounded-lg p-3 bg-secondary/5 space-y-2">
                     <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-mono text-muted-foreground uppercase">Problema #{idx + 1}</span>
+                      <span className="text-xs font-mono text-muted-foreground ">Problema #{idx + 1}</span>
                       <Button variant="ghost" size="icon" className="h-6 w-6"
                         onClick={() => { if (form.troubleshooting.length > 1) setForm((f) => ({ ...f, troubleshooting: f.troubleshooting.filter((_, i) => i !== idx) })); }}>
                         <Trash2 className="h-3 w-3 text-destructive" />
@@ -978,10 +978,10 @@ export default function TutorialEditor() {
               </SectionCard>
 
               {/* Bottom actions */}
-              <div className="flex justify-end gap-2 pt-2 pb-8">
+              <div className="flex flex-wrap justify-end gap-2 pt-2 pb-8">
                 <Button variant="outline" onClick={() => navigate("/tutorials")}>Cancelar</Button>
                 <Button onClick={() => setActiveTab("preview")} variant="secondary" className="gap-1.5">
-                  <Eye className="h-4 w-4" /> Preview
+                  <Eye className="h-4 w-4" /> Prévia
                 </Button>
                 <Button onClick={handleSave} disabled={saving || !form.title.trim()} className="gap-1.5">
                   {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
@@ -993,7 +993,7 @@ export default function TutorialEditor() {
             {/* Right sidebar (stacks below main content on mobile/tablet) */}
             <div className="space-y-5">
               {/* Thumbnail */}
-              <SectionCard title="Thumbnail (Capa do tutorial)" icon={Image} variant="cyan">
+              <SectionCard title="Capa do tutorial" icon={Image} variant="cyan">
 
                 <div className="space-y-3">
                   <Input
@@ -1032,7 +1032,7 @@ export default function TutorialEditor() {
               <SectionCard title="Tags" icon={Hash} variant="green">
                 <div className="flex flex-wrap gap-1.5">
                   {form.tags.map((tag) => (
-                    <Badge key={tag} variant="secondary" className="text-[10px] gap-1 cursor-pointer hover:bg-destructive/20" onClick={() => removeTag(tag)}>
+                    <Badge key={tag} variant="secondary" className="text-xs gap-1 cursor-pointer hover:bg-destructive/20" onClick={() => removeTag(tag)}>
                       {tag} ×
                     </Badge>
                   ))}
@@ -1051,7 +1051,7 @@ export default function TutorialEditor() {
                 </div>
                 <div className="flex flex-wrap gap-1">
                   {TAG_SUGGESTIONS.filter((t) => !form.tags.includes(t)).slice(0, 8).map((tag) => (
-                    <Badge key={tag} variant="outline" className="text-[9px] cursor-pointer hover:bg-secondary transition-colors" onClick={() => addTag(tag)}>
+                    <Badge key={tag} variant="outline" className="text-[11px] cursor-pointer hover:bg-secondary transition-colors" onClick={() => addTag(tag)}>
                       + {tag}
                     </Badge>
                   ))}
@@ -1065,7 +1065,7 @@ export default function TutorialEditor() {
                     const selected = form.relatedTutorialIds.includes(t.id);
                     return (
                       <Badge key={t.id} variant={selected ? "default" : "outline"}
-                        className="cursor-pointer text-[9px] transition-all hover:scale-105"
+                        className="cursor-pointer text-[11px] transition-all hover:scale-105"
                         onClick={() => {
                           setForm((f) => ({
                             ...f,
@@ -1077,7 +1077,7 @@ export default function TutorialEditor() {
                     );
                   })}
                   {allTutorials.filter((t: any) => t.id !== id).length === 0 && (
-                    <p className="text-[10px] text-muted-foreground">Nenhum disponível.</p>
+                    <p className="text-xs text-muted-foreground">Nenhum disponível.</p>
                   )}
                 </div>
               </SectionCard>
@@ -1089,7 +1089,7 @@ export default function TutorialEditor() {
       <Dialog open={aiOpen} onOpenChange={(o) => { if (!isGenerating) setAiOpen(o); }}>
         <DialogContent className="sm:max-w-2xl bg-card/95 backdrop-blur border-primary/20">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 font-mono">
+            <DialogTitle className="flex items-center gap-2">
               <Sparkles className="h-4 w-4 text-primary" />
               Gerar tutorial com IA
             </DialogTitle>
@@ -1098,16 +1098,16 @@ export default function TutorialEditor() {
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-3">
-            <Label className="text-xs uppercase tracking-wider text-muted-foreground">Briefing / Prompt</Label>
+            <Label className="text-xs  tracking-wider text-muted-foreground">Briefing / Prompt</Label>
             <Textarea
               value={aiPrompt}
               onChange={(e) => setAiPrompt(e.target.value)}
               placeholder={`Ex: Ensine iniciantes a criar o primeiro script Lua no Game Guardian para modificar dinheiro em jogos offline. Foque em passos práticos, cite o uso de gg.searchNumber e gg.editAll, e mostre um exemplo curto de código.`}
               rows={9}
-              className="text-sm resize-none font-mono bg-background/60 border-border/30 focus:border-primary/50"
+              className="text-sm resize-none bg-background/60 border-border/30 focus:border-primary/50"
               disabled={isGenerating}
             />
-            <p className="text-[10px] text-muted-foreground/70">
+            <p className="text-xs text-muted-foreground/70">
               Dica: quanto mais contexto (público-alvo, nível, exemplos que quer), melhor o resultado.
             </p>
           </div>
