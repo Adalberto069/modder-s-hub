@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { Menu, X, User, LogOut, LayoutDashboard, Shield, Settings } from "lucide-react";
@@ -35,22 +35,22 @@ export function Navbar() {
         </Link>
 
         {/* Desktop nav */}
-        <div className="hidden lg:flex items-center gap-7 font-semibold">
-          <Link to="/marketplace" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+        <div className="hidden lg:flex items-center gap-6 font-semibold desktop-navigation">
+          <NavLink to="/marketplace" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
             Marketplace
-          </Link>
-          <Link to="/tutorials" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+          </NavLink>
+          <NavLink to="/tutorials" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
             Tutoriais
-          </Link>
-          <Link to="/forum" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+          </NavLink>
+          <NavLink to="/forum" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
             Fórum
-          </Link>
-          <Link to="/ferramentas" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+          </NavLink>
+          <NavLink to="/ferramentas" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
             Ferramentas
-          </Link>
-          <Link to="/bounties" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+          </NavLink>
+          <NavLink to="/bounties" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
             Encomendas
-          </Link>
+          </NavLink>
           {!user ? (
             <div className="flex gap-2">
               <Button variant="ghost" size="sm" onClick={() => navigate("/auth")}>

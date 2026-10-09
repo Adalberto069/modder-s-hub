@@ -44,6 +44,8 @@
     --rating: 44 95% 62%;
     --hero-shade: linear-gradient(90deg, hsl(var(--background) / 0.99) 0%, hsl(var(--background) / 0.92) 35%, hsl(var(--background) / 0.35) 100%);
     --shadow-neon: 0 0 24px hsl(var(--primary) / 0.12);
+    --shadow-panel: 0 12px 36px hsl(var(--background) / 0.3);
+    --gradient-hero: linear-gradient(135deg, hsl(var(--background)), hsl(var(--surface)));
     --sidebar-background: 225 14% 9%;
     --sidebar-foreground: 210 20% 96%;
     --sidebar-primary: 153 95% 58%;
@@ -78,37 +80,37 @@
 
 @layer utilities {
   .neon-glow-purple {
-    box-shadow: 0 0 10px hsl(153 95% 58% / 0.3), 0 0 40px hsl(153 95% 58% / 0.1);
+    box-shadow: var(--shadow-neon);
   }
   .neon-glow-green {
-    box-shadow: 0 0 10px hsl(153 95% 58% / 0.3), 0 0 40px hsl(153 95% 58% / 0.1);
+    box-shadow: var(--shadow-neon);
   }
   .neon-border {
-    border: 1px solid hsl(153 95% 58% / 0.3);
+    border: 1px solid hsl(var(--border));
   }
   .neon-border-green {
-    border: 1px solid hsl(153 95% 58% / 0.3);
+    border: 1px solid hsl(var(--border));
   }
   .text-neon-purple {
-    color: hsl(153 95% 58%);
+    color: hsl(var(--primary));
   }
   .text-neon-green {
-    color: hsl(153 95% 58%);
+    color: hsl(var(--primary));
   }
   .text-neon-cyan {
-    color: hsl(184 90% 61%);
+    color: hsl(var(--neon-cyan));
   }
   .text-neon-pink {
-    color: hsl(184 90% 61%);
+    color: hsl(var(--neon-cyan));
   }
   .bg-grid-pattern {
     background-image: 
-      linear-gradient(hsl(153 95% 58% / 0.03) 1px, transparent 1px),
-      linear-gradient(90deg, hsl(153 95% 58% / 0.03) 1px, transparent 1px);
+      linear-gradient(hsl(var(--primary) / 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(var(--primary) / 0.03) 1px, transparent 1px);
     background-size: 40px 40px;
   }
   .gradient-hero {
-    background: linear-gradient(135deg, hsl(228 19% 5%) 0%, hsl(270 30% 10%) 50%, hsl(228 19% 5%) 100%);
+    background: var(--gradient-hero);
   }
   .custom-scrollbar::-webkit-scrollbar {
     width: 4px;
@@ -117,11 +119,11 @@
     background: transparent;
   }
   .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: hsl(153 95% 58% / 0.2);
+    background: hsl(var(--primary) / 0.2);
     border-radius: 10px;
   }
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: hsl(153 95% 58% / 0.4);
+    background: hsl(var(--primary) / 0.4);
   }
 
   /* ─── Scanlines (CRT) ─── */
@@ -129,7 +131,7 @@
     position: relative;
   }
   .scanlines::after {
-    content: "";
+    content: none;
     position: absolute;
     inset: 0;
     pointer-events: none;
@@ -146,7 +148,7 @@
 
   /* ─── Subtle noise texture ─── */
   .noise::before {
-    content: "";
+    content: none;
     position: absolute;
     inset: 0;
     pointer-events: none;
@@ -173,7 +175,7 @@
   }
   .glitch:hover::before,
   .glitch:hover::after {
-    content: attr(data-text);
+    content: none;
     position: absolute;
     inset: 0;
     pointer-events: none;
@@ -220,6 +222,7 @@
   }
   .ascii-frame::before,
   .ascii-frame::after {
+    display: none;
     position: absolute;
     width: 12px;
     height: 12px;
@@ -260,6 +263,7 @@
   .hero-shade { background: var(--hero-shade); }
   .shadow-neon { box-shadow: var(--shadow-neon); }
   .terminal-backdrop {
+    display: none;
     position: absolute;
     top: 2rem;
     right: 3%;
@@ -275,9 +279,9 @@
   }
   .terminal-backdrop pre { white-space: pre; }
   .terminal-cursor { animation: caret-blink 1.4s steps(2, start) infinite; }
-  .signal-divider { position: relative; border-top-color: transparent; border-bottom-color: transparent; }
+  .signal-divider { position: relative; border-color: hsl(var(--border)); }
   .signal-divider::after {
-    content: "";
+    content: none;
     position: absolute;
     bottom: 0;
     left: 0;
@@ -306,5 +310,49 @@
   }
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+  }
+}
+
+@layer components {
+  .page-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    padding-block: 1.5rem 2rem;
+    border-bottom: 1px solid hsl(var(--border));
+  }
+  .site-main h1, .site-main h2, .site-main h3 {
+    text-transform: none;
+    font-style: normal;
+    overflow-wrap: anywhere;
+  }
+  .site-main :where(p, label, span, div).font-mono,
+  .ui-card.font-mono, .ui-dialog.font-mono, .ui-tabs.font-mono {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+  }
+  .site-main :where(code, pre, .cm-editor, .cm-editor *, .code-terminal, .code-terminal *) {
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .ui-button, .ui-tab {
+    text-transform: none;
+    font-style: normal;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 600;
+    border-radius: calc(var(--radius) - 2px);
+  }
+  .ui-card, .ui-dialog { border-radius: var(--radius); }
+  .ui-input { text-transform: none; font-family: 'Plus Jakarta Sans', sans-serif; }
+  .ui-tabs { gap: 0.25rem; border-radius: var(--radius); }
+  .ui-tab { min-width: 0; }
+  .site-main .container { max-width: 1280px; }
+  .site-main :where(input:not([type="checkbox"]):not([type="radio"]), textarea) {
+    border-radius: calc(var(--radius) - 2px);
+  }
+  @media (max-width: 639px) {
+    .page-header { align-items: flex-start; flex-direction: column; padding-top: 0.5rem; }
+    .page-header > :last-child { max-width: 100%; }
+    .ui-tab { white-space: normal; overflow-wrap: anywhere; }
   }
 }
