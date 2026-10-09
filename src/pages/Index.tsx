@@ -17,7 +17,7 @@ import { Card } from "@/components/ui/card";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { UserBadges } from "@/components/UserBadges";
 import { RoleBadge } from "@/components/RoleBadge";
-import hubImage from "@/assets/hiddenmod-gaming-hub.jpg";
+import { TerminalBackdrop } from "@/components/TerminalBackdrop";
 import { useState } from "react";
 
 export default function Index() {
@@ -102,14 +102,13 @@ export default function Index() {
 
   return (
     <Layout>
-      <section className="relative overflow-hidden border-b border-border bg-background premium-hero">
-        <img src={hubImage} alt="Console de jogos com iluminação verde e ciano" width={1920} height={1024} fetchPriority="high" className="absolute inset-0 h-full w-full object-cover object-right" />
-        <div className="absolute inset-0 hero-shade" />
-        <div className="container relative py-14 sm:py-20 lg:py-24">
+      <section className="relative overflow-hidden border-b border-border bg-background bg-grid-pattern hacker-hero signal-divider">
+        <TerminalBackdrop className="hacker-code" />
+        <div className="container relative py-10 sm:py-14 lg:py-16">
           <div className="max-w-xl">
-            <p className="inline-flex items-center gap-3 text-xs font-sans text-neon-cyan mb-7 border border-neon-cyan/25 rounded-md bg-glass/70 px-3 py-2"><span className="h-1.5 w-1.5 rounded-full bg-neon-cyan" /> HIDDENMOD / GAMING SOFTWARE</p>
+            <p className="hacker-label inline-flex items-center gap-3 text-xs text-neon-cyan mb-7"><Terminal className="h-4 w-4" /> ~/hiddenmod / access_terminal</p>
             <h1 className="text-5xl sm:text-7xl font-extrabold leading-tight text-foreground mb-5">Hidden<span className="text-primary">Mod</span><span className="text-primary">.</span></h1>
-            <p className="font-display text-3xl sm:text-4xl font-extrabold text-foreground mb-5">Seu jogo.<br /><span className="text-neon-cyan">Outro nível.</span></p>
+            <p className="font-display text-3xl sm:text-4xl font-extrabold text-foreground mb-5">Seu jogo.<br /><span className="text-neon-cyan">Seu controle.</span></p>
             <p className="text-base text-muted-foreground leading-relaxed max-w-md mb-8">Scripts para Game Guardian e APKs de jogos modificados. Explore criações de modders em um só lugar.</p>
             <div className="flex flex-wrap gap-3">
               <Button size="lg" className="h-12 rounded-md shadow-neon" onClick={() => navigate('/marketplace')}>Ver scripts <ChevronRight /></Button>

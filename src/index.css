@@ -277,6 +277,27 @@
     mask-image: linear-gradient(to bottom, hsl(var(--background)) 65%, transparent);
   }
   .terminal-backdrop pre { white-space: pre; }
+  .hacker-hero .hacker-code {
+    display: block;
+    top: 2rem;
+    right: 2%;
+    width: min(36rem, 48%);
+    opacity: 0.32;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .hacker-label { font-family: 'JetBrains Mono', monospace !important; }
+  .hacker-hero .signal-divider::after { content: ""; }
+  .hacker-hero::after {
+    content: "";
+    position: absolute;
+    inset: auto 0 0;
+    height: 2px;
+    background: hsl(var(--primary));
+    pointer-events: none;
+  }
+  @media (max-width: 1023px) {
+    .hacker-hero .hacker-code { right: -8%; width: 60%; opacity: 0.09; }
+  }
   .terminal-cursor { animation: caret-blink 1.4s steps(2, start) infinite; }
   .signal-divider { position: relative; border-color: hsl(var(--border)); }
   .signal-divider::after {
