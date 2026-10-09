@@ -137,7 +137,7 @@ export default function Tutorials() {
 
             {/* Category filters */}
             <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none flex-1 min-w-0">
-              <Badge
+              <Button size="sm"
                 variant="outline"
                 className={`cursor-pointer whitespace-nowrap px-4 py-1.5 transition-all duration-200 text-xs rounded-md shrink-0 ${
                   activeCategory === "all" ? "bg-neon-cyan text-background border-neon-cyan shadow-neon" : "border-border hover:border-border/30 bg-background text-muted-foreground hover:text-foreground"
@@ -147,7 +147,7 @@ export default function Tutorials() {
                 Todos ({tutorials.length})
               </Button>
               {CATEGORIES.map((cat) => (
-                <Badge
+                <Button size="sm"
                   key={cat.value}
                   variant="outline"
                    className={`cursor-pointer whitespace-nowrap px-4 py-1.5 transition-all duration-200 text-xs rounded-md shrink-0 ${
@@ -173,7 +173,7 @@ export default function Tutorials() {
               {HIDDENMOD_TOPICS.map((topic) => {
                 const Icon = topic.icon;
                 return (
-                  <button
+                  <Button variant="outline"
                     key={topic.q}
                     onClick={() => setSearch(topic.q)}
                     className={`group h-auto whitespace-normal flex-col items-start text-left bg-card border border-border ${topic.hover} hover:bg-secondary transition-all duration-200 p-3 rounded-md font-sans`}
