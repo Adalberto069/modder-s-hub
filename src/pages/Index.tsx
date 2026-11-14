@@ -80,7 +80,7 @@ export default function Index() {
             {featured && !search && (
               <div className="min-w-0">
                 <p className="hacker-label text-xs text-muted-foreground mb-2">EM DESTAQUE / COMUNIDADE</p>
-                <Link to={`/script/${featured.id}`} className="block home-feature-media bg-card overflow-hidden rounded-md border border-border" aria-label={`Conhecer ${featured.title}`}>
+                <Link to={`/script/${featured.id}`} className={`block ${featured.thumbnail_url ? "home-feature-media" : "h-20"} bg-card overflow-hidden rounded-md border border-border`} aria-label={`Conhecer ${featured.title}`}>
                   {featured.thumbnail_url ? <img src={featured.thumbnail_url} alt={featured.title} width="640" height="320" fetchPriority="high" className="h-full w-full object-cover" /> : <div className="h-full flex items-center justify-center text-primary"><Code className="h-12 w-12" /></div>}
                 </Link>
                 <div className="flex items-start justify-between gap-4 mt-3">
@@ -99,7 +99,7 @@ export default function Index() {
               {search ? <Button variant="outline" onClick={() => { setSearch(""); setSearchInput(""); }}><X /> Limpar busca</Button> : <Button asChild variant="ghost"><Link to="/marketplace">Ver todas <ArrowUpRight /></Link></Button>}
             </div>
             {isPending ? <div role="status" className="py-8 text-muted-foreground">Carregando publicações…</div> : isError ? <p role="alert" className="py-6 text-muted-foreground">Não foi possível carregar as publicações agora. Tente novamente em instantes.</p> : scripts.length === 0 ? <div className="border-y border-border py-8"><h3 className="font-semibold">{search ? "Nenhuma publicação encontrada" : "O catálogo está começando"}</h3><p className="text-sm text-muted-foreground mt-2">{search ? "Tente outro nome ou explore o marketplace." : "As criações publicadas pela comunidade aparecerão aqui."}</p></div> : (
-              <div className="catalog-bento home-catalog">
+              <div className={`catalog-bento home-catalog ${scripts.length === 1 ? "home-single-product" : ""}`}>
                 {scripts.map(script => <div key={script.id} className="min-w-0 flex flex-col">
                   <ScriptCard id={script.id} title={script.title} modderName={creatorName(script.modder_id)} modderId={script.modder_id} status={script.status} downloadCount={script.download_count} averageRating={Number(script.average_rating)} isPaid={script.is_paid} price={Number(script.price)} thumbnailUrl={script.thumbnail_url} categorySlug={script.categories?.slug} scriptType={script.script_type} apkVersion={script.apk_version} />
                   <dl className="grid grid-cols-2 gap-x-3 gap-y-2 text-xs mt-3 px-1">
