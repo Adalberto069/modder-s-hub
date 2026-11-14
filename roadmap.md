@@ -16,3 +16,8 @@
 - [x] Unificar páginas, controles, formulários e janelas no estilo premium.
 - [x] Reformular tutoriais, fórum, ferramentas, encomendas e painéis.
 - [x] Verificar páginas públicas, navegação e testes existentes.
+
+# Refinamento da página inicial
+- [x] Compactar abertura, remover telemetria decorativa e destacar produtos reais.
+- [x] Adicionar busca real no início, comparação de produtos e conteúdo da comunidade.
+- [x] Verificar busca, navegação, foco e apresentação em computador e celular.
