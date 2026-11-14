@@ -20,4 +20,4 @@
 # Refinamento da página inicial
 - [x] Compactar abertura, remover telemetria decorativa e destacar produtos reais.
 - [x] Adicionar busca real no início, comparação de produtos e conteúdo da comunidade.
-- [ ] Verificar busca, navegação, foco e apresentação em computador e celular.
+- [x] Verificar busca, navegação, foco e apresentação em computador e celular.
