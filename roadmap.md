@@ -21,3 +21,8 @@
 - [x] Compactar abertura, remover telemetria decorativa e destacar produtos reais.
 - [x] Adicionar busca real no início, comparação de produtos e conteúdo da comunidade.
 - [x] Verificar busca, navegação, foco e apresentação em computador e celular.
+
+# Acabamento da página inicial
+- [x] Centralizar conteúdo, aprimorar destaque e criar capa gráfica sem gameplay fictício.
+- [x] Equilibrar uma ou duas publicações e aplicar interações discretas.
+- [ ] Verificar desktop, celular e navegação existente.

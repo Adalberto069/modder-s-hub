@@ -5,11 +5,12 @@ import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScriptCard } from "@/components/ScriptCard";
+import { ProductCover } from "@/components/brand/ProductCover";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { supabase } from "@/integrations/supabase/client";
 import { useModderProfiles } from "@/hooks/use-modder-profiles";
 import { useAuth } from "@/lib/auth";
-import { ArrowUpRight, Search, Code, BookOpen, MessageSquare, Layers, Users, Smartphone, X } from "lucide-react";
+import { ArrowUpRight, Search, BookOpen, MessageSquare, Layers, Users, Smartphone, X } from "lucide-react";
 
 const formatDate = (value: string) => new Date(value).toLocaleDateString("pt-BR");
 
@@ -20,7 +21,7 @@ export default function Index() {
   const { data: scripts = [], isPending, isError } = useQuery({
     queryKey: ["home-publications", search],
     queryFn: async () => {
-      let query = supabase.from("scripts").select("id, title, modder_id, status, download_count, average_rating, is_paid, price, thumbnail_url, script_type, apk_version, apk_min_android, game_name, updated_at, version, categories(slug)").eq("publish_status", "published").order("download_count", { ascending: false }).limit(6);
+      let query = supabase.from("scripts").select("id, title, description, modder_id, status, download_count, average_rating, is_paid, price, thumbnail_url, script_type, apk_version, apk_min_android, game_name, updated_at, version, categories(slug)").eq("publish_status", "published").order("download_count", { ascending: false }).limit(6);
       if (search) query = query.ilike("title", `%${search}%`);
       const { data, error } = await query;
       if (error) throw error;
@@ -66,7 +67,7 @@ export default function Index() {
         </section>
 
         <section className="container py-7 sm:py-9">
-          <div className={`grid gap-7 items-center ${featured && !search ? "lg:grid-cols-2" : "max-w-2xl"}`}>
+          <div className={`grid gap-7 lg:gap-12 items-center ${featured && !search ? "lg:grid-cols-2" : "max-w-2xl"}`}>
             <div>
               <p className="hacker-label text-xs text-primary mb-3">~/comunidade / modding brasileiro</p>
               <h1 className="text-4xl sm:text-5xl font-extrabold leading-tight mb-3">Hidden<span className="text-primary">Mod.</span></h1>
@@ -78,15 +79,16 @@ export default function Index() {
               </div>
             </div>
             {featured && !search && (
-              <div className="min-w-0">
+              <div className="home-feature min-w-0">
                 <p className="hacker-label text-xs text-muted-foreground mb-2">EM DESTAQUE / COMUNIDADE</p>
-                <Link to={`/script/${featured.id}`} className={`block ${featured.thumbnail_url ? "home-feature-media" : "h-20"} bg-card overflow-hidden rounded-md border border-border`} aria-label={`Conhecer ${featured.title}`}>
-                  {featured.thumbnail_url ? <img src={featured.thumbnail_url} alt={featured.title} width="640" height="320" fetchPriority="high" className="h-full w-full object-cover" /> : <div className="h-full flex items-center justify-center text-primary"><Code className="h-12 w-12" /></div>}
+                <Link to={`/script/${featured.id}`} className="block home-feature-media bg-card overflow-hidden rounded-md border border-border" aria-label={`Conhecer ${featured.title}`}>
+                  {featured.thumbnail_url ? <img src={featured.thumbnail_url} alt={featured.title} width="640" height="320" fetchPriority="high" className="h-full w-full object-cover" /> : <ProductCover category={featured.script_type === "apk" ? "APK / ANDROID" : "LUA / GAME GUARDIAN"} />}
                 </Link>
                 <div className="flex items-start justify-between gap-4 mt-3">
-                  <div className="min-w-0"><Link to={`/script/${featured.id}`} className="font-bold text-foreground hover:text-primary break-words">{featured.title}</Link><p className="text-sm text-muted-foreground mt-1">{featured.game_name || (featured.script_type === "apk" ? "APK de jogo" : "Game Guardian")} · <Link className="hover:text-primary" to={`/modder/${featured.modder_id}`}>{creatorName(featured.modder_id)}</Link></p></div>
+                  <div className="min-w-0"><Link to={`/script/${featured.id}`} className="text-xl font-bold text-foreground hover:text-primary break-words">{featured.title}</Link><p className="text-sm text-muted-foreground mt-1">{featured.game_name || (featured.script_type === "apk" ? "APK de jogo" : "Game Guardian")} · <Link className="hover:text-primary" to={`/modder/${featured.modder_id}`}>{creatorName(featured.modder_id)}</Link></p></div>
                   <span className="text-primary font-bold whitespace-nowrap">{featured.is_paid ? Number(featured.price ?? 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" }) : "Grátis"}</span>
                 </div>
+                {featured.description && <p className="text-sm text-muted-foreground leading-relaxed mt-3 line-clamp-2">{featured.description}</p>}
               </div>
             )}
           </div>
@@ -99,9 +101,9 @@ export default function Index() {
               {search ? <Button variant="outline" onClick={() => { setSearch(""); setSearchInput(""); }}><X /> Limpar busca</Button> : <Button asChild variant="ghost"><Link to="/marketplace">Ver todas <ArrowUpRight /></Link></Button>}
             </div>
             {isPending ? <div role="status" className="py-8 text-muted-foreground">Carregando publicações…</div> : isError ? <p role="alert" className="py-6 text-muted-foreground">Não foi possível carregar as publicações agora. Tente novamente em instantes.</p> : scripts.length === 0 ? <div className="border-y border-border py-8"><h3 className="font-semibold">{search ? "Nenhuma publicação encontrada" : "O catálogo está começando"}</h3><p className="text-sm text-muted-foreground mt-2">{search ? "Tente outro nome ou explore o marketplace." : "As criações publicadas pela comunidade aparecerão aqui."}</p></div> : (
-              <div className={`catalog-bento home-catalog ${scripts.length === 1 ? "home-single-product" : ""}`}>
-                {scripts.map(script => <div key={script.id} className="min-w-0 flex flex-col">
-                  <ScriptCard id={script.id} title={script.title} modderName={creatorName(script.modder_id)} modderId={script.modder_id} status={script.status} downloadCount={script.download_count} averageRating={Number(script.average_rating)} isPaid={script.is_paid} price={Number(script.price)} thumbnailUrl={script.thumbnail_url} categorySlug={script.categories?.slug} scriptType={script.script_type} apkVersion={script.apk_version} />
+              <div className={`catalog-bento home-catalog ${scripts.length === 1 ? "home-single-product" : scripts.length === 2 ? "home-two-products" : ""}`}>
+                {scripts.map(script => <div key={script.id} className="home-publication min-w-0 flex flex-col">
+                  <ScriptCard id={script.id} title={script.title} modderName={creatorName(script.modder_id)} modderId={script.modder_id} status={script.status} downloadCount={script.download_count} averageRating={Number(script.average_rating)} isPaid={script.is_paid} price={Number(script.price)} thumbnailUrl={script.thumbnail_url} categorySlug={script.categories?.slug} scriptType={script.script_type} apkVersion={script.apk_version} fallbackCover={<ProductCover category={script.script_type === "apk" ? "APK / ANDROID" : "LUA / GAME GUARDIAN"} />} />
                   <dl className="grid grid-cols-2 gap-x-3 gap-y-2 text-xs mt-3 px-1">
                     <div><dt className="text-muted-foreground">Jogo</dt><dd className="text-foreground break-words mt-1">{script.game_name || "Não informado"}</dd></div>
                     <div><dt className="text-muted-foreground">Compatibilidade</dt><dd className="text-foreground mt-1">{script.script_type === "apk" ? (script.apk_min_android ? `Android ${script.apk_min_android}+` : "Android não informado") : "Game Guardian"}</dd></div>

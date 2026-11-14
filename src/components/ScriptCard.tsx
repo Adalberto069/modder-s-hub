@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { ReactNode } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -12,13 +13,14 @@ interface ScriptCardProps {
   status: "working" | "detected" | "updating";
   downloadCount: number; averageRating: number; isPaid: boolean; price?: number;
   thumbnailUrl?: string | null; categorySlug?: string; scriptType?: string; apkVersion?: string | null;
+  fallbackCover?: ReactNode;
 }
 const statusConfig = {
   working: { label: "Atualizado", className: "text-primary border-primary/30" },
   detected: { label: "Detectado", className: "text-destructive border-destructive/30" },
   updating: { label: "Em atualização", className: "text-neon-cyan border-neon-cyan/30" },
 };
-export function ScriptCard({ id, title, modderName, modderId, status, downloadCount, averageRating, isPaid, price, thumbnailUrl, categorySlug, scriptType, apkVersion }: ScriptCardProps) {
+export function ScriptCard({ id, title, modderName, modderId, status, downloadCount, averageRating, isPaid, price, thumbnailUrl, categorySlug, scriptType, apkVersion, fallbackCover }: ScriptCardProps) {
   const st = statusConfig[status] ?? statusConfig.updating;
   const { isFavorite, toggleFavorite } = useFavorites();
   const fav = isFavorite(id);
@@ -26,7 +28,7 @@ export function ScriptCard({ id, title, modderName, modderId, status, downloadCo
   return (
     <Card className="group relative overflow-hidden rounded-lg border-border hover:border-primary/50 transition-all duration-300 bg-card h-full flex flex-col shadow-none hover:shadow-neon">
       <Link to={`/script/${id}`} aria-label={`Ver ${title}`} className="script-thumbnail aspect-video bg-surface flex items-center justify-center overflow-hidden relative border-b border-border">
-        {thumbnailUrl ? <img src={thumbnailUrl} alt={title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" loading="lazy" /> : <div className="flex flex-col items-center gap-3 text-muted-foreground">{isApk ? <Smartphone className="h-12 w-12 text-neon-cyan/50" /> : <Code className="h-12 w-12 text-primary/50" />}<span className="text-[10px] uppercase">{isApk ? "Android / Gaming" : "Lua / Game Guardian"}</span></div>}
+        {thumbnailUrl ? <img src={thumbnailUrl} alt={title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" loading="lazy" /> : fallbackCover ?? <div className="flex flex-col items-center gap-3 text-muted-foreground">{isApk ? <Smartphone className="h-12 w-12 text-neon-cyan/50" /> : <Code className="h-12 w-12 text-primary/50" />}<span className="text-[10px] uppercase">{isApk ? "Android / Gaming" : "Lua / Game Guardian"}</span></div>}
         <div className="absolute bottom-3 left-3 flex flex-wrap gap-2">
           <Badge variant="outline" className={`bg-glass/90 backdrop-blur-md text-[10px] rounded-sm ${st.className}`}>{st.label}</Badge>
           <Badge variant="outline" className="bg-glass/90 text-neon-cyan border-border text-[10px] rounded-sm">{isApk ? (apkVersion ? `APK / v${apkVersion}` : 'APK MOD') : (categorySlug === 'scripts-lua' ? 'LUA' : categorySlug ?? 'LUA')}</Badge>
