@@ -1,327 +1,134 @@
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import { ScriptCard } from "@/components/ScriptCard";
-import { useNavigate } from "react-router-dom";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { supabase } from "@/integrations/supabase/client";
-import { useQuery } from "@tanstack/react-query";
-import { motion } from "framer-motion";
 import { useModderProfiles } from "@/hooks/use-modder-profiles";
 import { useAuth } from "@/lib/auth";
-import {
-  Code, ShieldCheck, Key, Store, Zap, Users, ChevronRight, Trophy,
-  Eye, Activity, Cpu, Terminal, Fingerprint, Network, SearchCode
-} from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Card } from "@/components/ui/card";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { UserBadges } from "@/components/UserBadges";
-import { RoleBadge } from "@/components/RoleBadge";
-import { TerminalBackdrop } from "@/components/TerminalBackdrop";
-import { useState } from "react";
+import { ArrowUpRight, Search, Code, BookOpen, MessageSquare, Layers, Users, Smartphone, X } from "lucide-react";
+
+const formatDate = (value: string) => new Date(value).toLocaleDateString("pt-BR");
 
 export default function Index() {
-  const navigate = useNavigate();
   const { user } = useAuth();
-  const [selectedModder, setSelectedModder] = useState<any>(null);
-
-  const { data: scripts } = useQuery({
-    queryKey: ["featured-scripts"],
+  const [searchInput, setSearchInput] = useState("");
+  const [search, setSearch] = useState("");
+  const { data: scripts = [], isPending, isError } = useQuery({
+    queryKey: ["home-publications", search],
     queryFn: async () => {
-      const { data } = await supabase
-        .from("scripts")
-        .select("*, categories(slug)")
-        .eq("publish_status", "published")
-        .order("download_count", { ascending: false })
-        .limit(6);
+      let query = supabase.from("scripts").select("id, title, modder_id, status, download_count, average_rating, is_paid, price, thumbnail_url, script_type, apk_version, apk_min_android, game_name, updated_at, version, categories(slug)").eq("publish_status", "published").order("download_count", { ascending: false }).limit(6);
+      if (search) query = query.ilike("title", `%${search}%`);
+      const { data, error } = await query;
+      if (error) throw error;
       return data ?? [];
     },
   });
-
-  const modderIds = [...new Set(scripts?.map((s: any) => s.modder_id as string) ?? [])];
-  const { data: topModders = [] } = useQuery({
-    queryKey: ["top-modders"],
+  const modderIds = [...new Set(scripts.map(script => script.modder_id))];
+  const { data: profiles = {} } = useModderProfiles(modderIds);
+  const { data: tutorials = [], isPending: tutorialsPending, isError: tutorialsError } = useQuery({
+    queryKey: ["home-tutorials", user?.id],
+    enabled: !!user,
     queryFn: async () => {
-      const { data } = await supabase
-        .from("profiles")
-        .select("id, user_id, username, display_name, avatar_url, bio, reputation_score, total_downloads, total_positive_reviews, created_at, updated_at")
-        .order("reputation_score", { ascending: false })
-        .limit(4);
+      const { data, error } = await supabase.from("tutorials").select("id, title, description, thumbnail_url, updated_at, category").order("created_at", { ascending: false }).limit(3);
+      if (error) throw error;
       return data ?? [];
     },
   });
-
-  const { data: profileMap = {} } = useModderProfiles(modderIds);
-  const hallOfFameModders = Object.values(profileMap).length > 0
-    ? Array.from(new Set(Object.values(profileMap)))
-    : topModders;
-
-  const hallIds = hallOfFameModders.flatMap((p: any) => [p.user_id, p.id].filter(Boolean));
-  const { data: hallRolesMap = {} } = useQuery({
-    queryKey: ["hall-roles", hallIds.join(",")],
+  const { data: posts = [], isPending: postsPending, isError: postsError } = useQuery({
+    queryKey: ["home-community"],
     queryFn: async () => {
-      if (hallIds.length === 0) return {};
-      const { data } = await supabase
-        .from("user_roles")
-        .select("user_id, role, approved")
-        .in("user_id", hallIds)
-        .eq("approved", true);
-
-      const map: Record<string, string> = {};
-      for (const r of data ?? []) {
-        const current = map[r.user_id];
-        if (r.role === "admin" || (!current && r.role === "modder")) {
-          map[r.user_id] = r.role;
-        }
-      }
-      for (const profile of hallOfFameModders) {
-        if (profile.user_id && map[profile.user_id]) {
-          map[profile.id] = map[profile.user_id];
-        }
-      }
-      return map;
-    },
-    enabled: hallIds.length > 0,
-  });
-
-  const { data: stats } = useQuery({
-    queryKey: ["platform-stats"],
-    queryFn: async () => {
-      const [scriptsRes, profilesRes] = await Promise.all([
-        supabase.from("scripts").select("download_count", { count: "exact" }).eq("publish_status", "published"),
-        supabase.from("profiles").select("id", { count: "exact" }),
-      ]);
-      const totalDownloads = (scriptsRes.data ?? []).reduce((s: number, r: any) => s + (r.download_count || 0), 0);
-      return {
-        scripts: scriptsRes.count ?? 0,
-        users: profilesRes.count ?? 0,
-        downloads: totalDownloads,
-      };
+      const { data, error } = await supabase.from("forum_posts").select("id, title, category, created_at").order("created_at", { ascending: false }).limit(3);
+      if (error) throw error;
+      return data ?? [];
     },
   });
+  const featured = scripts.find(script => script.thumbnail_url) ?? scripts[0];
+  const creators = modderIds.filter(id => profiles[id]);
+  const creatorName = (id: string) => profiles[id]?.display_name || profiles[id]?.username || "Autor";
 
   return (
-    <Layout>
-      <section className="relative overflow-hidden border-b border-border bg-background bg-grid-pattern hacker-hero signal-divider">
-        <TerminalBackdrop className="hacker-code" />
-        <div className="container relative py-10 sm:py-14 lg:py-16">
-          <div className="max-w-xl">
-            <p className="hacker-label inline-flex items-center gap-3 text-xs text-neon-cyan mb-7"><Terminal className="h-4 w-4" /> ~/hiddenmod / access_terminal</p>
-            <h1 className="text-5xl sm:text-7xl font-extrabold leading-tight text-foreground mb-5">Hidden<span className="text-primary">Mod</span><span className="text-primary">.</span></h1>
-            <p className="font-display text-3xl sm:text-4xl font-extrabold text-foreground mb-5">Seu jogo.<br /><span className="text-neon-cyan">Seu controle.</span></p>
-            <p className="text-base text-muted-foreground leading-relaxed max-w-md mb-8">Scripts para Game Guardian e APKs de jogos modificados. Explore criações de modders em um só lugar.</p>
-            <div className="flex flex-wrap gap-3">
-              <Button size="lg" className="h-12 rounded-md shadow-neon" onClick={() => navigate('/marketplace')}>Ver scripts <ChevronRight /></Button>
-              <Button size="lg" variant="outline" className="h-12 rounded-md bg-glass/60" onClick={() => navigate('/marketplace?type=apk')}>Explorar APKs <Code /></Button>
-            </div>
-          </div>
-          <div className="flex flex-wrap gap-6 sm:gap-10 mt-10 pt-5 border-t border-foreground/10 max-w-xl">
-            {[
-              { label: 'Publicações', value: stats?.scripts ?? 0 },
-              { label: 'Membros', value: stats?.users ?? 0 },
-              { label: 'Downloads', value: stats?.downloads ?? 0 },
-            ].map(item => <div key={item.label}><p className="font-display font-bold text-xl text-foreground">{item.value.toLocaleString('pt-BR')}</p><p className="text-xs text-muted-foreground mt-1 ">{item.label}</p></div>)}
-          </div>
-        </div>
-      </section>
-
-      {/* ══════════════ RECENT BREACHES (MARKETPLACE PREVIEW) ══════════════ */}
-      <section className="relative overflow-hidden py-10 sm:py-16 bg-background border-t border-border">
-        <div className="container relative px-4 sm:px-6">
-          <div className="flex flex-col md:flex-row items-end justify-between mb-7 sm:mb-9 gap-4">
-            <div>
-              <p className="text-xs font-semibold text-neon-cyan mb-3">FEITOS PELA COMUNIDADE</p>
-              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-normal text-foreground">
-                Em <span className="text-primary">destaque</span>
-              </h2>
-              <p className="text-muted-foreground text-sm mt-3">Conheça as publicações mais baixadas pelos jogadores.</p>
-            </div>
-            <Button variant="ghost" onClick={() => navigate("/marketplace")} className="text-muted-foreground hover:text-foreground  font-bold text-xs">
-              ver tudo <ChevronRight className="ml-2 w-4 h-4" />
-            </Button>
-          </div>
-
-          <div className="catalog-bento">
-            {scripts?.slice(0, 6).map((script: any, i: number) => (
-              <motion.div
-                key={script.id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-              >
-                <ScriptCard
-                  id={script.id}
-                  title={script.title}
-                  modderName={profileMap[script.modder_id]?.display_name ?? profileMap[script.modder_id]?.username ?? "Modder"}
-                  modderId={script.modder_id}
-                  status={script.status}
-                  downloadCount={script.download_count}
-                  averageRating={Number(script.average_rating)}
-                  isPaid={script.is_paid}
-                  price={Number(script.price)}
-                  thumbnailUrl={script.thumbnail_url}
-                  categorySlug={script.categories?.slug}
-                  scriptType={script.script_type}
-                  apkVersion={script.apk_version}
-                />
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ══════════════ TOP MODDERS (COMPACT ROW) ══════════════ */}
-      <section className="py-12 sm:py-16 bg-surface border-t border-foreground/5">
-        <div className="container px-4 sm:px-6">
-          <div className="flex items-end justify-between mb-6 flex-wrap gap-3">
-            <div>
-              <div className="flex items-center gap-2 mb-1">
-                <div className="h-[1px] w-6 bg-primary/60" />
-                <span className="text-xs font-sans   text-primary/80">Ranking</span>
+    <div className="home-refined">
+      <Layout>
+        <section className="border-b border-border bg-surface">
+          <div className="container py-4">
+            <form role="search" className="flex gap-2 max-w-2xl" onSubmit={event => { event.preventDefault(); setSearch(searchInput.trim()); document.getElementById("publicacoes")?.scrollIntoView({ block: "start" }); }}>
+              <div className="relative flex-1 min-w-0">
+                <Search aria-hidden="true" className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
+                <Input type="search" aria-label="Buscar publicações pelo nome" placeholder="Buscar scripts e APKs pelo nome…" value={searchInput} onChange={event => setSearchInput(event.target.value)} className="pl-10 bg-card" />
               </div>
-              <h2 className="text-xl sm:text-2xl font-bold  tracking-normal text-foreground">
-                Top <span className="text-primary/80">modders</span>
-              </h2>
+              <Button type="submit"><Search className="h-4 w-4" /> Buscar</Button>
+            </form>
+          </div>
+        </section>
+
+        <section className="container py-7 sm:py-9">
+          <div className={`grid gap-7 items-center ${featured && !search ? "lg:grid-cols-2" : "max-w-2xl"}`}>
+            <div>
+              <p className="hacker-label text-xs text-primary mb-3">~/comunidade / modding brasileiro</p>
+              <h1 className="text-4xl sm:text-5xl font-extrabold leading-tight mb-3">Hidden<span className="text-primary">Mod.</span></h1>
+              <p className="text-xl font-semibold text-foreground mb-3">Feito por modders. Descoberto por você.</p>
+              <p className="text-sm sm:text-base text-muted-foreground leading-relaxed max-w-lg">Scripts para Game Guardian e APKs de jogos modificados. Encontre seu próximo mod e conheça quem está por trás dele.</p>
+              <div className="flex flex-wrap gap-2 mt-5">
+                <Button asChild><Link to="/marketplace">Explorar marketplace <ArrowUpRight /></Link></Button>
+                <Button asChild variant="outline"><Link to="/marketplace?type=apk"><Smartphone /> APKs de jogos</Link></Button>
+              </div>
             </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => navigate("/marketplace?tab=modders")}
-              className="text-xs font-sans   text-muted-foreground hover:text-primary"
-            >
-              ver todos →
-            </Button>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-            {hallOfFameModders.slice(0, 3).map((profile: any, i: number) => {
-              const roleKey = hallRolesMap[profile.user_id] || hallRolesMap[profile.id];
-              const displayRole: "admin" | "modder" | "member" = roleKey === "admin" ? "admin" : "modder";
-              return (
-                <Button variant="ghost"
-                  key={profile.id}
-                  onClick={() => setSelectedModder(profile)}
-                  className="flex items-center gap-3 h-auto whitespace-normal justify-start p-3 bg-surface border border-foreground/10 hover:border-primary/40 hover:bg-surface transition-all text-left group"
-                >
-                  <span className="text-xs font-sans text-primary/60 font-bold w-4 shrink-0">#{i + 1}</span>
-                  <Avatar className="h-10 w-10 rounded-md border border-foreground/10 bg-background shrink-0">
-                    <AvatarImage src={profile.avatar_url} />
-                    <AvatarFallback className="bg-transparent text-foreground text-sm font-bold">
-                      {(profile.display_name || profile.username || "?")[0].toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="min-w-0 flex-1">
-                    <p className="font-bold text-sm  tracking-normal text-foreground truncate group-hover:text-primary transition-colors">
-                      {profile.display_name || profile.username || "Anonymous"}
-                    </p>
-                    <div className="flex items-center gap-2 mt-0.5">
-                      <RoleBadge role={displayRole} />
-                    </div>
-                  </div>
-                </Button>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-
-      {/* ══════════════ FINAL CTA ══════════════ */}
-      <section className="py-12 sm:py-16 bg-surface border-t border-neon-green/20 relative">
-        <div className="container px-4 text-center max-w-3xl mx-auto relative z-10">
-          <Network className="w-12 h-12 text-neon-green mx-auto mb-6 opacity-50" />
-          <h2 className="text-4xl sm:text-6xl font-bold  tracking-normal text-foreground mb-6">
-            {user ? <>Continue <span className="text-neon-green">explorando</span></> : <>Sua próxima <span className="text-neon-green">jogada</span></>}
-          </h2>
-          <p className="text-muted-foreground font-sans text-sm sm:text-base mb-10 border-l-2 border-r-2 border-neon-green/30 inline-block px-6">
-            {user
-              ? "explore o marketplace, poste encomendas ou publique um novo mod."
-              : "cadastro grátis. compre scripts, peça encomendas ou aplique como modder e comece a vender hoje."}
-          </p>
-          <div className="flex justify-center flex-col sm:flex-row gap-4">
-             {!user && (
-               <Button size="lg" onClick={() => navigate("/auth?tab=signup")} className="h-14 px-10 bg-foreground text-background hover:bg-foreground/90 font-bold   rounded-md text-xs w-full sm:w-auto">
-                 criar conta
-               </Button>
-             )}
-             {user && (
-               <Button size="lg" onClick={() => navigate("/bounties")} className="h-14 px-10 bg-neon-green text-background hover:bg-neon-green/90 font-bold   rounded-md text-xs w-full sm:w-auto">
-                 ver encomendas
-               </Button>
-             )}
-             <Button size="lg" onClick={() => navigate("/marketplace")} variant="outline" className="h-14 px-10 text-foreground border-foreground/20 hover:bg-foreground/5 font-bold   rounded-md text-xs w-full sm:w-auto">
-               ver marketplace
-             </Button>
-          </div>
-
-        </div>
-      </section>
-
-      {/* ══════════════ MODDER DIALOG ══════════════ */}
-      <Dialog open={!!selectedModder} onOpenChange={(open) => !open && setSelectedModder(null)}>
-        <DialogContent className="max-w-md bg-surface border-foreground/10 p-0 overflow-hidden font-sans text-foreground rounded-md">
-          {selectedModder && (() => {
-            const roleKey = hallRolesMap[selectedModder.user_id] || hallRolesMap[selectedModder.id];
-            const displayRole: "admin" | "modder" | "member" = roleKey === "admin" ? "admin" : "modder";
-            return (
-              <div className="flex flex-col">
-                <div className="h-2 w-full bg-primary" />
-                <div className="p-8 pb-4">
-                  <div className="flex justify-between items-start mb-8">
-                     <span className="text-xs text-muted-foreground   opacity-50">Perfil do modder</span>
-                     <Fingerprint className="w-5 h-5 text-primary" />
-                  </div>
-                  
-                  <div className="flex gap-6 items-center mb-8">
-                    <Avatar className="h-20 w-20 rounded-md border border-foreground/20 bg-background">
-                      <AvatarImage src={selectedModder.avatar_url} />
-                      <AvatarFallback className="bg-transparent text-foreground text-2xl font-bold">
-                        {(selectedModder.display_name || selectedModder.username || "?")[0].toUpperCase()}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex flex-col">
-                      <h3 className="text-2xl font-bold  tracking-normal">{selectedModder.display_name || selectedModder.username}</h3>
-                      <p className="text-xs text-muted-foreground  opacity-70 mt-1 mb-2">ID: {selectedModder.id.substring(0, 12)}</p>
-                      <RoleBadge role={displayRole} />
-                    </div>
-                  </div>
-
-                  <div className="bg-surface border border-foreground/5 p-4 mb-8">
-                     <p className="text-xs text-muted-foreground leading-relaxed lowercase">
-                       {selectedModder.bio ? `> ${selectedModder.bio}` : "Este modder ainda não adicionou uma bio."}
-                     </p>
-                  </div>
-
-                  <div className="grid grid-cols-3 divide-x divide-border/10 border-t border-b border-foreground/10 py-4 mb-8">
-                    {[
-                       { value: selectedModder.reputation_score ?? 0, label: "Reputação" },
-                       { value: selectedModder.total_downloads ?? 0, label: "Downloads" },
-                       { value: selectedModder.total_positive_reviews ?? 0, label: "Avaliações" },
-                    ].map(st => (
-                      <div key={st.label} className="text-center">
-                        <p className="text-xl font-bold text-foreground">{st.value}</p>
-                        <p className="text-xs text-muted-foreground mt-1">{st.label}</p>
-                      </div>
-                    ))}
-                  </div>
-
-                  <Button
-                    size="lg"
-                    className="w-full h-12 bg-foreground text-background hover:bg-foreground/90 font-bold   text-xs rounded-md"
-                    onClick={() => {
-                      setSelectedModder(null);
-                      navigate(`/modder/${selectedModder.user_id}`);
-                    }}
-                  >
-                    Ver perfil completo
-                  </Button>
+            {featured && !search && (
+              <div className="min-w-0">
+                <p className="hacker-label text-xs text-muted-foreground mb-2">EM DESTAQUE / COMUNIDADE</p>
+                <Link to={`/script/${featured.id}`} className="block home-feature-media bg-card overflow-hidden rounded-md border border-border" aria-label={`Conhecer ${featured.title}`}>
+                  {featured.thumbnail_url ? <img src={featured.thumbnail_url} alt={featured.title} width="640" height="320" fetchPriority="high" className="h-full w-full object-cover" /> : <div className="h-full flex items-center justify-center text-primary"><Code className="h-12 w-12" /></div>}
+                </Link>
+                <div className="flex items-start justify-between gap-4 mt-3">
+                  <div className="min-w-0"><Link to={`/script/${featured.id}`} className="font-bold text-foreground hover:text-primary break-words">{featured.title}</Link><p className="text-sm text-muted-foreground mt-1">{featured.game_name || (featured.script_type === "apk" ? "APK de jogo" : "Game Guardian")} · <Link className="hover:text-primary" to={`/modder/${featured.modder_id}`}>{creatorName(featured.modder_id)}</Link></p></div>
+                  <span className="text-primary font-bold whitespace-nowrap">{featured.is_paid ? Number(featured.price ?? 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" }) : "Grátis"}</span>
                 </div>
               </div>
-            );
-          })()}
-        </DialogContent>
-      </Dialog>
-    </Layout>
+            )}
+          </div>
+        </section>
+
+        <section id="publicacoes" className="border-t border-border scroll-mt-20 py-7 sm:py-10">
+          <div className="container">
+            <div className="flex items-center justify-between flex-wrap gap-3 mb-5">
+              <div><p className="hacker-label text-xs text-primary mb-2">/ marketplace</p><h2 className="text-2xl font-bold">{search ? "Resultado da busca" : "Publicações em destaque"}</h2><p className="text-sm text-muted-foreground mt-2">{search ? `Publicações com “${search}” no nome.` : "Compare jogos, versões e criações da comunidade."}</p></div>
+              {search ? <Button variant="outline" onClick={() => { setSearch(""); setSearchInput(""); }}><X /> Limpar busca</Button> : <Button asChild variant="ghost"><Link to="/marketplace">Ver todas <ArrowUpRight /></Link></Button>}
+            </div>
+            {isPending ? <div role="status" className="py-8 text-muted-foreground">Carregando publicações…</div> : isError ? <p role="alert" className="py-6 text-muted-foreground">Não foi possível carregar as publicações agora. Tente novamente em instantes.</p> : scripts.length === 0 ? <div className="border-y border-border py-8"><h3 className="font-semibold">{search ? "Nenhuma publicação encontrada" : "O catálogo está começando"}</h3><p className="text-sm text-muted-foreground mt-2">{search ? "Tente outro nome ou explore o marketplace." : "As criações publicadas pela comunidade aparecerão aqui."}</p></div> : (
+              <div className="catalog-bento home-catalog">
+                {scripts.map(script => <div key={script.id} className="min-w-0 flex flex-col">
+                  <ScriptCard id={script.id} title={script.title} modderName={creatorName(script.modder_id)} modderId={script.modder_id} status={script.status} downloadCount={script.download_count} averageRating={Number(script.average_rating)} isPaid={script.is_paid} price={Number(script.price)} thumbnailUrl={script.thumbnail_url} categorySlug={script.categories?.slug} scriptType={script.script_type} apkVersion={script.apk_version} />
+                  <dl className="grid grid-cols-2 gap-x-3 gap-y-2 text-xs mt-3 px-1">
+                    <div><dt className="text-muted-foreground">Jogo</dt><dd className="text-foreground break-words mt-1">{script.game_name || "Não informado"}</dd></div>
+                    <div><dt className="text-muted-foreground">Compatibilidade</dt><dd className="text-foreground mt-1">{script.script_type === "apk" ? (script.apk_min_android ? `Android ${script.apk_min_android}+` : "Android não informado") : "Game Guardian"}</dd></div>
+                    <div><dt className="text-muted-foreground">Versão</dt><dd className="text-foreground mt-1">{(script.script_type === "apk" ? script.apk_version : script.version) || "Não informada"}</dd></div>
+                    <div><dt className="text-muted-foreground">Atualização</dt><dd className="text-foreground mt-1"><time dateTime={script.updated_at}>{formatDate(script.updated_at)}</time></dd></div>
+                  </dl>
+                </div>)}
+              </div>
+            )}
+          </div>
+        </section>
+
+        {creators.length > 0 && <section className="border-t border-border py-7 bg-surface"><div className="container"><div className="flex justify-between items-center gap-3 mb-4"><h2 className="text-xl font-bold">Por trás dos mods</h2><Users aria-hidden="true" className="h-5 w-5 text-primary" /></div><div className="flex flex-wrap gap-5">{creators.map(id => <Link key={id} to={`/modder/${id}`} className="flex gap-3 items-center hover:text-primary min-w-0"><Avatar className="h-9 w-9 rounded-md"><AvatarImage src={profiles[id].avatar_url} alt="" /><AvatarFallback>{creatorName(id).charAt(0).toUpperCase()}</AvatarFallback></Avatar><span className="text-sm font-semibold break-words">{creatorName(id)}</span></Link>)}</div></div></section>}
+
+        <section className="border-t border-border py-8 sm:py-10"><div className="container"><h2 className="text-xl font-bold mb-5">Seu ponto de encontro para modding</h2><div className="grid sm:grid-cols-3 gap-6">
+          {[{ icon: Layers, title: "Descubra", text: "Explore scripts e APKs. Confira os detalhes e requisitos de cada publicação.", url: "/marketplace" }, { icon: BookOpen, title: "Aprenda", text: "Encontre tutoriais de Game Guardian, Lua e jogos Android.", url: "/tutorials" }, { icon: MessageSquare, title: "Troque ideias", text: "Compartilhe dúvidas e converse com outros jogadores no fórum.", url: "/forum" }].map(item => <div key={item.title} className="border-l-2 border-border pl-4"><item.icon aria-hidden="true" className="h-5 w-5 text-primary mb-3" /><Link to={item.url} className="font-semibold hover:text-primary inline-flex items-center gap-2">{item.title}<ArrowUpRight className="h-4 w-4" /></Link><p className="text-sm text-muted-foreground leading-relaxed mt-2">{item.text}</p></div>)}
+        </div></div></section>
+
+        <section className="bg-surface border-t border-border py-8 sm:py-10"><div className="container grid lg:grid-cols-2 gap-10">
+          <div><div className="flex items-center justify-between gap-3 mb-5"><h2 className="text-xl font-bold">Tutoriais recentes</h2><Button asChild variant="ghost" size="sm"><Link to="/tutorials">Ver todos <ArrowUpRight /></Link></Button></div>
+            {!user ? <div className="border-y border-border py-5"><p className="font-semibold">Aprenda com a comunidade</p><p className="text-sm text-muted-foreground mt-2 mb-4">Entre na sua conta para acessar os tutoriais.</p><Button asChild variant="outline" size="sm"><Link to="/tutorials">Acessar tutoriais <BookOpen /></Link></Button></div> : tutorialsPending ? <p role="status" className="text-muted-foreground text-sm">Carregando tutoriais…</p> : tutorialsError ? <p className="text-muted-foreground text-sm">Não foi possível carregar os tutoriais agora.</p> : tutorials.length === 0 ? <p className="text-muted-foreground text-sm">Ainda não há tutoriais publicados. Novos guias aparecerão aqui.</p> : <div className="divide-y divide-border">{tutorials.map(tutorial => <Link key={tutorial.id} to={`/tutorial/${tutorial.id}`} className="flex items-center gap-4 py-4 first:pt-0 group">{tutorial.thumbnail_url ? <img src={tutorial.thumbnail_url} alt="" width="96" height="64" loading="lazy" className="w-24 h-16 object-cover rounded-md shrink-0" /> : <BookOpen aria-hidden="true" className="h-8 w-8 text-primary shrink-0" />}<div className="min-w-0"><h3 className="font-semibold text-sm group-hover:text-primary break-words">{tutorial.title}</h3><p className="text-xs text-muted-foreground mt-2">Atualizado em <time dateTime={tutorial.updated_at}>{formatDate(tutorial.updated_at)}</time></p></div></Link>)}</div>}
+          </div>
+          <div><div className="flex items-center justify-between gap-3 mb-5"><h2 className="text-xl font-bold">Na comunidade</h2><Button asChild variant="ghost" size="sm"><Link to="/forum">Abrir fórum <ArrowUpRight /></Link></Button></div>
+            {postsPending ? <p role="status" className="text-muted-foreground text-sm">Carregando conversas…</p> : postsError ? <p className="text-muted-foreground text-sm">Não foi possível carregar as conversas agora.</p> : posts.length === 0 ? <div className="border-y border-border py-5"><p className="font-semibold">A próxima conversa pode ser sua</p><p className="text-sm text-muted-foreground mt-2">Ainda não há publicações no fórum. Compartilhe uma dúvida ou ideia.</p></div> : <div className="divide-y divide-border">{posts.map(post => <Link key={post.id} to="/forum" className="block py-4 first:pt-0 group"><p className="hacker-label text-xs text-primary mb-2">{post.category}</p><h3 className="font-semibold text-sm group-hover:text-primary break-words">{post.title}</h3><time dateTime={post.created_at} className="block text-xs text-muted-foreground mt-2">{formatDate(post.created_at)}</time></Link>)}</div>}
+          </div>
+        </div></section>
+      </Layout>
+    </div>
   );
 }
