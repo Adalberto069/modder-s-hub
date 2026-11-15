@@ -601,6 +601,7 @@ export default function Admin() {
           <TabsList className="mb-5 flex w-full flex-wrap justify-start gap-1 p-1 bg-card border border-border rounded-md h-auto [&_button]:h-9 [&_button]:px-3 [&_button_span]:inline">
             <TabsTrigger value="scripts" className="text-xs gap-2"><Pencil className="h-4 w-4" /><span>Publicações</span></TabsTrigger>
             <TabsTrigger value="categories" className="text-xs gap-2"><Plus className="h-4 w-4" /><span>Categorias</span></TabsTrigger>
+            <TabsTrigger value="badges" className="text-xs gap-2"><ShieldCheck className="h-4 w-4" /><span>Badges</span></TabsTrigger>
             <TabsTrigger value="moderation" className="text-xs sm:text-xs   font-bold gap-2 data-[state=active]:bg-background data-[state=active]:text-neon-purple rounded-md h-full">
               <Code className="h-4 w-4" /> <span className="hidden sm:inline">Moderação</span>
             </TabsTrigger>
@@ -629,8 +630,10 @@ export default function Admin() {
 
           <TabsContent value="scripts"><AdminCatalog mode="scripts" /></TabsContent>
           <TabsContent value="categories"><AdminCatalog mode="categories" /></TabsContent>
+          <TabsContent value="badges"><AdminBadges /></TabsContent>
           {/* Scripts Tab */}
           <TabsContent value="moderation">
+            <div className="space-y-4 mb-5"><AdminModerationQueue /><AdminFlaggedScripts /></div>
             <Card className="border-border bg-card rounded-md">
               <CardHeader className="border-b border-border/60 bg-background">
                 <CardTitle className="text-sm font-bold   flex items-center gap-2 text-foreground">
@@ -860,20 +863,6 @@ export default function Admin() {
           </TabsContent>
         </Tabs>
 
-        {/* Moderation Queue */}
-        <div className="mt-8">
-          <AdminModerationQueue />
-        </div>
-
-        {/* Flagged Scripts */}
-        <div className="mt-8">
-          <AdminFlaggedScripts />
-        </div>
-
-        {/* Badge Management */}
-        <div className="mt-8">
-          <AdminBadges />
-        </div>
       </div>
 
       {/* Code Viewer Dialog */}

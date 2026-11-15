@@ -58,7 +58,7 @@ export function AdminCatalog({ mode }: { mode: "scripts" | "categories" }) {
       const { data, error } = await supabase.from("scripts").update({ title: scriptDraft.title.trim(), description: scriptDraft.description.trim() || null, game_name: scriptDraft.game_name.trim() || null, category_id: scriptDraft.category_id === "none" ? null : scriptDraft.category_id, is_paid: scriptDraft.is_paid, price }).eq("id", scriptDraft.id).select("id").single();
       if (error || !data) throw error ?? new Error("Não foi possível salvar.");
       await invalidateCatalog(); setScriptDraft(null); toast.success("Publicação atualizada.");
-    } catch (error) { setFormError(error instanceof Error ? error.message : "Não foi possível salvar a publicação."); }
+    } catch (error) { setFormError(error && typeof error === "object" && "message" in error ? String(error.message) : "Não foi possível salvar a publicação."); }
     finally { setSaving(false); }
   };
   const saveCategory = async (event: React.FormEvent) => {
