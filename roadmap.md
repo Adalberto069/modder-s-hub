@@ -25,4 +25,4 @@
 # Acabamento da página inicial
 - [x] Centralizar conteúdo, aprimorar destaque e criar capa gráfica sem gameplay fictício.
 - [x] Equilibrar uma ou duas publicações e aplicar interações discretas.
-- [ ] Verificar desktop, celular e navegação existente.
+- [x] Verificar desktop, celular e navegação existente.
