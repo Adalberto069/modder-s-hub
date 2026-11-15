@@ -26,3 +26,8 @@
 - [x] Centralizar conteúdo, aprimorar destaque e criar capa gráfica sem gameplay fictício.
 - [x] Equilibrar uma ou duas publicações e aplicar interações discretas.
 - [x] Verificar desktop, celular e navegação existente.
+
+# Administração compacta
+- [ ] Adicionar gestão de publicações, preços e categorias dentro do painel existente.
+- [ ] Compactar apresentação administrativa sem modificar páginas públicas.
+- [ ] Verificar edição e leitura dos dados com acesso administrativo.
