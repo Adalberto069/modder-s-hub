@@ -6,3 +6,4 @@
 - Use the shared PageHeader for section introductions and shared UI primitives for controls; this keeps the premium presentation consistent without coupling it to business logic.
 - Scope homepage refinements under `.home-refined` and reuse ScriptCard; this keeps catalog presentation consistent without changing other pages or their access rules.
 - Provide optional fallback artwork to ScriptCard from the homepage; this allows branded empty covers without changing the marketplace's defaults.
+- Keep quick catalog edits in AdminCatalog and authorize writes through existing admin-checked database policies; never include license, source-code or payment fields in quick-edit payloads.

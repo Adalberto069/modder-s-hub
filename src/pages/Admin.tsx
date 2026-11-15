@@ -29,6 +29,7 @@ import { AdminUsersTab } from "@/components/admin/AdminUsersTab";
 import { AdminDisputesTab } from "@/components/admin/AdminDisputesTab";
 import { AdminPurchaseDisputesTab } from "@/components/admin/AdminPurchaseDisputesTab";
 import { AdminAuditTab } from "@/components/admin/AdminAuditTab";
+import { AdminCatalog } from "@/components/admin/AdminCatalog";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import LuaCodeEditor from "@/components/LuaCodeEditor";
@@ -388,8 +389,11 @@ export default function Admin() {
 
   return (
     <Layout>
-      <div className="container py-8">
-        <PageHeader eyebrow="HIDDENMOD / ADMINISTRAÇÃO" title={<>Visão <span className="text-primary">geral.</span></>} description="Publicações, comunidade e operações da plataforma." actions={<Button onClick={() => navigate("/script/new")}><Plus /> Nova publicação</Button>} />
+      <div className="container max-w-[1200px] py-5 [&_.page-header]:py-4 [&_.page-header]:mb-5 [&_.page-header_h1]:text-3xl [&_.page-header_p]:mt-2">
+        <PageHeader eyebrow="HIDDENMOD / ADMINISTRAÇÃO" title={<>Painel <span className="text-primary">administrativo.</span></>} description="Gerencie publicações, preços, categorias e comunidade." actions={<Button size="sm" onClick={() => navigate("/script/new")}><Plus /> Nova publicação</Button>} />
+
+        <details className="mb-5 border-b border-border">
+          <summary className="cursor-pointer py-3 text-sm font-semibold text-muted-foreground focus-visible:outline focus-visible:outline-ring">Resumo financeiro e solicitações</summary>
 
         {/* Stats Grid */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
@@ -591,11 +595,15 @@ export default function Admin() {
           </Card>
         )}
 
+        </details>
         {/* Main admin tabs */}
         <Tabs defaultValue="scripts" className="font-sans">
-          <TabsList className="mb-6 grid w-full grid-cols-2 sm:grid-cols-4 xl:grid-cols-8 p-1 bg-card border border-border rounded-md h-auto">
-            <TabsTrigger value="scripts" className="text-xs sm:text-xs   font-bold gap-2 data-[state=active]:bg-background data-[state=active]:text-neon-purple rounded-md h-full">
-              <Code className="h-4 w-4" /> <span className="hidden sm:inline">Scripts</span>
+          <TabsList className="mb-5 flex w-full flex-wrap justify-start gap-1 p-1 bg-card border border-border rounded-md h-auto [&_button]:h-9 [&_button]:px-3 [&_button_span]:inline">
+            <TabsTrigger value="scripts" className="text-xs gap-2"><Pencil className="h-4 w-4" /><span>Publicações</span></TabsTrigger>
+            <TabsTrigger value="categories" className="text-xs gap-2"><Plus className="h-4 w-4" /><span>Categorias</span></TabsTrigger>
+            <TabsTrigger value="badges" className="text-xs gap-2"><ShieldCheck className="h-4 w-4" /><span>Badges</span></TabsTrigger>
+            <TabsTrigger value="moderation" className="text-xs sm:text-xs   font-bold gap-2 data-[state=active]:bg-background data-[state=active]:text-neon-purple rounded-md h-full">
+              <Code className="h-4 w-4" /> <span className="hidden sm:inline">Moderação</span>
             </TabsTrigger>
             <TabsTrigger value="users" className="text-xs sm:text-xs   font-bold gap-2 data-[state=active]:bg-background data-[state=active]:text-neon-cyan rounded-md h-full">
               <Users className="h-4 w-4" /> <span className="hidden sm:inline">Usuários</span>
@@ -620,8 +628,12 @@ export default function Admin() {
             </TabsTrigger>
           </TabsList>
 
+          <TabsContent value="scripts"><AdminCatalog mode="scripts" /></TabsContent>
+          <TabsContent value="categories"><AdminCatalog mode="categories" /></TabsContent>
+          <TabsContent value="badges"><AdminBadges /></TabsContent>
           {/* Scripts Tab */}
-          <TabsContent value="scripts">
+          <TabsContent value="moderation">
+            <div className="space-y-4 mb-5"><AdminModerationQueue /><AdminFlaggedScripts /></div>
             <Card className="border-border bg-card rounded-md">
               <CardHeader className="border-b border-border/60 bg-background">
                 <CardTitle className="text-sm font-bold   flex items-center gap-2 text-foreground">
@@ -851,20 +863,6 @@ export default function Admin() {
           </TabsContent>
         </Tabs>
 
-        {/* Moderation Queue */}
-        <div className="mt-8">
-          <AdminModerationQueue />
-        </div>
-
-        {/* Flagged Scripts */}
-        <div className="mt-8">
-          <AdminFlaggedScripts />
-        </div>
-
-        {/* Badge Management */}
-        <div className="mt-8">
-          <AdminBadges />
-        </div>
       </div>
 
       {/* Code Viewer Dialog */}
