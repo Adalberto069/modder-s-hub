@@ -28,6 +28,6 @@
 - [x] Verificar desktop, celular e navegação existente.
 
 # Administração compacta
-- [ ] Adicionar gestão de publicações, preços e categorias dentro do painel existente.
-- [ ] Compactar apresentação administrativa sem modificar páginas públicas.
-- [ ] Verificar edição e leitura dos dados com acesso administrativo.
+- [x] Adicionar gestão de publicações, preços e categorias dentro do painel existente.
+- [x] Compactar apresentação administrativa sem modificar páginas públicas.
+- [x] Verificar edição e leitura dos dados com acesso administrativo.
