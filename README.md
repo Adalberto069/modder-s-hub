@@ -1,73 +1,70 @@
-# Welcome to your Lovable project
+# Modder's Hub
 
-## Project info
+Contexto do Projeto: > Crie uma plataforma completa de marketplace e comunidade para Modders Mobile (focada em Scripts Lua para Game Guardian e APKs). O design deve ser "Dark Mode" tecnológico, com estética gamer/hacker, focado em performance mobile.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+Funcionalidades Principais:
 
-## How can I edit this code?
+Sistema de Autenticação: Login para Usuários e Modders via Supabase.
 
-There are several ways of editing your application.
+Marketplace de Scripts:
 
-**Use Lovable**
+Filtro por "Grátis" e "Pago".
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+Categorias: Root, Virtualizado, Scripts Lua, APKs Mod.
 
-Changes made via Lovable will be committed automatically to this repo.
+Botão de "Download" para grátis e "Comprar" para pagos (integração visual de checkout).
 
-**Use your preferred IDE**
+Status do script: "Working", "Detected" ou "Updating".
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+Sistema de Ranking e Score:
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+Cada modder tem um perfil com "Reputação".
 
-Follow these steps:
+Ganha pontos por: Scripts postados, avaliações positivas e número de downloads.
+
+Ranking global na página inicial mostrando os "Top Modders".
+
+Aba de Sugestões e Encomendas (Bounty Board):
+
+Usuários postam pedidos: "Quero script para o jogo [X]".
+
+Possibilidade de sugerir um valor em dinheiro pelo script.
+
+Modders podem aceitar o desafio.
+
+Área de Tutoriais: Uma seção de blog ou cards com pequenos tutoriais sobre como usar scripts e virtualizadores.
+
+Dashboard do Modder: Onde ele pode subir arquivos, ver quanto ganhou e o engajamento dos seus scripts.
+
+Regras de Negócio:
+
+Somente o Modder e o Admin podem deletar scripts.
+
+O Score do modder deve ser atualizado em tempo real no banco de dados.
+
+O layout deve ser responsivo (Mobile-First).
+
+Tecnologias: Use React, Tailwind CSS, Lucide Icons para os ícones e Supabase para o Banco de Dados e Auth.
+
+This project was built with [Lovable](https://lovable.dev).
+
+**Live app**: https://hiddenmod.lovable.app
+
+## Build with Lovable
+
+Continue developing this project in the [Lovable editor](https://lovable.dev/projects/db95f84e-891f-4a4e-9646-56f2826ac434).
+
+- **Ship faster**: describe what you want to build and Lovable handles the code.
+- **Stay in sync**: every change made in Lovable is committed straight to this repository.
+- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
+
+## Development
+
+Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
+git clone <this-repository-url>
+cd <repository-name>
 npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
 npm run dev
 ```
-
-**Edit a file directly in GitHub**
-
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
